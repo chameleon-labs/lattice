@@ -1,0 +1,21 @@
+{
+  "name": "lattice",
+  "private": true,
+  "description": "Monorepo for Lattice, the chameleon-labs design system.",
+  "license": "MIT",
+  "author": "George Karan",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chameleon-labs/lattice.git"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "packageManager": "pnpm@10.7.0",
+  "scripts": {
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test"
+  }
+}

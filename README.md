@@ -12,7 +12,14 @@ That is what a token system is. The name is the architecture.
 
 ## What this is
 
-A colour system, and later a component layer built on [Ariakit](https://github.com/ariakit/ariakit).
+Two packages, one of which exists so far.
+
+| Package | What it is |
+|---|---|
+| `@chameleon-labs/lattice-tokens` | the colour system — scales, semantic tokens, modes, severity ramp, chart palettes |
+| `@chameleon-labs/lattice-react` | the component layer on [Ariakit](https://github.com/ariakit/ariakit) — **not built yet** |
+
+They are separate because tokens carry no framework dependency and should stay installable by a consumer that never touches React. Typography and spacing scales, when they land, are tokens too and belong in the first package.
 
 It is opinionated about values and behaviour, and deliberately unopinionated about composition — Ariakit already solves composition, so Lattice's job is to decide what things look like and guarantee they stay legible.
 
@@ -41,6 +48,28 @@ Systems that skip the semantic tier end up unable to add a second theme without 
 ## Design docs
 
 Decisions live in [`docs/superpowers/specs/`](./docs/superpowers/specs/). Start with the [colour system design](./docs/superpowers/specs/2026-07-28-lattice-color-system-design.md) — it records what was chosen, what was rejected, and the measurements behind both.
+
+## Development
+
+Node 24 (see [`.nvmrc`](./.nvmrc)) and pnpm.
+
+```sh
+pnpm install
+pnpm build    # typecheck, then emit dist/
+pnpm test     # vitest
+```
+
+A pnpm workspace. Root scripts fan out to every package; run them inside `packages/tokens/` to work on one.
+
+```
+packages/
+├── tokens/     @chameleon-labs/lattice-tokens — config/, generate/, tests/, dist/
+└── react/      @chameleon-labs/lattice-react — not built yet
+```
+
+Inside `packages/tokens/`, `config/` declares the curves, hues and contracts and `generate/` turns them into artefacts. `dist/` is generated output and is not committed.
+
+Never hand-edit a primitive token, and never hand-edit `dist/`. Change the config and rebuild — a colour that is not computed does not ship.
 
 ## Licence
 
