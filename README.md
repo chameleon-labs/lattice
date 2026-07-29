@@ -42,6 +42,20 @@ Systems that skip the semantic tier end up unable to add a second theme without 
 
 Decisions live in [`docs/superpowers/specs/`](./docs/superpowers/specs/). Start with the [colour system design](./docs/superpowers/specs/2026-07-28-lattice-color-system-design.md) — it records what was chosen, what was rejected, and the measurements behind both.
 
+## Development
+
+Node 24 (see [`.nvmrc`](./.nvmrc)) and pnpm.
+
+```sh
+pnpm install
+pnpm build    # typecheck, then emit dist/
+pnpm test     # vitest
+```
+
+Source lives in `tokens/` — `config/` declares the curves, hues and contracts, `generate/` turns them into artefacts. `dist/` is generated output and is not committed.
+
+Never hand-edit a primitive token, and never hand-edit `dist/`. Change the config and rebuild — a colour that is not computed does not ship.
+
 ## Licence
 
 [MIT](./LICENSE)

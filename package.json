@@ -1,0 +1,49 @@
+{
+  "name": "@chameleon-labs/lattice",
+  "version": "0.0.0",
+  "description": "An accessibility-first design system. Colour is generated in OKLCH, and contrast contracts fail the build.",
+  "license": "MIT",
+  "author": "George Karan",
+  "homepage": "https://github.com/chameleon-labs/lattice#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chameleon-labs/lattice.git"
+  },
+  "bugs": "https://github.com/chameleon-labs/lattice/issues",
+  "keywords": [
+    "design-system",
+    "design-tokens",
+    "color",
+    "oklch",
+    "accessibility",
+    "wcag"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "packageManager": "pnpm@10.7.0",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./lattice.css": "./dist/lattice.css",
+    "./tokens.json": "./dist/tokens.json",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "tsc --noEmit && tsx tokens/generate/build.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "tsx": "^4.23.1",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  }
+}
