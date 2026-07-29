@@ -119,6 +119,8 @@ Measured across all five scales in both modes:
 
 One correction across ten scale-modes, moving L by 0.004 — visually undetectable. The solver is a safety net, not a constant override.
 
+**This table measures the curve alone**, before the accent's solid-step constraint is applied. It is the evidence for the rule, not the final accent scale — the accent's own `on-solid` constraint and the cascade below move its steps 9–12, and its final values are in *`on-solid` is computed* further down. The two are consistent: the constraint is a separate, deliberate override applied after the contrast contracts are satisfied.
+
 ### Contracts
 
 | Step | Reference | Minimum |
