@@ -36,8 +36,10 @@ APCA is perceptually more accurate, particularly in dark mode. It is also not a 
 
 Three tiers.
 
+The repository is a pnpm workspace. `packages/tokens/` is this spec; `packages/react/` is the component layer and does not exist yet.
+
 ```
-tokens/
+packages/tokens/
 ├── config/
 │   ├── lightness.ts    shared L curve (light + dark)
 │   ├── chroma.ts       chroma envelope, as a fraction of each scale's peak
@@ -48,11 +50,11 @@ tokens/
 │   ├── contrast.ts     WCAG 2.x ratio (gate) + APCA Lc (advisory)
 │   ├── solve.ts        solve L against a target ratio
 │   └── emit.ts         CSS + design-tokens JSON
-dist/
-├── lattice.css         all tiers, both modes
-└── tokens.json         design-token format
-tests/
-└── contracts.test.ts   every pair, every scale, every mode
+├── dist/
+│   ├── lattice.css     all tiers, both modes
+│   └── tokens.json     design-token format
+└── tests/
+    └── contracts.test.ts   every pair, every scale, every mode
 ```
 
 **Tier 1 — primitive, generated.** `--lat-accent-1…12`, `--lat-gray-1…12`, `--lat-danger-*`, `--lat-warning-*`, `--lat-success-*`. Emitted by the build. Never hand-edited. Never referenced by a component.
@@ -224,7 +226,7 @@ Published as **`@chameleon-labs/lattice-tokens`**: `dist/lattice.css` and `dist/
 
 The name is suffixed rather than bare because the component layer ships as a **second package, `@chameleon-labs/lattice-react`**. Every system this design draws on is structured that way, and the discriminator is the peer dependency: `@radix-ui/colors`, `@primer/primitives`, `@adobe/spectrum-tokens` and `@ariakit/core` declare no framework peer, while their component counterparts do. Splitting keeps the tokens installable by a consumer that never uses React, and lets the typography and spacing scales land in the same package without a rename — they are tokens too. The bare name `@chameleon-labs/lattice` stays unpublished, free to become a meta-package that re-exports both.
 
-Both packages live in this repository. The workspace restructure is deferred until the component package actually exists; until then a single package at the root is the simpler arrangement.
+Both packages live in this repository, a pnpm workspace: `packages/tokens/` and, later, `packages/react/`. The workspace exists from the start rather than being retrofitted — the second package is committed work, not a maybe, so deferring only moves a guaranteed migration to a point where it would invalidate the paths every pipeline issue implements into.
 
 ## Non-goals for v1
 

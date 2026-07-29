@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url'
  * not invent token values: every colour in this package is computed from the
  * config or it does not exist.
  */
-const dist = fileURLToPath(new URL('../../dist/', import.meta.url))
+const dist = fileURLToPath(new URL('../dist/', import.meta.url))
 
 await mkdir(dist, { recursive: true })
 

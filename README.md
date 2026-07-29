@@ -59,7 +59,15 @@ pnpm build    # typecheck, then emit dist/
 pnpm test     # vitest
 ```
 
-Source lives in `tokens/` — `config/` declares the curves, hues and contracts, `generate/` turns them into artefacts. `dist/` is generated output and is not committed.
+A pnpm workspace. Root scripts fan out to every package; run them inside `packages/tokens/` to work on one.
+
+```
+packages/
+├── tokens/     @chameleon-labs/lattice-tokens — config/, generate/, tests/, dist/
+└── react/      @chameleon-labs/lattice-react — not built yet
+```
+
+Inside `packages/tokens/`, `config/` declares the curves, hues and contracts and `generate/` turns them into artefacts. `dist/` is generated output and is not committed.
 
 Never hand-edit a primitive token, and never hand-edit `dist/`. Change the config and rebuild — a colour that is not computed does not ship.
 
