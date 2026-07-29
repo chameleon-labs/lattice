@@ -220,7 +220,11 @@ APCA Lc is computed and reported in all four groups. It never fails a build.
 
 ## Distribution
 
-`dist/lattice.css` and `dist/tokens.json`. Semver with real releases; no API stability promise stated. Consumers import one stylesheet and get CSS custom properties — no build-tool coupling, no runtime, no framework requirement.
+Published as **`@chameleon-labs/lattice-tokens`**: `dist/lattice.css` and `dist/tokens.json`. Semver with real releases; no API stability promise stated. Consumers import one stylesheet and get CSS custom properties — no build-tool coupling, no runtime, no framework requirement.
+
+The name is suffixed rather than bare because the component layer ships as a **second package, `@chameleon-labs/lattice-react`**. Every system this design draws on is structured that way, and the discriminator is the peer dependency: `@radix-ui/colors`, `@primer/primitives`, `@adobe/spectrum-tokens` and `@ariakit/core` declare no framework peer, while their component counterparts do. Splitting keeps the tokens installable by a consumer that never uses React, and lets the typography and spacing scales land in the same package without a rename — they are tokens too. The bare name `@chameleon-labs/lattice` stays unpublished, free to become a meta-package that re-exports both.
+
+Both packages live in this repository. The workspace restructure is deferred until the component package actually exists; until then a single package at the root is the simpler arrangement.
 
 ## Non-goals for v1
 

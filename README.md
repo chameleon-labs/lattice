@@ -12,7 +12,14 @@ That is what a token system is. The name is the architecture.
 
 ## What this is
 
-A colour system, and later a component layer built on [Ariakit](https://github.com/ariakit/ariakit).
+Two packages, one of which exists so far.
+
+| Package | What it is |
+|---|---|
+| `@chameleon-labs/lattice-tokens` | the colour system — scales, semantic tokens, modes, severity ramp, chart palettes |
+| `@chameleon-labs/lattice-react` | the component layer on [Ariakit](https://github.com/ariakit/ariakit) — **not built yet** |
+
+They are separate because tokens carry no framework dependency and should stay installable by a consumer that never touches React. Typography and spacing scales, when they land, are tokens too and belong in the first package.
 
 It is opinionated about values and behaviour, and deliberately unopinionated about composition — Ariakit already solves composition, so Lattice's job is to decide what things look like and guarantee they stay legible.
 
