@@ -168,7 +168,7 @@ describe('tokens.json', () => {
     expect(DTCG_SCHEMA).toBe('https://www.designtokens.org/schemas/2025.10/format.json')
   })
 
-  it('carries one colour token per step per scale per mode', () => {
+  it('carries one colour token per primitive step and chart slot, in each mode', () => {
     expect(leaves()).toHaveLength(PER_BLOCK * MODES.length)
   })
 

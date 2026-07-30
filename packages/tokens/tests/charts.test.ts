@@ -292,6 +292,58 @@ describe('the sequential ramp', () => {
   })
 })
 
+describe('an empty palette', () => {
+  // The two validators failed in opposite directions. The categorical checks all
+  // passed vacuously and reported ok — no slot off the band, no pair too close —
+  // which is the quietest possible way to gate a build on nothing. The ordinal
+  // light-end check indexed into an empty array and threw. Both now say so.
+  it('fails the categorical checks instead of passing vacuously', () => {
+    const report = validateCategorical([], 'light')
+
+    expect(report.ok).toBe(false)
+    expect(report.checks).toHaveLength(1)
+    expect(report.checks[0]?.name).toBe('Palette present')
+  })
+
+  it('fails the ordinal checks instead of throwing', () => {
+    expect(() => validateSequential([], 'light')).not.toThrow()
+    expect(validateSequential([], 'light').ok).toBe(false)
+  })
+})
+
+describe('a ramp declared the other way round', () => {
+  // Monotone in either direction is still a ramp, but the reported direction has
+  // to be the one actually found — the detail is what a build log shows.
+  it('passes, and is described as ascending', () => {
+    const ascending = [...buildSequential()].reverse()
+    const monotone = validateSequential(ascending, 'light').checks.find(
+      (check) => check.name === 'Lightness monotone'
+    )
+
+    expect(monotone?.state).toBe('pass')
+    expect(monotone?.detail).toBe('steps read dark to light')
+  })
+
+  it('describes the shipped ramp as descending', () => {
+    const monotone = validateSequential(buildSequential(), 'light').checks.find(
+      (check) => check.name === 'Lightness monotone'
+    )
+
+    expect(monotone?.detail).toBe('steps read light to dark')
+  })
+
+  it('names the values when a ramp is not monotone at all', () => {
+    const ramp = buildSequential()
+    const jumbled = [ramp[0]!, ramp[3]!, ramp[1]!, ramp[5]!]
+    const monotone = validateSequential(jumbled, 'light').checks.find(
+      (check) => check.name === 'Lightness monotone'
+    )
+
+    expect(monotone?.state).toBe('fail')
+    expect(monotone?.detail).toMatch(/not monotone/)
+  })
+})
+
 describe('the ordinal clamp', () => {
   // The full range is for sequential encoding, where the palest step may recede
   // into the surface. Ordinal marks each have to read, so the ends clamp.

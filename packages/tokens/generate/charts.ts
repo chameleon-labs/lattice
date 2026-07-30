@@ -63,6 +63,20 @@ export interface PaletteReport {
   readonly ok: boolean
 }
 
+/**
+ * What both validators return for an empty palette.
+ *
+ * Neither can say anything useful about no colours, and each would otherwise get
+ * it wrong in an opposite way: every categorical check passes vacuously — no slot
+ * is off the band, no pair is too close — while the ordinal light-end check
+ * indexes into an empty array and throws. A named failure says which it is.
+ */
+const EMPTY_CHECK: CheckResult = {
+  name: 'Palette present',
+  state: 'fail',
+  detail: 'empty palette — nothing to validate'
+}
+
 export function buildCategorical(mode: Mode): ChartSwatch[] {
   return CATEGORICAL.map((entry) => {
     const { oklch, hex } = ship({
@@ -115,6 +129,13 @@ export function validateCategorical(
   const pairs = options.pairs ?? 'adjacent'
   const surface = options.surface ?? CHART_SURFACES[mode]
   const checks: CheckResult[] = []
+
+  // An empty palette otherwise passes every check vacuously — no slot is off the
+  // band, no pair is too close — and reports ok. That is the quietest possible
+  // way to gate a build on nothing.
+  if (palette.length === 0) {
+    return { mode, pairs, checks: [EMPTY_CHECK], ok: false }
+  }
 
   // 1. Fixed order, never cycled. Compared against the matching prefix, because
   //    a scatter chart legitimately validates only the leading slots.
@@ -269,15 +290,27 @@ export function validateSequential(
 ): PaletteReport {
   const surface = options.surface ?? CHART_SURFACES[mode]
   const checks: CheckResult[] = []
+
+  // Same reasoning as the categorical validator, plus this one would throw:
+  // the light-end check indexes into a sorted empty array.
+  if (palette.length === 0) {
+    return { mode, pairs: 'adjacent', checks: [EMPTY_CHECK], ok: false }
+  }
+
   const lightnesses = palette.map((swatch) => swatch.l)
 
-  // Monotone lightness, in either direction.
+  // Monotone lightness, in either direction — a ramp declared dark-to-light is
+  // still a ramp. The detail names the direction found rather than assuming one.
   const ascending = lightnesses.every((l, i) => i === 0 || l > lightnesses[i - 1]!)
   const descending = lightnesses.every((l, i) => i === 0 || l < lightnesses[i - 1]!)
   checks.push({
     name: 'Lightness monotone',
     state: ascending || descending ? 'pass' : 'fail',
-    detail: ascending || descending ? 'steps read light to dark' : lightnesses.join(', ')
+    detail: descending
+      ? 'steps read light to dark'
+      : ascending
+        ? 'steps read dark to light'
+        : `not monotone: ${lightnesses.map((l) => l.toFixed(3)).join(', ')}`
   })
 
   // Adjacent gaps. Filtered on the raw gap rather than a rounded one, so a gap

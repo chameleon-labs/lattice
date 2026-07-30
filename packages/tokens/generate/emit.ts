@@ -4,8 +4,9 @@
  * `lattice.css` is what a consumer imports; `tokens.json` is the machine-readable
  * form, in the Design Tokens Community Group format.
  *
- * This module emits the **primitive tier** only. The semantic tier — step aliases
- * and role aliases — and the nested-mode behaviour that depends on it land in #6.
+ * Emits the **primitive tier** and the **chart palettes**. The semantic tier —
+ * step aliases and role aliases — and the nested-mode behaviour that depends on
+ * it land in #6, so nothing here is an alias: every value is a generated colour.
  */
 
 import { ORDINAL_CLAMP } from '../config/charts.js'
