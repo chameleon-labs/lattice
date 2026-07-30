@@ -56,13 +56,45 @@ describe('tokens.json against the published DTCG schema', () => {
   })
 
   it('accepts every typography primitive value shape', () => {
-    const global = tokens['global'] as Record<string, Record<string, { $value: unknown }>>
+    const global = tokens['global'] as Record<
+      string,
+      Record<string, { $type?: string; $value: unknown }>
+    >
 
     expect(global['font']?.['sans']?.$value).toBeInstanceOf(Array)
     expect(global['font-size']?.['base']?.$value).toEqual({ value: 1, unit: 'rem' })
     expect(global['line-height']?.['normal']?.$value).toBe(1.5)
+    expect(global['letter-spacing']?.['normal']?.$value).toEqual({ value: 0, unit: 'rem' })
     expect(global['font-weight']?.['bold']?.$value).toBe(700)
+    expect(global['text']?.['body']).toEqual({
+      $type: 'typography',
+      $value: {
+        fontFamily: '{global.font.sans}',
+        fontSize: '{global.font-size.base}',
+        fontWeight: '{global.font-weight.regular}',
+        letterSpacing: '{global.letter-spacing.normal}',
+        lineHeight: '{global.line-height.normal}'
+      }
+    })
     expect(validate(tokens)).toBe(true)
+  })
+
+  it('rejects a typography composite missing a required property', () => {
+    const broken = structuredClone(tokens) as Record<string, unknown>
+    const global = broken['global'] as Record<string, Record<string, Record<string, unknown>>>
+    global['text'] = {
+      body: {
+        $type: 'typography',
+        $value: {
+          fontFamily: '{global.font.sans}',
+          fontSize: '{global.font-size.base}',
+          fontWeight: '{global.font-weight.regular}',
+          letterSpacing: '{global.letter-spacing.normal}'
+        }
+      }
+    }
+
+    expect(validate(broken)).toBe(false)
   })
 
   it('rejects a token whose value is neither a colour nor a reference', () => {

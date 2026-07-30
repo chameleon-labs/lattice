@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { MODES, STEPS } from '../config/lightness.js'
 import { SCALE_NAMES } from '../config/scales.js'
 import { SEVERITY_LEVELS } from '../config/severity.js'
+import { TYPOGRAPHY_ROLES } from '../config/typography-roles.js'
 import { ALIAS_COUNT } from '../generate/semantic.js'
 import { STEP_JOBS } from '../config/steps.js'
 import {
@@ -15,6 +16,12 @@ import {
 import { formatHex, oklchToSrgb } from '../generate/oklch.js'
 import { buildAllScales } from '../generate/scale.js'
 import { TYPOGRAPHY_PRIMITIVE_COUNT } from '../generate/typography.js'
+import {
+  TYPOGRAPHY_RESPONSIVE_OVERRIDE_COUNT,
+  TYPOGRAPHY_ROLE_COUNT,
+  TYPOGRAPHY_ROLE_PROPERTY_COUNT,
+  typographyRoleResponsiveCss
+} from '../generate/typography-roles.js'
 
 const scales = buildAllScales()
 const css = emitCss(scales)
@@ -30,6 +37,8 @@ const SEVERITY_STEPS = SEVERITY_LEVELS.length
 const PER_BLOCK = PRIMITIVES + CHART_SLOTS + SEQUENTIAL_STEPS + SEVERITY_STEPS + ALIAS_COUNT
 // Light once, dark twice - see the block test below.
 const BLOCKS = 3
+const GLOBAL_DECLARATIONS =
+  TYPOGRAPHY_PRIMITIVE_COUNT + TYPOGRAPHY_ROLE_COUNT * TYPOGRAPHY_ROLE_PROPERTY_COUNT
 
 describe('formatOklch', () => {
   // The precision that matters. Rounding to the three decimals the spec's tables
@@ -78,12 +87,27 @@ describe('lattice.css', () => {
   it('declares theme-independent typography once before every themed block', () => {
     const [globalBlock, lightBlock, darkBlock, mediaBlock] = splitBlocks(css)
 
-    expect(count(globalBlock)).toBe(TYPOGRAPHY_PRIMITIVE_COUNT)
+    expect(count(globalBlock)).toBe(GLOBAL_DECLARATIONS)
     expect(count(lightBlock)).toBe(PER_BLOCK)
     expect(count(darkBlock)).toBe(PER_BLOCK)
     expect(count(mediaBlock)).toBe(PER_BLOCK)
-    expect(count(css)).toBe(TYPOGRAPHY_PRIMITIVE_COUNT + PER_BLOCK * BLOCKS)
+    expect(count(css)).toBe(
+      GLOBAL_DECLARATIONS + PER_BLOCK * BLOCKS + TYPOGRAPHY_RESPONSIVE_OVERRIDE_COUNT
+    )
     expect(css.match(/--lat-font-size-base:/g)).toHaveLength(1)
+  })
+
+  it('appends only the approved responsive typography overrides', () => {
+    expect(css).toContain(typographyRoleResponsiveCss())
+    expect(count(typographyRoleResponsiveCss())).toBe(TYPOGRAPHY_RESPONSIVE_OVERRIDE_COUNT)
+    expect(typographyRoleResponsiveCss()).not.toMatch(/--lat-text-(body|lead|ui|caption|micro|code)/)
+  })
+
+  it('describes the derived typography counts in its generated header', () => {
+    expect(css).toContain(
+      `/* Typography: ${TYPOGRAPHY_PRIMITIVE_COUNT} primitives; ` +
+        `${TYPOGRAPHY_ROLE_COUNT} semantic roles x ${TYPOGRAPHY_ROLE_PROPERTY_COUNT} properties. */`
+    )
   })
 
   // Every declaration is either a generated colour or a reference to one. The
@@ -203,7 +227,9 @@ describe('tokens.json', () => {
       .map((leaf) => ({ path: leaf.path, value: leaf.token.$value as unknown as string }))
 
   it('carries one token per primitive step, chart slot, severity level and alias', () => {
-    expect(leaves()).toHaveLength(TYPOGRAPHY_PRIMITIVE_COUNT + PER_BLOCK * MODES.length)
+    expect(leaves()).toHaveLength(
+      TYPOGRAPHY_PRIMITIVE_COUNT + TYPOGRAPHY_ROLE_COUNT + PER_BLOCK * MODES.length
+    )
   })
 
   it('carries global typography separately from the colour modes', () => {
@@ -211,9 +237,46 @@ describe('tokens.json', () => {
 
     expect(global['font-size']?.['base']?.$value).toEqual({ value: 1, unit: 'rem' })
     expect(global['line-height']?.['normal']?.$value).toBe(1.5)
+    expect(global['letter-spacing']?.['normal']?.$value).toEqual({ value: 0, unit: 'rem' })
     expect(global['font-weight']?.['bold']?.$value).toBe(700)
     expect(tokens['light']).toBeDefined()
     expect(tokens['dark']).toBeDefined()
+  })
+
+  it('keeps CSS and DTCG aliases in parity for every typography role', () => {
+    const global = tokens['global'] as Record<string, unknown>
+    expect(global['text']).toBeDefined()
+    const text = (global['text'] ?? {}) as Record<
+      string,
+      {
+        $type: string
+        $value: Record<string, string>
+      }
+    >
+    const properties = {
+      fontFamily: 'font-family',
+      fontSize: 'font-size',
+      fontWeight: 'font-weight',
+      letterSpacing: 'letter-spacing',
+      lineHeight: 'line-height'
+    } as const
+
+    expect(Object.keys(text)).toEqual(Object.keys(TYPOGRAPHY_ROLES))
+    expect(global['text-narrow']).toBeUndefined()
+
+    for (const [roleName, token] of Object.entries(text)) {
+      expect(token.$type, roleName).toBe('typography')
+      expect(Object.keys(token.$value), roleName).toEqual(Object.keys(properties))
+      for (const [property, cssProperty] of Object.entries(properties)) {
+        const reference = token.$value[property]!
+        const primitive = reference.slice('{global.'.length, -1).replaceAll('.', '-')
+
+        expect(reference, `${roleName}.${property}`).toMatch(/^\{global\.[a-z0-9.-]+\}$/)
+        expect(css).toContain(
+          `--lat-text-${roleName}-${cssProperty}: var(--lat-${primitive});`
+        )
+      }
+    }
   })
 
   it('declares every colour-valued token as a DTCG oklch colour', () => {
@@ -347,14 +410,21 @@ function splitBlocks(stylesheet: string): [string, string, string, string] {
   const lightAt = stylesheet.indexOf("\n:root,\n[data-lat-theme='light'] {")
   const darkAt = stylesheet.indexOf("\n[data-lat-theme='dark'] {")
   const mediaAt = stylesheet.indexOf('@media (prefers-color-scheme: dark)')
+  const responsiveAt = stylesheet.indexOf('@media (width < 40rem)')
 
   // Same guard as tests/semantic.test.ts: a missing delimiter makes indexOf
   // return -1, and the resulting slice fails every later assertion on content
   // rather than saying the split itself found nothing.
-  if (lightAt < 0 || darkAt < lightAt || mediaAt < darkAt) {
+  if (
+    lightAt < 0 ||
+    darkAt < lightAt ||
+    mediaAt < darkAt ||
+    responsiveAt < mediaAt
+  ) {
     throw new Error(
       `cannot split the stylesheet into blocks: light rule at ${lightAt}, ` +
-        `dark rule at ${darkAt}, media query at ${mediaAt}`
+        `dark rule at ${darkAt}, media query at ${mediaAt}, ` +
+        `responsive query at ${responsiveAt}`
     )
   }
 
@@ -362,6 +432,6 @@ function splitBlocks(stylesheet: string): [string, string, string, string] {
     stylesheet.slice(0, lightAt),
     stylesheet.slice(lightAt, darkAt),
     stylesheet.slice(darkAt, mediaAt),
-    stylesheet.slice(mediaAt)
+    stylesheet.slice(mediaAt, responsiveAt)
   ]
 }

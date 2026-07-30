@@ -19,16 +19,29 @@ const css = emitCss(scales)
  * split found nothing to split.
  */
 function blocks(stylesheet: string): [string, string, string] {
+  const lightAt = stylesheet.indexOf("\n:root,\n[data-lat-theme='light'] {")
   const darkAt = stylesheet.indexOf("\n[data-lat-theme='dark'] {")
   const mediaAt = stylesheet.indexOf('@media (prefers-color-scheme: dark)')
+  const responsiveAt = stylesheet.indexOf('@media (width < 40rem)')
 
-  if (darkAt < 0 || mediaAt < 0 || mediaAt < darkAt) {
+  if (
+    lightAt < 0 ||
+    darkAt < lightAt ||
+    mediaAt < darkAt ||
+    responsiveAt < mediaAt
+  ) {
     throw new Error(
-      `cannot split the stylesheet into blocks: dark rule at ${darkAt}, media query at ${mediaAt}`
+      `cannot split the stylesheet into blocks: light rule at ${lightAt}, ` +
+        `dark rule at ${darkAt}, media query at ${mediaAt}, ` +
+        `responsive query at ${responsiveAt}`
     )
   }
 
-  return [stylesheet.slice(0, darkAt), stylesheet.slice(darkAt, mediaAt), stylesheet.slice(mediaAt)]
+  return [
+    stylesheet.slice(lightAt, darkAt),
+    stylesheet.slice(darkAt, mediaAt),
+    stylesheet.slice(mediaAt, responsiveAt)
+  ]
 }
 
 describe('the block splitter itself', () => {
