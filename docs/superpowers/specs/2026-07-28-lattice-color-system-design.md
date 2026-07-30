@@ -12,9 +12,9 @@ That is what a token system is. The name is the architecture.
 
 ## Background: what we are avoiding
 
-The reference point is Croct's `application-ui-js`. Its `src/styles/lightMode.ts` is 1,998 lines of *per-component* colour maps — `ui.component.alert.cautious.background` — fed by ~90 per-component colour files. The consequence is visible in `darkMode.ts`: it is `{...lightMode}` with exactly two overrides. Dark mode was never built, because with component-level tokens a second mode means re-authoring two thousand lines.
+The reference point is a production design system we have worked in, whose colour layer is defined **per component**: a named entry for every part of every component, spread across dozens of files and thousands of lines. The consequence shows up in its dark theme, which is the light theme spread into a new object with a couple of overrides on top. Dark mode was never really built, because when every colour is addressed through a component name, a second mode means re-authoring all of them.
 
-Every mature system we surveyed — Spectrum, Carbon, Primer, Radix, Chakra v3 — has a **semantic tier between primitives and components**. Croct's has primitives and component tokens and nothing in between. That missing tier is the single most important thing this design adds.
+Every mature system we surveyed — Spectrum, Carbon, Primer, Radix, Chakra v3 — has a **semantic tier between primitives and components**. That reference system has primitives and component tokens and nothing in between. The missing tier is the single most important thing this design adds.
 
 ## Decisions
 
@@ -66,7 +66,7 @@ packages/tokens/
 
 Components reach for role aliases first and step aliases only where the role layer does not cover the case.
 
-**Tier 3 — component tokens.** Permitted, but each one requires a written justification in review. This is the tier that destroyed the Croct system by becoming the default. The constraint is social, not technical, and that is deliberate — a lint rule here would be circumvented rather than obeyed.
+**Tier 3 — component tokens.** Permitted, but each one requires a written justification in review. This is the tier that undermined the reference system by becoming its default. The constraint is social, not technical, and that is deliberate — a lint rule here would be circumvented rather than obeyed.
 
 ### The step contract
 
