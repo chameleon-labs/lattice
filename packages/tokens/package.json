@@ -2,7 +2,7 @@
   "name": "@chameleon-labs/lattice-tokens",
   "version": "0.0.0",
   "private": true,
-  "description": "The token layer of Lattice, an accessibility-first design system. Colour is generated in OKLCH, and contrast contracts fail the build.",
+  "description": "The token layer of Lattice, an accessibility-first design system. Reviewed contracts guard colour, typography, and layout values at build time.",
   "license": "MIT",
   "author": "George Karan",
   "homepage": "https://github.com/chameleon-labs/lattice#readme",
@@ -16,6 +16,7 @@
     "design-system",
     "design-tokens",
     "color",
+    "typography",
     "oklch",
     "accessibility",
     "wcag"
