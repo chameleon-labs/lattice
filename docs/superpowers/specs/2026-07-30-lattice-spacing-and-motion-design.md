@@ -62,14 +62,15 @@ That is the correct behaviour rather than a curiosity. A reader with larger text
 
 ### Container widths are capped by measure, not by viewport
 
-| Name | rem | Intended use |
+| Token | Max width | Intended use |
 |---|---|---|
-| `prose` | 42 | A single reading column |
-| `content` | 64 | Forms, detail views |
-| `wide` | 80 | Tables, dashboards |
-| `full` | none | Edge-to-edge |
+| `--lat-container-prose` | `42rem` | A single reading column |
+| `--lat-container-content` | `64rem` | Forms, detail views |
+| `--lat-container-wide` | `80rem` | Tables, dashboards |
 
-`prose` at `42rem` is roughly 65–70 characters at the body size, inside the 45–75 range that typographic research treats as comfortable. It is expressed in `rem` rather than `ch` because `ch` is not representable in the token format — DTCG's `dimension` type accepts only `px` and `rem` — so a `ch`-based measure would exist in CSS and be inexpressible in `tokens.json`. The `rem` value approximates it and stays in both artefacts.
+**There is no `full` token.** Edge-to-edge is the absence of a container, not a container with an uncapped width, and the distinction matters for the artefacts rather than for taste: DTCG's `dimension` type requires a numeric `value` and a `unit` of `px` or `rem`, so a keyword like `none` has no representation as a dimension token. Shipping one would mean a token that exists in the stylesheet and cannot exist in `tokens.json`, breaking the parity this system tests for. A component that spans the viewport simply sets no container.
+
+`prose` at `42rem` is roughly 65–70 characters at the body size, inside the 45–75 range that typographic research treats as comfortable. It is expressed in `rem` rather than `ch` for the same representability reason — `ch` is not a DTCG unit either. The `rem` value approximates the measure and stays in both artefacts.
 
 ## Radii
 
@@ -81,15 +82,17 @@ Five roles, not raw numbers, so a component asks for what it is rather than for 
 | `sm` | 0.25 | 4 | Inputs, badges, small controls |
 | `md` | 0.5 | 8 | Buttons, cards |
 | `lg` | 0.75 | 12 | Dialogs, panels, popovers |
-| `full` | 9999 | — | Pills, avatars, circular controls |
+| `full` | 9999 | sentinel | Pills, avatars, circular controls |
 
 **Nested radii are derived, not chosen.** When a rounded element sits inside another with padding between them, the inner radius must be the outer radius minus the gap, or the two curves run non-concentric and the inset looks wrong:
 
 ```
-inner radius = outer radius − gap
+inner radius = outer radius - gap
 ```
 
 A card at `lg` (12px) with `2` (8px) of padding gives its inner element `sm` (4px). Picking the inner radius independently is the usual cause of the effect. `full` is exempt: it stays `full` at any nesting.
+
+`full` is a **sentinel rather than a measurement** — any value larger than half the element's shorter side produces the same pill, so `9999rem` is not a length anyone should read as one. It stays a `rem` value rather than the more familiar `9999px` so that it remains a DTCG `dimension` like every other radius, and rather than `50%` because percentages are not a DTCG unit and an ellipse is not what is wanted on a non-square element.
 
 ## Elevation
 
