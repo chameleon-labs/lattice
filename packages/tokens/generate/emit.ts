@@ -8,8 +8,10 @@
  * and role aliases — and the nested-mode behaviour that depends on it land in #6.
  */
 
+import { ORDINAL_CLAMP } from '../config/charts.js'
 import { MODES, STEPS, type Mode } from '../config/lightness.js'
 import { SCALE_JOBS, STEP_JOBS } from '../config/steps.js'
+import { buildCategorical, buildSequential } from './charts.js'
 import type { Scale, Swatch } from './scale.js'
 
 /**
@@ -44,10 +46,24 @@ const customProperty = (scale: Scale, swatch: Swatch): string =>
   `  --lat-${scale.name}-${swatch.step}: ${formatOklch(swatch)};`
 
 function block(scales: readonly Scale[], mode: Mode): string {
-  return scales
+  const primitives = scales
     .filter((scale) => scale.mode === mode)
     .map((scale) => scale.steps.map((swatch) => customProperty(scale, swatch)).join('\n'))
     .join('\n\n')
+
+  const categorical = buildCategorical(mode)
+    .map((swatch) => `  --lat-chart-${swatch.slot}: ${formatOklch(swatch)};`)
+    .join('\n')
+
+  // The sequential ramp is identical in both modes — only the ordinal clamp
+  // differs, and that is guidance about which steps to use rather than a
+  // different colour. It is repeated per block so every token resolves from one
+  // place regardless of which rule won.
+  const sequential = buildSequential()
+    .map((swatch) => `  --lat-chart-sequential-${swatch.step}: ${formatOklch(swatch)};`)
+    .join('\n')
+
+  return `${primitives}\n\n${categorical}\n\n${sequential}`
 }
 
 /**
@@ -122,20 +138,24 @@ export interface DesignTokens {
   readonly [mode: string]: unknown
 }
 
+function colorValue(l: number, c: number, h: number, hex: string): ColorToken['$value'] {
+  return {
+    colorSpace: 'oklch',
+    components: [
+      Number(l.toFixed(PLACES)),
+      Number(c.toFixed(PLACES)),
+      Number(h.toFixed(PLACES))
+    ],
+    alpha: 1,
+    hex
+  }
+}
+
 function token(swatch: Swatch): ColorToken {
   return {
     $type: 'color',
     $description: STEP_JOBS[swatch.step - 1] ?? `step ${swatch.step}`,
-    $value: {
-      colorSpace: 'oklch',
-      components: [
-        Number(swatch.l.toFixed(PLACES)),
-        Number(swatch.c.toFixed(PLACES)),
-        Number(swatch.h.toFixed(PLACES))
-      ],
-      alpha: 1,
-      hex: swatch.hex
-    }
+    $value: colorValue(swatch.l, swatch.c, swatch.h, swatch.hex)
   }
 }
 
@@ -166,6 +186,39 @@ export function emitTokens(scales: readonly Scale[]): DesignTokens {
       group[scale.name] = {
         $description: SCALE_JOBS[scale.name] ?? scale.name,
         ...steps
+      }
+    }
+
+    const categorical: Record<string, ColorToken> = {}
+    for (const swatch of buildCategorical(mode)) {
+      categorical[String(swatch.slot)] = {
+        $type: 'color',
+        $description: `Categorical slot ${swatch.slot} — ${swatch.name}. Fixed order, never cycled.`,
+        $value: colorValue(swatch.l, swatch.c, swatch.h, swatch.hex)
+      }
+    }
+
+    const sequential: Record<string, ColorToken> = {}
+    for (const swatch of buildSequential()) {
+      const clamp = ORDINAL_CLAMP[mode]
+      const usableForOrdinal = mode === 'light' ? swatch.step >= clamp : swatch.step <= clamp
+      sequential[String(swatch.step)] = {
+        $type: 'color',
+        $description:
+          `Sequential step ${swatch.step}.` +
+          (usableForOrdinal ? '' : ` Sequential encoding only — outside the ordinal clamp at ${clamp}.`),
+        $value: colorValue(swatch.l, swatch.c, swatch.h, swatch.hex)
+      }
+    }
+
+    group['chart'] = {
+      $description:
+        'Chart palettes. The categorical set distinguishes unordered series; the ' +
+        'sequential ramp encodes magnitude along one hue. They are not interchangeable.',
+      categorical: { $description: 'Eight slots, fixed order, never cycled.', ...categorical },
+      sequential: {
+        $description: `One hue, pale to deep. Ordinal encoding clamps at step ${ORDINAL_CLAMP[mode]} in ${mode} mode.`,
+        ...sequential
       }
     }
 

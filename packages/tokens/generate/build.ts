@@ -2,6 +2,14 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { MODES } from '../config/lightness.js'
+import {
+  allPairsCap,
+  buildCategorical,
+  ordinalRange,
+  validateCategorical,
+  validateSequential
+} from './charts.js'
 import { emitCss, emitTokens } from './emit.js'
 import { buildAllScales } from './scale.js'
 
@@ -19,7 +27,7 @@ const dist = fileURLToPath(new URL('../dist/', import.meta.url))
 await mkdir(dist, { recursive: true })
 
 const scales = buildAllScales()
-const failures = scales.flatMap((scale) =>
+const failures: string[] = scales.flatMap((scale) =>
   scale.contracts
     .filter((contract) => !contract.passes)
     .map(
@@ -58,6 +66,26 @@ for (const scale of scales) {
 
   console.log('  %s  %s  %s', scale.name.padEnd(8), scale.mode.padEnd(5), advisory)
 }
+
+// The chart palettes carry their own checks. A warn is a documented conditional
+// — the palette is legal with a secondary encoding such as direct labels — so it
+// is reported and does not stop the build. A fail does.
+console.log('\nChart palettes:')
+for (const mode of MODES) {
+  const categorical = validateCategorical(buildCategorical(mode), mode)
+  const ordinal = validateSequential(ordinalRange(mode), mode)
+
+  for (const report of [categorical, ordinal]) {
+    for (const check of report.checks) {
+      const marker = check.state === 'pass' ? '    ' : check.state === 'warn' ? 'WARN' : 'FAIL'
+      console.log('  %s %s  %s  %s', marker, mode.padEnd(5), check.name.padEnd(20), check.detail)
+      if (check.state === 'fail') {
+        failures.push(`${mode} chart palette: ${check.name} — ${check.detail}`)
+      }
+    }
+  }
+}
+console.log('  all-pairs cap: %d slots', allPairsCap(MODES))
 
 // Nothing is written while a contract is unmet: a stale dist/ is a better
 // outcome than one carrying a palette that fails its own gate.

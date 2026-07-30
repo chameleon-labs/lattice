@@ -17,7 +17,13 @@ const scales = buildAllScales()
 const css = emitCss(scales)
 const tokens = emitTokens(scales)
 
-const TOTAL = SCALE_NAMES.length * STEPS
+const PRIMITIVES = SCALE_NAMES.length * STEPS
+const CHART_SLOTS = 8
+const SEQUENTIAL_STEPS = 7
+// Per mode block: the primitive tier plus both chart palettes.
+const PER_BLOCK = PRIMITIVES + CHART_SLOTS + SEQUENTIAL_STEPS
+// Light once, dark twice - see the block test below.
+const BLOCKS = 3
 
 describe('formatOklch', () => {
   // The precision that matters. Rounding to the three decimals the spec's tables
@@ -66,16 +72,16 @@ describe('lattice.css', () => {
   it('declares each mode in its own block, dark twice', () => {
     const [lightBlock, darkBlock, mediaBlock] = splitBlocks(css)
 
-    expect(count(lightBlock)).toBe(TOTAL)
-    expect(count(darkBlock)).toBe(TOTAL)
-    expect(count(mediaBlock)).toBe(TOTAL)
-    expect(count(css)).toBe(TOTAL * 3)
+    expect(count(lightBlock)).toBe(PER_BLOCK)
+    expect(count(darkBlock)).toBe(PER_BLOCK)
+    expect(count(mediaBlock)).toBe(PER_BLOCK)
+    expect(count(css)).toBe(PER_BLOCK * BLOCKS)
   })
 
   it('emits values as oklch() so the generated colour is the source of truth', () => {
-    const values = css.match(/--lat-[a-z]+-\d+: ([^;]+);/g) ?? []
+    const values = css.match(/--lat-[a-z-]+-\d+: ([^;]+);/g) ?? []
 
-    expect(values).toHaveLength(TOTAL * 3)
+    expect(values).toHaveLength(PER_BLOCK * BLOCKS)
     for (const declaration of values) {
       expect(declaration).toMatch(/oklch\(/)
     }
@@ -84,7 +90,7 @@ describe('lattice.css', () => {
   it('gives the two dark blocks identical values', () => {
     const [, darkBlock, mediaBlock] = splitBlocks(css)
     const declarations = (block: string): string[] =>
-      (block.match(/--lat-[a-z]+-\d+: [^;]+;/g) ?? []).map((line) => line.trim())
+      (block.match(/--lat-[a-z-]+-\d+: [^;]+;/g) ?? []).map((line) => line.trim())
 
     expect(declarations(mediaBlock)).toEqual(declarations(darkBlock))
   })
@@ -94,7 +100,7 @@ describe('lattice.css', () => {
   // A second hex declaration would therefore be dead weight rather than a
   // fallback — a real one needs @supports. Pinned so nobody adds the broken idiom.
   it('does not pretend a second declaration is a fallback', () => {
-    const hexValues = css.match(/--lat-[a-z]+-\d+: #[0-9a-f]{6};/g) ?? []
+    const hexValues = css.match(/--lat-[a-z-]+-\d+: #[0-9a-f]{6};/g) ?? []
 
     expect(hexValues).toHaveLength(0)
   })
@@ -163,7 +169,7 @@ describe('tokens.json', () => {
   })
 
   it('carries one colour token per step per scale per mode', () => {
-    expect(leaves()).toHaveLength(TOTAL * MODES.length)
+    expect(leaves()).toHaveLength(PER_BLOCK * MODES.length)
   })
 
   it('declares every token as a DTCG oklch colour', () => {
@@ -247,7 +253,7 @@ function trim(value: number): string {
 }
 
 function count(block: string): number {
-  return (block.match(/--lat-[a-z]+-\d+:/g) ?? []).length
+  return (block.match(/--lat-[a-z-]+-\d+:/g) ?? []).length
 }
 
 /** The light rule, the explicit-dark rule, and the preference-driven dark rule. */
