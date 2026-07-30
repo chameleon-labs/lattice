@@ -9,7 +9,7 @@
 | Decision | Choice |
 |---|---|
 | Families | System stacks: one sans for UI, one monospace. No web font in v1. |
-| Scale | Modular, ratio **1.2**, snapped to whole pixels at the default root. Seven sizes, 13–40px. |
+| Scale | Ratio-based, snapped to **0.125rem** (2px). Eight sizes, 12–36px. Ratio tightens near body size and widens at display. |
 | Sizing unit | `rem` everywhere. Never `px`, never viewport units alone. |
 | Fluid vs stepped | **Stepped.** Fluid is available as a documented escape hatch with one hard rule. |
 | Line height | Unitless. **≥ 1.5** for text, ≥ 1.25 for display. |
@@ -40,23 +40,34 @@ A monospace face is required, not optional. Any product that renders code, ident
 
 ## The scale
 
-Seeded by a modular ratio and then snapped, so the relationships are principled and the values still land on whole pixels at the default root.
+| Name | rem | px at root 16 | Ratio to previous |
+|---|---|---|---|
+| `xs` | 0.75 | 12 | — |
+| `sm` | 0.875 | 14 | 1.167 |
+| `base` | 1 | 16 | 1.143 |
+| `lg` | 1.125 | 18 | 1.125 |
+| `xl` | 1.25 | 20 | 1.111 |
+| `2xl` | 1.5 | 24 | 1.200 |
+| `3xl` | 1.875 | 30 | 1.250 |
+| `4xl` | 2.25 | 36 | 1.200 |
 
-**Ratio 1.2**, base `1rem`, snapped to `0.0625rem`. The snapped value is what ships.
+Every size is an even number of pixels at the default root and a multiple of `0.125rem`. Ratios sit in a band of 1.111–1.250.
 
-| Name | Ideal (rem) | Shipped (rem) | px at root 16 | Snap drift |
-|---|---|---|---|---|
-| `sm` | 0.8333 | **0.8125** | 13 | −0.33px |
-| `base` | 1.0000 | **1.0000** | 16 | — |
-| `lg` | 1.2000 | **1.1875** | 19 | −0.20px |
-| `xl` | 1.4400 | **1.4375** | 23 | −0.04px |
-| `2xl` | 1.7280 | **1.7500** | 28 | +0.35px |
-| `3xl` | 2.0736 | **2.0625** | 33 | −0.18px |
-| `4xl` | 2.4883 | **2.5000** | 40 | +0.19px |
+### Why the ratio is not constant
 
-Worst snap drift is 0.35px at the default root, and every size is a whole pixel there. Measured step-to-step ratios stay within 1.18–1.23 of the nominal 1.2.
+A type scale is multiplicative, not additive: 12→14px is an obvious jump and 34→36px is invisible, so equal *steps* do not produce equal perceived differences. That rules out a linear scale.
 
-**There is no size below `sm`.** A scale that offers 11px will have 11px used, and the smallest text in a system should still be readable. The floor is a decision, not the place the ratio happened to stop.
+But a single constant ratio is also wrong, and the reason is where the distinctions have to live. Around body size a product needs several closely-spaced sizes — caption, secondary, body, lead — and they must remain distinguishable at 2px apart. At display sizes the opposite holds: a heading needs to read as clearly larger than the one below it, which takes a wider step. So the ratio is **tightest at `xl` (1.111) and widest at `3xl` (1.250)**.
+
+**A linear 0.25rem scale gets this exactly backwards.** Stepping 12, 16, 20, 24, 28 gives ratios that *fall* from 1.333 to 1.143: a jarring 33% jump between the two smallest sizes, where fine control matters most, and near-invisible steps at the top, where contrast matters most. 0.25rem steps are a **spacing** convention — spacing composes additively, so a uniform grid is right there and wrong here.
+
+### Why 0.125rem snapping
+
+Snapping to 1px lets a constant ratio survive, but the cost is not worth it. It produces values like `0.8125rem` and `2.0625rem`, which are hard to read, hard to recall and easy to mistype, and it puts four of seven sizes on a fractional line box at the default root (13 × 1.5 = 19.5px). Snapping to 2px keeps every size legible as a token and every text size on a whole line box.
+
+The result converges closely with widely shipped scales — Tailwind's default is 12, 14, 16, 18, 20, 24, 30, 36 — and that is a feature rather than a coincidence to hide. The constraints above are not unusual ones, so arriving somewhere unfamiliar would have meant either a different constraint or a mistake. A developer reading `--lat-font-size-lg: 1.125rem` should not have to look it up.
+
+**There is no size below `xs`.** A scale that offers 10 or 11px will have 10 or 11px used somewhere, and the smallest text in a system should still be readable. The floor is a decision, not the place the ratio happened to stop.
 
 ## Line height
 
@@ -69,10 +80,12 @@ Unitless, always. This is not a style preference — a length inherits as a leng
 
 Measured in a browser. The second case puts lines on a collision course wherever a component nests larger text inside smaller, and it silently violates the 1.5 floor while the declaration still reads `24px`.
 
-| Size | Line height | Rationale |
-|---|---|---|
-| `sm`, `base`, `lg`, `xl` | **1.5** | WCAG 2.2 SC 1.4.12 floor for blocks of text |
-| `2xl`, `3xl`, `4xl` | **1.25** | Display sizes; 1.4.12 governs blocks of text, and 1.5 on a 40px heading reads as a gap |
+| Size | Line height | Line box at root 16 | Rationale |
+|---|---|---|---|
+| `xs`, `sm`, `base`, `lg`, `xl` | **1.5** | 18, 21, 24, 27, 30px | WCAG 2.2 SC 1.4.12 floor for blocks of text |
+| `2xl`, `3xl`, `4xl` | **1.25** | 30, 37.5, 45px | Display sizes; 1.4.12 governs blocks of text, and 1.5 on a 36px heading reads as a gap |
+
+Every text size lands on a whole line box; `3xl` does not, at 37.5px. That is left alone rather than tuned around: browsers render half-pixel line boxes without trouble, and baseline-grid alignment is a stated non-goal, so contorting either the size or the ratio to chase it would be paying for something this system does not use.
 
 ## Weights
 
@@ -126,8 +139,8 @@ Aliases must be emitted **into every theme scope that redeclares a primitive the
 These are gates, not guidance.
 
 1. **Every size in `rem`.** A `px` size ignores the user's font-size setting outright, as measured above.
-2. **Body text is at least `1rem`.** The scale's `base` is the floor for prose; `sm` is for supporting text, never for the main reading column.
-3. **No size below `0.8125rem`.**
+2. **Body text is at least `1rem`.** The scale's `base` is the floor for prose; `sm` and `xs` are for supporting text — labels, captions, metadata — and never for the main reading column.
+3. **No size below `0.75rem`.**
 4. **Line height unitless, ≥ 1.5 for text.**
 5. **Nothing that holds text may have a fixed height.** SC 1.4.12 lets users override line, letter, word and paragraph spacing; a fixed height turns that into clipped text. Use `min-height`.
 6. **Reflow at 320 CSS px** — the 400%-zoom equivalent — with no horizontal scrolling. Verified: at a 24px root and a 320px viewport, document scroll width stayed equal to the viewport.
@@ -136,7 +149,7 @@ These are gates, not guidance.
 
 Tests are the deliverable, as in colour.
 
-1. **Scale contract** — every size is `rem`, lands on a whole pixel at the default root, and sits within the snap tolerance of the ideal ratio.
+1. **Scale contract** — every size is `rem`, is a multiple of `0.125rem`, is an even number of pixels at the default root, and its ratio to the previous size falls inside the 1.111–1.250 band. The band is the assertion: it catches both a size edited to an arbitrary value and a step that has drifted far enough to read as a different scale.
 2. **Floors** — no size below the minimum; every text line height at or above 1.5; every display line height at or above 1.25.
 3. **Unitless line heights** — asserted structurally, since a length is the failure mode.
 4. **Emitted parity** — the CSS and the JSON describe the same scale, and `tokens.json` validates against the published DTCG schema, including the composite `typography` tokens.
