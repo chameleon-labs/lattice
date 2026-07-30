@@ -4,17 +4,20 @@
  * `lattice.css` is what a consumer imports; `tokens.json` is the machine-readable
  * form, in the Design Tokens Community Group format.
  *
- * Emits the **primitive tier**, the **chart palettes** and the **severity ramp**.
- * The semantic tier — step aliases and role aliases — and the nested-mode
- * behaviour that depends on it land in #6, so nothing here is an alias: every
- * value is a generated colour.
+ * Emits the **primitive tier**, the **chart palettes**, the **severity ramp** and
+ * the **semantic tier** — step aliases and role aliases — in both artefacts. The
+ * stylesheet expresses aliases as `var()` references and the JSON as DTCG
+ * `{group.token}` references, so a consumer reading only the JSON sees the same
+ * two tiers rather than primitives with no meaning attached.
  */
 
 import { ORDINAL_CLAMP } from '../config/charts.js'
 import { MODES, STEPS, type Mode } from '../config/lightness.js'
+import { ON_SOLID_ROLE, ROLE_ALIASES, STEP_SLUGS } from '../config/semantic.js'
 import { SCALE_JOBS, STEP_JOBS } from '../config/steps.js'
 import { buildCategorical, buildSequential } from './charts.js'
 import type { Scale, Swatch } from './scale.js'
+import { accentOnSolid, semanticBlock } from './semantic.js'
 import { buildSeverity } from './severity.js'
 
 /**
@@ -70,7 +73,11 @@ function block(scales: readonly Scale[], mode: Mode): string {
     .map((swatch) => `  --lat-severity-${swatch.level}: ${formatOklch(swatch)};`)
     .join('\n')
 
-  return `${primitives}\n\n${categorical}\n\n${sequential}\n\n${severity}`
+  // The semantic tier goes in every block rather than once on :root. An alias
+  // holding a var() reference resolves on the element that declares it, so a
+  // single root declaration would freeze to the root theme and keep that value
+  // inside a nested scope that redefines the primitive underneath.
+  return [primitives, categorical, sequential, severity, semanticBlock(scales, mode)].join('\n\n')
 }
 
 /**
@@ -139,6 +146,20 @@ export interface ColorToken {
   }
 }
 
+/**
+ * A DTCG token whose value is a reference to another token.
+ *
+ * The format's own alias mechanism, `{group.token}`. The semantic tier is
+ * expressed with it so `tokens.json` carries the same two tiers the stylesheet
+ * does — a consumer reading only the JSON would otherwise see primitives and no
+ * meaning.
+ */
+export interface AliasToken {
+  readonly $type: 'color'
+  readonly $description?: string
+  readonly $value: string
+}
+
 export interface DesignTokens {
   readonly $schema: string
   readonly $description: string
@@ -190,10 +211,52 @@ export function emitTokens(scales: readonly Scale[]): DesignTokens {
         steps[String(swatch.step)] = token(swatch)
       }
 
+      // Step aliases sit in the same group as the numbers they name, so
+      // `light.gray.2` and `light.gray.bg-subtle` are neighbours and the second
+      // explains the first.
+      const named: Record<string, AliasToken> = {}
+      for (const [index, slug] of STEP_SLUGS.entries()) {
+        named[slug] = {
+          $type: 'color',
+          $description: `${STEP_JOBS[index] ?? `step ${index + 1}`} — step ${index + 1}.`,
+          $value: `{${mode}.${scale.name}.${index + 1}}`
+        }
+      }
+
       group[scale.name] = {
         $description: SCALE_JOBS[scale.name] ?? scale.name,
-        ...steps
+        ...steps,
+        ...named
       }
+    }
+
+    // Roles: what a component reaches for first.
+    const roles: Record<string, ColorToken | AliasToken> = {}
+    for (const alias of ROLE_ALIASES) {
+      roles[alias.role] = {
+        $type: 'color',
+        $value: `{${mode}.${alias.scale}.${alias.slug}}`
+      }
+    }
+    // Read from the scales already built rather than rebuilding the accent, so
+    // the JSON and the stylesheet cannot disagree about what sits on the fill.
+    const onSolid = accentOnSolid(scales, mode)
+    roles[ON_SOLID_ROLE] = {
+      $type: 'color',
+      $description:
+        `Text on --lat-solid. Computed rather than assumed: ${onSolid.text} wins at ` +
+        `${onSolid.ratio.toFixed(2)}:1 against the accent fill.`,
+      $value:
+        onSolid.text === 'white'
+          ? { colorSpace: 'oklch', components: [1, 0, 0], alpha: 1, hex: '#ffffff' }
+          : { colorSpace: 'oklch', components: [0, 0, 0], alpha: 1, hex: '#000000' }
+    }
+
+    group['role'] = {
+      $description:
+        'The semantic roles a component reaches for first. Step aliases inside each ' +
+        'scale cover the cases these do not.',
+      ...roles
     }
 
     const categorical: Record<string, ColorToken> = {}
