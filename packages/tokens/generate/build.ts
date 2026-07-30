@@ -12,6 +12,7 @@ import {
 } from './charts.js'
 import { emitCss, emitTokens } from './emit.js'
 import { buildAllScales } from './scale.js'
+import { buildSeverity, validateSeverity } from './severity.js'
 
 /**
  * Build entrypoint. Emits the published artefacts — `dist/lattice.css` and
@@ -86,6 +87,20 @@ for (const mode of MODES) {
   }
 }
 console.log('  all-pairs cap: %d slots', allPairsCap(MODES))
+
+// The severity ramp. Its greyscale check warns rather than fails in dark mode,
+// because dark trades that cue away deliberately — see config/severity.ts.
+console.log('\nSeverity ramp:')
+for (const mode of MODES) {
+  for (const check of validateSeverity(buildSeverity(mode), mode).checks) {
+    const marker = check.state === 'pass' ? '    ' : check.state === 'warn' ? 'WARN' : 'FAIL'
+    console.log('  %s %s  %s  %s', marker, mode.padEnd(5), check.name.padEnd(20), check.detail)
+    if (check.state === 'fail') {
+      failures.push(`${mode} severity ramp: ${check.name} — ${check.detail}`)
+    }
+  }
+}
+console.log('  usage rule: colour never carries severity alone — icon and label are mandatory')
 
 // Nothing is written while a contract is unmet: a stale dist/ is a better
 // outcome than one carrying a palette that fails its own gate.
