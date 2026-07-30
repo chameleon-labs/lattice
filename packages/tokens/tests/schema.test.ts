@@ -55,10 +55,31 @@ describe('tokens.json against the published DTCG schema', () => {
     expect((light['gray']?.['bg'] as { $value: unknown }).$value).toBe('{light.gray.1}')
   })
 
+  it('accepts every typography primitive value shape', () => {
+    const global = tokens['global'] as Record<string, Record<string, { $value: unknown }>>
+
+    expect(global['font']?.['sans']?.$value).toBeInstanceOf(Array)
+    expect(global['font-size']?.['base']?.$value).toEqual({ value: 1, unit: 'rem' })
+    expect(global['line-height']?.['normal']?.$value).toBe(1.5)
+    expect(global['font-weight']?.['bold']?.$value).toBe(700)
+    expect(validate(tokens)).toBe(true)
+  })
+
   it('rejects a token whose value is neither a colour nor a reference', () => {
     const broken = structuredClone(tokens) as Record<string, unknown>
     const light = broken['light'] as Record<string, Record<string, Record<string, unknown>>>
     light['gray']!['1'] = { $type: 'color', $value: 42 }
+
+    expect(validate(broken)).toBe(false)
+  })
+
+  it('rejects a dimension unit the format cannot represent', () => {
+    const broken = structuredClone(tokens) as Record<string, unknown>
+    const global = broken['global'] as Record<string, Record<string, Record<string, unknown>>>
+    global['font-size']!['base'] = {
+      $type: 'dimension',
+      $value: { value: 1, unit: 'em' }
+    }
 
     expect(validate(broken)).toBe(false)
   })

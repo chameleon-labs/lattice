@@ -2,7 +2,7 @@
 
 > The design system behind [tabstop](https://github.com/chameleon-labs/tabstop) and whatever comes next. Accessibility is the constraint, not the feature.
 
-**Status: early development.** The colour system is specified; nothing is published yet.
+**Status: early development.** Colour, typography, and spacing/motion are specified; nothing is published yet.
 
 ## The name
 
@@ -16,10 +16,10 @@ Two packages, one of which exists so far.
 
 | Package | What it is |
 |---|---|
-| `@chameleon-labs/lattice-tokens` | the colour system — scales, semantic tokens, modes, severity ramp, chart palettes |
+| `@chameleon-labs/lattice-tokens` | foundational design tokens — colour, typography, spacing, sizing, elevation, and motion |
 | `@chameleon-labs/lattice-react` | the component layer on [Ariakit](https://github.com/ariakit/ariakit) — **not built yet** |
 
-They are separate because tokens carry no framework dependency and should stay installable by a consumer that never touches React. Typography and spacing scales, when they land, are tokens too and belong in the first package.
+They are separate because tokens carry no framework dependency and should stay installable by a consumer that never touches React.
 
 It is opinionated about values and behaviour, and deliberately unopinionated about composition — Ariakit already solves composition, so Lattice's job is to decide what things look like and guarantee they stay legible.
 
@@ -41,13 +41,15 @@ Systems that skip the semantic tier end up unable to add a second theme without 
 
 ## Scope
 
-**In:** colour scales, semantic tokens, light and dark modes, an ordered severity ramp, and validated categorical and sequential chart palettes.
+**In:** colour scales, semantic colour tokens, light and dark modes, an ordered severity ramp, validated categorical and sequential chart palettes, and typography primitives.
 
-**Not yet:** components, typography, spacing, wide-gamut output, forced-colors handling. Each is tracked separately.
+**Not yet:** components, semantic typography roles, spacing implementation, wide-gamut output, forced-colors handling. Each is tracked separately.
+
+Typography keeps the system sans stack as its default and offers Inter as an optional primitive. Applications that opt into Inter provide the font themselves; the token package does not bundle or load web fonts.
 
 ## Design docs
 
-Decisions live in [`docs/superpowers/specs/`](./docs/superpowers/specs/). Start with the [colour system design](./docs/superpowers/specs/2026-07-28-lattice-color-system-design.md) — it records what was chosen, what was rejected, and the measurements behind both.
+Decisions live in [`docs/superpowers/specs/`](./docs/superpowers/specs/). Start with the [colour system](./docs/superpowers/specs/2026-07-28-lattice-color-system-design.md), [typography](./docs/superpowers/specs/2026-07-30-lattice-typography-design.md), and [spacing/motion](./docs/superpowers/specs/2026-07-30-lattice-spacing-and-motion-design.md) designs — they record what was chosen, what was rejected, and the measurements behind each.
 
 ## Development
 
@@ -67,9 +69,9 @@ packages/
 └── react/      @chameleon-labs/lattice-react — not built yet
 ```
 
-Inside `packages/tokens/`, `config/` declares the curves, hues and contracts and `generate/` turns them into artefacts. `dist/` is generated output and is not committed.
+Inside `packages/tokens/`, `config/` declares reviewed token values and contracts and `generate/` turns them into artefacts. `dist/` is generated output and is not committed.
 
-Never hand-edit a primitive token, and never hand-edit `dist/`. Change the config and rebuild — a colour that is not computed does not ship.
+Never hand-edit a primitive token, and never hand-edit `dist/`. Change the config and rebuild — a value that is not declared or computed does not ship.
 
 ## Licence
 
