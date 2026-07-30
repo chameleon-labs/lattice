@@ -121,7 +121,7 @@ One limit worth stating: **1.5 is a Latin floor.** CJK text needs materially mor
 
 Fluid sizing is excluded, but not for the reason first supposed. The usual formulation is unsafe, and a safe one exists — so safety is not the argument.
 
-Measured, at a user default of 20px against a browser default of 16:
+Measured at a **1280px viewport**, comparing a user default of 20px against a browser default of 16. The viewport matters and is stated because the `vw` terms depend on it — at 1280px, `0.5vw` is 6.4px, which is where 19.2 and 22.4 below come from.
 
 | Declaration | root 16 | root 20 | Responds to the user |
 |---|---|---|---|
@@ -130,7 +130,12 @@ Measured, at a user default of 20px against a browser default of 16:
 | `clamp(14px, 2vw, 22px)` | 22px | **22px** | **no** |
 | `clamp(0.875rem, 0.8rem + 0.5vw, 1.375rem)` | 19.2px | 22.4px | yes |
 
-And a ceiling expressed in `px` caps growth exactly where an enlarging reader needs it. At a 24px root, `…, 22px)` computes to 22px while `…, 1.375rem)` reaches 28.8px.
+A ceiling expressed in `px` then caps growth exactly where an enlarging reader needs it. Measured at a **1920px viewport**, where `0.5vw` is 9.6px:
+
+| Preferred value `0.8rem + 0.5vw`, with ceiling | root 16 | root 24 |
+|---|---|---|
+| `…, 22px)` | 22px | **22px** — capped |
+| `…, 1.375rem)` | 22px | 28.8px |
 
 So a `clamp()` whose every term is `rem`-based is safe. **The real blocker is the token format**: DTCG's `dimension` type accepts a number and a unit of `px` or `rem`, and has no representation for a `clamp()`. A fluid scale would exist in the stylesheet and be inexpressible in `tokens.json`, breaking the artefact parity the colour system establishes.
 
