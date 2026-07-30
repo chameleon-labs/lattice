@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { MODES, STEPS } from '../config/lightness.js'
 import { SCALE_NAMES } from '../config/scales.js'
 import { SEVERITY_LEVELS } from '../config/severity.js'
+import { ALIAS_COUNT } from '../generate/semantic.js'
 import { STEP_JOBS } from '../config/steps.js'
 import {
   DTCG_SCHEMA,
@@ -22,8 +23,10 @@ const PRIMITIVES = SCALE_NAMES.length * STEPS
 const CHART_SLOTS = 8
 const SEQUENTIAL_STEPS = 7
 const SEVERITY_STEPS = SEVERITY_LEVELS.length
-// Per mode block: the primitive tier, both chart palettes, and the severity ramp.
-const PER_BLOCK = PRIMITIVES + CHART_SLOTS + SEQUENTIAL_STEPS + SEVERITY_STEPS
+// Per mode block: the primitive tier, both chart palettes, the severity ramp,
+// and the whole semantic tier — see tests/semantic.test.ts for why the aliases
+// are repeated per block rather than declared once on :root.
+const PER_BLOCK = PRIMITIVES + CHART_SLOTS + SEQUENTIAL_STEPS + SEVERITY_STEPS + ALIAS_COUNT
 // Light once, dark twice - see the block test below.
 const BLOCKS = 3
 
@@ -80,12 +83,14 @@ describe('lattice.css', () => {
     expect(count(css)).toBe(PER_BLOCK * BLOCKS)
   })
 
-  it('emits values as oklch() so the generated colour is the source of truth', () => {
+  // Every declaration is either a generated colour or a reference to one. The
+  // semantic tier introduced the second kind; nothing is ever a hex literal.
+  it('emits every declaration as an oklch colour or a var reference', () => {
     const values = css.match(/--lat-[a-z0-9-]+: ([^;]+);/g) ?? []
 
     expect(values).toHaveLength(PER_BLOCK * BLOCKS)
     for (const declaration of values) {
-      expect(declaration).toMatch(/oklch\(/)
+      expect(declaration).toMatch(/(oklch\(|var\(--lat-)/)
     }
   })
 
@@ -170,12 +175,25 @@ describe('tokens.json', () => {
     expect(DTCG_SCHEMA).toBe('https://www.designtokens.org/schemas/2025.10/format.json')
   })
 
-  it('carries one colour token per primitive step, chart slot and severity level', () => {
+  // Two kinds of leaf now: a colour, and a reference to one. The semantic tier
+  // uses DTCG's own `{group.token}` alias syntax, so the JSON carries the same
+  // two tiers the stylesheet does.
+  const colorLeaves = (): { path: string; token: ColorToken }[] =>
+    leaves().filter((leaf) => typeof leaf.token.$value === 'object') as {
+      path: string
+      token: ColorToken
+    }[]
+  const aliasLeaves = (): { path: string; value: string }[] =>
+    leaves()
+      .filter((leaf) => typeof leaf.token.$value === 'string')
+      .map((leaf) => ({ path: leaf.path, value: leaf.token.$value as unknown as string }))
+
+  it('carries one token per primitive step, chart slot, severity level and alias', () => {
     expect(leaves()).toHaveLength(PER_BLOCK * MODES.length)
   })
 
-  it('declares every token as a DTCG oklch colour', () => {
-    for (const { path, token } of leaves()) {
+  it('declares every colour-valued token as a DTCG oklch colour', () => {
+    for (const { path, token } of colorLeaves()) {
       expect(token.$type, path).toBe('color')
       expect(token.$value.colorSpace, path).toBe('oklch')
       expect(token.$value.components, path).toHaveLength(3)
@@ -184,7 +202,7 @@ describe('tokens.json', () => {
   })
 
   it('keeps every component inside the range the colour module defines', () => {
-    for (const { path, token } of leaves()) {
+    for (const { path, token } of colorLeaves()) {
       const [l, c, h] = token.$value.components
 
       expect(l, path).toBeGreaterThanOrEqual(0)
@@ -193,6 +211,25 @@ describe('tokens.json', () => {
       expect(c, path).toBeLessThanOrEqual(0.5)
       expect(h, path).toBeGreaterThanOrEqual(0)
       expect(h, path).toBeLessThan(360)
+    }
+  })
+
+  // A reference that does not resolve is the JSON equivalent of a dangling
+  // var(): the file parses, and a consumer resolving it gets nothing.
+  it('resolves every alias reference to a token that exists', () => {
+    const paths = new Set(leaves().map((leaf) => leaf.path))
+    const aliases = aliasLeaves()
+
+    expect(aliases.length).toBeGreaterThan(0)
+    for (const { path, value } of aliases) {
+      expect(value, path).toMatch(/^\{[a-z0-9.-]+\}$/)
+      expect(paths, `${path} -> ${value}`).toContain(value.slice(1, -1))
+    }
+  })
+
+  it('keeps every alias inside its own mode, so a theme never leaks', () => {
+    for (const { path, value } of aliasLeaves()) {
+      expect(value.startsWith(`{${path.split('.')[0]}.`), `${path} -> ${value}`).toBe(true)
     }
   })
 
@@ -211,8 +248,8 @@ describe('tokens.json', () => {
     }
   })
 
-  it('agrees with the CSS on every value', () => {
-    for (const { token } of leaves()) {
+  it('agrees with the CSS on every colour value', () => {
+    for (const { token } of colorLeaves()) {
       const [l, c, h] = token.$value.components
 
       expect(css).toContain(`oklch(${trim(l)} ${trim(c)} ${trim(h)})`)
