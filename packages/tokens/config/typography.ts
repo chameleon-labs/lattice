@@ -51,6 +51,10 @@ export const LINE_HEIGHTS = {
   loose: 1.75
 } as const
 
+export const LETTER_SPACINGS = {
+  normal: 0
+} as const
+
 export const FONT_WEIGHTS = {
   regular: 400,
   semibold: 600,
