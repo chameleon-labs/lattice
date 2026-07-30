@@ -16,8 +16,8 @@ import { MODES, STEPS, type Mode } from '../config/lightness.js'
 import { ON_SOLID_ROLE, ROLE_ALIASES, STEP_SLUGS } from '../config/semantic.js'
 import { SCALE_JOBS, STEP_JOBS } from '../config/steps.js'
 import { buildCategorical, buildSequential } from './charts.js'
-import { buildScale, type Scale, type Swatch } from './scale.js'
-import { semanticBlock } from './semantic.js'
+import type { Scale, Swatch } from './scale.js'
+import { accentOnSolid, semanticBlock } from './semantic.js'
 import { buildSeverity } from './severity.js'
 
 /**
@@ -77,7 +77,7 @@ function block(scales: readonly Scale[], mode: Mode): string {
   // holding a var() reference resolves on the element that declares it, so a
   // single root declaration would freeze to the root theme and keep that value
   // inside a nested scope that redefines the primitive underneath.
-  return [primitives, categorical, sequential, severity, semanticBlock(mode)].join('\n\n')
+  return [primitives, categorical, sequential, severity, semanticBlock(scales, mode)].join('\n\n')
 }
 
 /**
@@ -238,7 +238,9 @@ export function emitTokens(scales: readonly Scale[]): DesignTokens {
         $value: `{${mode}.${alias.scale}.${alias.slug}}`
       }
     }
-    const onSolid = buildScale('accent', mode).onSolid
+    // Read from the scales already built rather than rebuilding the accent, so
+    // the JSON and the stylesheet cannot disagree about what sits on the fill.
+    const onSolid = accentOnSolid(scales, mode)
     roles[ON_SOLID_ROLE] = {
       $type: 'color',
       $description:

@@ -9,7 +9,7 @@
 import { STEPS, type Mode } from '../config/lightness.js'
 import { SCALE_NAMES } from '../config/scales.js'
 import { ON_SOLID_ROLE, ROLE_ALIASES, STEP_SLUGS } from '../config/semantic.js'
-import { buildScale } from './scale.js'
+import type { OnSolid, Scale } from './scale.js'
 
 export interface Alias {
   /** Full custom property name, including the `--lat-` prefix. */
@@ -39,7 +39,7 @@ export function stepAliases(): Alias[] {
  * Each points at a step alias rather than a raw step, so the indirection reads as
  * a sentence: `--lat-text` is the grey scale's text step.
  */
-export function roleAliases(mode: Mode): Alias[] {
+export function roleAliases(scales: readonly Scale[], mode: Mode): Alias[] {
   const roles: Alias[] = ROLE_ALIASES.map((alias) => ({
     name: `--lat-${alias.role}`,
     value: `var(--lat-${alias.scale}-${alias.slug})`
@@ -49,13 +49,30 @@ export function roleAliases(mode: Mode): Alias[] {
   // against the accent's fill and reports the winner. Written as oklch so the
   // stylesheet holds no hex, which keeps the "oklch is the source of truth" rule
   // true for every declaration rather than most of them.
-  const onSolid = buildScale('accent', mode).onSolid.text
   roles.push({
     name: `--lat-${ON_SOLID_ROLE}`,
-    value: onSolid === 'white' ? 'oklch(1 0 0)' : 'oklch(0 0 0)'
+    value: accentOnSolid(scales, mode).text === 'white' ? 'oklch(1 0 0)' : 'oklch(0 0 0)'
   })
 
   return roles
+}
+
+/**
+ * The accent's computed on-solid, read from the scales that were already built.
+ *
+ * Both artefacts resolve it through here rather than rebuilding the scale, so the
+ * stylesheet and the JSON cannot disagree about which text colour sits on the
+ * fill — they are reading one object, not two independent computations that
+ * happen to agree today.
+ */
+export function accentOnSolid(scales: readonly Scale[], mode: Mode): OnSolid {
+  const accent = scales.find((scale) => scale.name === 'accent' && scale.mode === mode)
+
+  if (!accent) {
+    throw new Error(`no accent scale for ${mode} mode among the ${scales.length} scales supplied`)
+  }
+
+  return accent.onSolid
 }
 
 /**
@@ -68,9 +85,9 @@ export function roleAliases(mode: Mode): Alias[] {
  * primitive underneath. Re-declaring per scope is what makes `[data-lat-theme]`
  * work anywhere.
  */
-export function semanticBlock(mode: Mode, indent = '  '): string {
+export function semanticBlock(scales: readonly Scale[], mode: Mode, indent = '  '): string {
   const steps = stepAliases()
-  const roles = roleAliases(mode)
+  const roles = roleAliases(scales, mode)
   const declare = (alias: Alias): string => `${indent}${alias.name}: ${alias.value};`
 
   return [steps.map(declare).join('\n'), roles.map(declare).join('\n')].join('\n\n')

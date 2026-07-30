@@ -323,6 +323,15 @@ function splitBlocks(stylesheet: string): [string, string, string] {
   const darkAt = stylesheet.indexOf("\n[data-lat-theme='dark'] {")
   const mediaAt = stylesheet.indexOf('@media (prefers-color-scheme: dark)')
 
+  // Same guard as tests/semantic.test.ts: a missing delimiter makes indexOf
+  // return -1, and the resulting slice fails every later assertion on content
+  // rather than saying the split itself found nothing.
+  if (darkAt < 0 || mediaAt < 0 || mediaAt < darkAt) {
+    throw new Error(
+      `cannot split the stylesheet into blocks: dark rule at ${darkAt}, media query at ${mediaAt}`
+    )
+  }
+
   return [
     stylesheet.slice(0, darkAt),
     stylesheet.slice(darkAt, mediaAt),

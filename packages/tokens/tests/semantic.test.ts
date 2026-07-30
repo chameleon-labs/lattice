@@ -5,17 +5,50 @@ import { SCALE_NAMES } from '../config/scales.js'
 import { ON_SOLID_ROLE, ROLE_ALIASES, ROLE_NAMES, STEP_SLUGS } from '../config/semantic.js'
 import { emitCss } from '../generate/emit.js'
 import { buildAllScales, buildScale } from '../generate/scale.js'
-import { ALIAS_COUNT, roleAliases, stepAliases } from '../generate/semantic.js'
+import { accentOnSolid, ALIAS_COUNT, roleAliases, stepAliases } from '../generate/semantic.js'
 
-const css = emitCss(buildAllScales())
+const scales = buildAllScales()
+const css = emitCss(scales)
 
-/** The light rule, the explicit-dark rule, and the preference-driven dark rule. */
+/**
+ * The light rule, the explicit-dark rule, and the preference-driven dark rule.
+ *
+ * Throws rather than slicing on a missing delimiter. `indexOf` returns -1 when a
+ * selector changes, and `slice(-1, …)` then yields a one-character string, so
+ * every assertion downstream fails on content when the real problem is that the
+ * split found nothing to split.
+ */
 function blocks(stylesheet: string): [string, string, string] {
   const darkAt = stylesheet.indexOf("\n[data-lat-theme='dark'] {")
   const mediaAt = stylesheet.indexOf('@media (prefers-color-scheme: dark)')
 
+  if (darkAt < 0 || mediaAt < 0 || mediaAt < darkAt) {
+    throw new Error(
+      `cannot split the stylesheet into blocks: dark rule at ${darkAt}, media query at ${mediaAt}`
+    )
+  }
+
   return [stylesheet.slice(0, darkAt), stylesheet.slice(darkAt, mediaAt), stylesheet.slice(mediaAt)]
 }
+
+describe('the block splitter itself', () => {
+  // Every assertion below is only as trustworthy as this split. Unguarded,
+  // indexOf returns -1 when a selector changes and slice(-1, …) yields a
+  // one-character string, so the real failure — "the stylesheet no longer has
+  // the block I expected" — surfaces as a dozen confusing content mismatches.
+  it('refuses to split a stylesheet that lacks the expected rules', () => {
+    expect(() => blocks(':root { --lat-gray-1: oklch(0.5 0 0); }')).toThrow(/block/i)
+  })
+
+  it('splits the real stylesheet into three non-empty blocks', () => {
+    const parts = blocks(css)
+
+    expect(parts).toHaveLength(3)
+    for (const part of parts) {
+      expect(part.length).toBeGreaterThan(100)
+    }
+  })
+})
 
 describe('step aliases', () => {
   it('names every step of every scale by its job', () => {
@@ -45,7 +78,7 @@ describe('step aliases', () => {
 
 describe('role aliases', () => {
   it.each(MODES)('covers the documented roles in %s mode', (mode) => {
-    expect(roleAliases(mode).map((alias) => alias.name)).toEqual(
+    expect(roleAliases(scales, mode).map((alias) => alias.name)).toEqual(
       ROLE_NAMES.map((role) => `--lat-${role}`)
     )
   })
@@ -78,9 +111,34 @@ describe('role aliases', () => {
   // whatever the generator computed.
   it.each(MODES)('takes on-solid from the computed answer in %s mode', (mode) => {
     const expected = buildScale('accent', mode).onSolid.text === 'white' ? 'oklch(1 0 0)' : 'oklch(0 0 0)'
-    const onSolid = roleAliases(mode).find((alias) => alias.name === `--lat-${ON_SOLID_ROLE}`)
+    const onSolid = roleAliases(scales, mode).find((alias) => alias.name === `--lat-${ON_SOLID_ROLE}`)
 
     expect(onSolid?.value).toBe(expected)
+  })
+
+  // Both artefacts read on-solid from the scales already built, so they cannot
+  // disagree about what sits on the fill. If the accent is not among them that is
+  // a caller error worth naming, not a reason to silently rebuild it.
+  it('refuses to resolve on-solid from scales that lack the accent', () => {
+    const withoutAccent = scales.filter((scale) => scale.name !== 'accent')
+
+    expect(() => accentOnSolid(withoutAccent, 'light')).toThrow(/accent/i)
+  })
+
+  // The discriminating test: a doctored accent proves the value is read from the
+  // array that was passed in. Rebuilding the scale internally would ignore this
+  // and return white, which is the divergence the plumbing exists to prevent.
+  it('reads on-solid from the supplied scales rather than rebuilding them', () => {
+    const doctored = scales.map((scale) =>
+      scale.name === 'accent' && scale.mode === 'light'
+        ? { ...scale, onSolid: { text: 'black' as const, ratio: 9.9, apcaLc: 0 } }
+        : scale
+    )
+
+    expect(accentOnSolid(doctored, 'light').text).toBe('black')
+    expect(
+      roleAliases(doctored, 'light').find((alias) => alias.name === '--lat-on-solid')?.value
+    ).toBe('oklch(0 0 0)')
   })
 
   it('keeps the focus ring distinct from a resting border', () => {
@@ -103,7 +161,7 @@ describe('the tier is emitted into every theme scope', () => {
   it('declares every alias in all three blocks', () => {
     const [light, dark, media] = blocks(css)
 
-    for (const alias of [...stepAliases(), ...roleAliases('light')]) {
+    for (const alias of [...stepAliases(), ...roleAliases(scales, 'light')]) {
       expect(light, alias.name).toContain(`${alias.name}:`)
       expect(dark, alias.name).toContain(`${alias.name}:`)
       expect(media, alias.name).toContain(`${alias.name}:`)
@@ -120,7 +178,7 @@ describe('the tier is emitted into every theme scope', () => {
   })
 
   it('agrees with the count the generator reports', () => {
-    expect(ALIAS_COUNT).toBe(stepAliases().length + roleAliases('light').length)
+    expect(ALIAS_COUNT).toBe(stepAliases().length + roleAliases(scales, 'light').length)
   })
 })
 
