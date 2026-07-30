@@ -6,6 +6,7 @@ import {
   FONT_SIZE_RATIO_RANGE,
   FONT_SIZES,
   FONT_WEIGHTS,
+  LETTER_SPACINGS,
   LINE_HEIGHTS
 } from '../config/typography.js'
 import {
@@ -87,6 +88,15 @@ describe('typography primitives', () => {
     })
     expect(Object.values(LINE_HEIGHTS).every(Number.isFinite)).toBe(true)
     expect(FONT_WEIGHTS).toEqual({ regular: 400, semibold: 600, bold: 700 })
+  })
+
+  it('provides the zero-tracking primitive required by every role', () => {
+    expect(LETTER_SPACINGS).toEqual({ normal: 0 })
+    expect(typographyCss()).toContain('--lat-letter-spacing-normal: 0rem;')
+    expect(typographyTokens()['letter-spacing'].normal).toEqual({
+      $type: 'dimension',
+      $value: { value: 0, unit: 'rem' }
+    })
   })
 
   it('formats the exact CSS primitive names and values', () => {

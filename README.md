@@ -41,11 +41,11 @@ Systems that skip the semantic tier end up unable to add a second theme without 
 
 ## Scope
 
-**In:** colour scales, semantic colour tokens, light and dark modes, an ordered severity ramp, validated categorical and sequential chart palettes, and typography primitives.
+**In:** colour scales, semantic colour tokens, light and dark modes, an ordered severity ramp, validated categorical and sequential chart palettes, and primitive and semantic typography tokens.
 
-**Not yet:** components, semantic typography roles, spacing implementation, wide-gamut output, forced-colors handling. Each is tracked separately.
+**Not yet:** components, spacing implementation, wide-gamut output, forced-colors handling. Each is tracked separately.
 
-Typography keeps the system sans stack as its default and offers Inter as an optional primitive. Applications that opt into Inter provide the font themselves; the token package does not bundle or load web fonts.
+Typography keeps the system sans stack as its default, provides eleven semantic roles, and offers Inter as an optional primitive. Applications that opt into Inter provide the font themselves; the token package does not bundle or load web fonts.
 
 ## Design docs
 
@@ -57,8 +57,9 @@ Node 24 (see [`.nvmrc`](./.nvmrc)) and pnpm.
 
 ```sh
 pnpm install
+pnpm --filter @chameleon-labs/lattice-tokens exec playwright install firefox
 pnpm build    # typecheck, then emit dist/
-pnpm test     # vitest
+pnpm test     # vitest and Firefox browser coverage
 ```
 
 A pnpm workspace. Root scripts fan out to every package; run them inside `packages/tokens/` to work on one.

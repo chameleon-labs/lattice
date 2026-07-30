@@ -19,16 +19,30 @@ const css = emitCss(scales)
  * split found nothing to split.
  */
 function blocks(stylesheet: string): [string, string, string] {
+  const lightAt = stylesheet.indexOf("\n:root,\n[data-lat-theme='light'] {")
   const darkAt = stylesheet.indexOf("\n[data-lat-theme='dark'] {")
   const mediaAt = stylesheet.indexOf('@media (prefers-color-scheme: dark)')
+  const responsiveAt = stylesheet.indexOf('@media (width < 40rem)')
+  const mediaEnd = responsiveAt < 0 ? stylesheet.length : responsiveAt
 
-  if (darkAt < 0 || mediaAt < 0 || mediaAt < darkAt) {
+  if (
+    lightAt < 0 ||
+    darkAt < lightAt ||
+    mediaAt < darkAt ||
+    (responsiveAt >= 0 && responsiveAt < mediaAt)
+  ) {
     throw new Error(
-      `cannot split the stylesheet into blocks: dark rule at ${darkAt}, media query at ${mediaAt}`
+      `cannot split the stylesheet into blocks: light rule at ${lightAt}, ` +
+        `dark rule at ${darkAt}, media query at ${mediaAt}, ` +
+        `responsive query at ${responsiveAt}`
     )
   }
 
-  return [stylesheet.slice(0, darkAt), stylesheet.slice(darkAt, mediaAt), stylesheet.slice(mediaAt)]
+  return [
+    stylesheet.slice(lightAt, darkAt),
+    stylesheet.slice(darkAt, mediaAt),
+    stylesheet.slice(mediaAt, mediaEnd)
+  ]
 }
 
 describe('the block splitter itself', () => {
@@ -47,6 +61,13 @@ describe('the block splitter itself', () => {
     for (const part of parts) {
       expect(part.length).toBeGreaterThan(100)
     }
+  })
+
+  it('splits colour blocks when no later typography query exists', () => {
+    const responsiveAt = css.indexOf('@media (width < 40rem)')
+
+    expect(responsiveAt).toBeGreaterThan(-1)
+    expect(blocks(css.slice(0, responsiveAt))).toHaveLength(3)
   })
 })
 

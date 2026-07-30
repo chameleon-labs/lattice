@@ -1,7 +1,7 @@
 # Lattice — typography design
 
 **Date:** 2026-07-30
-**Status:** approved, implementation tracked in #26 and #27
+**Status:** approved; primitives completed in #26, semantic roles tracked in #27
 **Scope:** the typography scale and its tokens. Colour is specified separately; spacing and sizing are tracked separately again.
 
 Throughout, sizes are given in `rem` — that is the token — with a px equivalent **at the default root** shown for readability. Those px figures are not the values: at a user default of 20px the whole scale is 25% larger, which is the point of the unit.
@@ -15,8 +15,9 @@ Throughout, sizes are given in `rem` — that is the token — with a px equival
 | Sizing unit | `rem` everywhere — declarations *and* media queries. Never `px`, never viewport units alone. |
 | Fluid vs stepped | **Stepped**, with the three display sizes stepping down once at narrow viewports. |
 | Line height | A named set, unitless, chosen by role rather than fixed per size. **≥ 1.5** for blocks of text. |
-| Letter spacing | `0` at every size in v1 — a value the token format obliges us to state. |
+| Letter spacing | One `normal` primitive at `0rem`; every v1 role references it. |
 | Weights | 400, 600, 700. 500 is excluded on purpose. |
+| Roles | Eleven roles: seven text/UI roles and headings 1–4. `micro` is retained with a restricted-use contract. |
 | Tokens | The same three tiers as colour: primitive → semantic role → component. |
 
 Every number below is computed or measured.
@@ -126,6 +127,14 @@ One limit worth stating: **1.5 is a Latin floor.** CJK text needs materially mor
 
 **500 is excluded deliberately.** Across a system stack its availability is inconsistent, so it resolves to a synthesised weight on some platforms and a real one on others — the same token then renders differently per operating system, which is what a design system exists to prevent. Three weights that are real everywhere beat four where one is a lottery.
 
+## Letter spacing
+
+One primitive: `normal`, with a value of `0rem`.
+
+The value is deliberately named rather than inlined into every role. DTCG requires `letterSpacing` in a `typography` composite, and issue #27 requires every composite property to reference a primitive. The primitive therefore ships as `--lat-letter-spacing-normal` in CSS and `global.letter-spacing.normal` in JSON.
+
+`0rem` rather than unitless `0` keeps the CSS and DTCG representations identical: DTCG models letter spacing as a `dimension`, whose supported units are `rem` and `px`. Non-zero tracking remains deferred because the system family is not a single controlled face.
+
 ## Stepped, not fluid
 
 Fluid sizing is excluded, but not for the reason first supposed. The usual formulation is unsafe, and a safe one exists — so safety is not the argument.
@@ -169,13 +178,34 @@ No new sizes are introduced: the step-down moves a role along the existing scale
 
 Three tiers, matching the colour system.
 
-**Tier 1 — primitive, generated.** `--lat-font-size-*`, `--lat-line-height-*`, `--lat-font-weight-*`, `--lat-font-sans`, `--lat-font-inter`, `--lat-font-mono`. Emitted by the build. Never hand-edited.
+**Tier 1 — primitive, generated.** `--lat-font-size-*`, `--lat-line-height-*`, `--lat-font-weight-*`, `--lat-letter-spacing-normal`, `--lat-font-sans`, `--lat-font-inter`, `--lat-font-mono`. Emitted by the build. Never hand-edited.
 
-**Tier 2 — semantic role, hand-authored.** A role bundles the properties that always travel together, so a component sets one thing rather than several:
+**Tier 2 — semantic role, generated from a hand-authored matrix.** CSS has no token value that can hold a structured typography object, so it exposes five mechanically related properties per role rather than inventing a shorthand:
 
-`--lat-text-body`, `--lat-text-body-strong`, `--lat-text-lead`, `--lat-text-ui`, `--lat-text-caption`, `--lat-text-micro`, `--lat-text-code`, `--lat-text-heading-1` … `--lat-text-heading-4`.
+```css
+--lat-text-body-font-family: var(--lat-font-sans);
+--lat-text-body-font-size: var(--lat-font-size-base);
+--lat-text-body-font-weight: var(--lat-font-weight-regular);
+--lat-text-body-letter-spacing: var(--lat-letter-spacing-normal);
+--lat-text-body-line-height: var(--lat-line-height-normal);
+```
 
-In `tokens.json` a role is DTCG's composite `typography` type, which exists for exactly this. Two constraints come from that format and are worth knowing before the tokens are designed rather than after:
+In `tokens.json`, the same role is one DTCG `typography` composite under `global.text.*`. All five sub-properties reference the corresponding primitive:
+
+```json
+{
+  "$type": "typography",
+  "$value": {
+    "fontFamily": "{global.font.sans}",
+    "fontSize": "{global.font-size.base}",
+    "fontWeight": "{global.font-weight.regular}",
+    "letterSpacing": "{global.letter-spacing.normal}",
+    "lineHeight": "{global.line-height.normal}"
+  }
+}
+```
+
+Two constraints come from that format and are worth knowing before the tokens are designed rather than after:
 
 - **All five sub-properties are required**: `fontFamily`, `fontSize`, `fontWeight`, `letterSpacing`, `lineHeight`. There is no partial typography token, which is why letter spacing is decided rather than deferred — a role cannot omit it.
 - **`dimension` accepts only `px` and `rem`.** The rem-everywhere decision is expressible in the JSON artefact; `em`, `ch` and `%` are not. Any future need for `ch`-based measure lives in CSS, not in the token file.
@@ -183,6 +213,48 @@ In `tokens.json` a role is DTCG's composite `typography` type, which exists for 
 **Tier 3 — component tokens.** Permitted with a written justification in review, as in colour.
 
 Aliases must be emitted **into every theme scope that redeclares a primitive they reference**, for the reason established in the colour system: a custom property holding a `var()` reference resolves on the element that declares it, so a single root declaration freezes. Typography has no light/dark split today, so this costs nothing now and is a trap the moment a density or reading mode is added.
+
+The implementation preserves the tier boundary in its modules. `config/typography-roles.ts` owns the matrix and narrow size map; every key is typed against `config/typography.ts`. `generate/typography-roles.ts` turns that single source into CSS aliases and DTCG composites. `generate/emit.ts` only composes those results into the two artefacts.
+
+### Role matrix
+
+Every role uses `letter-spacing.normal`. System sans remains the default; the optional Inter primitive is never selected implicitly.
+
+| Role | Family | Size | Weight | Line height | Narrow size |
+|---|---|---|---|---|---|
+| `body` | `sans` | `base` | `regular` | `normal` | — |
+| `body-strong` | `sans` | `base` | `semibold` | `normal` | — |
+| `lead` | `sans` | `lg` | `regular` | `relaxed` | — |
+| `ui` | `sans` | `sm` | `semibold` | `snug` | — |
+| `caption` | `sans` | `xs` | `regular` | `normal` | — |
+| `micro` | `sans` | `2xs` | `regular` | `normal` | — |
+| `code` | `mono` | `sm` | `regular` | `normal` | — |
+| `heading-1` | `sans` | `4xl` | `bold` | `tight` | `3xl` |
+| `heading-2` | `sans` | `3xl` | `bold` | `tight` | `2xl` |
+| `heading-3` | `sans` | `2xl` | `semibold` | `snug` | `xl` |
+| `heading-4` | `sans` | `xl` | `semibold` | `snug` | — |
+
+`body`, `body-strong`, and `lead` are prose roles, so their size is at least `base` and their line height at least `normal`. `caption` may wrap and therefore also keeps `normal` leading. `ui` and the heading roles may use tighter leading because they represent single-line controls or display text.
+
+`micro` deliberately survives as the only semantic route to `2xs`, with the primitive's restriction attached: non-essential, non-prose labels only; never task-critical content, main-column prose, or the sole copy of information.
+
+There are four heading roles. A fifth remains excluded until a real hierarchy requires it; adding an unused public role would be permanent API without a present consumer.
+
+### Responsive output and JSON boundary
+
+Only CSS carries the conditional behavior:
+
+```css
+@media (width < 40rem) {
+  :root {
+    --lat-text-heading-1-font-size: var(--lat-font-size-3xl);
+    --lat-text-heading-2-font-size: var(--lat-font-size-2xl);
+    --lat-text-heading-3-font-size: var(--lat-font-size-xl);
+  }
+}
+```
+
+DTCG has no media-query condition, so `global.text.*` contains the default/wide composites only. The shared narrow map still makes the three aliases testable and guarantees they reference existing size primitives. Emitting invented `text-narrow` composites would describe static tokens without the condition that gives them meaning, so v1 does not do it.
 
 ## Accessibility constraints
 
@@ -201,12 +273,15 @@ One clarification, because the earlier draft implied otherwise: **WCAG sets no m
 Tests are the deliverable, as in colour.
 
 1. **Scale contract** — every size is `rem`, is a multiple of `0.125rem`, and its ratio to the previous size falls inside the 1.111–1.250 band. The band is the assertion: it catches both a size edited to an arbitrary value and a step that has drifted far enough to read as a different scale.
-2. **Floors** — no size below `2xs`; every role used for blocks of text resolves to a line height of at least 1.5.
+2. **Floors** — no size below `2xs`; every prose role resolves to at least `1rem` and a line height of at least 1.5; `micro` is the only `2xs` role and carries its restricted classification.
 3. **Unitless line heights** — asserted structurally, since a length is the failure mode.
-4. **Role integrity** — every role names a size and a line height that exist, and every one of the five composite sub-properties is present.
-5. **Step-down coverage** — each narrow-viewport role resolves to a size already in the scale.
-6. **Emitted parity** — the CSS and the JSON describe the same scale, and `tokens.json` validates against the published DTCG schema, including composite `typography` tokens.
-7. **Browser behaviour** — a check at a raised root font size and a 320px viewport, plus the `rem` breakpoint responding to the user's font-size preference.
+4. **Role integrity** — the exact eleven-role matrix is pinned; every role names existing family, size, weight, letter-spacing, and line-height primitives; every composite contains all five properties.
+5. **Step-down coverage** — exactly headings 1–3 step down one existing size below exactly `40rem`; heading 4 and every non-heading role remain unchanged.
+6. **Emitted parity** — CSS's five role properties resolve to the same five aliases as each default DTCG composite; `tokens.json` validates against the published 2025.10 schema, including a negative test that removes a required composite property.
+7. **Browser behaviour** — Playwright runs two isolated Firefox projects at a 700px viewport: the default 16px preference remains wide, while `font.size.variable.x-western` raised to 20 makes `(width < 40rem)` match and steps headings down. A 320 CSS px fixture with a 24px root renders representative content for all eleven roles and requires document scroll width to equal viewport width.
+8. **Mutation checks** — tests must catch a missing role or property, an invalid primitive reference, a changed breakpoint unit, and an incorrect heading step.
+
+Browser coverage uses `@playwright/test`; `pnpm test` runs it after Vitest. CI installs Firefox and its required OS dependencies with Playwright's browser-specific install command, rather than downloading three engines the package does not test.
 
 ## Non-goals for v1
 
@@ -216,8 +291,6 @@ Tests are the deliverable, as in colour.
 - Vertical rhythm and baseline-grid alignment. `text-box-trim` is the eventual answer to uneven half-leading and is not Baseline yet; worth revisiting when it is.
 - Language-specific stacks and their metrics. `loose` exists for CJK leading, but CJK families, weights and letter spacing are out of scope.
 
-## Open questions
+## Deferred question
 
 - **Whether any size wants non-zero tracking.** v1 ships `0` everywhere, which the composite type obliges us to state explicitly. The instinct is that display sizes want slight negative tracking, but shipped practice points the other way: Carbon applies a small *positive* tracking to its 14px sets and zero above. Either way the right amount is face-dependent, and the face is whatever the platform supplies, so tuning against a stack we do not control would be guessing. Revisit alongside any decision to self-host.
-- **Whether headings need four levels or five.** Four roles are specified; a fifth is cheap to add and impossible to remove.
-- **Whether `--lat-text-micro` earns its place** as a role, or whether `2xs` should be reachable only through the size primitive. A role makes the restriction harder to state; a bare primitive makes it easier to misuse.

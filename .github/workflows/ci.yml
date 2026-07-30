@@ -32,6 +32,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Install Firefox
+        run: pnpm --filter @chameleon-labs/lattice-tokens exec playwright install --with-deps firefox
+
       - name: Typecheck
         run: pnpm -r typecheck
 
