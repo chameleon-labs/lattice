@@ -17,7 +17,7 @@ import {
   type SeverityLevel
 } from '../config/severity.js'
 import type { CheckResult, PaletteReport } from './charts.js'
-import { contrastRatio, relativeLuminance } from './contrast.js'
+import { apcaLc, contrastRatio, relativeLuminance } from './contrast.js'
 import { parseHex } from './oklch.js'
 import { ship } from './solve.js'
 
@@ -111,18 +111,26 @@ export function validateSeverity(
   const faint = ramp.filter(
     (swatch) => contrastRatio(parseHex(swatch.hex), parseHex(surface)) < SEVERITY_CONTRAST_MIN
   )
+  // APCA reported beside the gate, never folded into it: the state is decided by
+  // the WCAG ratio alone. The worst Lc is the one worth surfacing, since it is
+  // the level closest to disappearing against its surface.
+  const worstLc = Math.min(
+    ...ramp.map((swatch) => Math.abs(apcaLc(parseHex(swatch.hex), parseHex(surface))))
+  )
+
   checks.push({
     name: 'Contrast vs surface',
     state: faint.length === 0 ? 'pass' : 'fail',
     detail:
-      faint.length === 0
+      `worst APCA Lc ${worstLc.toFixed(1)} (advisory) · ` +
+      (faint.length === 0
         ? `all ${ramp.length} at or above ${SEVERITY_CONTRAST_MIN}:1 against ${surface}`
         : faint
             .map(
               (swatch) =>
                 `${swatch.level} ${contrastRatio(parseHex(swatch.hex), parseHex(surface)).toFixed(2)}:1`
             )
-            .join(', ')
+            .join(', '))
   })
 
   // Light claims monotone chroma as well as lightness; that is what makes the

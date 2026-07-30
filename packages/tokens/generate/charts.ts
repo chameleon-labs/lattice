@@ -19,7 +19,7 @@ import {
   TIERS
 } from '../config/charts.js'
 import type { Mode } from '../config/lightness.js'
-import { contrastRatio } from './contrast.js'
+import { apcaLc, contrastRatio } from './contrast.js'
 import { deltaE } from './cvd.js'
 import { parseHex } from './oklch.js'
 import { ship } from './solve.js'
@@ -226,17 +226,25 @@ export function validateCategorical(
   const faint = palette.filter(
     (swatch) => contrastRatio(parseHex(swatch.hex), parseHex(surface)) < CHECKS.contrastMin
   )
+  // APCA is reported beside the gate and never folded into it: the state above
+  // is decided by the WCAG ratio alone. Reported as the worst Lc in the palette,
+  // since a mark that disappears is the one worth knowing about.
+  const worstLc = Math.min(
+    ...palette.map((swatch) => Math.abs(apcaLc(parseHex(swatch.hex), parseHex(surface))))
+  )
+
   checks.push({
     name: 'Contrast vs surface',
     state: faint.length === 0 ? 'pass' : 'warn',
     detail:
-      faint.length === 0
+      `worst APCA Lc ${worstLc.toFixed(1)} (advisory) · ` +
+      (faint.length === 0
         ? `all ${palette.length} at or above ${CHECKS.contrastMin}:1 against ${surface}`
         : `relief required for: ${faint
             .map(
               (s) => `${s.name} ${contrastRatio(parseHex(s.hex), parseHex(surface)).toFixed(2)}:1`
             )
-            .join(', ')}`
+            .join(', ')}`)
   })
 
   // 6. The values are the generated ones. In a hand-run validator this is a
