@@ -23,12 +23,13 @@ function blocks(stylesheet: string): [string, string, string] {
   const darkAt = stylesheet.indexOf("\n[data-lat-theme='dark'] {")
   const mediaAt = stylesheet.indexOf('@media (prefers-color-scheme: dark)')
   const responsiveAt = stylesheet.indexOf('@media (width < 40rem)')
+  const mediaEnd = responsiveAt < 0 ? stylesheet.length : responsiveAt
 
   if (
     lightAt < 0 ||
     darkAt < lightAt ||
     mediaAt < darkAt ||
-    responsiveAt < mediaAt
+    (responsiveAt >= 0 && responsiveAt < mediaAt)
   ) {
     throw new Error(
       `cannot split the stylesheet into blocks: light rule at ${lightAt}, ` +
@@ -40,7 +41,7 @@ function blocks(stylesheet: string): [string, string, string] {
   return [
     stylesheet.slice(lightAt, darkAt),
     stylesheet.slice(darkAt, mediaAt),
-    stylesheet.slice(mediaAt, responsiveAt)
+    stylesheet.slice(mediaAt, mediaEnd)
   ]
 }
 
@@ -60,6 +61,13 @@ describe('the block splitter itself', () => {
     for (const part of parts) {
       expect(part.length).toBeGreaterThan(100)
     }
+  })
+
+  it('splits colour blocks when no later typography query exists', () => {
+    const responsiveAt = css.indexOf('@media (width < 40rem)')
+
+    expect(responsiveAt).toBeGreaterThan(-1)
+    expect(blocks(css.slice(0, responsiveAt))).toHaveLength(3)
   })
 })
 
