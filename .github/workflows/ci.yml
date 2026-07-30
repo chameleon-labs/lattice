@@ -1,0 +1,55 @@
+name: CI
+
+# The colour spec's claim is that the contrast contracts fail the build. Without
+# this workflow that was true only on a developer's machine: nothing ran the
+# suite on a pull request, so every green result was a report rather than a gate.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Read from the workspace root rather than pinned here, so the version
+          # this runs on cannot drift from the one the package declares.
+          node-version-file: package.json
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm -r typecheck
+
+      - name: Test
+        run: pnpm -r test
+
+      # Runs last because it is the slowest and the most complete: it generates
+      # every scale, gates on the contrast contracts, and writes the artefacts.
+      # A contract failure exits non-zero here and nothing reaches dist/.
+      - name: Build
+        run: pnpm -r build
+
+      # dist/ is gitignored, so a broken emit would otherwise be invisible until
+      # release. This proves the two published files exist and are non-empty.
+      - name: Verify emitted artefacts
+        run: |
+          set -euo pipefail
+          for f in packages/tokens/dist/lattice.css packages/tokens/dist/tokens.json; do
+            test -s "$f" || { echo "missing or empty: $f"; exit 1; }
+            echo "ok: $f ($(wc -c < "$f") bytes)"
+          done
