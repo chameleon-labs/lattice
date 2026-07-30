@@ -10,7 +10,7 @@ Sizes are `rem` — that is the token. Px equivalents are given **at the default
 
 | Decision | Choice |
 |---|---|
-| Spacing | Linear on a `0.25rem` grid, thinning above `1.5rem`. Fourteen steps, `0`–`8rem`. |
+| Spacing | Linear on a `0.25rem` grid with two fractional steps, thinning above `1.5rem`. Sixteen steps, `0`–`8rem`. |
 | Breakpoints | `rem`, not `px`, so they respond to the user's font size. |
 | Container widths | Capped by reading measure, not by viewport. |
 | Radii | Five roles, not raw numbers. Nested radii are derived, not chosen. |
@@ -27,7 +27,9 @@ Every number below is computed or measured.
 | Step | rem | px at default root |
 |---|---|---|
 | `0` | 0 | 0 |
+| `0.5` | 0.125 | 2 |
 | `1` | 0.25 | 4 |
+| `1.5` | 0.375 | 6 |
 | `2` | 0.5 | 8 |
 | `3` | 0.75 | 12 |
 | `4` | 1 | 16 |
@@ -41,9 +43,25 @@ Every number below is computed or measured.
 | `24` | 6 | 96 |
 | `32` | 8 | 128 |
 
-Every value is a multiple of the base unit, so the step number *is* the multiplier: step `6` is six quarter-rems. The scale thins above `1.5rem` because the difference between 88px and 96px of page margin is not a decision anyone makes, while the difference between 4px and 8px of inset is one people make constantly.
+**The step number is the multiplier**: step `6` is six quarter-rems, and step `0.5` is half of one. That property holds for every step including the fractional pair, which is what makes the arithmetic checkable rather than remembered.
 
-**On the range:** the full `0`–`8rem` span is kept. The argument for cutting it is that large values go unused, but the failure mode of omitting them is the same one the typography floor had — a team needing 96px of section spacing writes `margin: 96px`, in `px`, outside the system. The cost of an unused token is a line in a stylesheet; the cost of an absent one is an untokenised hardcode.
+The scale thins above `1.5rem` because the difference between 88px and 96px of page margin is not a decision anyone makes, while the difference between 4px and 8px of inset is one people make constantly.
+
+### The two fractional steps, and why they exist
+
+An earlier draft stopped at a strict `0.25rem` grid with no sub-4px value. Checked against what ships, that was the outlier: **every major system carries one** — Carbon and Primer at 2px, Spectrum at 1px, Tailwind at 2px with a literal 1px besides — and three of the four also carry 6px.
+
+The reasoning for adding them is the one this system has already used twice. Omitting a value does not prevent its use; it prevents the use being *tokenised*. A 2px focus-ring offset is a real need — this spec creates it, in the focus-ring constraint below — and without a token someone writes `2px`, in `px`, outside the system and immune to the user's font size.
+
+The fractional naming is borrowed from Tailwind because it is the only convention that adds the values without breaking the multiplier property: `0.5 × 4px = 2px`.
+
+### Naming: multiples, not pixels
+
+Primer and Spectrum name spacing tokens by pixel value — Primer's `base-size-16` **is** `1rem`. That is a deliberate divergence here rather than an oversight.
+
+A px-derived name for a `rem` value is a lie the moment the root moves: at a user default of 20px, `base-size-16` computes to 20px and the name still says 16. Naming by multiple of the base unit stays true at any root, which matters more in a system whose first accessibility gate is that every dimension responds to the user's font size.
+
+**On the range:** the full `0`–`8rem` span is kept, for the same reason the fractional steps were added. A team needing 96px of section spacing and finding no token writes `margin: 96px`. The cost of an unused token is a line in a stylesheet; the cost of an absent one is an untokenised hardcode.
 
 ## Sizing
 
@@ -145,7 +163,11 @@ Each does the work the others cannot: the shadow reads on light, the surface ste
 | `entrance` | `cubic-bezier(0, 0, 0, 1)` | Elements arriving — decelerate in |
 | `exit` | `cubic-bezier(0.3, 0, 1, 1)` | Elements leaving — accelerate out |
 
+The three-way split is not invented here: Carbon ships the same `standard` / `entrance` / `exit` taxonomy, which is reassuring about the vocabulary. The curves differ — Carbon's resolve to `y = 0.9` rather than `1`, giving a softer settle, and it carries `productive` and `expressive` variants of each. One variant is enough until a second is needed.
+
 Nothing above `400ms`. A transition long enough to notice is long enough to wait for, and the ceiling is a decision rather than an accident.
+
+This is a considered divergence: Primer ships durations to 1000ms across twelve steps. Offering a duration is not requiring it, and a wider range is defensible for choreographed or expressive motion — but five named durations that all sit inside a bound are easier to hold in mind than twelve that do not, and a ceiling is only a ceiling if something enforces it.
 
 ### Reduced motion reduces motion, not feedback
 
@@ -198,6 +220,6 @@ These are gates, not guidance.
 
 ## Open questions
 
-- **Whether `--lat-space-0` earns a token.** Zero is zero, and a token for it is either useful consistency or noise.
+- **Whether `--lat-space-0` earns a token.** Kept for now: `gap: 0` and `padding: 0` are common enough that a token makes a layout read consistently, and Tailwind agrees. Worth noting the field is split — Carbon, Primer and Spectrum all omit it.
 - **Whether elevation levels should be named for depth or for use** — `raised`/`overlay`/`modal` names the use, which reads better and dates faster.
 - **Whether the shadow colour should be neutral or hue-matched.** A shadow tinted toward the surface's hue reads as more natural, but it is one more thing to generate and to test.
