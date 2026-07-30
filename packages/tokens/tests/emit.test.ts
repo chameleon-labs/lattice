@@ -14,6 +14,7 @@ import {
 } from '../generate/emit.js'
 import { formatHex, oklchToSrgb } from '../generate/oklch.js'
 import { buildAllScales } from '../generate/scale.js'
+import { TYPOGRAPHY_PRIMITIVE_COUNT } from '../generate/typography.js'
 
 const scales = buildAllScales()
 const css = emitCss(scales)
@@ -74,19 +75,24 @@ describe('lattice.css', () => {
   // cascade rather than a mistake, because a media query cannot reuse the
   // declarations of a rule outside it. It is the main cost of the mode strategy
   // and is asserted per block so a change to any one of them is visible.
-  it('declares each mode in its own block, dark twice', () => {
-    const [lightBlock, darkBlock, mediaBlock] = splitBlocks(css)
+  it('declares theme-independent typography once before every themed block', () => {
+    const [globalBlock, lightBlock, darkBlock, mediaBlock] = splitBlocks(css)
 
+    expect(count(globalBlock)).toBe(TYPOGRAPHY_PRIMITIVE_COUNT)
     expect(count(lightBlock)).toBe(PER_BLOCK)
     expect(count(darkBlock)).toBe(PER_BLOCK)
     expect(count(mediaBlock)).toBe(PER_BLOCK)
-    expect(count(css)).toBe(PER_BLOCK * BLOCKS)
+    expect(count(css)).toBe(TYPOGRAPHY_PRIMITIVE_COUNT + PER_BLOCK * BLOCKS)
+    expect(css.match(/--lat-font-size-base:/g)).toHaveLength(1)
   })
 
   // Every declaration is either a generated colour or a reference to one. The
   // semantic tier introduced the second kind; nothing is ever a hex literal.
-  it('emits every declaration as an oklch colour or a var reference', () => {
-    const values = css.match(/--lat-[a-z0-9-]+: ([^;]+);/g) ?? []
+  it('emits every themed declaration as an oklch colour or a var reference', () => {
+    const [, lightBlock, darkBlock, mediaBlock] = splitBlocks(css)
+    const values = [lightBlock, darkBlock, mediaBlock].flatMap(
+      (themed) => themed.match(/--lat-[a-z0-9-]+: ([^;]+);/g) ?? []
+    )
 
     expect(values).toHaveLength(PER_BLOCK * BLOCKS)
     for (const declaration of values) {
@@ -95,7 +101,7 @@ describe('lattice.css', () => {
   })
 
   it('gives the two dark blocks identical values', () => {
-    const [, darkBlock, mediaBlock] = splitBlocks(css)
+    const [, , darkBlock, mediaBlock] = splitBlocks(css)
     const declarations = (block: string): string[] =>
       (block.match(/--lat-[a-z0-9-]+: [^;]+;/g) ?? []).map((line) => line.trim())
 
@@ -149,15 +155,21 @@ describe('lattice.css', () => {
 })
 
 describe('tokens.json', () => {
-  const leaves = (): { path: string; token: ColorToken }[] => {
-    const found: { path: string; token: ColorToken }[] = []
+  interface TokenLeaf {
+    readonly $type: string
+    readonly $description?: string
+    readonly $value: unknown
+  }
+
+  const leaves = (): { path: string; token: TokenLeaf }[] => {
+    const found: { path: string; token: TokenLeaf }[] = []
     const walk = (node: unknown, path: string): void => {
       if (node === null || typeof node !== 'object') {
         return
       }
       const record = node as Record<string, unknown>
       if ('$value' in record) {
-        found.push({ path, token: record as unknown as ColorToken })
+        found.push({ path, token: record as unknown as TokenLeaf })
         return
       }
       for (const [key, child] of Object.entries(record)) {
@@ -179,7 +191,9 @@ describe('tokens.json', () => {
   // uses DTCG's own `{group.token}` alias syntax, so the JSON carries the same
   // two tiers the stylesheet does.
   const colorLeaves = (): { path: string; token: ColorToken }[] =>
-    leaves().filter((leaf) => typeof leaf.token.$value === 'object') as {
+    leaves().filter(
+      (leaf) => leaf.token.$type === 'color' && typeof leaf.token.$value === 'object'
+    ) as unknown as {
       path: string
       token: ColorToken
     }[]
@@ -189,7 +203,17 @@ describe('tokens.json', () => {
       .map((leaf) => ({ path: leaf.path, value: leaf.token.$value as unknown as string }))
 
   it('carries one token per primitive step, chart slot, severity level and alias', () => {
-    expect(leaves()).toHaveLength(PER_BLOCK * MODES.length)
+    expect(leaves()).toHaveLength(TYPOGRAPHY_PRIMITIVE_COUNT + PER_BLOCK * MODES.length)
+  })
+
+  it('carries global typography separately from the colour modes', () => {
+    const global = tokens['global'] as Record<string, Record<string, TokenLeaf>>
+
+    expect(global['font-size']?.['base']?.$value).toEqual({ value: 1, unit: 'rem' })
+    expect(global['line-height']?.['normal']?.$value).toBe(1.5)
+    expect(global['font-weight']?.['bold']?.$value).toBe(700)
+    expect(tokens['light']).toBeDefined()
+    expect(tokens['dark']).toBeDefined()
   })
 
   it('declares every colour-valued token as a DTCG oklch colour', () => {
@@ -237,7 +261,7 @@ describe('tokens.json', () => {
   // hex here is what keeps the contract-verified value in the artefact, since the
   // CSS deliberately ships oklch() alone.
   it('carries the verified hex as the DTCG fallback', () => {
-    const byPath = new Map(leaves().map((leaf) => [leaf.path, leaf.token]))
+    const byPath = new Map(colorLeaves().map((leaf) => [leaf.path, leaf.token]))
 
     for (const scale of scales) {
       for (const swatch of scale.steps) {
@@ -318,22 +342,25 @@ function count(block: string): number {
   return (block.match(/--lat-[a-z0-9-]+:/g) ?? []).length
 }
 
-/** The light rule, the explicit-dark rule, and the preference-driven dark rule. */
-function splitBlocks(stylesheet: string): [string, string, string] {
+/** The global, light, explicit-dark, and preference-driven dark rules. */
+function splitBlocks(stylesheet: string): [string, string, string, string] {
+  const lightAt = stylesheet.indexOf("\n:root,\n[data-lat-theme='light'] {")
   const darkAt = stylesheet.indexOf("\n[data-lat-theme='dark'] {")
   const mediaAt = stylesheet.indexOf('@media (prefers-color-scheme: dark)')
 
   // Same guard as tests/semantic.test.ts: a missing delimiter makes indexOf
   // return -1, and the resulting slice fails every later assertion on content
   // rather than saying the split itself found nothing.
-  if (darkAt < 0 || mediaAt < 0 || mediaAt < darkAt) {
+  if (lightAt < 0 || darkAt < lightAt || mediaAt < darkAt) {
     throw new Error(
-      `cannot split the stylesheet into blocks: dark rule at ${darkAt}, media query at ${mediaAt}`
+      `cannot split the stylesheet into blocks: light rule at ${lightAt}, ` +
+        `dark rule at ${darkAt}, media query at ${mediaAt}`
     )
   }
 
   return [
-    stylesheet.slice(0, darkAt),
+    stylesheet.slice(0, lightAt),
+    stylesheet.slice(lightAt, darkAt),
     stylesheet.slice(darkAt, mediaAt),
     stylesheet.slice(mediaAt)
   ]
