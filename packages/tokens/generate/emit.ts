@@ -219,11 +219,14 @@ export function emitTokens(scales: readonly Scale[]): DesignTokens {
     }
 
     const severity: Record<string, ColorToken> = {}
-    for (const swatch of buildSeverity(mode)) {
+    const ramp = buildSeverity(mode)
+    for (const swatch of ramp) {
       severity[swatch.level] = {
         $type: 'color',
+        // The total is read off the ramp rather than written in, so this cannot
+        // outlive a change to the level list.
         $description:
-          `Impact level ${swatch.rank} of 4 — ${swatch.level}. ` +
+          `Impact level ${swatch.rank} of ${ramp.length} — ${swatch.level}. ` +
           'Must ship with an icon and a text label: colour never carries severity alone.',
         $value: colorValue(swatch.l, swatch.c, swatch.h, swatch.hex)
       }

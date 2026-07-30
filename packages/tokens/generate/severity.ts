@@ -70,13 +70,23 @@ export function validateSeverity(
     }
   }
 
-  // The order is the whole point, so it is checked before anything measured.
+  // The order is the whole point, so it is checked before anything measured —
+  // and all four levels must be present, not merely a prefix of them.
+  //
+  // The categorical validator deliberately compares against a prefix, because a
+  // scatter chart validates only the leading slots it actually uses. Severity has
+  // no equivalent: the levels are a fixed vocabulary, and a ramp without
+  // `critical` is not a shorter ramp but a broken one. Comparing against a prefix
+  // here passed a three-level ramp, and a one-level ramp too.
   const order = ramp.map((swatch) => swatch.level).join(' ')
-  const expected = SEVERITY_LEVELS.slice(0, ramp.length).join(' ')
+  const expected = SEVERITY_LEVELS.join(' ')
   checks.push({
     name: 'Ordered levels',
     state: order === expected ? 'pass' : 'fail',
-    detail: order === expected ? `${ramp.length} levels, least severe first` : order
+    detail:
+      order === expected
+        ? `all ${SEVERITY_LEVELS.length} levels, least severe first`
+        : `expected ${expected}, got ${order || '(none)'}`
   })
 
   // Greyscale ordering: does the ramp still read as ordered with colour removed?

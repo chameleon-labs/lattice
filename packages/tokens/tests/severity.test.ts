@@ -8,7 +8,7 @@ import {
   SEVERITY_LEVELS,
   SEVERITY_MIN_LUMINANCE_GAP
 } from '../config/severity.js'
-import { contrastRatio, relativeLuminance } from '../generate/contrast.js'
+import { contrastRatio } from '../generate/contrast.js'
 import { deltaE } from '../generate/cvd.js'
 import { parseHex } from '../generate/oklch.js'
 import { buildSeverity, validateSeverity } from '../generate/severity.js'
@@ -174,6 +174,25 @@ describe('the severity checks', () => {
 
     expect(report.ok).toBe(false)
     expect(report.checks.find((check) => check.name === 'Ordered levels')?.state).toBe('fail')
+  })
+
+  // A ramp missing a level is broken, not shorter. The categorical validator
+  // compares against a prefix on purpose — a scatter chart validates only the
+  // slots it uses — and carrying that over let a three-level ramp with no
+  // `critical` pass, and a one-level ramp too.
+  it.each([1, 2, 3])('fails a ramp truncated to %i level(s)', (kept) => {
+    const report = validateSeverity(buildSeverity('light').slice(0, kept), 'light')
+
+    expect(report.ok).toBe(false)
+    expect(report.checks.find((check) => check.name === 'Ordered levels')?.state).toBe('fail')
+  })
+
+  it('names the level that went missing', () => {
+    const detail = validateSeverity(buildSeverity('light').slice(0, 3), 'light').checks.find(
+      (check) => check.name === 'Ordered levels'
+    )?.detail
+
+    expect(detail).toContain('critical')
   })
 
   it('fails an empty ramp rather than passing vacuously', () => {

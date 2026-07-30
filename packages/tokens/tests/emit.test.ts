@@ -245,6 +245,29 @@ describe('tokens.json', () => {
     expect(byPath.get('dark.gray.12')?.$description).toBe(STEP_JOBS[11])
   })
 
+  // The rank and the total are both read off the generated ramp, so neither can
+  // drift from what is actually emitted if the level list changes.
+  it('ranks each severity level against the real size of the ramp', () => {
+    const byPath = new Map(leaves().map((leaf) => [leaf.path, leaf.token]))
+
+    for (const mode of MODES) {
+      SEVERITY_LEVELS.forEach((level, index) => {
+        expect(byPath.get(`${mode}.severity.${level}`)?.$description).toContain(
+          `Impact level ${index + 1} of ${SEVERITY_LEVELS.length} — ${level}`
+        )
+      })
+    }
+  })
+
+  // The usage rule is only useful if it travels with the tokens.
+  it('carries the icon-and-label rule on every severity token', () => {
+    for (const { path, token } of leaves()) {
+      if (path.includes('.severity.')) {
+        expect(token.$description, path).toMatch(/icon and a text label/)
+      }
+    }
+  })
+
   it('serialises to JSON and back unchanged', () => {
     expect(JSON.parse(JSON.stringify(tokens))).toEqual(tokens)
   })
