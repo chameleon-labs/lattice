@@ -1,4 +1,4 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": ["config", "generate", "tests", "vitest.config.ts"]
+  "include": ["config", "generate", "tests", "playwright.config.ts", "vitest.config.ts"]
 }
