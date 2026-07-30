@@ -49,7 +49,7 @@ Typography keeps the system sans stack as its default and offers Inter as an opt
 
 ## Design docs
 
-Decisions live in [`docs/superpowers/specs/`](./docs/superpowers/specs/). Start with the [colour system](./docs/superpowers/specs/2026-07-28-lattice-color-system-design.md), [typography](./docs/superpowers/specs/2026-07-30-lattice-typography-design.md), and [spacing/motion](./docs/superpowers/specs/2026-07-30-lattice-spacing-and-motion-design.md) designs — they record what was chosen, what was rejected, and the measurements behind both.
+Decisions live in [`docs/superpowers/specs/`](./docs/superpowers/specs/). Start with the [colour system](./docs/superpowers/specs/2026-07-28-lattice-color-system-design.md), [typography](./docs/superpowers/specs/2026-07-30-lattice-typography-design.md), and [spacing/motion](./docs/superpowers/specs/2026-07-30-lattice-spacing-and-motion-design.md) designs — they record what was chosen, what was rejected, and the measurements behind each.
 
 ## Development
 

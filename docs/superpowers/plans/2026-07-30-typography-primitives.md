@@ -11,8 +11,8 @@
 ## Global Constraints
 
 - Follow the approved spec at `docs/superpowers/specs/2026-07-30-lattice-typography-design.md`.
-- Work directly in `/Users/george/WebstormProjects/lattice` on `main`; do not create a worktree.
-- Do not commit or push until George has reviewed the complete local diff and explicitly approves it.
+- Work from the repository root on a feature branch.
+- Do not commit or push until the complete local diff has been reviewed and explicitly approved.
 - Use test-driven development: write each behavior test, observe the intended failure, then add the smallest implementation.
 - Typography primitives are theme-independent and must appear exactly once in CSS.
 - The system sans stack remains the default. Inter is an opt-in primitive only.
@@ -622,11 +622,11 @@ Set #26 to In Progress when implementation begins. After verification, leave the
 - test, typecheck, and build results;
 - mutation results;
 - any divergence from this plan;
-- the local diff ready for George to review.
+- the local diff ready for maintainer review.
 
 - [ ] **Step 5: Commit and push only after explicit approval**
 
-After George approves the local diff:
+After a maintainer approves the local diff:
 
 ```bash
 git add README.md docs/superpowers/specs/2026-07-30-lattice-typography-design.md \
@@ -640,7 +640,7 @@ git add README.md docs/superpowers/specs/2026-07-30-lattice-typography-design.md
 git -c commit.gpgsign=false commit -m "Typography primitives and global token emission"
 ```
 
-Do not add an AI attribution trailer or generated-by wording. Do not push until separately approved if George asks to review the commit first.
+Do not add an AI attribution trailer or generated-by wording. Do not push until separately approved if the maintainer asks to review the commit first.
 
 ### Task 6: Optional Inter primitive amendment
 
