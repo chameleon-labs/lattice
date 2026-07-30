@@ -7,8 +7,10 @@
  *   misses its minimum fails the build.
  * - **APCA** `Lc` is computed and reported and **never** gated on. It is
  *   perceptually more accurate, particularly in dark mode, but it is not a
- *   conformance standard — and tabstop audits with axe-core, which reports
- *   WCAG 2. Reporting both keeps the gap between them visible.
+ *   conformance standard, and the audit engines a consuming product is measured
+ *   by report WCAG 2. A palette justified by a different standard than the one
+ *   it will be audited against would be indefensible. Reporting both keeps the
+ *   gap between them visible rather than hidden.
  */
 
 import { srgbToLinear, type Rgb } from './oklch.js'
