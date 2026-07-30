@@ -1,7 +1,7 @@
 # Lattice — typography design
 
 **Date:** 2026-07-30
-**Status:** draft, ready for review
+**Status:** approved, implementation tracked in #26 and #27
 **Scope:** the typography scale and its tokens. Colour is specified separately; spacing and sizing are tracked separately again.
 
 Throughout, sizes are given in `rem` — that is the token — with a px equivalent **at the default root** shown for readability. Those px figures are not the values: at a user default of 20px the whole scale is 25% larger, which is the point of the unit.
@@ -10,7 +10,7 @@ Throughout, sizes are given in `rem` — that is the token — with a px equival
 
 | Decision | Choice |
 |---|---|
-| Families | System stacks: one sans for UI, one monospace. No web font in v1. |
+| Families | System sans remains the default; one monospace stack and one optional Inter stack are also available. Font delivery is out of scope in v1. |
 | Scale | Ratio-based, snapped to `0.125rem`. Nine sizes, `0.625rem`–`2.25rem`. Ratio tightens near body size and widens at display. |
 | Sizing unit | `rem` everywhere — declarations *and* media queries. Never `px`, never viewport units alone. |
 | Fluid vs stepped | **Stepped**, with the three display sizes stepping down once at narrow viewports. |
@@ -21,7 +21,7 @@ Throughout, sizes are given in `rem` — that is the token — with a px equival
 
 Every number below is computed or measured.
 
-## Why the system stack
+## Why the system stack remains the default
 
 A design system that exists to make accessible products has a hard time justifying a web font in v1.
 
@@ -29,16 +29,25 @@ A design system that exists to make accessible products has a hard time justifyi
 - It is page weight on the critical path, and the fallback path has to be designed anyway.
 - The system stack honours platform-level font substitution, which is where a reader who has configured a more readable face has configured it.
 
-The stack is not a brand asset, and that is the cost. **Revisit when brand differentiation is worth a loading state** — at which point the font must be subsetted, preloaded, served with `font-display: swap`, and its fallback metrics matched with `size-adjust` so the swap does not move the page.
+The stack is not a brand asset, and that is the cost. Products that already load Inter can opt into the Inter primitive without changing Lattice's default or making the token package responsible for delivery.
 
 A monospace face is required, not optional. Any product rendering code, identifiers, selectors, file paths or columns of figures needs glyph-width stability. For figures inside a proportional face, `font-variant-numeric: tabular-nums` is usually the better answer than switching family.
 
 ```css
 --lat-font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
                  'Helvetica Neue', Arial, sans-serif;
+--lat-font-inter: InterVariable, 'Inter Variable', Inter, ui-sans-serif,
+                  system-ui, -apple-system, 'Segoe UI', Roboto,
+                  'Helvetica Neue', Arial, sans-serif;
 --lat-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
                  'Liberation Mono', monospace;
 ```
+
+### Optional Inter, without font delivery
+
+`--lat-font-inter` is an opt-in family primitive. It prefers the current variable web-family name `InterVariable`, then the local/current installed name `'Inter Variable'`, then the static family `Inter`, before falling through to the complete system sans stack. The names follow Inter's [official web CSS](https://rsms.me/inter/inter.css); Inter's [official site](https://rsms.me/inter/) documents its variable and static distributions.
+
+Lattice does not bundle font files, emit `@font-face`, request a CDN, or add a font dependency. The consuming application owns loading Inter and choosing its subsets and caching policy. If it does not load Inter, the token behaves as the system stack with no network side effect. Semantic roles remain on `--lat-font-sans` unless a product explicitly opts into `--lat-font-inter`.
 
 ## The scale
 
@@ -160,7 +169,7 @@ No new sizes are introduced: the step-down moves a role along the existing scale
 
 Three tiers, matching the colour system.
 
-**Tier 1 — primitive, generated.** `--lat-font-size-*`, `--lat-line-height-*`, `--lat-font-weight-*`, `--lat-font-sans`, `--lat-font-mono`. Emitted by the build. Never hand-edited.
+**Tier 1 — primitive, generated.** `--lat-font-size-*`, `--lat-line-height-*`, `--lat-font-weight-*`, `--lat-font-sans`, `--lat-font-inter`, `--lat-font-mono`. Emitted by the build. Never hand-edited.
 
 **Tier 2 — semantic role, hand-authored.** A role bundles the properties that always travel together, so a component sets one thing rather than several:
 
@@ -201,7 +210,7 @@ Tests are the deliverable, as in colour.
 
 ## Non-goals for v1
 
-- Web fonts, self-hosting, subsetting, `size-adjust` fallback matching.
+- Font delivery, self-hosting, subsetting, and `size-adjust` fallback matching. The optional Inter primitive is only a family stack.
 - Fluid sizing.
 - A separate density scale. The decoupled line heights cover the common compact case without one.
 - Vertical rhythm and baseline-grid alignment. `text-box-trim` is the eventual answer to uneven half-leading and is not Baseline yet; worth revisiting when it is.
