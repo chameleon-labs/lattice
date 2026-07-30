@@ -41,6 +41,13 @@ export function parseHex(hex: string): Rgb {
 }
 
 function channelToByte(value: number): string {
+  // Math.min/Math.max pass NaN straight through, so without this an emitted
+  // stylesheet would contain '#NaNNaNNaN' and still parse as valid CSS. A build
+  // that stops is strictly better than a token file that is quietly wrong.
+  if (!Number.isFinite(value)) {
+    throw new Error(`channel is not finite: ${value}`)
+  }
+
   const clamped = Math.min(1, Math.max(0, value))
   return Math.round(clamped * 255)
     .toString(16)
@@ -143,8 +150,12 @@ export function inGamut(color: Oklch): boolean {
   return representable(r) && representable(g) && representable(b)
 }
 
-/** Chroma precision of the gamut search — two orders finer than a hex step. */
-const CHROMA_RESOLUTION = 1e-4
+/**
+ * Chroma precision of the gamut search: about 400x finer than one 8-bit step
+ * (1/255 ≈ 3.9e-3), so the recorded chroma is well inside the quantisation that
+ * emitting a hex value imposes anyway.
+ */
+const CHROMA_RESOLUTION = 1e-5
 
 /**
  * Fits a requested chroma into sRGB by binary search, holding lightness and hue.
@@ -155,6 +166,16 @@ const CHROMA_RESOLUTION = 1e-4
  * clipping the RGB channels — clipping moves all three.
  */
 export function fitToGamut(color: Oklch): Oklch {
+  // Both non-finite cases are unacceptable, and neither is caught by the loop.
+  // Infinite chroma keeps the midpoint at Infinity so `clips` never decreases
+  // and the search spins forever — and because the loop is synchronous it blocks
+  // the event loop, so no test timeout or async watchdog can interrupt it. NaN
+  // chroma is the opposite failure: it fails the loop condition immediately and
+  // returns chroma 0, silently reporting grey as the fitted colour.
+  if (!Number.isFinite(color.l) || !Number.isFinite(color.c) || !Number.isFinite(color.h)) {
+    throw new Error(`cannot fit a non-finite colour: oklch(${color.l} ${color.c} ${color.h})`)
+  }
+
   if (inGamut(color)) {
     return color
   }

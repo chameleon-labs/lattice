@@ -37,6 +37,17 @@ describe('formatHex', () => {
   it('clamps channels that fall outside 0..1', () => {
     expect(formatHex({ r: 1.4, g: -0.2, b: 0 })).toBe('#ff0000')
   })
+
+  // Math.min/Math.max do not clamp NaN, so an unguarded implementation emits
+  // '#NaNNaNNaN' into a stylesheet. Refusing is the only safe answer: a token
+  // file that parses but is wrong is worse than a build that stops.
+  it.each(['r', 'g', 'b'] as const)('refuses a non-finite %s channel', (channel) => {
+    expect(() => formatHex({ r: 0, g: 0, b: 0, [channel]: Number.NaN })).toThrow(/finite/i)
+  })
+
+  it('refuses an infinite channel', () => {
+    expect(() => formatHex({ r: Number.POSITIVE_INFINITY, g: 0, b: 0 })).toThrow(/finite/i)
+  })
 })
 
 describe('sRGB transfer function', () => {
@@ -157,7 +168,39 @@ describe('fitToGamut', () => {
     const fitted = fitToGamut({ l: 0.7, c: 0.35, h: 150 })
 
     expect(fitted.c).toBeGreaterThan(0.15)
-    expect(inGamut({ ...fitted, c: fitted.c + 0.002 })).toBe(false)
+    expect(inGamut({ ...fitted, c: fitted.c + 5e-5 })).toBe(false)
+  })
+
+  // c: Infinity leaves the midpoint at Infinity forever, so the search never
+  // terminates; c: NaN fails the loop condition on the first check and quietly
+  // returns chroma 0. A hang and a silent wrong answer both have to be refused.
+  //
+  // No test timeout guards this: the loop is synchronous, so it blocks the event
+  // loop and vitest's timer can never fire. Without the guard in fitToGamut the
+  // whole suite hangs rather than failing, which is why the guard throws instead
+  // of clamping.
+  it.each([Number.POSITIVE_INFINITY, Number.NaN])(
+    'refuses chroma %p instead of hanging or silently returning grey',
+    (c) => {
+      expect(() => fitToGamut({ l: 0.5, c, h: 150 })).toThrow(/finite/i)
+    }
+  )
+
+  it('refuses a non-finite lightness', () => {
+    expect(() => fitToGamut({ l: Number.NaN, c: 0.2, h: 150 })).toThrow(/finite/i)
+  })
+
+  // Pins CHROMA_RESOLUTION. A single hue does not discriminate: whether the
+  // bisection happens to land near the boundary is luck, and a 1e-4 search
+  // passed a 5e-5 margin at hue 150 by chance. Swept across hues so a coarser
+  // resolution fails somewhere.
+  it('fits chroma to within 2e-5 of the boundary at every hue', () => {
+    for (const h of [0, 60, 120, 150, 210, 270, 305]) {
+      const fitted = fitToGamut({ l: 0.7, c: 0.4, h })
+
+      expect(inGamut(fitted)).toBe(true)
+      expect(inGamut({ ...fitted, c: fitted.c + 2e-5 })).toBe(false)
+    }
   })
 
   it('is idempotent', () => {
