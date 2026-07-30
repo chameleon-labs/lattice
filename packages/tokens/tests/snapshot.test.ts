@@ -46,10 +46,14 @@ describe('the emitted artefacts', () => {
 
   // Guards the snapshot itself: a shape file that silently emptied would match
   // nothing and still pass on the next accepted run.
+  //
+  // Deliberately no count assertion here. The exact total is already pinned in
+  // tests/emit.test.ts as `PER_BLOCK * MODES.length`, derived from the config, so
+  // it moves correctly when the config moves. A threshold repeated here would be
+  // a weaker hardcoded duplicate that fails on any legitimate reduction.
   it('covers every mode, scale, palette and alias in the shape file', () => {
     const paths = tokenPaths(emitTokens(scales))
 
-    expect(paths.length).toBeGreaterThan(300)
     for (const fragment of [
       'light.gray.1',
       'dark.accent.12',
