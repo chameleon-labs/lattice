@@ -50,7 +50,7 @@
 **Interfaces:**
 - Produces: the issue-level role matrix required by #27's acceptance criteria and an accurate In Progress board state.
 
-- [ ] **Step 1: Comment the approved matrix on issue #27**
+- [x] **Step 1: Comment the approved matrix on issue #27**
 
 Use `gh issue comment 27 --repo chameleon-labs/lattice` to record:
 
@@ -76,7 +76,7 @@ hierarchy stops at four headings. `letter-spacing.normal` is `0rem`. DTCG emits
 default composites; CSS alone carries the `40rem` condition for headings 1–3.
 ```
 
-- [ ] **Step 2: Set the project item to In Progress**
+- [x] **Step 2: Set the project item to In Progress**
 
 Resolve the current project item and Status field IDs from GitHub, set issue #27 to In Progress, and verify with:
 
@@ -97,7 +97,7 @@ Expected: the `Lattice v1` project item reports `In Progress`.
 - Produces: `LETTER_SPACINGS.normal`, CSS `--lat-letter-spacing-normal`, and DTCG `global.letter-spacing.normal`.
 - Consumed by: `config/typography-roles.ts` and `generate/typography-roles.ts`.
 
-- [ ] **Step 1: Add failing primitive assertions**
+- [x] **Step 1: Add failing primitive assertions**
 
 Import `LETTER_SPACINGS` and add:
 
@@ -112,7 +112,7 @@ it('provides the zero-tracking primitive required by every role', () => {
 })
 ```
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
 Run:
 
@@ -123,7 +123,7 @@ pnpm exec vitest run tests/typography.test.ts
 
 Expected: FAIL because `LETTER_SPACINGS` and the `letter-spacing` DTCG group do not exist.
 
-- [ ] **Step 3: Add the primitive**
+- [x] **Step 3: Add the primitive**
 
 In `config/typography.ts`:
 
@@ -140,7 +140,7 @@ In `generate/typography.ts`:
 - Add a readonly `'letter-spacing'` group of `DimensionToken` to `TypographyTokenGroups`.
 - Build that group with `{ $type: 'dimension', $value: { value, unit: 'rem' } }`.
 
-- [ ] **Step 4: Run the focused test and verify GREEN**
+- [x] **Step 4: Run the focused test and verify GREEN**
 
 Run:
 
@@ -150,11 +150,11 @@ pnpm exec vitest run tests/typography.test.ts
 
 Expected: all typography primitive tests pass.
 
-- [ ] **Step 5: Mutation-check the value and unit**
+- [x] **Step 5: Mutation-check the value and unit**
 
 Temporarily change `normal` to `0.01`, run the focused test, and confirm the exact-value assertion fails. Restore it, then temporarily emit `px` and confirm the DTCG assertion fails. Restore before continuing.
 
-- [ ] **Step 6: Hold the commit**
+- [x] **Step 6: Hold the commit**
 
 Do not commit. Record this intended commit boundary:
 
@@ -176,7 +176,7 @@ Add typography role contracts
   - `TypographyRoleName`
 - Consumes primitive keys from `config/typography.ts`.
 
-- [ ] **Step 1: Write the failing exact-matrix test**
+- [x] **Step 1: Write the failing exact-matrix test**
 
 Create `typography-roles.test.ts` with the hand-authored expected object:
 
@@ -294,7 +294,7 @@ describe('typography semantic roles', () => {
 })
 ```
 
-- [ ] **Step 2: Run and verify the missing-module failure**
+- [x] **Step 2: Run and verify the missing-module failure**
 
 Run:
 
@@ -304,7 +304,7 @@ pnpm exec vitest run tests/typography-roles.test.ts
 
 Expected: FAIL because `config/typography-roles.ts` does not exist.
 
-- [ ] **Step 3: Implement typed role contracts**
+- [x] **Step 3: Implement typed role contracts**
 
 Define key types from the primitive objects:
 
@@ -424,7 +424,7 @@ export const NARROW_HEADING_SIZES = {
 } as const satisfies Partial<Record<TypographyRoleName, keyof typeof FONT_SIZES>>
 ```
 
-- [ ] **Step 4: Add accessibility and primitive-reference tests**
+- [x] **Step 4: Add accessibility and primitive-reference tests**
 
 Add tests that:
 
@@ -434,7 +434,7 @@ Add tests that:
 - assert no role uses `inter`;
 - assert exactly four role names start with `heading-`.
 
-- [ ] **Step 5: Run the focused test**
+- [x] **Step 5: Run the focused test**
 
 Run:
 
@@ -444,7 +444,7 @@ pnpm exec vitest run tests/typography-roles.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 6: Mutation-check matrix scope**
+- [x] **Step 6: Mutation-check matrix scope**
 
 Temporarily delete `heading-4`, change `micro` to `xs`, and change `lead.lineHeight` to `snug`, one mutation at a time. The exact matrix, restricted-role, and prose-floor tests must fail respectively. Restore each mutation.
 
@@ -464,7 +464,7 @@ Temporarily delete `heading-4`, change `micro` to `xs`, and change `lead.lineHei
   - `TYPOGRAPHY_RESPONSIVE_OVERRIDE_COUNT`
 - Consumes: `TYPOGRAPHY_ROLES`, `NARROW_HEADING_SIZES`, `TYPOGRAPHY_BREAKPOINT_REM`.
 
-- [ ] **Step 1: Add failing CSS emission tests**
+- [x] **Step 1: Add failing CSS emission tests**
 
 Assert the exact five body aliases:
 
@@ -491,7 +491,7 @@ expect(typographyRoleResponsiveCss()).toBe(`@media (width < 40rem) {
 }`)
 ```
 
-- [ ] **Step 2: Add failing DTCG composite tests**
+- [x] **Step 2: Add failing DTCG composite tests**
 
 Assert:
 
@@ -509,7 +509,7 @@ expect(typographyRoleTokens().body).toEqual({
 expect(Object.keys(typographyRoleTokens())).toHaveLength(11)
 ```
 
-- [ ] **Step 3: Run and verify RED**
+- [x] **Step 3: Run and verify RED**
 
 Run:
 
@@ -519,7 +519,7 @@ pnpm exec vitest run tests/typography-roles.test.ts
 
 Expected: FAIL because `generate/typography-roles.ts` does not exist.
 
-- [ ] **Step 4: Implement the generator**
+- [x] **Step 4: Implement the generator**
 
 Define:
 
@@ -552,7 +552,7 @@ For every role, generate CSS aliases as `--lat-text-${role}-${cssProperty}: var(
 
 Generate the responsive CSS from `NARROW_HEADING_SIZES`; do not hardcode a second heading map.
 
-- [ ] **Step 5: Run the focused test and verify GREEN**
+- [x] **Step 5: Run the focused test and verify GREEN**
 
 Run:
 
@@ -562,7 +562,7 @@ pnpm exec vitest run tests/typography-roles.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 6: Mutation-check generation**
+- [x] **Step 6: Mutation-check generation**
 
 Temporarily omit `letterSpacing` from `PROPERTIES`, change the breakpoint suffix to `px`, and map heading 3 to `2xl`, one at a time. The property-count, exact-responsive, and narrow-map tests must fail. Restore each mutation.
 
@@ -579,7 +579,7 @@ Temporarily omit `letterSpacing` from `PROPERTIES`, change the breakpoint suffix
 - Consumes all public exports from `generate/typography-roles.ts`.
 - Produces role aliases and the responsive block in `lattice.css`; produces `global.text.*` composites in `tokens.json`.
 
-- [ ] **Step 1: Add failing integrated CSS assertions**
+- [x] **Step 1: Add failing integrated CSS assertions**
 
 Update global declaration counts to:
 
@@ -596,11 +596,11 @@ Assert:
 - no non-heading role appears inside the responsive block;
 - the generated header reports the derived primitive and role counts.
 
-- [ ] **Step 2: Add failing JSON and parity assertions**
+- [x] **Step 2: Add failing JSON and parity assertions**
 
 Assert `global.text` has exactly eleven keys. For each role and each of five properties, convert the DTCG reference to its CSS `var()` equivalent and compare it to the emitted CSS alias. Assert that `tokens.json` has no `text-narrow` group.
 
-- [ ] **Step 3: Run integrated tests and verify RED**
+- [x] **Step 3: Run integrated tests and verify RED**
 
 Run:
 
@@ -610,7 +610,7 @@ pnpm exec vitest run tests/emit.test.ts
 
 Expected: FAIL because `emit.ts` does not compose role output.
 
-- [ ] **Step 4: Compose CSS and JSON**
+- [x] **Step 4: Compose CSS and JSON**
 
 In `emitCss()`:
 
@@ -640,7 +640,7 @@ Typography: 21 primitives; 11 semantic roles x 5 properties.
 
 Derive every number from exported counts.
 
-- [ ] **Step 5: Add schema coverage**
+- [x] **Step 5: Add schema coverage**
 
 Extend the positive typography test:
 
@@ -657,7 +657,7 @@ expect(global.text?.body?.$value).toEqual({
 
 Add a negative test that clones the artefact, deletes `global.text.body.$value.lineHeight`, and expects schema validation to fail.
 
-- [ ] **Step 6: Run integrated and schema tests**
+- [x] **Step 6: Run integrated and schema tests**
 
 Run:
 
@@ -667,7 +667,7 @@ pnpm exec vitest run tests/emit.test.ts tests/schema.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 7: Observe snapshot failures before updating**
+- [x] **Step 7: Observe snapshot failures before updating**
 
 Run:
 
@@ -677,7 +677,7 @@ pnpm exec vitest run tests/snapshot.test.ts
 
 Expected: FAIL with one new letter-spacing primitive, 55 role declarations, three responsive declarations, one new primitive path, and eleven `global.text.*` token paths.
 
-- [ ] **Step 8: Update and inspect snapshots**
+- [x] **Step 8: Update and inspect snapshots**
 
 Run:
 
@@ -700,7 +700,7 @@ Inspect that no colour value, colour alias, or themed selector changed.
 - Consumes: `emitCss(buildAllScales())`, `TYPOGRAPHY_ROLES`.
 - Produces: `pnpm test:browser`; folds browser coverage into `pnpm test`.
 
-- [ ] **Step 1: Add Playwright Test**
+- [x] **Step 1: Add Playwright Test**
 
 Run from the repository root:
 
@@ -716,7 +716,7 @@ Add scripts:
 "test:browser": "playwright test"
 ```
 
-- [ ] **Step 2: Configure two isolated Firefox projects**
+- [x] **Step 2: Configure two isolated Firefox projects**
 
 Create `playwright.config.ts`:
 
@@ -753,7 +753,7 @@ export default defineConfig({
 })
 ```
 
-- [ ] **Step 3: Write the browser test before installing Firefox**
+- [x] **Step 3: Write the browser test before installing Firefox**
 
 Create the test with:
 
@@ -789,7 +789,7 @@ The second test sets the viewport to 320px, applies `html { font-size: 24px }`, 
 expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320)
 ```
 
-- [ ] **Step 4: Install Firefox and verify the browser test**
+- [x] **Step 4: Install Firefox and verify the browser test**
 
 Run:
 
@@ -801,7 +801,7 @@ pnpm test:browser
 
 Expected: four tests pass, two tests across two Firefox projects.
 
-- [ ] **Step 5: Add CI browser installation**
+- [x] **Step 5: Add CI browser installation**
 
 After `pnpm install --frozen-lockfile`, add:
 
@@ -812,7 +812,7 @@ After `pnpm install --frozen-lockfile`, add:
 
 Keep the existing `pnpm -r test` command so browser checks are a required gate.
 
-- [ ] **Step 6: Mutation-check the browser boundary**
+- [x] **Step 6: Mutation-check the browser boundary**
 
 Temporarily change the emitted query to `640px`; the large-default project must fail because Firefox still reports the query unmatched at 700px. Restore it. Temporarily remove the heading 1 override; the computed-size assertion must fail. Restore it.
 
@@ -825,15 +825,15 @@ Temporarily change the emitted query to `640px`; the large-default project must 
 **Interfaces:**
 - Produces: accurate public scope, a reviewable local diff, and issue #27 coordination.
 
-- [ ] **Step 1: Update README scope**
+- [x] **Step 1: Update README scope**
 
 Move semantic typography roles out of “Not yet.” State that the token package now contains primitive and semantic typography, while components remain unimplemented.
 
-- [ ] **Step 2: Verify issue coordination remains accurate**
+- [x] **Step 2: Verify issue coordination remains accurate**
 
 Confirm issue #27 still contains the approved matrix comment and its `Lattice v1` project item remains In Progress.
 
-- [ ] **Step 3: Run the complete gates**
+- [x] **Step 3: Run the complete gates**
 
 Run:
 
@@ -846,7 +846,7 @@ git diff --check
 
 Expected: all commands exit 0; Vitest reports all unit files passing and Playwright reports four Firefox tests passing.
 
-- [ ] **Step 4: Prove deterministic artefacts**
+- [x] **Step 4: Prove deterministic artefacts**
 
 Run the build twice and compare:
 
@@ -859,7 +859,7 @@ shasum -a 256 packages/tokens/dist/lattice.css packages/tokens/dist/tokens.json
 
 Expected: both checksum pairs match exactly.
 
-- [ ] **Step 5: Inspect the complete local diff**
+- [x] **Step 5: Inspect the complete local diff**
 
 Run:
 
@@ -872,7 +872,7 @@ git diff
 
 Expected: only issue #27 files are changed; generated `dist/` files remain ignored; no contributor-specific paths or AI attribution appear.
 
-- [ ] **Step 6: Request implementation review**
+- [x] **Step 6: Request implementation review**
 
 Report:
 
@@ -883,7 +883,7 @@ Report:
 
 Leave implementation changes uncommitted and unpushed until explicit approval.
 
-- [ ] **Step 7: Create small commits only after approval**
+- [x] **Step 7: Create small commits only after approval**
 
 Use these boundaries:
 
