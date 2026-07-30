@@ -1,6 +1,8 @@
-import { mkdir } from 'node:fs/promises'
+import { mkdir, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { emitCss, emitTokens } from './emit.js'
 import { buildAllScales } from './scale.js'
 
 /**
@@ -8,10 +10,9 @@ import { buildAllScales } from './scale.js'
  * `dist/tokens.json` — from the token config.
  *
  * The generator runs here and its contracts gate the build: a scale that cannot
- * meet its minimum ratio stops this process rather than shipping. Emitting the
- * artefacts themselves lands in #5, so for now this generates, verifies and
- * reports, and writes no files. It does not invent token values: every colour in
- * this package is computed from the config or it does not exist.
+ * meet its minimum ratio stops this process before anything is written, so a
+ * failing palette cannot reach `dist/`. It does not invent token values: every
+ * colour in this package is computed from the config or it does not exist.
  */
 const dist = fileURLToPath(new URL('../dist/', import.meta.url))
 
@@ -58,12 +59,30 @@ for (const scale of scales) {
   console.log('  %s  %s  %s', scale.name.padEnd(8), scale.mode.padEnd(5), advisory)
 }
 
+// Nothing is written while a contract is unmet: a stale dist/ is a better
+// outcome than one carrying a palette that fails its own gate.
 if (failures.length > 0) {
-  console.error('\nlattice: contract failures')
+  console.error('\nlattice: contract failures — nothing written')
   for (const failure of failures) {
     console.error('  %s', failure)
   }
   process.exit(1)
 }
 
-console.log('\nlattice: all contracts met — no tokens to emit yet (emit #5)')
+const css = emitCss(scales)
+const tokens = `${JSON.stringify(emitTokens(scales), null, 2)}\n`
+
+// `dist` is a filesystem path, so it is joined as one. Interpolating it back into
+// a `file:` URL would treat `#` and `?` in any parent directory name as a fragment
+// or query and silently truncate the path — writing lattice.css somewhere else
+// entirely, with no error.
+await writeFile(join(dist, 'lattice.css'), css, 'utf8')
+await writeFile(join(dist, 'tokens.json'), tokens, 'utf8')
+
+// Byte length, not string length: the header's em dash is one UTF-16 code unit
+// and three UTF-8 bytes, so `.length` under-reports what was actually written.
+console.log(
+  '\nlattice: wrote dist/lattice.css (%d bytes) and dist/tokens.json (%d bytes)',
+  Buffer.byteLength(css, 'utf8'),
+  Buffer.byteLength(tokens, 'utf8')
+)
