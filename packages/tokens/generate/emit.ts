@@ -4,9 +4,10 @@
  * `lattice.css` is what a consumer imports; `tokens.json` is the machine-readable
  * form, in the Design Tokens Community Group format.
  *
- * Emits the **primitive tier** and the **chart palettes**. The semantic tier —
- * step aliases and role aliases — and the nested-mode behaviour that depends on
- * it land in #6, so nothing here is an alias: every value is a generated colour.
+ * Emits the **primitive tier**, the **chart palettes** and the **severity ramp**.
+ * The semantic tier — step aliases and role aliases — and the nested-mode
+ * behaviour that depends on it land in #6, so nothing here is an alias: every
+ * value is a generated colour.
  */
 
 import { ORDINAL_CLAMP } from '../config/charts.js'
@@ -14,6 +15,7 @@ import { MODES, STEPS, type Mode } from '../config/lightness.js'
 import { SCALE_JOBS, STEP_JOBS } from '../config/steps.js'
 import { buildCategorical, buildSequential } from './charts.js'
 import type { Scale, Swatch } from './scale.js'
+import { buildSeverity } from './severity.js'
 
 /**
  * The published DTCG schema. The format module notes that a schema is still being
@@ -64,7 +66,11 @@ function block(scales: readonly Scale[], mode: Mode): string {
     .map((swatch) => `  --lat-chart-sequential-${swatch.step}: ${formatOklch(swatch)};`)
     .join('\n')
 
-  return `${primitives}\n\n${categorical}\n\n${sequential}`
+  const severity = buildSeverity(mode)
+    .map((swatch) => `  --lat-severity-${swatch.level}: ${formatOklch(swatch)};`)
+    .join('\n')
+
+  return `${primitives}\n\n${categorical}\n\n${sequential}\n\n${severity}`
 }
 
 /**
@@ -210,6 +216,25 @@ export function emitTokens(scales: readonly Scale[]): DesignTokens {
           (usableForOrdinal ? '' : ` Sequential encoding only — outside the ordinal clamp at ${clamp}.`),
         $value: colorValue(swatch.l, swatch.c, swatch.h, swatch.hex)
       }
+    }
+
+    const severity: Record<string, ColorToken> = {}
+    for (const swatch of buildSeverity(mode)) {
+      severity[swatch.level] = {
+        $type: 'color',
+        $description:
+          `Impact level ${swatch.rank} of 4 — ${swatch.level}. ` +
+          'Must ship with an icon and a text label: colour never carries severity alone.',
+        $value: colorValue(swatch.l, swatch.c, swatch.h, swatch.hex)
+      }
+    }
+
+    group['severity'] = {
+      $description:
+        'Ordered impact levels, least to most severe. Colour never carries severity ' +
+        'alone — every mark needs an icon and a label. In dark mode adjacent levels ' +
+        'are indistinguishable under deuteranopia, so this is a rule, not advice.',
+      ...severity
     }
 
     group['chart'] = {

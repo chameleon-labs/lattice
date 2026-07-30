@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { MODES, STEPS } from '../config/lightness.js'
 import { SCALE_NAMES } from '../config/scales.js'
+import { SEVERITY_LEVELS } from '../config/severity.js'
 import { STEP_JOBS } from '../config/steps.js'
 import {
   DTCG_SCHEMA,
@@ -20,8 +21,9 @@ const tokens = emitTokens(scales)
 const PRIMITIVES = SCALE_NAMES.length * STEPS
 const CHART_SLOTS = 8
 const SEQUENTIAL_STEPS = 7
-// Per mode block: the primitive tier plus both chart palettes.
-const PER_BLOCK = PRIMITIVES + CHART_SLOTS + SEQUENTIAL_STEPS
+const SEVERITY_STEPS = SEVERITY_LEVELS.length
+// Per mode block: the primitive tier, both chart palettes, and the severity ramp.
+const PER_BLOCK = PRIMITIVES + CHART_SLOTS + SEQUENTIAL_STEPS + SEVERITY_STEPS
 // Light once, dark twice - see the block test below.
 const BLOCKS = 3
 
@@ -79,7 +81,7 @@ describe('lattice.css', () => {
   })
 
   it('emits values as oklch() so the generated colour is the source of truth', () => {
-    const values = css.match(/--lat-[a-z-]+-\d+: ([^;]+);/g) ?? []
+    const values = css.match(/--lat-[a-z0-9-]+: ([^;]+);/g) ?? []
 
     expect(values).toHaveLength(PER_BLOCK * BLOCKS)
     for (const declaration of values) {
@@ -90,7 +92,7 @@ describe('lattice.css', () => {
   it('gives the two dark blocks identical values', () => {
     const [, darkBlock, mediaBlock] = splitBlocks(css)
     const declarations = (block: string): string[] =>
-      (block.match(/--lat-[a-z-]+-\d+: [^;]+;/g) ?? []).map((line) => line.trim())
+      (block.match(/--lat-[a-z0-9-]+: [^;]+;/g) ?? []).map((line) => line.trim())
 
     expect(declarations(mediaBlock)).toEqual(declarations(darkBlock))
   })
@@ -100,7 +102,7 @@ describe('lattice.css', () => {
   // A second hex declaration would therefore be dead weight rather than a
   // fallback — a real one needs @supports. Pinned so nobody adds the broken idiom.
   it('does not pretend a second declaration is a fallback', () => {
-    const hexValues = css.match(/--lat-[a-z-]+-\d+: #[0-9a-f]{6};/g) ?? []
+    const hexValues = css.match(/--lat-[a-z0-9-]+: #[0-9a-f]{6};/g) ?? []
 
     expect(hexValues).toHaveLength(0)
   })
@@ -168,7 +170,7 @@ describe('tokens.json', () => {
     expect(DTCG_SCHEMA).toBe('https://www.designtokens.org/schemas/2025.10/format.json')
   })
 
-  it('carries one colour token per primitive step and chart slot, in each mode', () => {
+  it('carries one colour token per primitive step, chart slot and severity level', () => {
     expect(leaves()).toHaveLength(PER_BLOCK * MODES.length)
   })
 
@@ -253,7 +255,7 @@ function trim(value: number): string {
 }
 
 function count(block: string): number {
-  return (block.match(/--lat-[a-z-]+-\d+:/g) ?? []).length
+  return (block.match(/--lat-[a-z0-9-]+:/g) ?? []).length
 }
 
 /** The light rule, the explicit-dark rule, and the preference-driven dark rule. */
