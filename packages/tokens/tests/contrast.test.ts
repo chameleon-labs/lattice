@@ -123,18 +123,81 @@ describe('apcaLc', () => {
     expect(apcaLc(parseHex('#ffffff'), parseHex('#000000'))).toBeCloseTo(-107.8847332, 5)
   })
 
-  it('takes its sign from which of the two is lighter, at every lightness', () => {
-    for (const hex of ['#000000', '#111112', '#595959', '#9a54da', '#eee1ff', '#ffffff']) {
-      const against = parseHex('#7f7f7f')
-      const color = parseHex(hex)
-      const lighter = relativeLuminance(color) > relativeLuminance(against)
-      const lc = apcaLc(color, against)
+  // "Lighter" is established by construction rather than by measuring it with
+  // another metric. On a grey ramp both transfer functions are strictly
+  // increasing in the single shared channel, so a higher byte is unambiguously
+  // lighter and the expected sign needs no oracle.
+  //
+  // Deliberately not written as `relativeLuminance(a) > relativeLuminance(b)`:
+  // WCAG and APCA luminance disagree about which of two colours is lighter for
+  // roughly 0.7% of random pairs (they weight and curve differently), so using
+  // one to predict the other's polarity is unsound even where it happens to
+  // agree. Measured: every such disagreement currently lands under LOW_CLIP and
+  // reports 0, so the unsoundness is unreachable today — but only because of an
+  // interaction between two constants that nothing states, and lowering LOW_CLIP
+  // would expose it.
+  it('is negative exactly when the text is the lighter of the two', () => {
+    const grey = (byte: number) => ({ r: byte / 255, g: byte / 255, b: byte / 255 })
+    // Every pair here clears LOW_CLIP. The clip is widest near black — byte 0
+    // needs 61 bytes of separation before Lc becomes nonzero, against 17 at byte
+    // 200 — which is the soft black clamp modelling display flare, so 17 is left
+    // out rather than special-cased.
+    const bytes = [0, 64, 127, 160, 200, 255]
+    let compared = 0
 
-      if (Math.abs(lc) < 1e-9) {
+    for (const darker of bytes) {
+      for (const lighter of bytes) {
+        if (darker >= lighter) {
+          continue
+        }
+
+        // Light text on a dark background is negative; the reverse is positive.
+        expect(apcaLc(grey(lighter), grey(darker))).toBeLessThan(0)
+        expect(apcaLc(grey(darker), grey(lighter))).toBeGreaterThan(0)
+        compared++
+      }
+    }
+
+    expect(compared).toBe(15)
+  })
+
+  // The polarity invariant, with no notion of "lighter" at all: swapping text and
+  // background must flip the sign whenever there is a sign to flip. This holds
+  // across the region where the two luminance metrics disagree, which the grey
+  // ramp above cannot reach.
+  it('flips sign when text and background are swapped', () => {
+    let seed = 0x9e3779b9
+    const nextByte = (): number => {
+      seed ^= seed << 13
+      seed ^= seed >>> 17
+      seed ^= seed << 5
+      seed >>>= 0
+      return seed & 0xff
+    }
+    const randomColor = () => ({
+      r: nextByte() / 255,
+      g: nextByte() / 255,
+      b: nextByte() / 255
+    })
+
+    let compared = 0
+
+    for (let i = 0; i < 2000; i++) {
+      const text = randomColor()
+      const background = randomColor()
+      const forward = apcaLc(text, background)
+      const reverse = apcaLc(background, text)
+
+      if (forward === 0 || reverse === 0) {
         continue
       }
-      expect(Math.sign(lc)).toBe(lighter ? -1 : 1)
+      expect(Math.sign(forward)).toBe(-Math.sign(reverse))
+      compared++
     }
+
+    // Guards the loop itself: if the clip swallowed everything this would assert
+    // nothing at all.
+    expect(compared).toBeGreaterThan(1500)
   })
 
   it.each([
@@ -238,23 +301,34 @@ describe('measuring what ships', () => {
   // says so rather than passing quietly.
   it('differs from the emitted hex by up to a tenth of a ratio point', () => {
     let worst = 0
+    let measured = 0
 
     for (const surfaceHex of ['#fdfdfd', '#111112', '#ffffff', '#000000']) {
       const surface = parseHex(surfaceHex)
 
+      // Integer step counts, with the lightness derived rather than accumulated:
+      // `l += 0.05` drifts, ends at 0.9000000000000002 and silently drops the
+      // 0.95 row, so the sweep would cover less than this test claims it does.
       for (let h = 0; h < 360; h += 10) {
-        for (let l = 0.05; l <= 0.95; l += 0.05) {
+        for (let step = 1; step <= 19; step++) {
+          const l = step * 0.05
+
           for (const c of [0.05, 0.15, 0.3]) {
             const fitted = oklchToSrgb(fitToGamut({ l, c, h }))
             const shipped = parseHex(formatHex(fitted))
             const gap = Math.abs(contrastRatio(fitted, surface) - contrastRatio(shipped, surface))
 
             worst = Math.max(worst, gap)
+            measured++
           }
         }
       }
     }
 
+    // Pins the coverage the comment claims: 4 surfaces x 36 hues x 19 lightnesses
+    // x 3 chromas. The accumulating loop this replaced silently measured 7776,
+    // and nothing would have noticed.
+    expect(measured).toBe(8208)
     expect(worst).toBeGreaterThan(0.05)
     expect(worst).toBeLessThan(0.1)
   })
