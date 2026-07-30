@@ -1,4 +1,5 @@
 import { mkdir, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { emitCss, emitTokens } from './emit.js'
@@ -71,11 +72,17 @@ if (failures.length > 0) {
 const css = emitCss(scales)
 const tokens = `${JSON.stringify(emitTokens(scales), null, 2)}\n`
 
-await writeFile(new URL('lattice.css', `file://${dist}`), css, 'utf8')
-await writeFile(new URL('tokens.json', `file://${dist}`), tokens, 'utf8')
+// `dist` is a filesystem path, so it is joined as one. Interpolating it back into
+// a `file:` URL would treat `#` and `?` in any parent directory name as a fragment
+// or query and silently truncate the path — writing lattice.css somewhere else
+// entirely, with no error.
+await writeFile(join(dist, 'lattice.css'), css, 'utf8')
+await writeFile(join(dist, 'tokens.json'), tokens, 'utf8')
 
+// Byte length, not string length: the header's em dash is one UTF-16 code unit
+// and three UTF-8 bytes, so `.length` under-reports what was actually written.
 console.log(
   '\nlattice: wrote dist/lattice.css (%d bytes) and dist/tokens.json (%d bytes)',
-  css.length,
-  tokens.length
+  Buffer.byteLength(css, 'utf8'),
+  Buffer.byteLength(tokens, 'utf8')
 )
