@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import { ELEVATION_LEVELS, ELEVATION_SCALE, SHADOWS } from '../config/elevation.js'
 import {
+  ELEVATION_ROLE_COUNT,
   SHADOW_PRIMITIVE_COUNT,
+  elevationCss,
+  elevationTokens,
   shadowCss,
   shadowTokens
 } from '../generate/elevation.js'
@@ -166,5 +169,103 @@ describe('shadow primitive generation', () => {
   it('is deterministic', () => {
     expect(shadowCss()).toBe(shadowCss())
     expect(JSON.stringify(shadowTokens())).toBe(JSON.stringify(shadowTokens()))
+  })
+})
+
+describe('elevation role generation', () => {
+  it('derives ten role tokens per mode', () => {
+    expect(ELEVATION_ROLE_COUNT).toBe(10)
+  })
+
+  it('emits every role as a var reference, never a literal', () => {
+    const css = elevationCss()
+
+    // Two per line: the property being declared and the property it references.
+    expect(css.match(/--lat-/g)).toHaveLength(ELEVATION_ROLE_COUNT * 2)
+    for (const declaration of css.split('\n')) {
+      expect(declaration).toMatch(/^ {2}--lat-elevation-[a-z-]+: var\(--lat-[a-z0-9-]+\);$/)
+    }
+  })
+
+  it('resolves each level to its approved signals', () => {
+    const css = elevationCss()
+
+    expect(css).toContain('--lat-elevation-flat-surface: var(--lat-gray-bg);')
+    expect(css).toContain('--lat-elevation-raised-surface: var(--lat-gray-bg-subtle);')
+    expect(css).toContain('--lat-elevation-raised-border: var(--lat-gray-border-subtle);')
+    expect(css).toContain('--lat-elevation-raised-shadow: var(--lat-shadow-small);')
+    expect(css).toContain('--lat-elevation-overlay-border: var(--lat-gray-border);')
+    expect(css).toContain('--lat-elevation-overlay-shadow: var(--lat-shadow-medium);')
+    expect(css).toContain('--lat-elevation-modal-surface: var(--lat-gray-component);')
+    expect(css).toContain('--lat-elevation-modal-shadow: var(--lat-shadow-large);')
+  })
+
+  it('gives flat a surface and nothing else', () => {
+    const css = elevationCss()
+
+    expect(css).toContain('--lat-elevation-flat-surface:')
+    expect(css).not.toContain('--lat-elevation-flat-border')
+    expect(css).not.toContain('--lat-elevation-flat-shadow')
+    expect(css).not.toContain('none')
+  })
+
+  // The assertion the specification exists to protect, at the emitted layer.
+  it('emits all three signals for every level above flat', () => {
+    const css = elevationCss()
+
+    for (const level of ['raised', 'overlay', 'modal']) {
+      for (const signal of ['surface', 'border', 'shadow']) {
+        expect(css, `${level}.${signal}`).toContain(`--lat-elevation-${level}-${signal}:`)
+      }
+    }
+  })
+
+  it('indents to the depth it is given', () => {
+    expect(elevationCss('    ').split('\n').every((line) => line.startsWith('    '))).toBe(true)
+  })
+
+  it('references only its own mode, plus the theme-independent shadows', () => {
+    for (const mode of ['light', 'dark'] as const) {
+      const tokens = elevationTokens(mode)
+
+      expect(tokens.raised!.surface!.$value).toBe(`{${mode}.gray.bg-subtle}`)
+      expect(tokens.raised!.border!.$value).toBe(`{${mode}.gray.border-subtle}`)
+      expect(tokens.raised!.shadow!.$value).toBe('{global.shadow.small}')
+      expect(tokens.modal!.surface!.$value).toBe(`{${mode}.gray.component}`)
+    }
+  })
+
+  it('types each DTCG role by the signal it carries', () => {
+    const tokens = elevationTokens('light')
+
+    expect(tokens.flat!.surface!.$type).toBe('color')
+    expect(tokens.raised!.border!.$type).toBe('color')
+    expect(tokens.raised!.shadow!.$type).toBe('shadow')
+    expect(Object.keys(tokens.flat!)).toEqual(['surface'])
+    expect(Object.keys(tokens.modal!)).toEqual(['surface', 'border', 'shadow'])
+  })
+
+  it('keeps CSS and DTCG roles in parity', () => {
+    const css = elevationCss()
+
+    for (const [level, signals] of Object.entries(elevationTokens('light'))) {
+      for (const [signal, token] of Object.entries(signals)) {
+        // {light.gray.bg-subtle} -> --lat-gray-bg-subtle
+        // {global.shadow.small}  -> --lat-shadow-small
+        // The first segment is the scope and is dropped in both cases; the CSS
+        // name is mechanically the last two.
+        const path = (token.$value as string).slice(1, -1).split('.')
+        const property = `--lat-${path[1]}-${path[2]}`
+
+        expect(css, `${level}.${signal}`).toContain(
+          `--lat-elevation-${level}-${signal}: var(${property});`
+        )
+      }
+    }
+  })
+
+  it('is deterministic', () => {
+    expect(elevationCss()).toBe(elevationCss())
+    expect(JSON.stringify(elevationTokens('dark'))).toBe(JSON.stringify(elevationTokens('dark')))
   })
 })

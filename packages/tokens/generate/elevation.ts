@@ -9,7 +9,14 @@
  * declares it, so one root declaration would freeze to the root theme.
  */
 
-import { SHADOWS, type ShadowName, type ShadowRecipe } from '../config/elevation.js'
+import {
+  ELEVATION_LEVELS,
+  ELEVATION_SCALE,
+  SHADOWS,
+  type ShadowName,
+  type ShadowRecipe
+} from '../config/elevation.js'
+import type { Mode } from '../config/lightness.js'
 
 /**
  * The shadow's colour.
@@ -70,4 +77,70 @@ export function shadowTokens(): Readonly<Record<ShadowName, ShadowToken>> {
   return Object.fromEntries(
     Object.entries(SHADOWS).map(([name, recipe]) => [name, shadowToken(recipe)])
   ) as Readonly<Record<ShadowName, ShadowToken>>
+}
+
+/** A DTCG role: always a reference, never a value. */
+export interface ElevationReference {
+  readonly $type: 'color' | 'shadow'
+  readonly $value: string
+}
+
+export type ElevationRoleTokens = Readonly<
+  Record<string, Readonly<Record<string, ElevationReference>>>
+>
+
+export const ELEVATION_ROLE_COUNT = ELEVATION_LEVELS.reduce(
+  (total, level) => total + 1 + (level.border ? 1 : 0) + (level.shadow ? 1 : 0),
+  0
+)
+
+/**
+ * The role declarations for one theme scope.
+ *
+ * Takes no mode: every value is a reference to a step alias that is itself
+ * redeclared per scope, so the text is identical in the light block, the dark
+ * block and the preference-driven block, and resolves differently in each.
+ */
+export function elevationCss(indent = '  '): string {
+  const lines: string[] = []
+
+  for (const level of ELEVATION_LEVELS) {
+    lines.push(
+      `${indent}--lat-elevation-${level.level}-surface: var(--lat-${ELEVATION_SCALE}-${level.surface});`
+    )
+    if (level.border) {
+      lines.push(
+        `${indent}--lat-elevation-${level.level}-border: var(--lat-${ELEVATION_SCALE}-${level.border});`
+      )
+    }
+    if (level.shadow) {
+      lines.push(`${indent}--lat-elevation-${level.level}-shadow: var(--lat-shadow-${level.shadow});`)
+    }
+  }
+
+  return lines.join('\n')
+}
+
+export function elevationTokens(mode: Mode): ElevationRoleTokens {
+  const groups: Record<string, Record<string, ElevationReference>> = {}
+
+  for (const level of ELEVATION_LEVELS) {
+    const signals: Record<string, ElevationReference> = {
+      surface: { $type: 'color', $value: `{${mode}.${ELEVATION_SCALE}.${level.surface}}` }
+    }
+    if (level.border) {
+      signals['border'] = {
+        $type: 'color',
+        $value: `{${mode}.${ELEVATION_SCALE}.${level.border}}`
+      }
+    }
+    if (level.shadow) {
+      // Theme-independent by design, so this is the one role that points out of
+      // its own mode and into the global tier.
+      signals['shadow'] = { $type: 'shadow', $value: `{global.shadow.${level.shadow}}` }
+    }
+    groups[level.level] = signals
+  }
+
+  return groups as ElevationRoleTokens
 }
