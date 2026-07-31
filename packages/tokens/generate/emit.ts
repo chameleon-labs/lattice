@@ -274,10 +274,26 @@ export function emitTokens(scales: readonly Scale[]): DesignTokens {
         }
       }
 
+      // Each scale carries the text colour measured against its own fill. The
+      // answers differ — white clears 4.5:1 on the accent and misses it on every
+      // other scale — so a component offering a solid fill in any tone needs
+      // that tone's answer rather than the accent's.
+      const scaleOnSolid: ColorToken = {
+        $type: 'color',
+        $description:
+          `Text on --lat-${scale.name}-solid. Computed rather than assumed: ` +
+          `${scale.onSolid.text} wins at ${scale.onSolid.ratio.toFixed(2)}:1 against this fill.`,
+        $value:
+          scale.onSolid.text === 'white'
+            ? { colorSpace: 'oklch', components: [1, 0, 0], alpha: 1, hex: '#ffffff' }
+            : { colorSpace: 'oklch', components: [0, 0, 0], alpha: 1, hex: '#000000' }
+      }
+
       group[scale.name] = {
         $description: SCALE_JOBS[scale.name] ?? scale.name,
         ...steps,
-        ...named
+        ...named,
+        'on-solid': scaleOnSolid
       }
     }
 

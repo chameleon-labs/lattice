@@ -5,7 +5,13 @@ import { SCALE_NAMES } from '../config/scales.js'
 import { ON_SOLID_ROLE, ROLE_ALIASES, ROLE_NAMES, STEP_SLUGS } from '../config/semantic.js'
 import { emitCss } from '../generate/emit.js'
 import { buildAllScales, buildScale } from '../generate/scale.js'
-import { accentOnSolid, ALIAS_COUNT, roleAliases, stepAliases } from '../generate/semantic.js'
+import {
+  accentOnSolid,
+  ALIAS_COUNT,
+  onSolidAliases,
+  roleAliases,
+  stepAliases
+} from '../generate/semantic.js'
 import { ELEVATION_ROLE_COUNT, shadowCss } from '../generate/elevation.js'
 
 const scales = buildAllScales()
@@ -98,6 +104,42 @@ describe('step aliases', () => {
   })
 })
 
+describe('per-scale on-solid', () => {
+  // The gap this closes was found by building a component. --lat-on-solid is
+  // computed against the accent's fill, and a solid button in any other tone
+  // reused it: white on the grey fill measures 3.12:1, below the 4.5:1 floor.
+  // Every scale already carried its own measured onSolid; only the accent's was
+  // ever published.
+  it.each(MODES)('publishes one on-solid per scale in %s mode', (mode) => {
+    expect(onSolidAliases(scales, mode).map((alias) => alias.name)).toEqual(
+      SCALE_NAMES.map((scale) => `--lat-${scale}-on-solid`)
+    )
+  })
+
+  // The assertion whose absence let the bug ship.
+  it.each(MODES)('meets AA against its own scale solid in %s mode', (mode) => {
+    for (const scale of scales.filter((candidate) => candidate.mode === mode)) {
+      expect(scale.onSolid.ratio, `${scale.name} ${mode}`).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  it.each(MODES)('emits a colour rather than a var() reference in %s mode', (mode) => {
+    for (const alias of onSolidAliases(scales, mode)) {
+      expect(alias.value, alias.name).toMatch(/^oklch\(/)
+    }
+  })
+
+  it.each(MODES)('takes each value from the scale it was measured on in %s mode', (mode) => {
+    for (const alias of onSolidAliases(scales, mode)) {
+      const name = alias.name.replace('--lat-', '').replace('-on-solid', '')
+      const scale = scales.find((candidate) => candidate.name === name && candidate.mode === mode)
+      const expected = scale?.onSolid.text === 'white' ? 'oklch(1 0 0)' : 'oklch(0 0 0)'
+
+      expect(alias.value, alias.name).toBe(expected)
+    }
+  })
+})
+
 describe('role aliases', () => {
   it.each(MODES)('covers the documented roles in %s mode', (mode) => {
     expect(roleAliases(scales, mode).map((alias) => alias.name)).toEqual(
@@ -183,7 +225,11 @@ describe('the tier is emitted into every theme scope', () => {
   it('declares every alias in all three blocks', () => {
     const [light, dark, media] = blocks(css)
 
-    for (const alias of [...stepAliases(), ...roleAliases(scales, 'light')]) {
+    for (const alias of [
+      ...stepAliases(),
+      ...onSolidAliases(scales, 'light'),
+      ...roleAliases(scales, 'light')
+    ]) {
       expect(light, alias.name).toContain(`${alias.name}:`)
       expect(dark, alias.name).toContain(`${alias.name}:`)
       expect(media, alias.name).toContain(`${alias.name}:`)
@@ -194,15 +240,22 @@ describe('the tier is emitted into every theme scope', () => {
     for (const block of blocks(css)) {
       const declared = block.match(/--lat-[a-z0-9-]+: var\(/g) ?? []
 
-      // Every alias but on-solid is a var() reference; on-solid is a colour.
+      // The on-solid aliases are colours rather than var() references — one per
+      // scale plus the unscoped accent alias — so they are subtracted here.
       // Elevation roles are var() references in the same blocks, and are counted
-      // separately so a change to either tier stays visible here.
-      expect(declared).toHaveLength(ALIAS_COUNT - 1 + ELEVATION_ROLE_COUNT)
+      // separately so a change to either tier stays visible.
+      const colourValued = onSolidAliases(scales, 'light').length + 1
+
+      expect(declared).toHaveLength(ALIAS_COUNT - colourValued + ELEVATION_ROLE_COUNT)
     }
   })
 
   it('agrees with the count the generator reports', () => {
-    expect(ALIAS_COUNT).toBe(stepAliases().length + roleAliases(scales, 'light').length)
+    expect(ALIAS_COUNT).toBe(
+      stepAliases().length +
+        onSolidAliases(scales, 'light').length +
+        roleAliases(scales, 'light').length
+    )
   })
 })
 

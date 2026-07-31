@@ -76,6 +76,33 @@ export function accentOnSolid(scales: readonly Scale[], mode: Mode): OnSolid {
 }
 
 /**
+ * One on-solid per scale, measured against that scale's own fill.
+ *
+ * `--lat-on-solid` answers "what text sits on `--lat-solid`", and `--lat-solid`
+ * is the accent. A component offering a solid fill in another family needs that
+ * family's answer, and the answers differ: white clears 4.5:1 on the accent and
+ * misses it on every other scale, where black clears it comfortably.
+ *
+ * Found by building a solid button with a tone axis — white on the grey fill
+ * measures 3.12:1. Every scale already carried its own measured `onSolid`, so
+ * the gap was in what got published rather than in what got measured.
+ */
+export function onSolidAliases(scales: readonly Scale[], mode: Mode): Alias[] {
+  return SCALE_NAMES.map((name) => {
+    const scale = scales.find((candidate) => candidate.name === name && candidate.mode === mode)
+
+    if (!scale) {
+      throw new Error(`no ${name} scale for ${mode} mode among the ${scales.length} scales supplied`)
+    }
+
+    return {
+      name: `--lat-${name}-on-solid`,
+      value: scale.onSolid.text === 'white' ? 'oklch(1 0 0)' : 'oklch(0 0 0)'
+    }
+  })
+}
+
+/**
  * Every alias for one theme scope, as CSS declarations.
  *
  * These are emitted **inside each mode block**, not once on `:root`. A custom
@@ -87,11 +114,17 @@ export function accentOnSolid(scales: readonly Scale[], mode: Mode): OnSolid {
  */
 export function semanticBlock(scales: readonly Scale[], mode: Mode, indent = '  '): string {
   const steps = stepAliases()
+  const onSolids = onSolidAliases(scales, mode)
   const roles = roleAliases(scales, mode)
   const declare = (alias: Alias): string => `${indent}${alias.name}: ${alias.value};`
 
-  return [steps.map(declare).join('\n'), roles.map(declare).join('\n')].join('\n\n')
+  return [
+    steps.map(declare).join('\n'),
+    onSolids.map(declare).join('\n'),
+    roles.map(declare).join('\n')
+  ].join('\n\n')
 }
 
 /** How many aliases a single theme scope carries. */
-export const ALIAS_COUNT = SCALE_NAMES.length * STEPS + ROLE_ALIASES.length + 1
+export const ALIAS_COUNT =
+  SCALE_NAMES.length * STEPS + SCALE_NAMES.length + ROLE_ALIASES.length + 1

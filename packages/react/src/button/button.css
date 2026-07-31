@@ -8,6 +8,10 @@
   --_component-hover: var(--lat-accent-component-hover);
   --_component-active: var(--lat-accent-component-active);
   --_text: var(--lat-accent-text);
+  /* Each family's own measured text colour. White clears 4.5:1 on the accent
+     fill and misses it on every other scale, so a solid button in any other
+     tone must not reuse the accent's answer. */
+  --_on-solid: var(--lat-accent-on-solid);
 
   display: inline-flex;
   align-items: center;
@@ -37,6 +41,7 @@
   --_component-hover: var(--lat-gray-component-hover);
   --_component-active: var(--lat-gray-component-active);
   --_text: var(--lat-gray-text);
+  --_on-solid: var(--lat-gray-on-solid);
 }
 
 .lat-button[data-tone='danger'] {
@@ -46,6 +51,7 @@
   --_component-hover: var(--lat-danger-component-hover);
   --_component-active: var(--lat-danger-component-active);
   --_text: var(--lat-danger-text);
+  --_on-solid: var(--lat-danger-on-solid);
 }
 
 .lat-button[data-size='sm'] {
@@ -62,7 +68,7 @@
 
 .lat-button[data-variant='solid'] {
   background-color: var(--_solid);
-  color: var(--lat-on-solid);
+  color: var(--_on-solid);
 }
 
 .lat-button[data-variant='solid']:hover {

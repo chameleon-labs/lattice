@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client'
 // The token stylesheet first: every component value is a var() reference into it.
 import '@chameleon-labs/lattice-tokens/lattice.css'
 import '../src/styles.css'
+import './demo.css'
 
 import { Button } from '../src/index.js'
 
