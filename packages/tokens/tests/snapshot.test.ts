@@ -61,6 +61,8 @@ describe('the emitted artefacts', () => {
       'global.breakpoint.sm',
       'global.container.prose',
       'global.radius.full',
+      'global.duration.base',
+      'global.easing.standard',
       'light.gray.bg',
       'light.role.text',
       'dark.role.on-solid',

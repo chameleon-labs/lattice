@@ -70,6 +70,8 @@ describe('tokens.json against the published DTCG schema', () => {
     expect(global['breakpoint']?.['sm']?.$value).toEqual({ value: 30, unit: 'rem' })
     expect(global['container']?.['prose']?.$value).toEqual({ value: 42, unit: 'rem' })
     expect(global['radius']?.['full']?.$value).toEqual({ value: 9999, unit: 'rem' })
+    expect(global['duration']?.['base']?.$value).toEqual({ value: 150, unit: 'ms' })
+    expect(global['easing']?.['standard']?.$value).toEqual([0.2, 0, 0, 1])
     expect(global['container']).not.toHaveProperty('full')
     expect(global['text']?.['body']).toEqual({
       $type: 'typography',
@@ -116,6 +118,28 @@ describe('tokens.json against the published DTCG schema', () => {
     global['font-size']!['base'] = {
       $type: 'dimension',
       $value: { value: 1, unit: 'em' }
+    }
+
+    expect(validate(broken)).toBe(false)
+  })
+
+  it('rejects a duration unit the format cannot represent', () => {
+    const broken = structuredClone(tokens) as Record<string, unknown>
+    const global = broken['global'] as Record<string, Record<string, Record<string, unknown>>>
+    global['duration']!['base'] = {
+      $type: 'duration',
+      $value: { value: 150, unit: 'frames' }
+    }
+
+    expect(validate(broken)).toBe(false)
+  })
+
+  it('rejects a cubicBezier x coordinate outside the format range', () => {
+    const broken = structuredClone(tokens) as Record<string, unknown>
+    const global = broken['global'] as Record<string, Record<string, Record<string, unknown>>>
+    global['easing']!['standard'] = {
+      $type: 'cubicBezier',
+      $value: [1.1, 0, 0, 1]
     }
 
     expect(validate(broken)).toBe(false)

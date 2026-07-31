@@ -21,6 +21,11 @@ import {
   layoutCss,
   layoutTokens
 } from './layout.js'
+import {
+  MOTION_PRIMITIVE_COUNTS,
+  motionCss,
+  motionTokens
+} from './motion.js'
 import type { Scale, Swatch } from './scale.js'
 import { accentOnSolid, semanticBlock } from './semantic.js'
 import { buildSeverity } from './severity.js'
@@ -127,10 +132,12 @@ export function emitCss(scales: readonly Scale[]): string {
 /* Colour primitives: ${scales.length / MODES.length} scales x ${STEPS} steps, both modes. */
 /* Typography: ${TYPOGRAPHY_PRIMITIVE_COUNT} primitives; ${TYPOGRAPHY_ROLE_COUNT} semantic roles x ${TYPOGRAPHY_ROLE_PROPERTY_COUNT} properties. */
 /* Layout primitives: ${LAYOUT_PRIMITIVE_COUNTS.space} spacing; ${LAYOUT_PRIMITIVE_COUNTS.breakpoint} breakpoints; ${LAYOUT_PRIMITIVE_COUNTS.container} containers; ${LAYOUT_PRIMITIVE_COUNTS.radius} radii. */
+/* Motion primitives: ${MOTION_PRIMITIVE_COUNTS.duration} durations; ${MOTION_PRIMITIVE_COUNTS.easing} easings. */
 
 :root {
 ${typographyCss()}
 ${layoutCss()}
+${motionCss()}
 ${typographyRoleCss()}
 }
 
@@ -351,9 +358,10 @@ export function emitTokens(scales: readonly Scale[]): DesignTokens {
       'build-time contracts. Do not edit by hand.',
     global: {
       $description:
-        'Theme-independent typography and layout primitives, plus semantic typography. Emitted once.',
+        'Theme-independent typography, layout and motion primitives, plus semantic typography. Emitted once.',
       ...typographyTokens(),
       ...layoutTokens(),
+      ...motionTokens(),
       text: typographyRoleTokens()
     },
     ...modes

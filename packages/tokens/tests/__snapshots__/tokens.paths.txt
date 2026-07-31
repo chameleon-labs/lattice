@@ -159,6 +159,14 @@ global.breakpoint.xl
 global.container.content
 global.container.prose
 global.container.wide
+global.duration.base
+global.duration.fast
+global.duration.instant
+global.duration.slow
+global.duration.slower
+global.easing.entrance
+global.easing.exit
+global.easing.standard
 global.font-size.2xl
 global.font-size.2xs
 global.font-size.3xl

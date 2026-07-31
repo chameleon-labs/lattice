@@ -2,6 +2,7 @@
 /* Colour primitives: 5 scales x 12 steps, both modes. */
 /* Typography: 21 primitives; 11 semantic roles x 5 properties. */
 /* Layout primitives: 16 spacing; 4 breakpoints; 3 containers; 5 radii. */
+/* Motion primitives: 5 durations; 3 easings. */
 
 :root {
   --lat-font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -53,6 +54,14 @@
   --lat-radius-md: 0.5rem;
   --lat-radius-lg: 0.75rem;
   --lat-radius-full: 9999rem;
+  --lat-duration-instant: 0ms;
+  --lat-duration-fast: 100ms;
+  --lat-duration-base: 150ms;
+  --lat-duration-slow: 250ms;
+  --lat-duration-slower: 400ms;
+  --lat-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --lat-easing-entrance: cubic-bezier(0, 0, 0, 1);
+  --lat-easing-exit: cubic-bezier(0.3, 0, 1, 1);
   --lat-text-body-font-family: var(--lat-font-sans);
   --lat-text-body-font-size: var(--lat-font-size-base);
   --lat-text-body-font-weight: var(--lat-font-weight-regular);
