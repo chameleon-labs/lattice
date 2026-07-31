@@ -1,0 +1,19 @@
+/*
+ * The raised elevation role: all three signals together.
+ *
+ * Each covers a case the others cannot. The shadow reads on light and is
+ * effectively absent on dark; the surface step reads on dark; the border is the
+ * only one that survives forced-colors, where the user agent strips shadows and
+ * flattens surfaces to the system canvas. Shipping fewer than three gives a card
+ * that disappears in one mode or one user setting.
+ */
+.lat-card {
+  display: block;
+  padding: var(--lat-space-5);
+
+  color: var(--lat-text);
+  background-color: var(--lat-elevation-raised-surface);
+  border: 1px solid var(--lat-elevation-raised-border);
+  border-radius: var(--lat-radius-lg);
+  box-shadow: var(--lat-elevation-raised-shadow);
+}

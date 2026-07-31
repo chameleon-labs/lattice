@@ -7,7 +7,10 @@ import '../src/styles.css'
 import './demo.css'
 
 import {
+  Badge,
   Button,
+  Callout,
+  Card,
   Dialog,
   DialogDisclosure,
   DialogDismiss,
@@ -64,6 +67,34 @@ function Gallery({ theme }: { theme: string }) {
         ))}
         <Input aria-label="URL invalid" invalid placeholder="invalid" />
         <Input aria-label="URL disabled" disabled placeholder="disabled" />
+      </Section>
+
+      <Section title="Card">
+        <Card>
+          <h4>example.com/checkout</h4>
+          <p>Score 72 — 3 critical, 5 serious.</p>
+        </Card>
+      </Section>
+
+      <Section title="Badge">
+        {(['neutral', 'accent', 'success', 'warning', 'danger'] as const).map((tone) => (
+          <Badge key={tone} tone={tone}>
+            {tone}
+          </Badge>
+        ))}
+        {(['critical', 'serious', 'moderate', 'minor'] as const).map((tone) => (
+          <Badge key={tone} tone={tone}>
+            {tone}
+          </Badge>
+        ))}
+      </Section>
+
+      <Section title="Callout">
+        {(['neutral', 'accent', 'success', 'warning', 'danger'] as const).map((tone) => (
+          <Callout key={tone} tone={tone} title={`${tone} callout`}>
+            The page took too long to respond. Try again in a minute.
+          </Callout>
+        ))}
       </Section>
 
       <Section title="Menu">

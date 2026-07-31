@@ -49,3 +49,12 @@ export type {
   MenuProviderProps,
   MenuSeparatorProps
 } from './menu/menu.js'
+
+export { Badge } from './badge/badge.js'
+export type { BadgeOptions, BadgeProps, BadgeTone } from './badge/badge.js'
+
+export { Callout } from './callout/callout.js'
+export type { CalloutOptions, CalloutProps, CalloutTone } from './callout/callout.js'
+
+export { Card } from './card/card.js'
+export type { CardProps } from './card/card.js'

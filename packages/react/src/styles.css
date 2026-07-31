@@ -11,7 +11,10 @@
  * scripts/copy-css.js. Order is alphabetical and carries no cascade meaning:
  * no rule here depends on another family's specificity.
  */
+@import './badge/badge.css';
 @import './button/button.css';
+@import './callout/callout.css';
+@import './card/card.css';
 @import './dialog/dialog.css';
 @import './disclosure/disclosure.css';
 @import './input/input.css';
