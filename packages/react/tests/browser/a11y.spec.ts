@@ -79,6 +79,49 @@ test('the switch thumb still moves between states under reduced motion', async (
   expect(on).not.toBe(off)
 })
 
+// These live here rather than in jsdom deliberately. Ariakit restores focus
+// using real layout and animation frames; under jsdom focus simply stays on the
+// dismiss button, so a jsdom assertion would either fail for the wrong reason or
+// be weakened until it proved nothing.
+test('Dialog traps focus and returns it to the trigger', async ({ page }) => {
+  await page.goto('/')
+
+  const trigger = page.locator('#theme-light').getByRole('button', { name: 'Remove page' })
+  await trigger.click()
+
+  const dialog = page.getByRole('dialog')
+  await expect(dialog).toBeVisible()
+
+  // Focus starts inside the dialog.
+  expect(await dialog.evaluate((el) => el.contains(document.activeElement))).toBe(true)
+
+  // Tabbing past the last focusable element wraps back inside rather than
+  // escaping to the page behind.
+  for (let i = 0; i < 6; i += 1) {
+    await page.keyboard.press('Tab')
+  }
+  expect(await dialog.evaluate((el) => el.contains(document.activeElement))).toBe(true)
+
+  await page.keyboard.press('Escape')
+  await expect(dialog).toBeHidden()
+
+  await expect(trigger).toBeFocused()
+})
+
+test('Menu returns focus to its button', async ({ page }) => {
+  await page.goto('/')
+
+  const button = page.locator('#theme-light').getByRole('button', { name: 'Actions' })
+  await button.click()
+
+  await expect(page.getByRole('menu')).toBeVisible()
+
+  await page.keyboard.press('Escape')
+
+  await expect(page.getByRole('menu')).toBeHidden()
+  await expect(button).toBeFocused()
+})
+
 test('borders survive forced-colors', async ({ page }) => {
   await page.emulateMedia({ forcedColors: 'active' })
   await page.goto('/')

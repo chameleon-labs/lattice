@@ -1,0 +1,65 @@
+.lat-menu {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: var(--lat-space-32);
+  padding: var(--lat-space-1);
+
+  color: var(--lat-text);
+  /* The overlay elevation role: surface, border and shadow together. */
+  background-color: var(--lat-elevation-overlay-surface);
+  border: 1px solid var(--lat-elevation-overlay-border);
+  border-radius: var(--lat-radius-md);
+  box-shadow: var(--lat-elevation-overlay-shadow);
+
+  opacity: 0;
+  transition-property: opacity;
+  transition-duration: var(--lat-duration-slow);
+  transition-timing-function: var(--lat-easing-entrance);
+}
+
+.lat-menu[data-enter] {
+  opacity: 1;
+}
+
+.lat-menu:focus-visible {
+  outline: 2px solid var(--lat-focus-ring);
+  outline-offset: 2px;
+}
+
+.lat-menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--lat-space-2);
+
+  font-family: var(--lat-text-ui-font-family);
+  font-size: var(--lat-text-ui-font-size);
+  line-height: var(--lat-text-ui-line-height);
+
+  padding: var(--lat-space-2) var(--lat-space-3);
+  border-radius: var(--lat-radius-sm);
+  cursor: pointer;
+}
+
+/* Ariakit marks the roving-focus item with data-active-item, which is the
+   keyboard user's position — it must look focused even though DOM focus stays
+   on the menu. */
+.lat-menu__item[data-active-item] {
+  background-color: var(--lat-component-hover);
+}
+
+.lat-menu__separator {
+  margin: var(--lat-space-1) 0;
+  border: none;
+  border-block-start: 1px solid var(--lat-border-subtle);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lat-menu {
+    transition-property: opacity, transform;
+    transform: translateY(calc(-1 * var(--lat-space-1)));
+  }
+
+  .lat-menu[data-enter] {
+    transform: translateY(0);
+  }
+}

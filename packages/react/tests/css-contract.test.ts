@@ -136,4 +136,22 @@ describe('findBlockSelectors', () => {
     `
     expect(findBlockSelectors(css).sort()).toEqual(['.lat-button', '.lat-card'])
   })
+
+  // Dialog and Menu redeclare their block inside the no-preference query to add
+  // an entrance transform. That is deliberate; the rule exists to catch the same
+  // block declared twice at top level.
+  it('ignores a block redeclared inside a media query', () => {
+    const css = `
+      .lat-dialog { opacity: 0; }
+      @media (prefers-reduced-motion: no-preference) {
+        .lat-dialog { transition-property: opacity, transform; }
+      }
+    `
+    expect(findBlockSelectors(css)).toEqual(['.lat-dialog'])
+  })
+
+  it('still catches the same block declared twice at top level', () => {
+    const css = `.lat-card { color: var(--lat-text); } .lat-card { color: var(--lat-bg); }`
+    expect(findBlockSelectors(css)).toEqual(['.lat-card', '.lat-card'])
+  })
 })

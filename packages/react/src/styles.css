@@ -12,8 +12,10 @@
  * no rule here depends on another family's specificity.
  */
 @import './button/button.css';
+@import './dialog/dialog.css';
 @import './disclosure/disclosure.css';
 @import './input/input.css';
+@import './menu/menu.css';
 @import './switch/switch.css';
 @import './tabs/tabs.css';
 @import './text-field/text-field.css';

@@ -8,10 +8,20 @@ import './demo.css'
 
 import {
   Button,
+  Dialog,
+  DialogDisclosure,
+  DialogDismiss,
+  DialogHeading,
+  DialogProvider,
   Disclosure,
   DisclosureContent,
   DisclosureProvider,
   Input,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuProvider,
+  MenuSeparator,
   Switch,
   Tab,
   TabList,
@@ -54,6 +64,30 @@ function Gallery({ theme }: { theme: string }) {
         ))}
         <Input aria-label="URL invalid" invalid placeholder="invalid" />
         <Input aria-label="URL disabled" disabled placeholder="disabled" />
+      </Section>
+
+      <Section title="Menu">
+        <MenuProvider>
+          <MenuButton>Actions</MenuButton>
+          <Menu>
+            <MenuItem>Pause monitoring</MenuItem>
+            <MenuItem>Copy link</MenuItem>
+            <MenuSeparator />
+            <MenuItem>Remove page</MenuItem>
+          </Menu>
+        </MenuProvider>
+      </Section>
+
+      <Section title="Dialog">
+        <DialogProvider>
+          <DialogDisclosure>Remove page</DialogDisclosure>
+          <Dialog>
+            <DialogHeading>Remove this page?</DialogHeading>
+            <p>This cannot be undone. Its audit history is removed with it.</p>
+            <DialogDismiss render={<Button tone="neutral" />}>Cancel</DialogDismiss>
+            <DialogDismiss render={<Button variant="solid" tone="danger" />}>Remove</DialogDismiss>
+          </Dialog>
+        </DialogProvider>
       </Section>
 
       <Section title="Disclosure">

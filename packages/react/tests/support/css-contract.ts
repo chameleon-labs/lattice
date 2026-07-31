@@ -135,7 +135,45 @@ export const findBareFocusOutlines = (css: string): string[] => {
   return found
 }
 
-export const findBlockSelectors = (css: string): string[] =>
-  [...stripComments(css).matchAll(/(^|\}|\{)\s*(\.lat-[a-z-]+)\s*\{/g)]
-    .map((match) => match[2] ?? '')
-    .filter((selector) => selector.length > 0)
+// Only top-level declarations count. A block redeclared inside a media query is
+// deliberate — Dialog and Menu add their entrance transform inside
+// `prefers-reduced-motion: no-preference` — whereas the same block declared
+// twice at top level is the copy-paste error this rule exists to catch.
+export const findBlockSelectors = (css: string): string[] => {
+  const source = stripComments(css)
+  const found: string[] = []
+  let depth = 0
+  let index = 0
+
+  while (index < source.length) {
+    const char = source[index]
+
+    if (char === '}') {
+      depth -= 1
+      index += 1
+      continue
+    }
+
+    if (char === '{') {
+      depth += 1
+      index += 1
+      continue
+    }
+
+    if (depth === 0) {
+      const rest = source.slice(index)
+      const match = /^\s*(\.lat-[a-z-]+)\s*\{/.exec(rest)
+
+      if (match !== null && match[1] !== undefined) {
+        found.push(match[1])
+        index += match[0].length
+        depth += 1
+        continue
+      }
+    }
+
+    index += 1
+  }
+
+  return found
+}

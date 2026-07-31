@@ -25,3 +25,27 @@ export type {
 
 export { Tab, TabList, TabPanel, TabProvider } from './tabs/tabs.js'
 export type { TabListProps, TabPanelProps, TabProps, TabProviderProps } from './tabs/tabs.js'
+
+export {
+  Dialog,
+  DialogDisclosure,
+  DialogDismiss,
+  DialogHeading,
+  DialogProvider
+} from './dialog/dialog.js'
+export type {
+  DialogDisclosureProps,
+  DialogDismissProps,
+  DialogHeadingProps,
+  DialogProps,
+  DialogProviderProps
+} from './dialog/dialog.js'
+
+export { Menu, MenuButton, MenuItem, MenuProvider, MenuSeparator } from './menu/menu.js'
+export type {
+  MenuButtonProps,
+  MenuItemProps,
+  MenuProps,
+  MenuProviderProps,
+  MenuSeparatorProps
+} from './menu/menu.js'
