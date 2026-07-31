@@ -17,7 +17,7 @@ Two packages, one of which exists so far.
 | Package | What it is |
 |---|---|
 | `@chameleon-labs/lattice-tokens` | foundational design tokens — colour, typography, spacing, sizing, elevation, and motion |
-| `@chameleon-labs/lattice-react` | the component layer on [Ariakit](https://github.com/ariakit/ariakit) — **not built yet** |
+| `@chameleon-labs/lattice-react` | the component layer on [Ariakit](https://github.com/ariakit/ariakit) — **scaffold only** |
 
 They are separate because tokens carry no framework dependency and should stay installable by a consumer that never touches React.
 
@@ -67,7 +67,7 @@ A pnpm workspace. Root scripts fan out to every package; run them inside `packag
 ```
 packages/
 ├── tokens/     @chameleon-labs/lattice-tokens — config/, generate/, tests/, dist/
-└── react/      @chameleon-labs/lattice-react — not built yet
+└── react/      @chameleon-labs/lattice-react — scaffold; components tracked in #37
 ```
 
 Inside `packages/tokens/`, `config/` declares reviewed token values and contracts and `generate/` turns them into artefacts. `dist/` is generated output and is not committed.
