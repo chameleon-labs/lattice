@@ -66,6 +66,11 @@ describe('tokens.json against the published DTCG schema', () => {
     expect(global['line-height']?.['normal']?.$value).toBe(1.5)
     expect(global['letter-spacing']?.['normal']?.$value).toEqual({ value: 0, unit: 'rem' })
     expect(global['font-weight']?.['bold']?.$value).toBe(700)
+    expect(global['space']?.['0-5']?.$value).toEqual({ value: 0.125, unit: 'rem' })
+    expect(global['breakpoint']?.['sm']?.$value).toEqual({ value: 30, unit: 'rem' })
+    expect(global['container']?.['prose']?.$value).toEqual({ value: 42, unit: 'rem' })
+    expect(global['radius']?.['full']?.$value).toEqual({ value: 9999, unit: 'rem' })
+    expect(global['container']).not.toHaveProperty('full')
     expect(global['text']?.['body']).toEqual({
       $type: 'typography',
       $value: {

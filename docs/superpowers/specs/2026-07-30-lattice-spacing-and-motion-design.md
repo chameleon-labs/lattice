@@ -1,7 +1,7 @@
 # Lattice — spacing, sizing, radii, elevation and motion
 
 **Date:** 2026-07-30
-**Status:** draft, ready for review
+**Status:** approved
 **Scope:** the non-colour, non-typographic primitives. Colour and typography are specified separately; components are tracked separately again.
 
 Sizes are `rem` — that is the token. Px equivalents are given **at the default root**, and are not the values: at a user default of 20px the whole system is 25% larger, which is the point of the unit.
@@ -110,6 +110,12 @@ inner radius = outer radius - gap
 
 A card at `lg` (12px) with `2` (8px) of padding gives its inner element `sm` (4px). Picking the inner radius independently is the usual cause of the effect. `full` is exempt: it stays `full` at any nesting.
 
+The finite pairing documented for v1 is therefore:
+
+| Outer | Gap | Inner |
+|---|---|---|
+| `lg` | space `2` | `sm` |
+
 `full` is a **sentinel rather than a measurement** — any value larger than half the element's shorter side produces the same pill, so `9999rem` is not a length anyone should read as one. It stays a `rem` value rather than the more familiar `9999px` so that it remains a DTCG `dimension` like every other radius, and rather than `50%` because percentages are not a DTCG unit and an ellipse is not what is wanted on a non-square element.
 
 ## Elevation
@@ -188,6 +194,27 @@ Three tiers, matching colour and typography.
 **Tier 3 — component tokens.** Permitted with a written justification in review, as in colour.
 
 Shadow and elevation tokens are **theme-dependent** and must be emitted into every theme scope, for the reason established in the colour system: a custom property holding a `var()` reference resolves on the element that declares it, so a single root declaration freezes and a nested theme keeps the wrong value. Spacing, radii and durations do not vary by theme and are emitted once.
+
+### Primitive layout slice
+
+The primitive layout slice is a dedicated module rather than an extension of typography or a generic token registry:
+
+- `config/layout.ts` owns the reviewed spacing, breakpoint, container and radius values, plus the documented finite nested-radius pairing.
+- `generate/layout.ts` turns that config into CSS declarations and DTCG dimension groups.
+- `generate/emit.ts` composes both representations into the existing global output once, before any theme-dependent colour block.
+
+It contains exactly 28 tokens: sixteen spacing steps, four breakpoints, three containers and five radii. The public paths mirror each other:
+
+| Family | CSS | DTCG |
+|---|---|---|
+| Spacing | `--lat-space-*` | `global.space.*` |
+| Breakpoints | `--lat-breakpoint-*` | `global.breakpoint.*` |
+| Containers | `--lat-container-*` | `global.container.*` |
+| Radii | `--lat-radius-*` | `global.radius.*` |
+
+DTCG names cannot contain `.`, so the two fractional spacing steps use the multiplier-preserving slugs `0-5` and `1-5` in both artefacts: `--lat-space-0-5` matches `global.space.0-5`, and `--lat-space-1-5` matches `global.space.1-5`.
+
+This slice does not add semantic inset or gap roles. Those mappings remain deferred until the component inventory demonstrates the vocabulary it needs. It also does not add a `full` container: edge-to-edge remains the absence of a container.
 
 ## Accessibility constraints
 
