@@ -68,7 +68,10 @@ describe('the emitted artefacts', () => {
       'dark.role.on-solid',
       'light.chart.categorical.1',
       'dark.chart.sequential.700',
-      'light.severity.critical'
+      'light.severity.critical',
+      'global.shadow.medium',
+      'light.elevation.raised.border',
+      'dark.elevation.modal.shadow'
     ]) {
       expect(paths, fragment).toContain(fragment)
     }
