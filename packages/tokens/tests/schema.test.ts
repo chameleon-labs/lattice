@@ -73,6 +73,13 @@ describe('tokens.json against the published DTCG schema', () => {
     expect(global['duration']?.['base']?.$value).toEqual({ value: 150, unit: 'ms' })
     expect(global['easing']?.['standard']?.$value).toEqual([0.2, 0, 0, 1])
     expect(global['container']).not.toHaveProperty('full')
+    expect(global['shadow']?.['medium']?.$value).toEqual({
+      color: { colorSpace: 'oklch', components: [0, 0, 0], alpha: 0.12 },
+      offsetX: { value: 0, unit: 'px' },
+      offsetY: { value: 4, unit: 'px' },
+      blur: { value: 8, unit: 'px' },
+      spread: { value: -1, unit: 'px' }
+    })
     expect(global['text']?.['body']).toEqual({
       $type: 'typography',
       $value: {
@@ -84,6 +91,31 @@ describe('tokens.json against the published DTCG schema', () => {
       }
     })
     expect(validate(tokens)).toBe(true)
+  })
+
+  it('rejects a shadow missing a required field', () => {
+    const broken = structuredClone(tokens) as Record<string, unknown>
+    const global = broken['global'] as Record<string, Record<string, Record<string, unknown>>>
+    global['shadow']!['medium'] = {
+      $type: 'shadow',
+      $value: {
+        color: { colorSpace: 'oklch', components: [0, 0, 0], alpha: 0.12 },
+        offsetX: { value: 0, unit: 'px' },
+        offsetY: { value: 4, unit: 'px' },
+        blur: { value: 8, unit: 'px' }
+      }
+    }
+
+    expect(validate(broken)).toBe(false)
+  })
+
+  it('rejects a shadow dimension unit the format cannot represent', () => {
+    const broken = structuredClone(tokens) as Record<string, unknown>
+    const global = broken['global'] as Record<string, Record<string, Record<string, unknown>>>
+    const shadow = global['shadow']!['medium'] as Record<string, Record<string, unknown>>
+    shadow['$value']!['blur'] = { value: 8, unit: 'furlongs' }
+
+    expect(validate(broken)).toBe(false)
   })
 
   it('rejects a typography composite missing a required property', () => {

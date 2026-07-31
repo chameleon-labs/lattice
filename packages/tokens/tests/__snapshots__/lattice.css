@@ -3,6 +3,7 @@
 /* Typography: 21 primitives; 11 semantic roles x 5 properties. */
 /* Layout primitives: 16 spacing; 4 breakpoints; 3 containers; 5 radii. */
 /* Motion primitives: 5 durations; 3 easings. */
+/* Elevation: 3 shadows; 10 role tokens per theme. */
 
 :root {
   --lat-font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -62,6 +63,9 @@
   --lat-easing-standard: cubic-bezier(0.2, 0, 0, 1);
   --lat-easing-entrance: cubic-bezier(0, 0, 0, 1);
   --lat-easing-exit: cubic-bezier(0.3, 0, 1, 1);
+  --lat-shadow-small: 0px 1px 2px 0px oklch(0 0 0 / 0.1);
+  --lat-shadow-medium: 0px 4px 8px -1px oklch(0 0 0 / 0.12);
+  --lat-shadow-large: 0px 12px 24px -4px oklch(0 0 0 / 0.16);
   --lat-text-body-font-family: var(--lat-font-sans);
   --lat-text-body-font-size: var(--lat-font-size-base);
   --lat-text-body-font-weight: var(--lat-font-weight-regular);
@@ -284,6 +288,17 @@
   --lat-text-subtle: var(--lat-gray-text-subtle);
   --lat-link: var(--lat-accent-text-subtle);
   --lat-on-solid: oklch(1 0 0);
+
+  --lat-elevation-flat-surface: var(--lat-gray-bg);
+  --lat-elevation-raised-surface: var(--lat-gray-bg-subtle);
+  --lat-elevation-raised-border: var(--lat-gray-border-subtle);
+  --lat-elevation-raised-shadow: var(--lat-shadow-small);
+  --lat-elevation-overlay-surface: var(--lat-gray-bg-subtle);
+  --lat-elevation-overlay-border: var(--lat-gray-border);
+  --lat-elevation-overlay-shadow: var(--lat-shadow-medium);
+  --lat-elevation-modal-surface: var(--lat-gray-component);
+  --lat-elevation-modal-border: var(--lat-gray-border);
+  --lat-elevation-modal-shadow: var(--lat-shadow-large);
 }
 
 [data-lat-theme='dark'] {
@@ -450,6 +465,17 @@
   --lat-text-subtle: var(--lat-gray-text-subtle);
   --lat-link: var(--lat-accent-text-subtle);
   --lat-on-solid: oklch(1 0 0);
+
+  --lat-elevation-flat-surface: var(--lat-gray-bg);
+  --lat-elevation-raised-surface: var(--lat-gray-bg-subtle);
+  --lat-elevation-raised-border: var(--lat-gray-border-subtle);
+  --lat-elevation-raised-shadow: var(--lat-shadow-small);
+  --lat-elevation-overlay-surface: var(--lat-gray-bg-subtle);
+  --lat-elevation-overlay-border: var(--lat-gray-border);
+  --lat-elevation-overlay-shadow: var(--lat-shadow-medium);
+  --lat-elevation-modal-surface: var(--lat-gray-component);
+  --lat-elevation-modal-border: var(--lat-gray-border);
+  --lat-elevation-modal-shadow: var(--lat-shadow-large);
 }
 
 /* The OS preference supplies the default and an explicit stamp overrides it in
@@ -620,6 +646,17 @@
     --lat-text-subtle: var(--lat-gray-text-subtle);
     --lat-link: var(--lat-accent-text-subtle);
     --lat-on-solid: oklch(1 0 0);
+
+    --lat-elevation-flat-surface: var(--lat-gray-bg);
+    --lat-elevation-raised-surface: var(--lat-gray-bg-subtle);
+    --lat-elevation-raised-border: var(--lat-gray-border-subtle);
+    --lat-elevation-raised-shadow: var(--lat-shadow-small);
+    --lat-elevation-overlay-surface: var(--lat-gray-bg-subtle);
+    --lat-elevation-overlay-border: var(--lat-gray-border);
+    --lat-elevation-overlay-shadow: var(--lat-shadow-medium);
+    --lat-elevation-modal-surface: var(--lat-gray-component);
+    --lat-elevation-modal-border: var(--lat-gray-border);
+    --lat-elevation-modal-shadow: var(--lat-shadow-large);
   }
 }
 

@@ -6,6 +6,7 @@ import { ON_SOLID_ROLE, ROLE_ALIASES, ROLE_NAMES, STEP_SLUGS } from '../config/s
 import { emitCss } from '../generate/emit.js'
 import { buildAllScales, buildScale } from '../generate/scale.js'
 import { accentOnSolid, ALIAS_COUNT, roleAliases, stepAliases } from '../generate/semantic.js'
+import { ELEVATION_ROLE_COUNT, shadowCss } from '../generate/elevation.js'
 
 const scales = buildAllScales()
 const css = emitCss(scales)
@@ -194,7 +195,9 @@ describe('the tier is emitted into every theme scope', () => {
       const declared = block.match(/--lat-[a-z0-9-]+: var\(/g) ?? []
 
       // Every alias but on-solid is a var() reference; on-solid is a colour.
-      expect(declared).toHaveLength(ALIAS_COUNT - 1)
+      // Elevation roles are var() references in the same blocks, and are counted
+      // separately so a change to either tier stays visible here.
+      expect(declared).toHaveLength(ALIAS_COUNT - 1 + ELEVATION_ROLE_COUNT)
     }
   })
 
@@ -209,7 +212,13 @@ describe('referential integrity', () => {
   // the property simply resolves to its guaranteed-invalid initial value.
   it.each([0, 1, 2])('leaves no dangling reference in block %i', (index) => {
     const block = blocks(css)[index]!
-    const declared = new Set((block.match(/(--lat-[a-z0-9-]+):/g) ?? []).map((m) => m.slice(0, -1)))
+    // Theme blocks may resolve against the theme-independent shadow primitives
+    // declared on :root, which are deliberately not repeated per theme, and
+    // against nothing else in the global tier.
+    const declared = new Set(
+      ([...(block.match(/(--lat-[a-z0-9-]+):/g) ?? []),
+        ...(shadowCss().match(/(--lat-[a-z0-9-]+):/g) ?? [])]).map((m) => m.slice(0, -1))
+    )
     const referenced = (block.match(/var\((--lat-[a-z0-9-]+)\)/g) ?? []).map((m) =>
       m.slice(4, -1)
     )

@@ -17,6 +17,14 @@ import { ON_SOLID_ROLE, ROLE_ALIASES, STEP_SLUGS } from '../config/semantic.js'
 import { SCALE_JOBS, STEP_JOBS } from '../config/steps.js'
 import { buildCategorical, buildSequential } from './charts.js'
 import {
+  ELEVATION_ROLE_COUNT,
+  SHADOW_PRIMITIVE_COUNT,
+  elevationCss,
+  elevationTokens,
+  shadowCss,
+  shadowTokens
+} from './elevation.js'
+import {
   LAYOUT_PRIMITIVE_COUNTS,
   layoutCss,
   layoutTokens
@@ -99,7 +107,14 @@ function themedBlock(scales: readonly Scale[], mode: Mode): string {
   // holding a var() reference resolves on the element that declares it, so a
   // single root declaration would freeze to the root theme and keep that value
   // inside a nested scope that redefines the primitive underneath.
-  return [primitives, categorical, sequential, severity, semanticBlock(scales, mode)].join('\n\n')
+  return [
+    primitives,
+    categorical,
+    sequential,
+    severity,
+    semanticBlock(scales, mode),
+    elevationCss()
+  ].join('\n\n')
 }
 
 /**
@@ -133,11 +148,13 @@ export function emitCss(scales: readonly Scale[]): string {
 /* Typography: ${TYPOGRAPHY_PRIMITIVE_COUNT} primitives; ${TYPOGRAPHY_ROLE_COUNT} semantic roles x ${TYPOGRAPHY_ROLE_PROPERTY_COUNT} properties. */
 /* Layout primitives: ${LAYOUT_PRIMITIVE_COUNTS.space} spacing; ${LAYOUT_PRIMITIVE_COUNTS.breakpoint} breakpoints; ${LAYOUT_PRIMITIVE_COUNTS.container} containers; ${LAYOUT_PRIMITIVE_COUNTS.radius} radii. */
 /* Motion primitives: ${MOTION_PRIMITIVE_COUNTS.duration} durations; ${MOTION_PRIMITIVE_COUNTS.easing} easings. */
+/* Elevation: ${SHADOW_PRIMITIVE_COUNT} shadows; ${ELEVATION_ROLE_COUNT} role tokens per theme. */
 
 :root {
 ${typographyCss()}
 ${layoutCss()}
 ${motionCss()}
+${shadowCss()}
 ${typographyRoleCss()}
 }
 
@@ -348,6 +365,14 @@ export function emitTokens(scales: readonly Scale[]): DesignTokens {
       }
     }
 
+    group['elevation'] = {
+      $description:
+        'Elevation levels. Every level above flat bundles a surface, a border and a ' +
+        'shadow: the shadow reads on light, the surface step reads on dark, and the ' +
+        'border is the only one that survives forced-colors.',
+      ...elevationTokens(mode)
+    }
+
     modes[mode] = group
   }
 
@@ -358,10 +383,11 @@ export function emitTokens(scales: readonly Scale[]): DesignTokens {
       'build-time contracts. Do not edit by hand.',
     global: {
       $description:
-        'Theme-independent typography, layout and motion primitives, plus semantic typography. Emitted once.',
+        'Theme-independent typography, layout, motion and shadow primitives, plus semantic typography. Emitted once.',
       ...typographyTokens(),
       ...layoutTokens(),
       ...motionTokens(),
+      shadow: shadowTokens(),
       text: typographyRoleTokens()
     },
     ...modes

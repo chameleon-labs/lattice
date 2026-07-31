@@ -13,6 +13,14 @@ import {
   formatOklch,
   type ColorToken
 } from '../generate/emit.js'
+import {
+  ELEVATION_ROLE_COUNT,
+  SHADOW_PRIMITIVE_COUNT,
+  elevationCss,
+  elevationTokens,
+  shadowCss,
+  shadowTokens
+} from '../generate/elevation.js'
 import { formatHex, oklchToSrgb } from '../generate/oklch.js'
 import { buildAllScales } from '../generate/scale.js'
 import {
@@ -47,14 +55,16 @@ const SEVERITY_STEPS = SEVERITY_LEVELS.length
 // Per mode block: the primitive tier, both chart palettes, the severity ramp,
 // and the whole semantic tier — see tests/semantic.test.ts for why the aliases
 // are repeated per block rather than declared once on :root.
-const PER_BLOCK = PRIMITIVES + CHART_SLOTS + SEQUENTIAL_STEPS + SEVERITY_STEPS + ALIAS_COUNT
+const PER_BLOCK =
+  PRIMITIVES + CHART_SLOTS + SEQUENTIAL_STEPS + SEVERITY_STEPS + ALIAS_COUNT + ELEVATION_ROLE_COUNT
 // Light once, dark twice - see the block test below.
 const BLOCKS = 3
 const GLOBAL_DECLARATIONS =
   TYPOGRAPHY_PRIMITIVE_COUNT +
   TYPOGRAPHY_ROLE_COUNT * TYPOGRAPHY_ROLE_PROPERTY_COUNT +
   LAYOUT_PRIMITIVE_COUNT +
-  MOTION_PRIMITIVE_COUNT
+  MOTION_PRIMITIVE_COUNT +
+  SHADOW_PRIMITIVE_COUNT
 
 describe('formatOklch', () => {
   // The precision that matters. Rounding to the three decimals the spec's tables
@@ -239,6 +249,40 @@ describe('lattice.css', () => {
   it('is deterministic', () => {
     expect(emitCss(buildAllScales())).toBe(css)
   })
+
+  it('emits every shadow primitive once in the global rule', () => {
+    const [globalBlock] = splitBlocks(css)
+
+    expect(globalBlock).toContain(shadowCss())
+    expect(count(shadowCss())).toBe(SHADOW_PRIMITIVE_COUNT)
+    expect(css.match(/--lat-shadow-small:/g)).toHaveLength(1)
+    expect(css.match(/--lat-shadow-large:/g)).toHaveLength(1)
+  })
+
+  it('repeats every elevation role in all three themed blocks', () => {
+    const [globalBlock, lightBlock, darkBlock, mediaBlock] = splitBlocks(css)
+
+    for (const block of [lightBlock, darkBlock]) {
+      expect(block).toContain(elevationCss())
+    }
+    // The preference block is nested one level deeper inside @media, so every
+    // declaration in it carries two more spaces. That is what the indent
+    // parameter exists for.
+    expect(mediaBlock).toContain(elevationCss('    '))
+    expect(globalBlock).not.toContain('--lat-elevation-')
+    expect(css.match(/--lat-elevation-modal-shadow:/g)).toHaveLength(3)
+  })
+
+  it('reports derived elevation counts in the generated header', () => {
+    expect(css).toContain(
+      `/* Elevation: ${SHADOW_PRIMITIVE_COUNT} shadows; ` +
+        `${ELEVATION_ROLE_COUNT} role tokens per theme. */`
+    )
+  })
+
+  it('never emits a forced-colors rule from the token package', () => {
+    expect(css).not.toContain('forced-colors')
+  })
 })
 
 describe('tokens.json', () => {
@@ -295,6 +339,7 @@ describe('tokens.json', () => {
         TYPOGRAPHY_ROLE_COUNT +
         LAYOUT_PRIMITIVE_COUNT +
         MOTION_PRIMITIVE_COUNT +
+        SHADOW_PRIMITIVE_COUNT +
         PER_BLOCK * MODES.length
     )
   })
@@ -420,6 +465,12 @@ describe('tokens.json', () => {
 
   it('keeps every alias inside its own mode, so a theme never leaks', () => {
     for (const { path, value } of aliasLeaves()) {
+      // Shadow primitives are theme-independent and live in the global tier, so
+      // an elevation role's shadow signal may point there. Nothing else may
+      // point into another mode.
+      if (value.startsWith('{global.shadow.') && path.endsWith('.shadow')) {
+        continue
+      }
       expect(value.startsWith(`{${path.split('.')[0]}.`), `${path} -> ${value}`).toBe(true)
     }
   })
@@ -498,6 +549,27 @@ describe('tokens.json', () => {
 
   it('serialises to JSON and back unchanged', () => {
     expect(JSON.parse(JSON.stringify(tokens))).toEqual(tokens)
+  })
+
+  it('keeps shadow primitives global and elevation roles per mode', () => {
+    const global = tokens['global'] as Record<string, unknown>
+
+    expect(global['shadow']).toEqual(shadowTokens())
+    expect(global).not.toHaveProperty('elevation')
+
+    for (const mode of MODES) {
+      const group = tokens[mode] as Record<string, unknown>
+      // elevation carries a $description alongside its roles, the same
+      // convention severity and chart use, so compare the roles beneath it
+      // rather than the group verbatim.
+      const { $description: _description, ...elevation } = group['elevation'] as Record<
+        string,
+        unknown
+      >
+
+      expect(elevation).toEqual(elevationTokens(mode))
+      expect(group).not.toHaveProperty('shadow')
+    }
   })
 })
 
