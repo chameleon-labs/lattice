@@ -1,0 +1,38 @@
+.lat-table {
+  inline-size: 100%;
+  border-collapse: collapse;
+
+  font-family: var(--lat-text-body-font-family);
+  font-size: var(--lat-text-body-font-size);
+  line-height: var(--lat-text-body-line-height);
+  color: var(--lat-text);
+}
+
+.lat-table__caption {
+  text-align: start;
+  padding-block-end: var(--lat-space-2);
+  font-family: var(--lat-text-caption-font-family);
+  font-size: var(--lat-text-caption-font-size);
+  color: var(--lat-text-subtle);
+}
+
+.lat-table__header {
+  text-align: start;
+  padding: var(--lat-space-2) var(--lat-space-3);
+  font-family: var(--lat-text-ui-font-family);
+  font-size: var(--lat-text-ui-font-size);
+  font-weight: var(--lat-font-weight-semibold);
+  color: var(--lat-text);
+  /* A border rather than a filled header band: it survives forced-colors, where
+     a background is flattened to the system canvas. */
+  border-block-end: 1px solid var(--lat-border);
+}
+
+.lat-table__cell {
+  padding: var(--lat-space-2) var(--lat-space-3);
+  border-block-end: 1px solid var(--lat-border-subtle);
+}
+
+.lat-table__row:last-child .lat-table__cell {
+  border-block-end: none;
+}

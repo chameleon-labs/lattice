@@ -26,6 +26,12 @@ import {
   MenuProvider,
   MenuSeparator,
   Switch,
+  TBody,
+  THead,
+  Table,
+  Td,
+  Th,
+  Tr,
   Tab,
   TabList,
   TabPanel,
@@ -150,6 +156,34 @@ function Gallery({ theme }: { theme: string }) {
         <Switch id={`${theme}-switch-on`} defaultChecked />
         <label htmlFor={`${theme}-switch-disabled`}>Unavailable</label>
         <Switch id={`${theme}-switch-disabled`} disabled />
+      </Section>
+
+      <Section title="Table">
+        <Table caption="Audit history">
+          <THead>
+            <Tr>
+              <Th scope="col">Date</Th>
+              <Th scope="col">Score</Th>
+              <Th scope="col">Change</Th>
+            </Tr>
+          </THead>
+          <TBody>
+            <Tr>
+              <Th scope="row">30 July</Th>
+              <Td>72</Td>
+              <Td>
+                <Badge tone="danger">down 12</Badge>
+              </Td>
+            </Tr>
+            <Tr>
+              <Th scope="row">29 July</Th>
+              <Td>84</Td>
+              <Td>
+                <Badge tone="success">up 3</Badge>
+              </Td>
+            </Tr>
+          </TBody>
+        </Table>
       </Section>
 
       <Section title="TextField">

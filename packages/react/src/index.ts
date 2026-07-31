@@ -58,3 +58,14 @@ export type { CalloutOptions, CalloutProps, CalloutTone } from './callout/callou
 
 export { Card } from './card/card.js'
 export type { CardProps } from './card/card.js'
+
+export { TBody, THead, Table, Td, Th, Tr } from './table/table.js'
+export type {
+  TBodyProps,
+  THeadProps,
+  TableOptions,
+  TableProps,
+  TdProps,
+  ThProps,
+  TrProps
+} from './table/table.js'
