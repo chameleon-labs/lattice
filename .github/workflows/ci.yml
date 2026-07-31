@@ -35,6 +35,13 @@ jobs:
       - name: Install Firefox
         run: pnpm --filter @chameleon-labs/lattice-tokens exec playwright install --with-deps firefox
 
+      # The React package's demo imports the emitted token stylesheet, and dist/
+      # is gitignored — so the artefact has to exist before its browser tests
+      # run. The full `pnpm -r build` below still runs for every package; this is
+      # the one ordering dependency that cannot wait for it.
+      - name: Build tokens
+        run: pnpm --filter @chameleon-labs/lattice-tokens build
+
       - name: Typecheck
         run: pnpm -r typecheck
 
@@ -48,11 +55,15 @@ jobs:
         run: pnpm -r build
 
       # dist/ is gitignored, so a broken emit would otherwise be invisible until
-      # release. This proves the two published files exist and are non-empty.
+      # release. This proves every published file exists and is non-empty.
       - name: Verify emitted artefacts
         run: |
           set -euo pipefail
-          for f in packages/tokens/dist/lattice.css packages/tokens/dist/tokens.json; do
+          for f in packages/tokens/dist/lattice.css \
+                   packages/tokens/dist/tokens.json \
+                   packages/react/dist/index.js \
+                   packages/react/dist/index.d.ts \
+                   packages/react/dist/styles.css; do
             test -s "$f" || { echo "missing or empty: $f"; exit 1; }
             echo "ok: $f ($(wc -c < "$f") bytes)"
           done

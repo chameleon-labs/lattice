@@ -1,0 +1,12 @@
+/*
+ * The single stylesheet this package ships. Consumers import it once:
+ *
+ *   import '@chameleon-labs/lattice-react/styles.css'
+ *
+ * It is deliberately not imported by the JavaScript, so the components stay
+ * usable in a bundler that is not configured for CSS — the same arrangement
+ * lattice.css already has.
+ *
+ * Every value here must be a var(--lat-…) reference. #37 adds the component
+ * rules and the static tests that enforce that.
+ */

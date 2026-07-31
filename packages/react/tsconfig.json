@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // Widened because this package touches the DOM, where the token package
+    // does not. `react-jsx` lets both tsc and esbuild use the automatic
+    // runtime, so no file needs to import React to use JSX.
+    "jsx": "react-jsx",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"]
+  },
+  "include": [
+    "src",
+    "tests",
+    "demo",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "playwright.config.ts"
+  ]
+}
