@@ -63,7 +63,7 @@
   - `SpaceName`, `BreakpointName`, `ContainerName`, `RadiusName`
 - Consumed by: `generate/layout.ts` and direct contract tests.
 
-- [ ] **Step 1: Write the failing exact-contract tests**
+- [x] **Step 1: Write the failing exact-contract tests**
 
 Create `packages/tokens/tests/layout.test.ts`:
 
@@ -108,7 +108,7 @@ describe('layout primitive contracts', () => {
 })
 ```
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
 Run:
 
@@ -119,7 +119,7 @@ pnpm exec vitest run tests/layout.test.ts
 
 Expected: FAIL because `config/layout.ts` does not exist.
 
-- [ ] **Step 3: Implement the typed config**
+- [x] **Step 3: Implement the typed config**
 
 Create `packages/tokens/config/layout.ts`:
 
@@ -185,7 +185,7 @@ export const NESTED_RADIUS_PAIRINGS = [
 ] as const satisfies readonly NestedRadiusPairing[]
 ```
 
-- [ ] **Step 4: Add arithmetic, ordering and scope tests**
+- [x] **Step 4: Add arithmetic, ordering and scope tests**
 
 Append to `layout.test.ts`:
 
@@ -227,7 +227,7 @@ it('uses DTCG-safe public slugs for every spacing step', () => {
 })
 ```
 
-- [ ] **Step 5: Run the focused test and verify GREEN**
+- [x] **Step 5: Run the focused test and verify GREEN**
 
 Run:
 
@@ -238,7 +238,7 @@ pnpm run typecheck
 
 Expected: all layout contract tests and TypeScript pass.
 
-- [ ] **Step 6: Mutation-check the contracts**
+- [x] **Step 6: Mutation-check the contracts**
 
 Apply one temporary mutation at a time:
 
@@ -250,7 +250,7 @@ Apply one temporary mutation at a time:
 
 Restore after every mutation and rerun the focused test.
 
-- [ ] **Step 7: Hold the intended commit boundary**
+- [x] **Step 7: Hold the intended commit boundary**
 
 Do not commit yet. Record this intended commit:
 
@@ -279,7 +279,7 @@ Add layout primitive contracts
   - `layoutTokens(): LayoutTokenGroups`
 - Consumed by: `generate/emit.ts` and integrated parity tests.
 
-- [ ] **Step 1: Add failing generator tests**
+- [x] **Step 1: Add failing generator tests**
 
 Append imports:
 
@@ -335,7 +335,7 @@ describe('layout primitive generation', () => {
 })
 ```
 
-- [ ] **Step 2: Run and verify RED**
+- [x] **Step 2: Run and verify RED**
 
 Run:
 
@@ -345,7 +345,7 @@ pnpm exec vitest run tests/layout.test.ts
 
 Expected: FAIL because `generate/layout.ts` does not exist.
 
-- [ ] **Step 3: Implement the generator**
+- [x] **Step 3: Implement the generator**
 
 Create `packages/tokens/generate/layout.ts`:
 
@@ -416,7 +416,7 @@ export function layoutTokens(): LayoutTokenGroups {
 }
 ```
 
-- [ ] **Step 4: Add direct CSS/DTCG parity coverage**
+- [x] **Step 4: Add direct CSS/DTCG parity coverage**
 
 Append:
 
@@ -436,7 +436,7 @@ it('keeps CSS and DTCG names and values in parity', () => {
 })
 ```
 
-- [ ] **Step 5: Run focused tests and typecheck**
+- [x] **Step 5: Run focused tests and typecheck**
 
 Run:
 
@@ -447,7 +447,7 @@ pnpm run typecheck
 
 Expected: PASS.
 
-- [ ] **Step 6: Mutation-check generation**
+- [x] **Step 6: Mutation-check generation**
 
 Apply one temporary mutation at a time:
 
@@ -458,7 +458,7 @@ Apply one temporary mutation at a time:
 
 Restore after every mutation.
 
-- [ ] **Step 7: Hold the intended commit boundary**
+- [x] **Step 7: Hold the intended commit boundary**
 
 Do not commit yet. Record:
 
@@ -484,7 +484,7 @@ Generate global layout primitives
 - Consumes: every public export from `generate/layout.ts`.
 - Produces: 28 global CSS declarations and 28 global DTCG leaves in the published artefacts.
 
-- [ ] **Step 1: Add failing integrated CSS assertions**
+- [x] **Step 1: Add failing integrated CSS assertions**
 
 In `emit.test.ts`, import:
 
@@ -529,7 +529,7 @@ it('reports derived layout counts in the generated header', () => {
 })
 ```
 
-- [ ] **Step 2: Add failing JSON scope and parity assertions**
+- [x] **Step 2: Add failing JSON scope and parity assertions**
 
 Update the expected leaf count by adding `LAYOUT_PRIMITIVE_COUNT`.
 
@@ -550,7 +550,7 @@ it('keeps layout primitives global and out of colour modes', () => {
 
 For each group returned by `layoutTokens()`, assert that the matching CSS declaration exists with the same numeric value and `rem` unit.
 
-- [ ] **Step 3: Run integrated tests and verify RED**
+- [x] **Step 3: Run integrated tests and verify RED**
 
 Run:
 
@@ -560,7 +560,7 @@ pnpm exec vitest run tests/emit.test.ts
 
 Expected: FAIL because `emit.ts` has not composed layout output.
 
-- [ ] **Step 4: Compose layout CSS and DTCG**
+- [x] **Step 4: Compose layout CSS and DTCG**
 
 In `generate/emit.ts`, import:
 
@@ -602,7 +602,7 @@ global: {
 }
 ```
 
-- [ ] **Step 5: Add positive schema assertions**
+- [x] **Step 5: Add positive schema assertions**
 
 In `schema.test.ts`, extend the global value-shape test:
 
@@ -617,7 +617,7 @@ expect(validate(tokens)).toBe(true)
 
 The existing negative test for an invalid `em` dimension unit remains the schema mutation gate.
 
-- [ ] **Step 6: Extend representative snapshot-path coverage**
+- [x] **Step 6: Extend representative snapshot-path coverage**
 
 In `snapshot.test.ts`, add these literal path fragments:
 
@@ -628,7 +628,7 @@ In `snapshot.test.ts`, add these literal path fragments:
 'global.radius.full',
 ```
 
-- [ ] **Step 7: Run integrated and schema tests**
+- [x] **Step 7: Run integrated and schema tests**
 
 Run:
 
@@ -638,7 +638,7 @@ pnpm exec vitest run tests/emit.test.ts tests/schema.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 8: Observe snapshot failures before updating**
+- [x] **Step 8: Observe snapshot failures before updating**
 
 Run:
 
@@ -648,7 +648,7 @@ pnpm exec vitest run tests/snapshot.test.ts
 
 Expected: two snapshot failures showing exactly 28 new CSS declarations and 28 new global DTCG paths, with no colour value, alias or theme selector change.
 
-- [ ] **Step 9: Update and inspect snapshots**
+- [x] **Step 9: Update and inspect snapshots**
 
 Run:
 
@@ -665,7 +665,7 @@ Confirm:
 - no light, dark or preference block changes;
 - the path snapshot gains only the four approved global groups and 28 leaves.
 
-- [ ] **Step 10: Mutation-check integration scope**
+- [x] **Step 10: Mutation-check integration scope**
 
 Apply one temporary mutation at a time:
 
@@ -676,7 +676,7 @@ Apply one temporary mutation at a time:
 
 Restore after every mutation.
 
-- [ ] **Step 11: Hold the intended commit boundary**
+- [x] **Step 11: Hold the intended commit boundary**
 
 Do not commit yet. Record:
 
@@ -698,11 +698,11 @@ Publish global layout primitives
 
 - Produces: accurate package scope, issue coordination evidence and a reviewable uncommitted implementation diff.
 
-- [ ] **Step 1: Update README scope**
+- [x] **Step 1: Update README scope**
 
 Change the scope so primitive spacing, breakpoints, containers and radii are in the token package. Keep semantic spacing, elevation and motion under “Not yet,” and keep components unimplemented.
 
-- [ ] **Step 2: Verify issue coordination**
+- [x] **Step 2: Verify issue coordination**
 
 Confirm:
 
@@ -712,7 +712,7 @@ gh issue view 28 --repo chameleon-labs/lattice --json state,projectItems,url
 
 Expected: issue #28 is open and its `Lattice v1` item is `In Progress`.
 
-- [ ] **Step 3: Run the complete gates**
+- [x] **Step 3: Run the complete gates**
 
 Run:
 
@@ -730,7 +730,7 @@ Expected:
 - typecheck and build exit 0;
 - the diff has no whitespace errors.
 
-- [ ] **Step 4: Prove deterministic artefacts**
+- [x] **Step 4: Prove deterministic artefacts**
 
 Run:
 
@@ -743,7 +743,7 @@ shasum -a 256 packages/tokens/dist/lattice.css packages/tokens/dist/tokens.json
 
 Expected: both checksum pairs match exactly.
 
-- [ ] **Step 5: Inspect the complete local diff**
+- [x] **Step 5: Inspect the complete local diff**
 
 Run:
 
@@ -761,7 +761,7 @@ Confirm:
 - no semantic inset/gap, elevation, shadow or motion token was introduced;
 - no contributor-specific path, co-author trailer or AI attribution appears.
 
-- [ ] **Step 6: Request implementation review**
+- [x] **Step 6: Request implementation review**
 
 Report:
 
@@ -772,7 +772,7 @@ Report:
 
 Leave every implementation change uncommitted and unpushed until explicit approval.
 
-- [ ] **Step 7: Create small commits only after approval**
+- [x] **Step 7: Create small commits only after approval**
 
 Use these boundaries:
 
