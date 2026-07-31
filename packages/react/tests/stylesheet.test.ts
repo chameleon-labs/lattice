@@ -1,15 +1,19 @@
 /**
  * @vitest-environment node
  *
- * Reads the built stylesheet and the token package's emitted CSS, so both
- * builds must have run. CI builds tokens before it tests and builds this
- * package's dist in the same fan-out; locally, run `pnpm build` in both first.
+ * Assembles the stylesheet from source with the same function the build uses,
+ * rather than reading dist/. Reading the built file passed locally and failed
+ * from a clean tree, because CI runs `test` before `build`. The token package's
+ * emitted CSS is still read from disk — CI builds it first, and it is the
+ * artefact whose token names this asserts against.
  *
  * It must not run under jsdom: there the global URL resolves
  * `new URL(relative, import.meta.url)` against the document's base.
  */
 import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
+import { assembleCss } from '../scripts/assemble-css.js'
 import {
   findAnimatedTransformsOutsideNoPreference,
   findBareFocusOutlines,
@@ -28,7 +32,7 @@ const read = (relative: string): string => {
   }
 }
 
-const css = read('../dist/styles.css')
+const css = await assembleCss(fileURLToPath(new URL('../src/styles.css', import.meta.url)))
 const tokensCss = read('../../tokens/dist/lattice.css')
 
 const declared = new Set(

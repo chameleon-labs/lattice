@@ -2,7 +2,7 @@
 
 > The design system behind [tabstop](https://github.com/chameleon-labs/tabstop) and whatever comes next. Accessibility is the constraint, not the feature.
 
-**Status: early development.** Colour, typography, spacing/motion, and elevation are specified; nothing is published yet.
+**Status: early development.** Colour, typography, spacing/motion and elevation are specified and built, and fourteen component families ship on top of them; nothing is published yet.
 
 ## The name
 
@@ -12,12 +12,12 @@ That is what a token system is. The name is the architecture.
 
 ## What this is
 
-Two packages, one of which exists so far.
+Two packages.
 
 | Package | What it is |
 |---|---|
 | `@chameleon-labs/lattice-tokens` | foundational design tokens — colour, typography, spacing, sizing, elevation, and motion |
-| `@chameleon-labs/lattice-react` | the component layer on [Ariakit](https://github.com/ariakit/ariakit) — **scaffold only** |
+| `@chameleon-labs/lattice-react` | the component layer on [Ariakit](https://github.com/ariakit/ariakit) — fourteen component families |
 
 They are separate because tokens carry no framework dependency and should stay installable by a consumer that never touches React.
 
@@ -41,15 +41,17 @@ Systems that skip the semantic tier end up unable to add a second theme without 
 
 ## Scope
 
-**In:** colour scales, semantic colour tokens, light and dark modes, an ordered severity ramp, validated categorical and sequential chart palettes, primitive and semantic typography tokens, primitive spacing, breakpoints, containers and radii tokens, primitive motion tokens, and calibrated elevation with theme-dependent roles.
+**In:** colour scales, semantic colour tokens, light and dark modes, a per-scale computed on-solid, an ordered severity ramp, validated categorical and sequential chart palettes, primitive and semantic typography tokens, primitive spacing, breakpoints, containers and radii tokens, primitive motion tokens, calibrated elevation with theme-dependent roles, and fourteen component families on Ariakit.
 
-**Not yet:** components, semantic spacing and motion, wide-gamut output, forced-colors handling. Each is tracked separately.
+**Not yet:** semantic spacing roles, wide-gamut output, forced-colors handling. Each is tracked separately.
+
+Components deferred with a reason: `EmptyState` — its four tabstop instances share no structure, and it makes no guarantee a consumer would otherwise have to remember, which is the admission test every shipped component passes. `Skeleton` and `Toast` — both want continuous motion, which the reduced-motion contract forbids until the pausability escape is designed. `Link`, `Tooltip`, `Select`, `Combobox` — no specified screen uses one.
 
 Typography keeps the system sans stack as its default, provides eleven semantic roles, and offers Inter as an optional primitive. Applications that opt into Inter provide the font themselves; the token package does not bundle or load web fonts.
 
 ## Design docs
 
-Decisions live in [`docs/superpowers/specs/`](./docs/superpowers/specs/). Start with the [colour system](./docs/superpowers/specs/2026-07-28-lattice-color-system-design.md), [typography](./docs/superpowers/specs/2026-07-30-lattice-typography-design.md), [spacing/motion](./docs/superpowers/specs/2026-07-30-lattice-spacing-and-motion-design.md), and [elevation](./docs/superpowers/specs/2026-07-31-lattice-elevation-design.md) designs — they record what was chosen, what was rejected, and the measurements behind each.
+Decisions live in [`docs/superpowers/specs/`](./docs/superpowers/specs/). Start with the [colour system](./docs/superpowers/specs/2026-07-28-lattice-color-system-design.md), [typography](./docs/superpowers/specs/2026-07-30-lattice-typography-design.md), [spacing/motion](./docs/superpowers/specs/2026-07-30-lattice-spacing-and-motion-design.md), [elevation](./docs/superpowers/specs/2026-07-31-lattice-elevation-design.md), and [the component library](./docs/superpowers/specs/2026-07-31-lattice-component-library-design.md) designs — they record what was chosen, what was rejected, and the measurements behind each.
 
 ## Development
 
@@ -57,17 +59,18 @@ Node 24 (see [`.nvmrc`](./.nvmrc)) and pnpm.
 
 ```sh
 pnpm install
+pnpm --filter @chameleon-labs/lattice-tokens build   # the React demo needs the emitted tokens
 pnpm --filter @chameleon-labs/lattice-tokens exec playwright install firefox
 pnpm build    # typecheck, then emit dist/
 pnpm test     # vitest and Firefox browser coverage
 ```
 
-A pnpm workspace. Root scripts fan out to every package; run them inside `packages/tokens/` to work on one.
+A pnpm workspace. Root scripts fan out to every package; run them inside a package directory to work on one.
 
 ```
 packages/
 ├── tokens/     @chameleon-labs/lattice-tokens — config/, generate/, tests/, dist/
-└── react/      @chameleon-labs/lattice-react — scaffold; components tracked in #37
+└── react/      @chameleon-labs/lattice-react — src/, demo/, tests/, dist/
 ```
 
 Inside `packages/tokens/`, `config/` declares reviewed token values and contracts and `generate/` turns them into artefacts. `dist/` is generated output and is not committed.
