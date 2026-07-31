@@ -89,9 +89,9 @@ Three, neutral, single-layer, identical in both modes.
 
 | Token | CSS value |
 |---|---|
-| `--lat-shadow-small` | `0 1px 2px 0 oklch(0 0 0 / 0.1)` |
-| `--lat-shadow-medium` | `0 4px 8px -1px oklch(0 0 0 / 0.12)` |
-| `--lat-shadow-large` | `0 12px 24px -4px oklch(0 0 0 / 0.16)` |
+| `--lat-shadow-small` | `0px 1px 2px 0px oklch(0 0 0 / 0.1)` |
+| `--lat-shadow-medium` | `0px 4px 8px -1px oklch(0 0 0 / 0.12)` |
+| `--lat-shadow-large` | `0px 12px 24px -4px oklch(0 0 0 / 0.16)` |
 
 A single layer rather than an ambient-plus-direct pair. Two layers read
 marginally softer on light and are indistinguishable on dark, which is not worth

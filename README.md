@@ -2,7 +2,7 @@
 
 > The design system behind [tabstop](https://github.com/chameleon-labs/tabstop) and whatever comes next. Accessibility is the constraint, not the feature.
 
-**Status: early development.** Colour, typography, and spacing/motion are specified; nothing is published yet.
+**Status: early development.** Colour, typography, spacing/motion, and elevation are specified; nothing is published yet.
 
 ## The name
 
@@ -41,15 +41,15 @@ Systems that skip the semantic tier end up unable to add a second theme without 
 
 ## Scope
 
-**In:** colour scales, semantic colour tokens, light and dark modes, an ordered severity ramp, validated categorical and sequential chart palettes, primitive and semantic typography tokens, primitive spacing, breakpoints, containers and radii tokens, and primitive motion tokens.
+**In:** colour scales, semantic colour tokens, light and dark modes, an ordered severity ramp, validated categorical and sequential chart palettes, primitive and semantic typography tokens, primitive spacing, breakpoints, containers and radii tokens, primitive motion tokens, and calibrated elevation with theme-dependent roles.
 
-**Not yet:** components, semantic spacing and motion, elevation, wide-gamut output, forced-colors handling. Each is tracked separately.
+**Not yet:** components, semantic spacing and motion, wide-gamut output, forced-colors handling. Each is tracked separately.
 
 Typography keeps the system sans stack as its default, provides eleven semantic roles, and offers Inter as an optional primitive. Applications that opt into Inter provide the font themselves; the token package does not bundle or load web fonts.
 
 ## Design docs
 
-Decisions live in [`docs/superpowers/specs/`](./docs/superpowers/specs/). Start with the [colour system](./docs/superpowers/specs/2026-07-28-lattice-color-system-design.md), [typography](./docs/superpowers/specs/2026-07-30-lattice-typography-design.md), and [spacing/motion](./docs/superpowers/specs/2026-07-30-lattice-spacing-and-motion-design.md) designs — they record what was chosen, what was rejected, and the measurements behind each.
+Decisions live in [`docs/superpowers/specs/`](./docs/superpowers/specs/). Start with the [colour system](./docs/superpowers/specs/2026-07-28-lattice-color-system-design.md), [typography](./docs/superpowers/specs/2026-07-30-lattice-typography-design.md), [spacing/motion](./docs/superpowers/specs/2026-07-30-lattice-spacing-and-motion-design.md), and [elevation](./docs/superpowers/specs/2026-07-31-lattice-elevation-design.md) designs — they record what was chosen, what was rejected, and the measurements behind each.
 
 ## Development
 
