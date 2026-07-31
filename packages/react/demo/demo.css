@@ -38,3 +38,15 @@ h3 {
   align-items: center;
   margin-block-end: var(--lat-space-6);
 }
+
+/* Input and TextField are full-width by design — a form field fills its column.
+   The demo lays them out in flex rows, so it constrains them here rather than
+   the component guessing a width it cannot know. */
+.demo-row .lat-input,
+.demo-row .lat-field {
+  max-inline-size: 22rem;
+}
+
+.demo-row .lat-callout {
+  max-inline-size: 30rem;
+}

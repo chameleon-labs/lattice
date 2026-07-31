@@ -16,6 +16,7 @@
   "scripts": {
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "demo": "pnpm --filter @chameleon-labs/lattice-react dev"
   }
 }

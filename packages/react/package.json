@@ -37,6 +37,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json && tsx scripts/build-css.ts",
+    "dev": "pnpm --filter @chameleon-labs/lattice-tokens build && vite --open",
     "typecheck": "tsc --noEmit",
     "test": "vitest run && playwright test",
     "test:unit": "vitest run",

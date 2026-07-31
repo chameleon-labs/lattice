@@ -60,13 +60,22 @@ take away.
 ## Development
 
 ```sh
-pnpm --filter @chameleon-labs/lattice-tokens build   # the demo needs the emitted tokens
-pnpm --filter @chameleon-labs/lattice-react exec playwright install firefox
+pnpm demo         # from the repo root — builds tokens, then opens the gallery
+```
 
+Or from inside this package:
+
+```sh
+pnpm dev          # same thing: builds tokens, then serves on :5173
 pnpm build        # tsc emits JS and declarations; the stylesheet is assembled
 pnpm typecheck
 pnpm test         # vitest (jsdom) then Playwright (Firefox at 16px and 20px)
+
+pnpm --filter @chameleon-labs/lattice-react exec playwright install firefox
 ```
+
+`dev` builds the token package first on purpose: the gallery imports the emitted
+`lattice.css`, and `dist/` is not committed.
 
 `demo/` is both the documentation and the target the browser tests drive, so
 what a reviewer looks at and what the assertions measure cannot diverge. **If a
