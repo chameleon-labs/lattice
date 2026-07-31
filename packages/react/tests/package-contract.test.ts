@@ -13,6 +13,7 @@ interface PackageJson {
   readonly dependencies?: Record<string, string>
   readonly devDependencies?: Record<string, string>
   readonly peerDependencies?: Record<string, string>
+  readonly optionalDependencies?: Record<string, string>
 }
 
 const load = (relative: string): PackageJson =>
@@ -38,10 +39,14 @@ describe('lattice-react package boundary', () => {
 
 describe('lattice-tokens stays installable without React', () => {
   it('names no React or Ariakit package in any dependency field', () => {
+    // All four map-shaped fields npm installs from. bundledDependencies is
+    // deliberately absent: it is an array of names that must already appear in
+    // dependencies, so it cannot introduce a package this map does not see.
     const combined = {
       ...tokens.dependencies,
       ...tokens.devDependencies,
-      ...tokens.peerDependencies
+      ...tokens.peerDependencies,
+      ...tokens.optionalDependencies
     }
 
     const offenders = Object.keys(combined).filter(
