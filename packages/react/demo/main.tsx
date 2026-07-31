@@ -6,7 +6,7 @@ import '@chameleon-labs/lattice-tokens/lattice.css'
 import '../src/styles.css'
 import './demo.css'
 
-import { Button } from '../src/index.js'
+import { Button, Input, TextField } from '../src/index.js'
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -34,6 +34,25 @@ function Gallery() {
         )}
         <Button disabled>disabled</Button>
         <Button render={<a href="#top" />}>as a link</Button>
+      </Section>
+
+      <Section title="Input">
+        {(['sm', 'md', 'lg'] as const).map((size) => (
+          <Input key={size} size={size} aria-label={`URL ${size}`} placeholder={`size ${size}`} />
+        ))}
+        <Input aria-label="URL invalid" invalid placeholder="invalid" />
+        <Input aria-label="URL disabled" disabled placeholder="disabled" />
+      </Section>
+
+      <Section title="TextField">
+        <TextField label="Plain" />
+        <TextField label="Described" description="We audit the page at this address." />
+        <TextField label="In error" error="That address can't be audited." />
+        <TextField
+          label="Both"
+          description="We audit the page at this address."
+          error="That address can't be audited."
+        />
       </Section>
     </>
   )

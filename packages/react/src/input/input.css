@@ -1,0 +1,55 @@
+.lat-input {
+  display: block;
+  inline-size: 100%;
+
+  font-family: var(--lat-text-ui-font-family);
+  font-size: var(--lat-text-ui-font-size);
+  line-height: var(--lat-text-ui-line-height);
+  letter-spacing: var(--lat-text-ui-letter-spacing);
+
+  color: var(--lat-text);
+  background-color: var(--lat-bg-subtle);
+  border: 1px solid var(--lat-border);
+  border-radius: var(--lat-radius-md);
+
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: var(--lat-duration-fast);
+  transition-timing-function: var(--lat-easing-standard);
+}
+
+.lat-input[data-size='sm'] {
+  padding: var(--lat-space-1) var(--lat-space-2);
+}
+
+.lat-input[data-size='md'] {
+  padding: var(--lat-space-2) var(--lat-space-3);
+}
+
+.lat-input[data-size='lg'] {
+  padding: var(--lat-space-3) var(--lat-space-4);
+}
+
+.lat-input::placeholder {
+  color: var(--lat-text-subtle);
+}
+
+.lat-input:hover {
+  border-color: var(--lat-border-interactive);
+}
+
+.lat-input:focus-visible {
+  outline: 2px solid var(--lat-focus-ring);
+  outline-offset: 2px;
+}
+
+/* The invalid state is a border colour *and* the aria-invalid attribute the
+   component sets, never colour alone — assistive technology reads the second. */
+.lat-input[aria-invalid='true'] {
+  border-color: var(--lat-danger-border-strong);
+}
+
+.lat-input:disabled {
+  background-color: var(--lat-gray-component);
+  color: var(--lat-gray-text-subtle);
+  cursor: not-allowed;
+}
