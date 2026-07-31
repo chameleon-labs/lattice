@@ -18,6 +18,7 @@
 @import './dialog/dialog.css';
 @import './disclosure/disclosure.css';
 @import './input/input.css';
+@import './live-region/live-region.css';
 @import './menu/menu.css';
 @import './switch/switch.css';
 @import './table/table.css';

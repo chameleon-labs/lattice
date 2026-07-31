@@ -69,3 +69,9 @@ export type {
   ThProps,
   TrProps
 } from './table/table.js'
+
+export { LiveRegion } from './live-region/live-region.js'
+export type { LiveRegionProps } from './live-region/live-region.js'
+
+export { VisuallyHidden } from './visually-hidden/visually-hidden.js'
+export type { VisuallyHiddenProps } from './visually-hidden/visually-hidden.js'

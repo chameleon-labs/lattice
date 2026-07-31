@@ -1,0 +1,12 @@
+/*
+ * Deliberately unstyled beyond typography. The region is visible by default,
+ * because tabstop's audit-progress text is both the announcement and the thing
+ * a sighted user reads (#19). A consumer wanting an announcement with no visual
+ * presence wraps this in VisuallyHidden rather than the component guessing.
+ */
+.lat-live-region {
+  font-family: var(--lat-text-body-font-family);
+  font-size: var(--lat-text-body-font-size);
+  line-height: var(--lat-text-body-line-height);
+  color: var(--lat-text);
+}

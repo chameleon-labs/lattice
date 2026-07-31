@@ -20,6 +20,7 @@ import {
   DisclosureContent,
   DisclosureProvider,
   Input,
+  LiveRegion,
   Menu,
   MenuButton,
   MenuItem,
@@ -32,6 +33,7 @@ import {
   Td,
   Th,
   Tr,
+  VisuallyHidden,
   Tab,
   TabList,
   TabPanel,
@@ -73,6 +75,17 @@ function Gallery({ theme }: { theme: string }) {
         ))}
         <Input aria-label="URL invalid" invalid placeholder="invalid" />
         <Input aria-label="URL disabled" disabled placeholder="disabled" />
+      </Section>
+
+      <Section title="LiveRegion">
+        <LiveRegion message="Running the accessibility engine — this usually takes about 30 seconds." />
+      </Section>
+
+      <Section title="VisuallyHidden">
+        <p>
+          This paragraph has extra context for screen readers only:
+          <VisuallyHidden> audited on 30 July at 09:14 UTC</VisuallyHidden>
+        </p>
       </Section>
 
       <Section title="Card">
