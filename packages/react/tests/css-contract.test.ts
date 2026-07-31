@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   findAnimatedTransformsOutsideNoPreference,
+  findBareFocusOutlines,
   findBlockSelectors,
   findColourLiterals,
   findGlobalSelectors,
@@ -103,6 +104,24 @@ describe('findAnimatedTransformsOutsideNoPreference', () => {
     expect(findAnimatedTransformsOutsideNoPreference(css)).toEqual([
       'transition-property: transform'
     ])
+  })
+})
+
+describe('findBareFocusOutlines', () => {
+  it('flags an outline hung off bare :focus', () => {
+    expect(findBareFocusOutlines(`.a:focus { outline: 2px solid var(--lat-focus-ring); }`)).toEqual([
+      '.a:focus'
+    ])
+  })
+
+  it('permits an outline on :focus-visible', () => {
+    expect(
+      findBareFocusOutlines(`.a:focus-visible { outline: 2px solid var(--lat-focus-ring); }`)
+    ).toEqual([])
+  })
+
+  it('ignores a :focus rule that sets no outline', () => {
+    expect(findBareFocusOutlines(`.a:focus { background-color: var(--lat-bg); }`)).toEqual([])
   })
 })
 

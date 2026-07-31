@@ -7,6 +7,8 @@
  * usable in a bundler that is not configured for CSS — the same arrangement
  * lattice.css already has.
  *
- * Every value here must be a var(--lat-…) reference. #37 adds the component
- * rules and the static tests that enforce that.
+ * The build inlines every @import below into one file — see
+ * scripts/copy-css.js. Order is alphabetical and carries no cascade meaning:
+ * no rule here depends on another family's specificity.
  */
+@import './button/button.css';

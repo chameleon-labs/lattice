@@ -113,6 +113,28 @@ export const findAnimatedTransformsOutsideNoPreference = (css: string): string[]
   return found
 }
 
+// Whether a *click* matches :focus-visible is the browser's heuristic, not
+// something this system implements — so asserting that in a browser test would
+// be measuring Firefox rather than Lattice. What Lattice controls is that the
+// ring is scoped to :focus-visible and never to bare :focus, which is a
+// property of the stylesheet and therefore deterministic.
+export const findBareFocusOutlines = (css: string): string[] => {
+  const found: string[] = []
+
+  for (const match of stripComments(css).matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    const selector = (match[1] ?? '').trim()
+    const body = match[2] ?? ''
+
+    if (!/outline/.test(body)) continue
+    if (!/:focus\b/.test(selector)) continue
+    if (/:focus-visible/.test(selector)) continue
+
+    found.push(selector)
+  }
+
+  return found
+}
+
 export const findBlockSelectors = (css: string): string[] =>
   [...stripComments(css).matchAll(/(^|\}|\{)\s*(\.lat-[a-z-]+)\s*\{/g)]
     .map((match) => match[2] ?? '')
