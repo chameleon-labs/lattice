@@ -60,6 +60,25 @@ test('animates no transform under reduced motion', async ({ page }) => {
   expect(offenders).toEqual([])
 })
 
+// The counterpart to the rule above: movement is gated, but the *position* the
+// movement would travel to is not. A switch whose thumb only reached its
+// on-position by animating would have no state signal under `reduce`.
+test('the switch thumb still moves between states under reduced motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/')
+
+  const thumbOffset = (selector: string) =>
+    page
+      .locator(selector)
+      .evaluate((el) => getComputedStyle(el, '::before').transform)
+
+  const off = await thumbOffset('#light-switch-off')
+  const on = await thumbOffset('#light-switch-on')
+
+  expect(off).not.toBe('none')
+  expect(on).not.toBe(off)
+})
+
 test('borders survive forced-colors', async ({ page }) => {
   await page.emulateMedia({ forcedColors: 'active' })
   await page.goto('/')

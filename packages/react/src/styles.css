@@ -13,4 +13,5 @@
  */
 @import './button/button.css';
 @import './input/input.css';
+@import './switch/switch.css';
 @import './text-field/text-field.css';

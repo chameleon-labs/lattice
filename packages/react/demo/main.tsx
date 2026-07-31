@@ -6,7 +6,7 @@ import '@chameleon-labs/lattice-tokens/lattice.css'
 import '../src/styles.css'
 import './demo.css'
 
-import { Button, Input, TextField } from '../src/index.js'
+import { Button, Input, Switch, TextField } from '../src/index.js'
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -19,7 +19,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 
 // The demo is a test fixture, not a showcase: if a variant is not rendered here,
 // no axe scan covers it. Every variant of every component belongs in Gallery.
-function Gallery() {
+function Gallery({ theme }: { theme: string }) {
   return (
     <>
       <Section title="Button">
@@ -42,6 +42,15 @@ function Gallery() {
         ))}
         <Input aria-label="URL invalid" invalid placeholder="invalid" />
         <Input aria-label="URL disabled" disabled placeholder="disabled" />
+      </Section>
+
+      <Section title="Switch">
+        <label htmlFor={`${theme}-switch-off`}>Paused</label>
+        <Switch id={`${theme}-switch-off`} />
+        <label htmlFor={`${theme}-switch-on`}>Monitoring</label>
+        <Switch id={`${theme}-switch-on`} defaultChecked />
+        <label htmlFor={`${theme}-switch-disabled`}>Unavailable</label>
+        <Switch id={`${theme}-switch-disabled`} disabled />
       </Section>
 
       <Section title="TextField">
@@ -74,11 +83,11 @@ createRoot(container).render(
       <h1 id="top">Lattice components</h1>
       <div data-lat-theme="light" id="theme-light">
         <h2>Light</h2>
-        <Gallery />
+        <Gallery theme="light" />
       </div>
       <div data-lat-theme="dark" id="theme-dark">
         <h2>Dark</h2>
-        <Gallery />
+        <Gallery theme="dark" />
       </div>
     </main>
   </StrictMode>

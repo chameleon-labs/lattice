@@ -1,0 +1,65 @@
+.lat-switch {
+  appearance: none;
+  position: relative;
+  flex: none;
+
+  /* Track 2rem wide, 1.25rem tall; thumb 1rem inset by 0.125rem. Travel is
+     therefore 2 - 1 - (2 × 0.125) = 0.75rem, which is --lat-space-3. */
+  inline-size: var(--lat-space-8);
+  block-size: var(--lat-space-5);
+
+  background-color: var(--lat-component);
+  border: 1px solid var(--lat-border);
+  border-radius: var(--lat-radius-full);
+  cursor: pointer;
+
+  transition-property: background-color, border-color;
+  transition-duration: var(--lat-duration-fast);
+  transition-timing-function: var(--lat-easing-standard);
+}
+
+.lat-switch::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: var(--lat-space-0-5);
+
+  inline-size: var(--lat-space-4);
+  block-size: var(--lat-space-4);
+
+  background-color: var(--lat-bg);
+  border-radius: var(--lat-radius-full);
+
+  /* Static, not animated. The thumb's position IS the state signal, so it must
+     be correct under prefers-reduced-motion: reduce exactly as it is otherwise.
+     Only the movement between the two positions is gated, below. */
+  transform: translateY(-50%);
+}
+
+.lat-switch[aria-checked='true'] {
+  background-color: var(--lat-solid);
+  border-color: var(--lat-solid);
+}
+
+.lat-switch[aria-checked='true']::before {
+  transform: translateY(-50%) translateX(var(--lat-space-3));
+}
+
+.lat-switch:focus-visible {
+  outline: 2px solid var(--lat-focus-ring);
+  outline-offset: 2px;
+}
+
+.lat-switch:disabled {
+  background-color: var(--lat-gray-component);
+  border-color: var(--lat-gray-border);
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lat-switch::before {
+    transition-property: transform;
+    transition-duration: var(--lat-duration-fast);
+    transition-timing-function: var(--lat-easing-standard);
+  }
+}
