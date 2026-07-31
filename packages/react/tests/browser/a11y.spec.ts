@@ -1,4 +1,8 @@
-import AxeBuilder from '@axe-core/playwright'
+// The named export, not the default. @axe-core/playwright is CJS, and under
+// NodeNext resolution a default import of a CJS module gives the namespace
+// object rather than the class — which Playwright's esbuild interop papers
+// over at runtime while `tsc` correctly rejects it as not constructable.
+import { AxeBuilder } from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
 for (const theme of ['light', 'dark'] as const) {
