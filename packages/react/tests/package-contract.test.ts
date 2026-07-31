@@ -1,3 +1,11 @@
+/**
+ * @vitest-environment node
+ *
+ * This file asserts on package manifests, not on the DOM. It must not run under
+ * jsdom: there, the global URL resolves `new URL(relative, import.meta.url)`
+ * against the document's base — http://localhost:3000 — rather than the passed
+ * file: base, and readFileSync then rejects the result.
+ */
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 

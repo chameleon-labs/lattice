@@ -1,0 +1,15 @@
+{
+  // Two configs rather than one: `tsc --noEmit` must see tests, demo and the
+  // config files, while the emit must see only src — otherwise rootDir widens
+  // and dist grows a directory level.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src"]
+}
