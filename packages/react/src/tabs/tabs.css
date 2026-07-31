@@ -1,0 +1,52 @@
+.lat-tab-list {
+  display: flex;
+  gap: var(--lat-space-1);
+  border-block-end: 1px solid var(--lat-border);
+}
+
+.lat-tab {
+  font-family: var(--lat-text-ui-font-family);
+  font-size: var(--lat-text-ui-font-size);
+  font-weight: var(--lat-font-weight-semibold);
+  line-height: var(--lat-text-ui-line-height);
+
+  padding: var(--lat-space-2) var(--lat-space-3);
+  color: var(--lat-text-subtle);
+  background-color: transparent;
+  border: none;
+  /* The selected marker is a border rather than a background, so it survives
+     forced-colors — where a background is flattened and a border is not. */
+  border-block-end: 2px solid transparent;
+  cursor: pointer;
+
+  transition-property: color, border-color, background-color;
+  transition-duration: var(--lat-duration-fast);
+  transition-timing-function: var(--lat-easing-standard);
+}
+
+.lat-tab:hover {
+  color: var(--lat-text);
+  background-color: var(--lat-component-hover);
+}
+
+/* Selection is signalled by the border and by aria-selected together, never by
+   colour alone — assistive technology reads the second. */
+.lat-tab[aria-selected='true'] {
+  color: var(--lat-text);
+  border-block-end-color: var(--lat-solid);
+}
+
+.lat-tab:focus-visible {
+  outline: 2px solid var(--lat-focus-ring);
+  outline-offset: -2px;
+}
+
+.lat-tab-panel {
+  padding: var(--lat-space-3);
+  color: var(--lat-text);
+}
+
+.lat-tab-panel:focus-visible {
+  outline: 2px solid var(--lat-focus-ring);
+  outline-offset: 2px;
+}

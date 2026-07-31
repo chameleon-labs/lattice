@@ -6,7 +6,19 @@ import '@chameleon-labs/lattice-tokens/lattice.css'
 import '../src/styles.css'
 import './demo.css'
 
-import { Button, Input, Switch, TextField } from '../src/index.js'
+import {
+  Button,
+  Disclosure,
+  DisclosureContent,
+  DisclosureProvider,
+  Input,
+  Switch,
+  Tab,
+  TabList,
+  TabPanel,
+  TabProvider,
+  TextField
+} from '../src/index.js'
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -42,6 +54,28 @@ function Gallery({ theme }: { theme: string }) {
         ))}
         <Input aria-label="URL invalid" invalid placeholder="invalid" />
         <Input aria-label="URL disabled" disabled placeholder="disabled" />
+      </Section>
+
+      <Section title="Disclosure">
+        <DisclosureProvider>
+          <Disclosure>Affected nodes</Disclosure>
+          <DisclosureContent>
+            <p>Three nodes match this rule.</p>
+          </DisclosureContent>
+        </DisclosureProvider>
+      </Section>
+
+      <Section title="Tabs">
+        <TabProvider defaultSelectedId={`${theme}-30`}>
+          <TabList aria-label="History window">
+            <Tab id={`${theme}-30`}>30 days</Tab>
+            <Tab id={`${theme}-90`}>90 days</Tab>
+            <Tab id={`${theme}-365`}>365 days</Tab>
+          </TabList>
+          <TabPanel tabId={`${theme}-30`}>Thirty days of history.</TabPanel>
+          <TabPanel tabId={`${theme}-90`}>Ninety days of history.</TabPanel>
+          <TabPanel tabId={`${theme}-365`}>A year of history.</TabPanel>
+        </TabProvider>
       </Section>
 
       <Section title="Switch">
