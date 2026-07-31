@@ -15,6 +15,13 @@ import {
 } from '../generate/emit.js'
 import { formatHex, oklchToSrgb } from '../generate/oklch.js'
 import { buildAllScales } from '../generate/scale.js'
+import {
+  LAYOUT_PRIMITIVE_COUNT,
+  LAYOUT_PRIMITIVE_COUNTS,
+  layoutCss,
+  layoutTokens,
+  type DimensionToken
+} from '../generate/layout.js'
 import { TYPOGRAPHY_PRIMITIVE_COUNT } from '../generate/typography.js'
 import {
   TYPOGRAPHY_RESPONSIVE_OVERRIDE_COUNT,
@@ -38,7 +45,9 @@ const PER_BLOCK = PRIMITIVES + CHART_SLOTS + SEQUENTIAL_STEPS + SEVERITY_STEPS +
 // Light once, dark twice - see the block test below.
 const BLOCKS = 3
 const GLOBAL_DECLARATIONS =
-  TYPOGRAPHY_PRIMITIVE_COUNT + TYPOGRAPHY_ROLE_COUNT * TYPOGRAPHY_ROLE_PROPERTY_COUNT
+  TYPOGRAPHY_PRIMITIVE_COUNT +
+  TYPOGRAPHY_ROLE_COUNT * TYPOGRAPHY_ROLE_PROPERTY_COUNT +
+  LAYOUT_PRIMITIVE_COUNT
 
 describe('formatOklch', () => {
   // The precision that matters. Rounding to the three decimals the spec's tables
@@ -97,6 +106,17 @@ describe('lattice.css', () => {
     expect(css.match(/--lat-font-size-base:/g)).toHaveLength(1)
   })
 
+  it('emits every layout primitive once in the global rule', () => {
+    const [globalBlock] = splitBlocks(css)
+
+    expect(globalBlock).toContain(layoutCss())
+    expect(count(layoutCss())).toBe(LAYOUT_PRIMITIVE_COUNT)
+    expect(css.match(/--lat-space-0-5:/g)).toHaveLength(1)
+    expect(css.match(/--lat-breakpoint-sm:/g)).toHaveLength(1)
+    expect(css.match(/--lat-container-prose:/g)).toHaveLength(1)
+    expect(css.match(/--lat-radius-full:/g)).toHaveLength(1)
+  })
+
   it('appends only the approved responsive typography overrides', () => {
     expect(css).toContain(typographyRoleResponsiveCss())
     expect(count(typographyRoleResponsiveCss())).toBe(TYPOGRAPHY_RESPONSIVE_OVERRIDE_COUNT)
@@ -107,6 +127,15 @@ describe('lattice.css', () => {
     expect(css).toContain(
       `/* Typography: ${TYPOGRAPHY_PRIMITIVE_COUNT} primitives; ` +
         `${TYPOGRAPHY_ROLE_COUNT} semantic roles x ${TYPOGRAPHY_ROLE_PROPERTY_COUNT} properties. */`
+    )
+  })
+
+  it('reports derived layout counts in the generated header', () => {
+    expect(css).toContain(
+      `/* Layout primitives: ${LAYOUT_PRIMITIVE_COUNTS.space} spacing; ` +
+        `${LAYOUT_PRIMITIVE_COUNTS.breakpoint} breakpoints; ` +
+        `${LAYOUT_PRIMITIVE_COUNTS.container} containers; ` +
+        `${LAYOUT_PRIMITIVE_COUNTS.radius} radii. */`
     )
   })
 
@@ -228,7 +257,10 @@ describe('tokens.json', () => {
 
   it('carries one token per primitive step, chart slot, severity level and alias', () => {
     expect(leaves()).toHaveLength(
-      TYPOGRAPHY_PRIMITIVE_COUNT + TYPOGRAPHY_ROLE_COUNT + PER_BLOCK * MODES.length
+      TYPOGRAPHY_PRIMITIVE_COUNT +
+        TYPOGRAPHY_ROLE_COUNT +
+        LAYOUT_PRIMITIVE_COUNT +
+        PER_BLOCK * MODES.length
     )
   })
 
@@ -241,6 +273,29 @@ describe('tokens.json', () => {
     expect(global['font-weight']?.['bold']?.$value).toBe(700)
     expect(tokens['light']).toBeDefined()
     expect(tokens['dark']).toBeDefined()
+  })
+
+  it('keeps layout primitives global and out of colour modes', () => {
+    const global = tokens['global'] as Record<string, unknown>
+
+    expect(Object.keys(global['space'] as object)).toHaveLength(16)
+    expect(Object.keys(global['breakpoint'] as object)).toHaveLength(4)
+    expect(Object.keys(global['container'] as object)).toEqual(['prose', 'content', 'wide'])
+    expect(Object.keys(global['radius'] as object)).toHaveLength(5)
+    expect(tokens['light']).not.toHaveProperty('space')
+    expect(tokens['dark']).not.toHaveProperty('space')
+  })
+
+  it('keeps CSS and DTCG layout dimensions in parity', () => {
+    for (const [groupName, group] of Object.entries(layoutTokens()) as Array<
+      [string, Readonly<Record<string, DimensionToken>>]
+    >) {
+      for (const [tokenName, token] of Object.entries(group)) {
+        expect(css, `${groupName}.${tokenName}`).toContain(
+          `--lat-${groupName}-${tokenName}: ${token.$value.value}${token.$value.unit};`
+        )
+      }
+    }
   })
 
   it('keeps CSS and DTCG aliases in parity for every typography role', () => {

@@ -57,6 +57,10 @@ describe('the emitted artefacts', () => {
     for (const fragment of [
       'light.gray.1',
       'dark.accent.12',
+      'global.space.0-5',
+      'global.breakpoint.sm',
+      'global.container.prose',
+      'global.radius.full',
       'light.gray.bg',
       'light.role.text',
       'dark.role.on-solid',
