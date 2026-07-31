@@ -68,7 +68,7 @@
   - `EasingName`
 - Consumed by: `generate/motion.ts` and direct contract tests.
 
-- [ ] **Step 1: Confirm the branch and clean baseline**
+- [x] **Step 1: Confirm the branch and clean baseline**
 
 Run:
 
@@ -84,7 +84,7 @@ Expected:
 - only the committed design documents exist before implementation;
 - the existing 339 unit tests and four Firefox tests pass.
 
-- [ ] **Step 2: Write the failing exact-contract tests**
+- [x] **Step 2: Write the failing exact-contract tests**
 
 Create `packages/tokens/tests/motion.test.ts`:
 
@@ -131,7 +131,7 @@ describe('motion primitive contracts', () => {
 })
 ```
 
-- [ ] **Step 3: Run the focused test and verify RED**
+- [x] **Step 3: Run the focused test and verify RED**
 
 Run:
 
@@ -142,7 +142,7 @@ pnpm exec vitest run tests/motion.test.ts
 
 Expected: FAIL because `config/motion.ts` does not exist.
 
-- [ ] **Step 4: Implement the typed config**
+- [x] **Step 4: Implement the typed config**
 
 Create `packages/tokens/config/motion.ts`:
 
@@ -167,7 +167,7 @@ export type DurationName = keyof typeof DURATIONS
 export type EasingName = keyof typeof EASINGS
 ```
 
-- [ ] **Step 5: Run focused tests and typecheck**
+- [x] **Step 5: Run focused tests and typecheck**
 
 Run:
 
@@ -179,7 +179,7 @@ pnpm run typecheck
 
 Expected: four focused tests pass and TypeScript exits `0`.
 
-- [ ] **Step 6: Mutation-check the contracts**
+- [x] **Step 6: Mutation-check the contracts**
 
 Apply one temporary mutation at a time:
 
@@ -190,7 +190,7 @@ Apply one temporary mutation at a time:
 
 Restore after every mutation and rerun the focused suite.
 
-- [ ] **Step 7: Hold the intended commit boundary**
+- [x] **Step 7: Hold the intended commit boundary**
 
 Do not commit yet. Record:
 
@@ -219,7 +219,7 @@ Add motion primitive contracts
   - `motionCss(): string`
   - `motionTokens(): MotionTokenGroups`
 
-- [ ] **Step 1: Add failing generation tests**
+- [x] **Step 1: Add failing generation tests**
 
 Append to `packages/tokens/tests/motion.test.ts`:
 
@@ -291,7 +291,7 @@ describe('motion primitive generation', () => {
 Move the generator import directly below the config import so all imports remain
 before the test declarations.
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
 Run:
 
@@ -302,7 +302,7 @@ pnpm exec vitest run tests/motion.test.ts
 
 Expected: FAIL because `generate/motion.ts` does not exist.
 
-- [ ] **Step 3: Implement the generator**
+- [x] **Step 3: Implement the generator**
 
 Create `packages/tokens/generate/motion.ts`:
 
@@ -382,7 +382,7 @@ export function motionTokens(): MotionTokenGroups {
 }
 ```
 
-- [ ] **Step 4: Run focused tests and typecheck**
+- [x] **Step 4: Run focused tests and typecheck**
 
 Run:
 
@@ -394,7 +394,7 @@ pnpm run typecheck
 
 Expected: nine focused tests pass and TypeScript exits `0`.
 
-- [ ] **Step 5: Mutation-check generation**
+- [x] **Step 5: Mutation-check generation**
 
 Apply one temporary mutation at a time:
 
@@ -406,7 +406,7 @@ Apply one temporary mutation at a time:
 
 Restore after every mutation and rerun the focused suite.
 
-- [ ] **Step 6: Hold the intended commit boundary**
+- [x] **Step 6: Hold the intended commit boundary**
 
 Do not commit yet. Record:
 
@@ -433,7 +433,7 @@ Generate global motion primitives
 - Produces: eight global CSS declarations and eight global DTCG leaves in the
   published artefacts.
 
-- [ ] **Step 1: Add failing integrated CSS and JSON assertions**
+- [x] **Step 1: Add failing integrated CSS and JSON assertions**
 
 In `packages/tokens/tests/emit.test.ts`, import:
 
@@ -494,7 +494,7 @@ it('keeps motion primitives global and out of colour modes', () => {
 })
 ```
 
-- [ ] **Step 2: Run integrated tests and verify RED**
+- [x] **Step 2: Run integrated tests and verify RED**
 
 Run:
 
@@ -505,7 +505,7 @@ pnpm exec vitest run tests/emit.test.ts
 
 Expected: FAIL because `emit.ts` has not composed motion output.
 
-- [ ] **Step 3: Compose motion CSS and DTCG**
+- [x] **Step 3: Compose motion CSS and DTCG**
 
 In `packages/tokens/generate/emit.ts`, import:
 
@@ -547,7 +547,7 @@ global: {
 }
 ```
 
-- [ ] **Step 4: Add positive and negative schema assertions**
+- [x] **Step 4: Add positive and negative schema assertions**
 
 In `packages/tokens/tests/schema.test.ts`, extend the global value-shape test:
 
@@ -582,7 +582,7 @@ it('rejects a cubicBezier x coordinate outside the format range', () => {
 })
 ```
 
-- [ ] **Step 5: Extend representative snapshot-path coverage**
+- [x] **Step 5: Extend representative snapshot-path coverage**
 
 In `packages/tokens/tests/snapshot.test.ts`, add:
 
@@ -591,7 +591,7 @@ In `packages/tokens/tests/snapshot.test.ts`, add:
 'global.easing.standard',
 ```
 
-- [ ] **Step 6: Run integrated and schema tests**
+- [x] **Step 6: Run integrated and schema tests**
 
 Run:
 
@@ -602,7 +602,7 @@ pnpm exec vitest run tests/motion.test.ts tests/emit.test.ts tests/schema.test.t
 
 Expected: PASS.
 
-- [ ] **Step 7: Observe snapshot failures before updating**
+- [x] **Step 7: Observe snapshot failures before updating**
 
 Run:
 
@@ -618,7 +618,7 @@ Expected: two snapshot failures showing:
 - eight new `global.duration.*` / `global.easing.*` paths;
 - no light, dark, preference or colour-value changes.
 
-- [ ] **Step 8: Update and inspect snapshots**
+- [x] **Step 8: Update and inspect snapshots**
 
 Run:
 
@@ -633,7 +633,7 @@ git diff -- packages/tokens/tests/__snapshots__/tokens.paths.txt
 Confirm the snapshot diff contains only the expected header, eight global CSS
 declarations and eight global DTCG paths.
 
-- [ ] **Step 9: Mutation-check integration scope**
+- [x] **Step 9: Mutation-check integration scope**
 
 Apply one temporary mutation at a time:
 
@@ -645,7 +645,7 @@ Apply one temporary mutation at a time:
 
 Restore after every mutation.
 
-- [ ] **Step 10: Hold the intended commit boundary**
+- [x] **Step 10: Hold the intended commit boundary**
 
 Do not commit yet. Record:
 
@@ -669,7 +669,7 @@ Publish global motion primitives
 - Produces: accurate package scope, a durable component-layer accessibility
   contract, full verification evidence and a reviewable uncommitted diff.
 
-- [ ] **Step 1: Update README scope**
+- [x] **Step 1: Update README scope**
 
 Change the scope paragraphs to:
 
@@ -679,7 +679,7 @@ Change the scope paragraphs to:
 **Not yet:** components, semantic spacing and motion, elevation, wide-gamut output, forced-colors handling. Each is tracked separately.
 ```
 
-- [ ] **Step 2: Append the issue #11 reduced-motion contract**
+- [x] **Step 2: Append the issue #11 reduced-motion contract**
 
 Read and preserve the current body:
 
@@ -717,7 +717,7 @@ gh issue view 11 --repo chameleon-labs/lattice --json body,url
 
 Expected: the original body is unchanged above one new checklist section.
 
-- [ ] **Step 3: Verify issue #29 coordination**
+- [x] **Step 3: Verify issue #29 coordination**
 
 Run:
 
@@ -727,7 +727,7 @@ gh issue view 29 --repo chameleon-labs/lattice --json state,projectItems,url
 
 Expected: issue #29 is open and its `Lattice v1` item is `In Progress`.
 
-- [ ] **Step 4: Run the complete gates**
+- [x] **Step 4: Run the complete gates**
 
 Run from the repository root:
 
@@ -745,7 +745,7 @@ Expected:
 - typecheck and build exit `0`;
 - the diff has no whitespace errors.
 
-- [ ] **Step 5: Prove deterministic artefacts**
+- [x] **Step 5: Prove deterministic artefacts**
 
 Run:
 
@@ -758,7 +758,7 @@ shasum -a 256 packages/tokens/dist/lattice.css packages/tokens/dist/tokens.json
 
 Expected: both checksum pairs match exactly.
 
-- [ ] **Step 6: Inspect the complete local diff**
+- [x] **Step 6: Inspect the complete local diff**
 
 Run:
 
@@ -781,7 +781,7 @@ Confirm:
 - no contributor-specific path, co-author trailer or AI attribution appears;
 - the index is empty and implementation remains uncommitted.
 
-- [ ] **Step 7: Request implementation review**
+- [x] **Step 7: Request implementation review**
 
 Report:
 
@@ -795,7 +795,7 @@ Report:
 Leave every implementation change uncommitted and unpushed until explicit
 approval.
 
-- [ ] **Step 8: Create small commits only after approval**
+- [x] **Step 8: Create small commits only after approval**
 
 Use these boundaries:
 

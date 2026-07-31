@@ -41,9 +41,9 @@ Systems that skip the semantic tier end up unable to add a second theme without 
 
 ## Scope
 
-**In:** colour scales, semantic colour tokens, light and dark modes, an ordered severity ramp, validated categorical and sequential chart palettes, primitive and semantic typography tokens, and primitive spacing, breakpoints, containers, and radii tokens.
+**In:** colour scales, semantic colour tokens, light and dark modes, an ordered severity ramp, validated categorical and sequential chart palettes, primitive and semantic typography tokens, primitive spacing, breakpoints, containers and radii tokens, and primitive motion tokens.
 
-**Not yet:** components, semantic spacing, elevation, and motion tokens, wide-gamut output, forced-colors handling. Each is tracked separately.
+**Not yet:** components, semantic spacing and motion, elevation, wide-gamut output, forced-colors handling. Each is tracked separately.
 
 Typography keeps the system sans stack as its default, provides eleven semantic roles, and offers Inter as an optional primitive. Applications that opt into Inter provide the font themselves; the token package does not bundle or load web fonts.
 
