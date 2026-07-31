@@ -1,7 +1,7 @@
 # Lattice — motion primitives
 
 **Date:** 2026-07-30
-**Status:** approved design; written review pending
+**Status:** approved
 **Issue:** [#29 — Motion primitives and reduced-motion component contract](https://github.com/chameleon-labs/lattice/issues/29)
 
 ## Purpose
