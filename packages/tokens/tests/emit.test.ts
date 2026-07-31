@@ -22,6 +22,12 @@ import {
   layoutTokens,
   type DimensionToken
 } from '../generate/layout.js'
+import {
+  MOTION_PRIMITIVE_COUNT,
+  MOTION_PRIMITIVE_COUNTS,
+  motionCss,
+  motionTokens
+} from '../generate/motion.js'
 import { TYPOGRAPHY_PRIMITIVE_COUNT } from '../generate/typography.js'
 import {
   TYPOGRAPHY_RESPONSIVE_OVERRIDE_COUNT,
@@ -47,7 +53,8 @@ const BLOCKS = 3
 const GLOBAL_DECLARATIONS =
   TYPOGRAPHY_PRIMITIVE_COUNT +
   TYPOGRAPHY_ROLE_COUNT * TYPOGRAPHY_ROLE_PROPERTY_COUNT +
-  LAYOUT_PRIMITIVE_COUNT
+  LAYOUT_PRIMITIVE_COUNT +
+  MOTION_PRIMITIVE_COUNT
 
 describe('formatOklch', () => {
   // The precision that matters. Rounding to the three decimals the spec's tables
@@ -117,6 +124,17 @@ describe('lattice.css', () => {
     expect(css.match(/--lat-radius-full:/g)).toHaveLength(1)
   })
 
+  it('emits every motion primitive once in the global rule', () => {
+    const [globalBlock] = splitBlocks(css)
+
+    expect(globalBlock).toContain(motionCss())
+    expect(count(motionCss())).toBe(MOTION_PRIMITIVE_COUNT)
+    expect(css.match(/--lat-duration-instant:/g)).toHaveLength(1)
+    expect(css.match(/--lat-duration-slower:/g)).toHaveLength(1)
+    expect(css.match(/--lat-easing-standard:/g)).toHaveLength(1)
+    expect(css.match(/--lat-easing-exit:/g)).toHaveLength(1)
+  })
+
   it('appends only the approved responsive typography overrides', () => {
     expect(css).toContain(typographyRoleResponsiveCss())
     expect(count(typographyRoleResponsiveCss())).toBe(TYPOGRAPHY_RESPONSIVE_OVERRIDE_COUNT)
@@ -137,6 +155,22 @@ describe('lattice.css', () => {
         `${LAYOUT_PRIMITIVE_COUNTS.container} containers; ` +
         `${LAYOUT_PRIMITIVE_COUNTS.radius} radii. */`
     )
+  })
+
+  it('reports derived motion counts in the generated header', () => {
+    expect(css).toContain(
+      `/* Motion primitives: ${MOTION_PRIMITIVE_COUNTS.duration} durations; ` +
+        `${MOTION_PRIMITIVE_COUNTS.easing} easings. */`
+    )
+  })
+
+  // The token package publishes values; it cannot know which property a
+  // component transitions, so it cannot know what reducing motion should strip.
+  // A blanket reset here would disable the opacity and colour feedback that
+  // reduced motion is supposed to keep. The contract lives on #11 instead.
+  it('does not emit component-level reduced-motion behavior', () => {
+    expect(css).not.toContain('prefers-reduced-motion')
+    expect(css).not.toMatch(/transition\s*:\s*none/)
   })
 
   // Every declaration is either a generated colour or a reference to one. The
@@ -260,6 +294,7 @@ describe('tokens.json', () => {
       TYPOGRAPHY_PRIMITIVE_COUNT +
         TYPOGRAPHY_ROLE_COUNT +
         LAYOUT_PRIMITIVE_COUNT +
+        MOTION_PRIMITIVE_COUNT +
         PER_BLOCK * MODES.length
     )
   })
@@ -284,6 +319,20 @@ describe('tokens.json', () => {
     expect(Object.keys(global['radius'] as object)).toHaveLength(5)
     expect(tokens['light']).not.toHaveProperty('space')
     expect(tokens['dark']).not.toHaveProperty('space')
+  })
+
+  it('keeps motion primitives global and out of colour modes', () => {
+    const global = tokens['global'] as Record<string, unknown>
+    const motion = motionTokens()
+
+    expect(global['duration']).toEqual(motion.duration)
+    expect(global['easing']).toEqual(motion.easing)
+    expect(Object.keys(global['duration'] as object)).toHaveLength(5)
+    expect(Object.keys(global['easing'] as object)).toHaveLength(3)
+    expect(tokens['light']).not.toHaveProperty('duration')
+    expect(tokens['light']).not.toHaveProperty('easing')
+    expect(tokens['dark']).not.toHaveProperty('duration')
+    expect(tokens['dark']).not.toHaveProperty('easing')
   })
 
   it('keeps CSS and DTCG layout dimensions in parity', () => {
