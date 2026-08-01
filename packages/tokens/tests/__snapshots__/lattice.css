@@ -273,6 +273,12 @@
   --lat-success-text-subtle: var(--lat-success-11);
   --lat-success-text: var(--lat-success-12);
 
+  --lat-accent-on-solid: oklch(1 0 0);
+  --lat-gray-on-solid: oklch(0 0 0);
+  --lat-danger-on-solid: oklch(0 0 0);
+  --lat-warning-on-solid: oklch(0 0 0);
+  --lat-success-on-solid: oklch(0 0 0);
+
   --lat-bg: var(--lat-gray-bg);
   --lat-bg-subtle: var(--lat-gray-bg-subtle);
   --lat-component: var(--lat-gray-component);
@@ -449,6 +455,12 @@
   --lat-success-solid-hover: var(--lat-success-10);
   --lat-success-text-subtle: var(--lat-success-11);
   --lat-success-text: var(--lat-success-12);
+
+  --lat-accent-on-solid: oklch(1 0 0);
+  --lat-gray-on-solid: oklch(0 0 0);
+  --lat-danger-on-solid: oklch(0 0 0);
+  --lat-warning-on-solid: oklch(0 0 0);
+  --lat-success-on-solid: oklch(0 0 0);
 
   --lat-bg: var(--lat-gray-bg);
   --lat-bg-subtle: var(--lat-gray-bg-subtle);
@@ -630,6 +642,12 @@
     --lat-success-solid-hover: var(--lat-success-10);
     --lat-success-text-subtle: var(--lat-success-11);
     --lat-success-text: var(--lat-success-12);
+
+    --lat-accent-on-solid: oklch(1 0 0);
+    --lat-gray-on-solid: oklch(0 0 0);
+    --lat-danger-on-solid: oklch(0 0 0);
+    --lat-warning-on-solid: oklch(0 0 0);
+    --lat-success-on-solid: oklch(0 0 0);
 
     --lat-bg: var(--lat-gray-bg);
     --lat-bg-subtle: var(--lat-gray-bg-subtle);

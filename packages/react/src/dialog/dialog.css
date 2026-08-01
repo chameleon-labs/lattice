@@ -1,0 +1,69 @@
+.lat-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: var(--lat-gray-1);
+  opacity: 0.8;
+}
+
+.lat-dialog {
+  position: fixed;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  /* Static: this is where the dialog *is*, not motion. Centring must hold under
+     prefers-reduced-motion: reduce exactly as it does otherwise. */
+  transform: translate(-50%, -50%);
+
+  inline-size: min(var(--lat-container-prose), calc(100vw - var(--lat-space-8)));
+  max-block-size: calc(100vh - var(--lat-space-8));
+  overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--lat-space-4);
+  padding: var(--lat-space-6);
+
+  color: var(--lat-text);
+  /* The modal elevation role: surface, border and shadow together. A shadow
+     alone is not subtle on a dark surface, it is absent. */
+  background-color: var(--lat-elevation-modal-surface);
+  border: 1px solid var(--lat-elevation-modal-border);
+  border-radius: var(--lat-radius-lg);
+  box-shadow: var(--lat-elevation-modal-shadow);
+
+  /* Opacity is unconditional: it is feedback, not vestibular movement. */
+  opacity: 0;
+  transition-property: opacity;
+  transition-duration: var(--lat-duration-slower);
+  transition-timing-function: var(--lat-easing-entrance);
+}
+
+.lat-dialog[data-enter] {
+  opacity: 1;
+}
+
+.lat-dialog__heading {
+  margin: 0;
+  font-family: var(--lat-text-heading-3-font-family);
+  font-size: var(--lat-text-heading-3-font-size);
+  font-weight: var(--lat-text-heading-3-font-weight);
+  line-height: var(--lat-text-heading-3-line-height);
+  color: var(--lat-text);
+}
+
+.lat-dialog:focus-visible {
+  outline: 2px solid var(--lat-focus-ring);
+  outline-offset: 2px;
+}
+
+/* The entrance lift is movement, so it is authored only where movement is
+   welcome. Under `reduce` the dialog still fades in and is still centred. */
+@media (prefers-reduced-motion: no-preference) {
+  .lat-dialog {
+    transition-property: opacity, transform;
+    transform: translate(-50%, calc(-50% + var(--lat-space-2)));
+  }
+
+  .lat-dialog[data-enter] {
+    transform: translate(-50%, -50%);
+  }
+}

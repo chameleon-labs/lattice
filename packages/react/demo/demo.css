@@ -1,0 +1,52 @@
+/*
+ * Demo-only styling. Deliberately NOT part of src/styles.css: nothing here is
+ * shipped, and the static contract tests read only the published file.
+ *
+ * The one rule that matters is the theme scope painting its own surface. A
+ * [data-lat-theme] element redefines the custom properties but does not paint
+ * anything, so without this the dark section's text renders on the page's white
+ * background — which axe correctly reports as a contrast failure. A consumer
+ * scoping a theme to part of a page has to do the same thing.
+ */
+
+body {
+  margin: 0;
+  background-color: var(--lat-bg);
+  color: var(--lat-text);
+  font-family: var(--lat-text-body-font-family);
+  font-size: var(--lat-text-body-font-size);
+  line-height: var(--lat-text-body-line-height);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--lat-text-heading-3-font-family);
+  color: var(--lat-text);
+}
+
+[data-lat-theme] {
+  background-color: var(--lat-bg);
+  color: var(--lat-text);
+  padding: var(--lat-space-6);
+}
+
+.demo-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lat-space-3);
+  align-items: center;
+  margin-block-end: var(--lat-space-6);
+}
+
+/* Input and TextField are full-width by design — a form field fills its column.
+   The demo lays them out in flex rows, so it constrains them here rather than
+   the component guessing a width it cannot know. */
+.demo-row .lat-input,
+.demo-row .lat-field {
+  max-inline-size: 22rem;
+}
+
+.demo-row .lat-callout {
+  max-inline-size: 30rem;
+}

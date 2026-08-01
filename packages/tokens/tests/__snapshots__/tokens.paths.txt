@@ -18,6 +18,7 @@ dark.accent.border-subtle
 dark.accent.component
 dark.accent.component-active
 dark.accent.component-hover
+dark.accent.on-solid
 dark.accent.solid
 dark.accent.solid-hover
 dark.accent.text
@@ -57,6 +58,7 @@ dark.danger.border-subtle
 dark.danger.component
 dark.danger.component-active
 dark.danger.component-hover
+dark.danger.on-solid
 dark.danger.solid
 dark.danger.solid-hover
 dark.danger.text
@@ -91,6 +93,7 @@ dark.gray.border-subtle
 dark.gray.component
 dark.gray.component-active
 dark.gray.component-hover
+dark.gray.on-solid
 dark.gray.solid
 dark.gray.solid-hover
 dark.gray.text
@@ -134,6 +137,7 @@ dark.success.border-subtle
 dark.success.component
 dark.success.component-active
 dark.success.component-hover
+dark.success.on-solid
 dark.success.solid
 dark.success.solid-hover
 dark.success.text
@@ -158,6 +162,7 @@ dark.warning.border-subtle
 dark.warning.component
 dark.warning.component-active
 dark.warning.component-hover
+dark.warning.on-solid
 dark.warning.solid
 dark.warning.solid-hover
 dark.warning.text
@@ -253,6 +258,7 @@ light.accent.border-subtle
 light.accent.component
 light.accent.component-active
 light.accent.component-hover
+light.accent.on-solid
 light.accent.solid
 light.accent.solid-hover
 light.accent.text
@@ -292,6 +298,7 @@ light.danger.border-subtle
 light.danger.component
 light.danger.component-active
 light.danger.component-hover
+light.danger.on-solid
 light.danger.solid
 light.danger.solid-hover
 light.danger.text
@@ -326,6 +333,7 @@ light.gray.border-subtle
 light.gray.component
 light.gray.component-active
 light.gray.component-hover
+light.gray.on-solid
 light.gray.solid
 light.gray.solid-hover
 light.gray.text
@@ -369,6 +377,7 @@ light.success.border-subtle
 light.success.component
 light.success.component-active
 light.success.component-hover
+light.success.on-solid
 light.success.solid
 light.success.solid-hover
 light.success.text
@@ -393,6 +402,7 @@ light.warning.border-subtle
 light.warning.component
 light.warning.component-active
 light.warning.component-hover
+light.warning.on-solid
 light.warning.solid
 light.warning.solid-hover
 light.warning.text

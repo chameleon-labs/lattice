@@ -1,0 +1,135 @@
+// The named export, not the default. @axe-core/playwright is CJS, and under
+// NodeNext resolution a default import of a CJS module gives the namespace
+// object rather than the class — which Playwright's esbuild interop papers
+// over at runtime while `tsc` correctly rejects it as not constructable.
+import { AxeBuilder } from '@axe-core/playwright'
+import { expect, test } from '@playwright/test'
+
+for (const theme of ['light', 'dark'] as const) {
+  test(`no axe violations in ${theme}`, async ({ page }) => {
+    await page.goto('/')
+
+    const results = await new AxeBuilder({ page }).include(`#theme-${theme}`).analyze()
+
+    expect(results.violations).toEqual([])
+  })
+}
+
+test('keyboard focus produces a visible ring', async ({ page }) => {
+  await page.goto('/')
+
+  // Drive focus purely by keyboard. A programmatic .focus() does not set the
+  // heuristic Firefox uses for :focus-visible, so a test that used one would be
+  // measuring the wrong thing — and would keep passing if the ring were removed.
+  await page.keyboard.press('Tab')
+
+  const focused = await page.evaluate(() => {
+    const el = document.activeElement
+    if (el === null) return null
+    const style = getComputedStyle(el)
+    return {
+      className: el.className,
+      matchesFocusVisible: el.matches(':focus-visible'),
+      outlineStyle: style.outlineStyle,
+      outlineWidth: style.outlineWidth
+    }
+  })
+
+  expect(focused).not.toBeNull()
+  expect(focused?.className).toContain('lat-button')
+  expect(focused?.matchesFocusVisible).toBe(true)
+  expect(focused?.outlineStyle).not.toBe('none')
+  expect(parseFloat(focused?.outlineWidth ?? '0')).toBeGreaterThan(0)
+})
+
+// The counterpart — that a pointer press leaves no ring behind — is asserted
+// statically, in tests/stylesheet.test.ts, rather than here. Whether a click
+// matches :focus-visible is the browser's heuristic; what this system controls
+// is that the ring hangs off :focus-visible and never off bare :focus.
+
+test('animates no transform under reduced motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/')
+
+  const offenders = await page.evaluate(() =>
+    [...document.querySelectorAll('*')]
+      .filter((el) => getComputedStyle(el).transitionProperty.includes('transform'))
+      .map((el) => el.className)
+  )
+
+  expect(offenders).toEqual([])
+})
+
+// The counterpart to the rule above: movement is gated, but the *position* the
+// movement would travel to is not. A switch whose thumb only reached its
+// on-position by animating would have no state signal under `reduce`.
+test('the switch thumb still moves between states under reduced motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/')
+
+  const thumbOffset = (selector: string) =>
+    page
+      .locator(selector)
+      .evaluate((el) => getComputedStyle(el, '::before').transform)
+
+  const off = await thumbOffset('#light-switch-off')
+  const on = await thumbOffset('#light-switch-on')
+
+  expect(off).not.toBe('none')
+  expect(on).not.toBe(off)
+})
+
+// These live here rather than in jsdom deliberately. Ariakit restores focus
+// using real layout and animation frames; under jsdom focus simply stays on the
+// dismiss button, so a jsdom assertion would either fail for the wrong reason or
+// be weakened until it proved nothing.
+test('Dialog traps focus and returns it to the trigger', async ({ page }) => {
+  await page.goto('/')
+
+  const trigger = page.locator('#theme-light').getByRole('button', { name: 'Remove page' })
+  await trigger.click()
+
+  const dialog = page.getByRole('dialog')
+  await expect(dialog).toBeVisible()
+
+  // Focus starts inside the dialog.
+  expect(await dialog.evaluate((el) => el.contains(document.activeElement))).toBe(true)
+
+  // Tabbing past the last focusable element wraps back inside rather than
+  // escaping to the page behind.
+  for (let i = 0; i < 6; i += 1) {
+    await page.keyboard.press('Tab')
+  }
+  expect(await dialog.evaluate((el) => el.contains(document.activeElement))).toBe(true)
+
+  await page.keyboard.press('Escape')
+  await expect(dialog).toBeHidden()
+
+  await expect(trigger).toBeFocused()
+})
+
+test('Menu returns focus to its button', async ({ page }) => {
+  await page.goto('/')
+
+  const button = page.locator('#theme-light').getByRole('button', { name: 'Actions' })
+  await button.click()
+
+  await expect(page.getByRole('menu')).toBeVisible()
+
+  await page.keyboard.press('Escape')
+
+  await expect(page.getByRole('menu')).toBeHidden()
+  await expect(button).toBeFocused()
+})
+
+test('borders survive forced-colors', async ({ page }) => {
+  await page.emulateMedia({ forcedColors: 'active' })
+  await page.goto('/')
+
+  const width = await page
+    .locator('#theme-light .lat-button')
+    .first()
+    .evaluate((el) => getComputedStyle(el).borderTopWidth)
+
+  expect(parseFloat(width)).toBeGreaterThan(0)
+})

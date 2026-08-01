@@ -1,0 +1,54 @@
+.lat-callout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lat-space-1);
+
+  padding: var(--lat-space-4);
+  border: 1px solid transparent;
+  /* The accent edge is a border rather than a background stripe, so it survives
+     forced-colors, where a background is flattened and a border is not. */
+  border-inline-start-width: var(--lat-space-1);
+  border-radius: var(--lat-radius-md);
+
+  color: var(--lat-gray-text);
+  background-color: var(--lat-gray-bg-subtle);
+  border-color: var(--lat-gray-border);
+}
+
+.lat-callout[data-tone='accent'] {
+  color: var(--lat-accent-text);
+  background-color: var(--lat-accent-bg-subtle);
+  border-color: var(--lat-accent-border);
+}
+
+.lat-callout[data-tone='success'] {
+  color: var(--lat-success-text);
+  background-color: var(--lat-success-bg-subtle);
+  border-color: var(--lat-success-border);
+}
+
+.lat-callout[data-tone='warning'] {
+  color: var(--lat-warning-text);
+  background-color: var(--lat-warning-bg-subtle);
+  border-color: var(--lat-warning-border);
+}
+
+.lat-callout[data-tone='danger'] {
+  color: var(--lat-danger-text);
+  background-color: var(--lat-danger-bg-subtle);
+  border-color: var(--lat-danger-border);
+}
+
+.lat-callout__title {
+  margin: 0;
+  font-family: var(--lat-text-ui-font-family);
+  font-size: var(--lat-text-ui-font-size);
+  font-weight: var(--lat-font-weight-semibold);
+  line-height: var(--lat-text-ui-line-height);
+}
+
+.lat-callout__body {
+  font-family: var(--lat-text-body-font-family);
+  font-size: var(--lat-text-body-font-size);
+  line-height: var(--lat-text-body-line-height);
+}
