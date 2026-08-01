@@ -23,11 +23,15 @@ export type MenuSeparatorProps<T extends ElementType = 'hr'> = AriakitMenuSepara
  * Ariakit's menu supplies roving focus, typeahead and focus return; this
  * supplies the surface, which uses the `overlay` elevation role.
  *
- * Only the parts a tabstop screen uses are wrapped. `MenuGroup`,
- * `MenuItemCheckbox`, `MenuItemRadio`, `MenuBar` and the rest of Ariakit's
- * eighteen parts are available but unstyled, and are deliberately not
- * re-exported: an unstyled part reaching a consumer through this package would
- * look like a system component and behave like an unfinished one.
+ * Only the parts a tabstop screen uses are wrapped: `MenuButton`, `Menu`,
+ * `MenuItem` and `MenuSeparator`, plus `MenuProvider` re-exported untouched.
+ *
+ * Ariakit's remaining menu parts — `MenuGroup`, `MenuItemCheckbox`,
+ * `MenuItemRadio`, `MenuBar` and the rest — are available from `@ariakit/react`
+ * but are deliberately not re-exported here: an unstyled part arriving through
+ * this package would look like a system component and behave like an unfinished
+ * one. No count is given, because that number belongs to Ariakit and moves with
+ * it.
  */
 export function Menu<T extends ElementType = 'div'>({ className, ...props }: MenuProps<T>) {
   return (

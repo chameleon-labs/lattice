@@ -8,7 +8,8 @@
  * lattice.css already has.
  *
  * The build inlines every @import below into one file — see
- * scripts/copy-css.js. Order is alphabetical and carries no cascade meaning:
+ * scripts/assemble-css.ts, which the build and the contract tests share.
+ * Order is alphabetical and carries no cascade meaning:
  * no rule here depends on another family's specificity.
  */
 @import './badge/badge.css';
