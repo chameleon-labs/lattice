@@ -175,43 +175,76 @@ accent sitting at 305° — a magenta that resolves toward violet — means the
 system has already half-committed to it.
 
 **The signature:** solid fills carry a hue-shifted OKLCH gradient, interpolating
-from the accent's 305° toward violet at roughly 275°, between two steps of
-**near-identical lightness**. Colour that changes across a surface without the
-surface changing brightness. Structural colour, literally.
+from the accent's 305° toward violet at 275°, between two steps of **identical
+lightness**. Colour that changes across a surface without the surface changing
+brightness. Structural colour, literally.
 
 | Aspect | Rule |
 |---|---|
-| Solid fills | Linear gradient, accent 305° → 275°, both endpoints at L 0.591 ± 0.005 |
+| Solid fills | Linear gradient, accent 305° → 275°, both endpoints at **L 0.575**, C 0.200 — `#954fd5` → `#5b65ec` |
 | Radius | `lg` (0.75rem) on surfaces; `full` on badges, which become pills |
 | Elevation | Generous — every level moves up one shadow step: `raised` to `medium`, `overlay` to `large`, `modal` to `large` at increased alpha |
 | Motion | `duration-base` over `fast`; `easing-entrance` on overlay appearance |
 | Status | Flat fills, unchanged. Only the accent is iridescent |
 
-**How this stays provable rather than decorative.** The gradient's endpoints are
-each a real token, and each is subject to the same 4.5:1 contract against
-`on-solid` that the flat fill passes today. Holding lightness constant across the
-interpolation is what makes that tractable: contrast against the label is
-approximately flat across the sweep, so validating the endpoints bounds the
-middle.
+**How this stays provable rather than decorative.** Each endpoint is subject to
+the same 4.5:1 contract against white that the flat accent fill passes today, and
+the interpolation between them is sampled and contracted at every step.
 
-Three consequences follow, and each is work rather than an assumption:
+### What the measurement changed
 
-1. The generator emits a second accent step-9 at hue 275°, gamut-mapped into
-   sRGB by the existing routine — chroma 0.200 at 275° may not survive sRGB
-   intact, and reducing chroma while holding lightness and hue is what the
-   pipeline already does.
-2. `contracts.ts` gains the second endpoint as a contracted pair, so the build
-   fails if the violet end misses 4.5:1 exactly as it would for the magenta end.
-3. Status fills stay flat. A gradient on `danger` would make severity harder to
+This section originally claimed that holding lightness constant made contrast
+"approximately flat" across the sweep, so validating the endpoints would bound
+the middle. **The first half of that is wrong and the second half is right.**
+Both were measured against the real pipeline before implementation, and the
+design below is the corrected version.
+
+**Contrast is not flat across hue at fixed lightness — it falls toward blue.**
+At the accent's pinned L 0.591, hue 305° reaches exactly 4.500:1 against white
+and hue 275° reaches only 4.338:1. The lightness a hue *needs* in order to clear
+4.5:1 varies:
+
+| Hue | L needed for 4.5:1 at C 0.200 |
+|---|---|
+| 305° | 0.5911 |
+| 295° | 0.5889 |
+| 285° | 0.5860 |
+| 275° | 0.5823 |
+
+Reducing chroma makes this worse rather than better — at L 0.591, dropping the
+violet end from C 0.200 to C 0.150 moves it from 4.338:1 to 4.241:1, because it
+slides toward a mid-grey that has less contrast against white than the saturated
+colour did. **Chroma is the wrong lever; lightness is the right one.**
+
+**So both endpoints are pinned to the darker of the two required lightnesses.**
+At L 0.575 the magenta end measures 4.817:1 and the violet end 4.641:1, with the
+worst point across a 61-sample sweep at 4.641:1. L 0.5823 — the exact solved
+boundary — was rejected: it measures 4.49997:1 and fails, which is precisely the
+kind of margin-free value that passes a solver and fails a build.
+
+The cost is that the gradient's magenta end sits fractionally darker than the
+shipped `--lat-accent-solid` at L 0.591. The difference is `#954fd5` against
+`#9a54db`, which is not perceptible in isolation and does mean the fill no longer
+begins at exactly the brand solid.
+
+**The monotonicity assumption held.** Across 61 samples the worst contrast always
+falls at the violet endpoint, never in the middle — so endpoint validation really
+does bound the sweep for this hue range. The sampling is kept anyway, because it
+costs nothing and the assumption was only established for *this* range.
+
+Two consequences follow:
+
+1. Status fills stay flat. A gradient on `danger` would make severity harder to
    recognise, and severity has the stronger claim — the same argument the tabstop
    spec makes for refusing a second brand hue.
-
-**The honest risk.** Endpoint validation bounds the middle only under the
-assumption that contrast varies monotonically between two endpoints of equal
-lightness. That assumption is very likely true and is not proven. If the
-implementation finds a mid-sweep dip, the answer is to sample the interpolation
-at intervals and contract every sample — more expensive, still automatic, and
-detected by measurement rather than by review.
+2. The endpoints are **not** emitted as shipped tokens. Wiring a token through
+   the generator for a candidate that may lose is the scaffolding-becoming-
+   permanent risk this spec's exit condition exists to prevent, and the direction
+   stylesheets are not shipped, so such a token would have no consumer. The
+   values are computed by the real pipeline modules and contracted in a test,
+   which keeps the guarantee — the build fails if either end misses 4.5:1 —
+   without shipping anything. If Iridescent wins, the fold-in promotes them into
+   `scales.ts` and `contracts.ts` properly.
 
 ## The accessibility sweep
 
@@ -245,7 +278,8 @@ nameable. This is the fallback, not the plan.
 
 **In:** the `direction` global and decorator wiring; three direction stylesheets;
 the `Specimen` story; the sweep extended across the direction axis; for
-Iridescent only, a second accent endpoint in the generator and its contract.
+Iridescent only, a test in the tokens package that computes both gradient
+endpoints with the real pipeline and contracts the sweep between them.
 
 **Out:** choosing the winner (that is a human looking at a screen); folding the
 winner into the real tokens and component CSS (a separate change, once there is a
@@ -253,7 +287,7 @@ winner); the documentation site; brand marks, logo and illustration; the written
 voice, which the README already has and which is not the gap.
 
 **Deleted on completion:** the two losing stylesheets, the `none` option, and —
-if Iridescent loses — the second accent endpoint and its contract.
+if Iridescent loses — the gradient endpoint test.
 
 ## Exit condition
 
