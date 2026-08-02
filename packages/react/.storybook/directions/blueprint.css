@@ -87,16 +87,18 @@
 }
 
 /*
- * The grid shows.
+ * There was a 1px grid texture inside `.lat-card` here, and it is gone.
  *
- * A 1px structural rule at the subtle-border step, in the region that is
- * otherwise empty. Decoration made of the same material as the borders around
- * it rather than applied on top of them — which is also why it is safe: the
- * subtle-border step is the faintest in the scale, and text sits on the card's
- * own surface colour above it.
+ * It was a pun — "blueprint" paper has a grid, a lattice is a grid — and it
+ * encoded nothing. Every other decision in this system earns its place by
+ * making a guarantee or carrying a measurement: the ring above clears SC
+ * 2.4.13, the rail is a second non-colour signal for selection, the missing
+ * shadow comes from the #30 calibration. Texture that means nothing is the one
+ * thing here that would not survive the admission test the components are held
+ * to.
+ *
+ * It also fought the rule above it. This direction removes the card's shadow so
+ * the *border* carries elevation; filling the interior with more 1px lines at
+ * the same subtle step put the border in competition with its own surface, and
+ * the cards read as broken tables.
  */
-[data-lat-direction='blueprint'] .lat-card {
-  background-image: linear-gradient(to right, var(--lat-border-subtle) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--lat-border-subtle) 1px, transparent 1px);
-  background-size: var(--lat-space-6) var(--lat-space-6);
-}

@@ -190,15 +190,31 @@ Instrument's base with one loud move: **the focus ring is the ornament.**
 Every other system minimises focus. A system whose README opens with
 *"Accessibility is the constraint, not the feature"* has the standing to do the
 opposite, and this is the direction that argues from the thesis rather than
-decorating it. It also cashes in the name — a lattice is a grid.
+decorating it.
 
 | Aspect | Rule |
 |---|---|
 | Base | Instrument, entirely |
 | Focus | 3px accent ring, `outline-offset: 3px`, plus an outer 1px halo at the accent's step-8 border colour |
 | Selection | A persistent 3px accent rail on the leading edge of the selected tab, active menu item and current table row |
-| Texture | A 1px structural grid, at the subtle-border step, in empty regions of `Card` and `Table` |
 | Everything else | As Instrument |
+
+**A texture that was built and then removed.** This direction originally carried
+a 1px grid inside `Card`, on the reasoning that blueprint paper has a grid and a
+lattice *is* a grid. That is a pun, not a rule, and it was cut after seeing it
+rendered.
+
+It failed the test the components are held to. Every other decision here earns
+its place by making a guarantee or carrying a measurement — the ring clears SC
+2.4.13, the rail is a second non-colour signal for selection, the absent shadow
+comes from the #30 calibration. The grid encoded nothing: not a baseline, not
+structure, and it does not survive `forced-colors`.
+
+It also fought the rule above it. Blueprint removes the card's shadow so the
+border carries elevation; filling the interior with more 1px lines at the same
+subtle step put the border in competition with its own surface, and the cards
+read as broken tables. **Blueprint's argument was never the grid** — it is the
+focus state, and removing the texture costs the direction nothing.
 
 **The conformance claim this direction can make.** WCAG 2.2 SC 2.4.13 *Focus
 Appearance* (AAA) asks for an indicator at least as large as a 2px-thick
