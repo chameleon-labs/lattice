@@ -5,6 +5,7 @@ import { Callout } from '../callout/callout.js'
 import { Card } from '../card/card.js'
 import { Switch } from '../switch/switch.js'
 import { TBody, THead, Table, Td, Th, Tr } from '../table/table.js'
+import { Tab, TabList, TabPanel, TabProvider } from '../tabs/tabs.js'
 import { TextField } from '../text-field/text-field.js'
 
 /**
@@ -70,6 +71,20 @@ export const Dashboard: Story = {
         </Card>
       </div>
 
+      {/* Tabs earn their place here: a selected tab is where a direction's
+          treatment of *selection* shows, and selection is one of the few states
+          visible in a screenshot at rest. */}
+      <TabProvider defaultSelectedId="window-30">
+        <TabList aria-label="History window">
+          <Tab id="window-30">30 days</Tab>
+          <Tab id="window-90">90 days</Tab>
+          <Tab id="window-365">365 days</Tab>
+        </TabList>
+        <TabPanel tabId="window-30">Thirty days of history.</TabPanel>
+        <TabPanel tabId="window-90">Ninety days of history.</TabPanel>
+        <TabPanel tabId="window-365">A year of history.</TabPanel>
+      </TabProvider>
+
       <Table caption="Issues found on the most recent run">
         <THead>
           <Tr>
@@ -93,7 +108,10 @@ export const Dashboard: Story = {
 
       <div className="lat-story__row">
         <TextField label="Add a URL to monitor" placeholder="https://example.com" />
-        <Button>Run audit</Button>
+        {/* Solid rather than the default soft: a primary action should be the
+            heaviest thing on the screen, and it is also where a direction's
+            treatment of the accent fill is visible at all. */}
+        <Button variant="solid">Run audit</Button>
         <Button variant="soft" tone="neutral">
           Export
         </Button>
