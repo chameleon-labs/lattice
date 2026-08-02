@@ -7,6 +7,25 @@ import '../src/styles.css'
 import './preview.css'
 
 /**
+ * Every stylesheet in directions/ is loaded, and its filename is the direction's
+ * name. Adding a direction is adding a file — nothing here enumerates them,
+ * which is the same guarantee the sweep makes about stories.
+ *
+ * The Playwright side reads the same directory with readdirSync. Two readers,
+ * one directory, so they cannot drift about which directions exist.
+ */
+const directionStyles = import.meta.glob('./directions/*.css', { eager: true })
+
+const DIRECTIONS = [
+  // Not a file: the system exactly as it ships, and the control the candidates
+  // are judged against.
+  'none',
+  ...Object.keys(directionStyles)
+    .map((path) => path.slice('./directions/'.length).replace(/\.css$/, ''))
+    .sort()
+]
+
+/**
  * The theme is a Storybook global rather than a story per mode.
  *
  * A global is addressable from the URL —
@@ -15,7 +34,11 @@ import './preview.css'
  * stories per component would put the burden back on whoever adds the next one.
  */
 const withTheme: Decorator = (Story, context) => (
-  <div className="lat-story" data-lat-theme={String(context.globals['theme'] ?? 'light')}>
+  <div
+    className="lat-story"
+    data-lat-theme={String(context.globals['theme'] ?? 'light')}
+    data-lat-direction={String(context.globals['direction'] ?? 'none')}
+  >
     <Story />
   </div>
 )
@@ -35,13 +58,28 @@ const preview: Preview = {
         ],
         dynamicTitle: true
       }
+    },
+
+    direction: {
+      description: 'Which candidate visual direction the story renders in',
+      toolbar: {
+        title: 'Direction',
+        icon: 'paintbrush',
+        items: DIRECTIONS.map((value) => ({
+          value,
+          title:
+            value === 'none' ? 'None (shipped)' : value.charAt(0).toUpperCase() + value.slice(1)
+        })),
+        dynamicTitle: true
+      }
     }
   },
 
   // Storybook 9 moved the default off `globalTypes.defaultValue`, which is now
   // ignored. Without this the first render has no theme attribute at all.
   initialGlobals: {
-    theme: 'light'
+    theme: 'light',
+    direction: 'none'
   },
 
   parameters: {

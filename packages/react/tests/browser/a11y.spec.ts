@@ -5,6 +5,7 @@
 import { AxeBuilder } from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 import {
+  DIRECTIONS,
   PAGE_SCOPED_RULES,
   THEMES,
   fetchStories,
@@ -44,41 +45,50 @@ test('the story index is populated', async ({ request }) => {
 for (const family of families) {
   const title = titleFor(family)
 
-  for (const theme of THEMES) {
-    test(`${title} has no axe violations in ${theme}`, async ({ page, request }) => {
-      const stories = (await fetchStories(request)).filter(
-        (story) => story.title === `Components/${title}`
-      )
+  for (const direction of DIRECTIONS) {
+    for (const theme of THEMES) {
+      test(`${title} has no axe violations in ${theme} / ${direction}`, async ({
+        page,
+        request
+      }) => {
+        const stories = (await fetchStories(request)).filter(
+          (story) => story.title === `Components/${title}`
+        )
 
-      // A component whose stories file exists but indexes nothing would
-      // otherwise sweep zero stories and pass.
-      expect(stories.length).toBeGreaterThan(0)
+        // A component whose stories file exists but indexes nothing would
+        // otherwise sweep zero stories and pass.
+        expect(stories.length).toBeGreaterThan(0)
 
-      for (const story of stories) {
-        await test.step(story.name, async () => {
-          await page.goto(storyUrl(story.id, theme))
+        for (const story of stories) {
+          await test.step(story.name, async () => {
+            await page.goto(storyUrl(story.id, theme, direction))
 
-          // The decorator's element, which is also what paints the themed
-          // surface. Waiting on it means axe never measures a half-mounted tree,
-          // and settling means it never measures a half-finished transition.
-          await page.locator('.lat-story').waitFor()
-          await settle(page)
+            // The decorator's element, which is also what paints the themed
+            // surface. Waiting on it means axe never measures a half-mounted
+            // tree, and settling means it never measures a half-finished
+            // transition.
+            await page.locator('.lat-story').waitFor()
+            await settle(page)
 
-          const results = await new AxeBuilder({ page }).disableRules(PAGE_SCOPED_RULES).analyze()
+            const results = await new AxeBuilder({ page })
+              .disableRules(PAGE_SCOPED_RULES)
+              .analyze()
 
-          // Reported as a summary rather than as raw violations: the raw objects
-          // carry the whole element tree, and a failure has to stay readable.
-          const summary = results.violations.map((violation) => ({
-            rule: violation.id,
-            impact: violation.impact,
-            help: violation.help,
-            targets: violation.nodes.map((node) => node.target.join(' '))
-          }))
+            // Reported as a summary rather than as raw violations: the raw
+            // objects carry the whole element tree, and a failure has to stay
+            // readable.
+            const summary = results.violations.map((violation) => ({
+              rule: violation.id,
+              impact: violation.impact,
+              help: violation.help,
+              targets: violation.nodes.map((node) => node.target.join(' '))
+            }))
 
-          expect.soft(summary, `${story.id} in ${theme}`).toEqual([])
-        })
-      }
-    })
+            expect.soft(summary, `${story.id} in ${theme} / ${direction}`).toEqual([])
+          })
+        }
+      })
+    }
   }
 
   /**
@@ -90,30 +100,37 @@ for (const family of families) {
    * them at once.
    *
    * Not split by theme — whether a transform is animated is a property of the
-   * stylesheet, and the stylesheet does not vary by mode.
+   * stylesheet, and the stylesheet does not vary by mode. It does vary by
+   * direction, which is exactly why the direction axis is here and the theme
+   * axis is not.
    */
-  test(`${title} animates no transform under reduced motion`, async ({ page, request }) => {
-    await page.emulateMedia({ reducedMotion: 'reduce' })
+  for (const direction of DIRECTIONS) {
+    test(`${title} animates no transform under reduced motion / ${direction}`, async ({
+      page,
+      request
+    }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' })
 
-    const stories = (await fetchStories(request)).filter(
-      (story) => story.title === `Components/${title}`
-    )
-
-    expect(stories.length).toBeGreaterThan(0)
-
-    for (const story of stories) {
-      await page.goto(storyUrl(story.id, 'light'))
-      await page.locator('.lat-story').waitFor()
-
-      const offenders = await page.evaluate(() =>
-        [...document.querySelectorAll('*')]
-          .filter((el) => getComputedStyle(el).transitionProperty.includes('transform'))
-          .map((el) => el.className)
+      const stories = (await fetchStories(request)).filter(
+        (story) => story.title === `Components/${title}`
       )
 
-      expect.soft(offenders, story.id).toEqual([])
-    }
-  })
+      expect(stories.length).toBeGreaterThan(0)
+
+      for (const story of stories) {
+        await page.goto(storyUrl(story.id, 'light', direction))
+        await page.locator('.lat-story').waitFor()
+
+        const offenders = await page.evaluate(() =>
+          [...document.querySelectorAll('*')]
+            .filter((el) => getComputedStyle(el).transitionProperty.includes('transform'))
+            .map((el) => el.className)
+        )
+
+        expect.soft(offenders, `${story.id} / ${direction}`).toEqual([])
+      }
+    })
+  }
 }
 
 test('keyboard focus produces a visible ring', async ({ page }) => {

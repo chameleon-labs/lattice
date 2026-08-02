@@ -36,6 +36,28 @@ export function storyFamilies(): string[] {
     .sort()
 }
 
+/**
+ * The candidate directions, read from disk for the same reason `storyFamilies`
+ * is: Playwright collects test files before the web server is up, so the shape
+ * of the suite cannot come from a runtime fetch.
+ *
+ * The preview discovers the same directory through `import.meta.glob`. Two
+ * readers, one directory, so they cannot drift about which directions exist.
+ *
+ * `none` is prepended and is not a file — it is the system exactly as it ships,
+ * which is the control the candidates are judged against.
+ */
+export function directionNames(): string[] {
+  const directions = new URL('../../../.storybook/directions/', import.meta.url)
+
+  return readdirSync(directions)
+    .filter((file) => file.endsWith('.css'))
+    .map((file) => file.replace(/\.css$/, ''))
+    .sort()
+}
+
+export const DIRECTIONS: readonly string[] = ['none', ...directionNames()]
+
 /** Every entry Storybook indexed as a story, in index order. */
 export async function fetchStories(request: APIRequestContext): Promise<StoryEntry[]> {
   const response = await request.get('/index.json')
@@ -79,8 +101,12 @@ export function titleFor(family: string): string {
  * panel working for anyone actually browsing Storybook. Only the sweep opts out,
  * and only because it is bringing its own axe.
  */
-export function storyUrl(id: string, theme: 'light' | 'dark'): string {
-  const globals = `theme:${theme};a11y.manual:!true`
+export function storyUrl(
+  id: string,
+  theme: 'light' | 'dark',
+  direction: string = 'none'
+): string {
+  const globals = `theme:${theme};direction:${direction};a11y.manual:!true`
 
   return `/iframe.html?id=${encodeURIComponent(id)}&viewMode=story&globals=${encodeURIComponent(globals)}`
 }
