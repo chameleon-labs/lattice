@@ -26,9 +26,13 @@ constraints first is what stops this becoming a re-design.
 
 - **The accent is hue 305°** — magenta — at peak chroma 0.200, with step 9
   pinned to L 0.591, the exact lightness where white text reaches 4.50:1.
-- **Grey shares hue 305°** at peak 0.012, so surfaces are faintly accent-tinted
-  rather than dead.
-- **Status hues are fixed**: danger 27°, warning 75°, success 145°.
+  **Under review — see "The accent hue is open" below.** The directions are
+  authored against the hue as a *variable*, never as a literal, so a change to it
+  costs nothing here.
+- **Grey shares the accent's hue** at peak 0.012, so surfaces are faintly
+  accent-tinted rather than dead. Whatever the accent becomes, grey follows.
+- **Status hues are fixed**: danger 27°, warning 75°, success 145°, with the
+  severity ramp at 14°, 36°, 62° and 88°.
 - **Step 9 is mode-invariant.** A solid fill is the same colour in both themes.
 - **Shadows are not load-bearing on dark.** The #30 calibration measured a
   shadow at 1.315:1 on light and 1.016:1 on dark; at 50% black the dark figure
@@ -39,6 +43,51 @@ constraints first is what stops this becoming a re-design.
 - **Severity is never colour alone.**
 
 A direction retunes. It does not renegotiate.
+
+## The accent hue is open
+
+Raised after the directions were built: the magenta is not settled. This does not
+disturb the work above — no direction hardcodes the accent, so the hue can change
+underneath all three — but it is worth recording what the measurement found,
+because the constraint is unusually sharp for this product.
+
+**The brand must never be mistakable for a status.** Seven colours are already
+spoken for, so the accent's job is to be far from all of them under colour-vision
+deficiency, not merely far in degrees. Candidates were scored by simulating
+protanopia, deuteranopia and tritanopia with the system's own `cvd` module and
+taking the worst ΔE against all seven.
+
+Each candidate had its step-9 lightness re-solved, because **the lightness at
+which white text reaches 4.5:1 is hue-dependent** — 0.561 at 230° rising to 0.591
+at 305°. Each was then built by the real pipeline, which fails if any contract
+breaks. All five built.
+
+| Hue | Solid | Step-9 L | Chroma fitted | Normal | Protan | Deutan | Tritan |
+|---|---|---|---|---|---|---|---|
+| 230° teal | `#0080a9` | 0.561 | **0.112** | 20.6 | 13.8 | 16.7 | 7.4 |
+| 255° azure | `#0075e3` | 0.572 | 0.188 | 29.5 | 23.5 | 26.2 | 7.0 |
+| 275° indigo | `#5d67ee` | 0.582 | 0.200 | 31.5 | 25.9 | 27.6 | 9.5 |
+| 295° violet | `#895ae4` | 0.588 | 0.200 | 27.3 | 25.1 | 25.8 | **13.0** |
+| 305° magenta *(current)* | `#9a54da` | 0.591 | 0.200 | 25.0 | 24.1 | 23.9 | 9.7 |
+
+Three findings, each a measurement rather than a preference:
+
+1. **Teal is out on chroma, not on separation.** sRGB cannot hold chroma 0.200 at
+   230°, so gamut mapping reduces it to 0.112 — the brand colour would be visibly
+   *less saturated than the status colours beside it*. The whole blue-green
+   region 165°–245° has this problem.
+2. **295° dominates 305° on every axis** — normal 27.3 vs 25.0, protan 25.1 vs
+   24.1, deutan 25.8 vs 23.9, tritan 13.0 vs 9.7. A 34% improvement in the worst
+   case for a 10° shift. If the answer is "keep purple", it should be 295°.
+3. **The purple region is not arbitrary.** 285°–305° is the most separable band
+   from the status palette overall, which means the original choice was defensible
+   even though it was not optimal.
+
+Changing it is three numbers in `packages/tokens/config/scales.ts`: the accent's
+`hue`, its pinned `solid.lightness`, and `gray.hue`. Everything else is generated.
+
+**Not decided here.** This section records what was measured, not what was
+chosen, and the hue is deliberately left as it ships until someone picks.
 
 ## The mechanism
 
