@@ -17,6 +17,7 @@
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
-    "demo": "pnpm --filter @chameleon-labs/lattice-react dev"
+    "storybook": "pnpm --filter @chameleon-labs/lattice-react dev",
+    "build-storybook": "pnpm --filter @chameleon-labs/lattice-react build-storybook"
   }
 }

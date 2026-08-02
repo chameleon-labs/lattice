@@ -35,10 +35,11 @@ jobs:
       - name: Install Firefox
         run: pnpm --filter @chameleon-labs/lattice-tokens exec playwright install --with-deps firefox
 
-      # The React package's demo imports the emitted token stylesheet, and dist/
-      # is gitignored — so the artefact has to exist before its browser tests
-      # run. The full `pnpm -r build` below still runs for every package; this is
-      # the one ordering dependency that cannot wait for it.
+      # The React package's Storybook preview imports the emitted token
+      # stylesheet, and dist/ is gitignored — so the artefact has to exist before
+      # its browser tests run. The full `pnpm -r build` below still runs for
+      # every package; this is the one ordering dependency that cannot wait for
+      # it.
       - name: Build tokens
         run: pnpm --filter @chameleon-labs/lattice-tokens build
 
@@ -53,6 +54,13 @@ jobs:
       # A contract failure exits non-zero here and nothing reaches dist/.
       - name: Build
         run: pnpm -r build
+
+      # The browser tests run Storybook in dev mode, which tolerates things the
+      # production build does not. Nothing is deployed yet, so without this step
+      # a Storybook that had stopped building would go unnoticed until the day
+      # someone tried to publish it.
+      - name: Build Storybook
+        run: pnpm build-storybook
 
       # dist/ is gitignored, so a broken emit would otherwise be invisible until
       # release. This proves every published file exists and is non-empty.

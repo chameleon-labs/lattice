@@ -1,7 +1,7 @@
 {
-  // Two configs rather than one: `tsc --noEmit` must see tests, demo and the
-  // config files, while the emit must see only src — otherwise rootDir widens
-  // and dist grows a directory level.
+  // Two configs rather than one: `tsc --noEmit` must see tests, stories and the
+  // config files, while the emit must see only the components — otherwise
+  // rootDir widens and dist grows a directory level.
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": false,
@@ -11,5 +11,10 @@
     "outDir": "dist",
     "rootDir": "src"
   },
-  "include": ["src"]
+  "include": ["src"],
+  // Stories are co-located with the component they document, which puts them
+  // inside `rootDir`. Without this they would compile into dist/ and ship to
+  // consumers, dragging @storybook/react-vite along as a runtime import.
+  // tsconfig.json still includes them, so they remain typechecked.
+  "exclude": ["src/**/*.stories.tsx"]
 }
