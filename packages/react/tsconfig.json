@@ -11,8 +11,7 @@
     "src",
     "scripts",
     "tests",
-    "demo",
-    "vite.config.ts",
+    ".storybook",
     "vitest.config.ts",
     "playwright.config.ts"
   ]

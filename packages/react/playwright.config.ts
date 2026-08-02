@@ -11,12 +11,23 @@ import { defineConfig } from '@playwright/test'
 export default defineConfig({
   testDir: './tests/browser',
   reporter: 'line',
+  // Raised from the 30s default. Each family test navigates once per story, and
+  // Storybook's dev server compiles a story's module the first time it is asked
+  // for — so the opening navigations are slow, and slower still with every
+  // worker asking at once. The tests themselves are not slow; the first visit is.
+  timeout: 90_000,
   use: {
-    baseURL: 'http://localhost:5173'
+    baseURL: 'http://localhost:6006'
   },
   webServer: {
-    command: 'pnpm exec vite',
-    url: 'http://localhost:5173',
+    command: 'pnpm exec storybook dev -p 6006 --no-open --quiet',
+    // Readiness is measured against the story index rather than against the
+    // root, because that is what the sweep reads. A server that has bound its
+    // port but has not finished indexing would serve the tests an empty list,
+    // and every loop over it would pass vacuously.
+    url: 'http://localhost:6006/index.json',
+    // A cold Storybook boot exceeds Playwright's 60s default on CI.
+    timeout: 180_000,
     reuseExistingServer: process.env.CI === undefined
   },
   projects: [

@@ -60,16 +60,17 @@ take away.
 ## Development
 
 ```sh
-pnpm demo         # from the repo root — builds tokens, then opens the gallery
+pnpm storybook    # from the repo root — builds tokens, then opens the gallery
 ```
 
 Or from inside this package:
 
 ```sh
-pnpm dev          # same thing: builds tokens, then serves on :5173
-pnpm build        # tsc emits JS and declarations; the stylesheet is assembled
+pnpm dev              # same thing: builds tokens, then serves on :6006
+pnpm build            # tsc emits JS and declarations; the stylesheet is assembled
+pnpm build-storybook  # the gallery, built for production
 pnpm typecheck
-pnpm test         # vitest (jsdom) then Playwright (Firefox at 16px and 20px)
+pnpm test             # vitest (jsdom) then Playwright (Firefox at 16px and 20px)
 
 pnpm --filter @chameleon-labs/lattice-react exec playwright install firefox
 ```
@@ -77,19 +78,30 @@ pnpm --filter @chameleon-labs/lattice-react exec playwright install firefox
 `dev` builds the token package first on purpose: the gallery imports the emitted
 `lattice.css`, and `dist/` is not committed.
 
-`demo/` is both the documentation and the target the browser tests drive, so
-what a reviewer looks at and what the assertions measure cannot diverge. **If a
-variant is not rendered there, no axe scan covers it.**
+Stories live beside the component they document — `src/button/button.stories.tsx`
+— and are excluded from `tsconfig.build.json`, so they are typechecked but never
+shipped.
+
+Storybook is both the documentation and the target the browser tests drive, so
+what a reviewer looks at and what the assertions measure cannot diverge. The
+browser suite reads Storybook's story index at run time and scans everything in
+it, which means **a story is covered because it exists** — there is no list to
+keep up to date. `tests/story-coverage.test.ts` closes the other half: every
+exported component must appear in a story, so a component cannot escape the
+sweep by having none.
+
+The theme is a Storybook global rather than a story per mode, which is what lets
+the sweep visit each story in both themes without doubling the story count.
 
 ## How the guarantees are tested
 
 Three tiers.
 
 1. **Behaviour** — vitest with jsdom and Testing Library, one file per family.
-2. **Real browser** — Playwright on Firefox at 16px and 20px root font size:
-   axe-core clean per theme, a visible keyboard focus ring, no transform
-   transitions under `reduce`, borders surviving `forced-colors`, and Dialog and
-   Menu returning focus.
+2. **Real browser** — Playwright on Firefox at 16px and 20px root font size,
+   against every story Storybook indexes: axe-core clean in both themes, a
+   visible keyboard focus ring, no transform transitions under `reduce`, borders
+   surviving `forced-colors`, and Dialog and Menu returning focus.
 3. **Static contract** — pure functions over the built stylesheet, proven
    against fixtures in `tests/css-contract.test.ts` before being pointed at the
    real file. No colour literal, every `--lat-*` reference resolving against the
@@ -97,7 +109,7 @@ Three tiers.
    transition outside `no-preference`, every focus ring on `:focus-visible`, and
    each block selector declared once at top level.
 
-## Three things that will bite
+## Five things that will bite
 
 A test that reads a file must declare `@vitest-environment node`. Under jsdom
 the global `URL` resolves `new URL(relative, import.meta.url)` against the
@@ -110,3 +122,16 @@ arrow keys — passing alone, failing in the file.
 **Focus restoration cannot be tested in jsdom.** Ariakit restores focus using
 real layout and animation frames; under jsdom focus simply stays where it was.
 Those assertions live in the browser suite.
+
+**Two axes cannot run in one frame.** `@storybook/addon-a11y` runs axe inside the
+story iframe on render, and `AxeBuilder` then runs its own over the same frame:
+the second aborts with "Axe is already running". It is a race, so it fails a
+handful of tests rather than all of them. The sweep visits every story with
+`globals=…;a11y.manual:!true`, which stands the addon down for that visit only —
+the panel still runs automatically for anyone browsing Storybook.
+
+**Let the story settle before measuring it.** `.lat-dialog` opens at `opacity: 0`
+and fades in. axe reading a frame part-way through measures a blended colour and
+reports a contrast violation against a dialog that is legible at rest. The sweep
+drains `document.getAnimations()` first — see `settle()` in
+`tests/browser/support/stories.ts`.

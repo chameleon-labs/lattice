@@ -59,14 +59,15 @@ Node 24 (see [`.nvmrc`](./.nvmrc)) and pnpm.
 
 ```sh
 pnpm install
-pnpm --filter @chameleon-labs/lattice-tokens build   # the React demo needs the emitted tokens
+pnpm --filter @chameleon-labs/lattice-tokens build   # Storybook needs the emitted tokens
 pnpm --filter @chameleon-labs/lattice-tokens exec playwright install firefox
-pnpm build    # typecheck, then emit dist/
-pnpm test     # vitest and Firefox browser coverage
-pnpm demo     # serve the component gallery at http://localhost:5173
+pnpm build           # typecheck, then emit dist/
+pnpm test            # vitest and Firefox browser coverage
+pnpm storybook       # serve the component gallery at http://localhost:6006
+pnpm build-storybook # the same gallery, built for production
 ```
 
-`pnpm demo` builds the tokens first, because the gallery imports the emitted
+`pnpm storybook` builds the tokens first, because the gallery imports the emitted
 stylesheet and `dist/` is not committed.
 
 A pnpm workspace. Root scripts fan out to every package; run them inside a package directory to work on one.
@@ -74,7 +75,7 @@ A pnpm workspace. Root scripts fan out to every package; run them inside a packa
 ```
 packages/
 ├── tokens/     @chameleon-labs/lattice-tokens — config/, generate/, tests/, dist/
-└── react/      @chameleon-labs/lattice-react — src/, demo/, tests/, dist/
+└── react/      @chameleon-labs/lattice-react — src/, .storybook/, tests/, dist/
 ```
 
 Inside `packages/tokens/`, `config/` declares reviewed token values and contracts and `generate/` turns them into artefacts. `dist/` is generated output and is not committed.
