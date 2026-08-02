@@ -186,3 +186,77 @@ test.describe('blueprint', () => {
     expect(shadow).toBe('none')
   })
 })
+
+test.describe('iridescent', () => {
+  // The Default button story is `soft`; only Variants renders a solid one, and
+  // the gradient is a claim about solid fills.
+  const SOLID = ".lat-button[data-variant='solid']"
+
+  test('the accent solid fill is a gradient, not a flat colour', async ({ page }) => {
+    await page.goto(storyUrl('components-button--variants', 'light', 'iridescent'))
+    await page.locator(SOLID).first().waitFor()
+
+    const image = await page
+      .locator(`${SOLID}[data-tone='accent']`)
+      .first()
+      .evaluate((el) => getComputedStyle(el).backgroundImage)
+
+    expect(image).toContain('gradient')
+  })
+
+  test('the fill is the same in both themes, because step 9 is mode-invariant', async ({
+    page
+  }) => {
+    const fillIn = async (theme: 'light' | 'dark') => {
+      await page.goto(storyUrl('components-button--variants', theme, 'iridescent'))
+      await page.locator(SOLID).first().waitFor()
+      return page
+        .locator(`${SOLID}[data-tone='accent']`)
+        .first()
+        .evaluate((el) => getComputedStyle(el).backgroundImage)
+    }
+
+    expect(await fillIn('light')).toBe(await fillIn('dark'))
+  })
+
+  /**
+   * Severity has the stronger claim.
+   *
+   * A gradient on `danger` would make a status harder to recognise, which is
+   * the same argument the tabstop spec makes when it refuses a second brand
+   * hue. Only the accent is iridescent.
+   */
+  test('status fills stay flat', async ({ page }) => {
+    await page.goto(storyUrl('components-button--tones', 'light', 'iridescent'))
+    await page.locator(SOLID).first().waitFor()
+
+    const images = await page
+      .locator(`${SOLID}:not([data-tone='accent'])`)
+      .evaluateAll((els) => els.map((el) => getComputedStyle(el).backgroundImage))
+
+    // The selector matched something — otherwise this passes by finding nothing.
+    expect(images.length).toBeGreaterThan(0)
+    expect(images.every((image) => image === 'none')).toBe(true)
+  })
+
+  test('surfaces carry a generous radius', async ({ page }) => {
+    await page.goto(storyUrl('components-card--default', 'light', 'iridescent'))
+    await page.locator('.lat-card').waitFor()
+
+    const radius = await page
+      .locator('.lat-card')
+      .evaluate((el) => getComputedStyle(el).borderTopLeftRadius)
+
+    // 1rem — 16px at the 16px root, 20px at the 20px root this suite also runs.
+    expect(parseFloat(radius)).toBeGreaterThanOrEqual(16)
+  })
+
+  test('elevation returns — a raised surface casts a shadow again', async ({ page }) => {
+    await page.goto(storyUrl('components-card--default', 'light', 'iridescent'))
+    await page.locator('.lat-card').waitFor()
+
+    const shadow = await page.locator('.lat-card').evaluate((el) => getComputedStyle(el).boxShadow)
+
+    expect(shadow).not.toBe('none')
+  })
+})

@@ -1,0 +1,69 @@
+/*
+ * Iridescent — the expressive pole, built from the origin story.
+ *
+ * Chameleons have no violet pigment. Their colour comes from the *spacing* of a
+ * lattice of guanine nanocrystals, and the animal changes colour by retuning
+ * that spacing. Structural colour, not pigment.
+ *
+ * So the signature is a fill whose hue travels — magenta 305 to violet 275 —
+ * across a surface whose lightness never changes. Colour that moves without the
+ * surface getting brighter or darker. That is what structural colour looks like,
+ * and it is the one move here no other design system is entitled to make.
+ *
+ * Holding lightness constant is what makes it provable, though not in the way it
+ * first appears. Contrast at fixed lightness is *not* flat across hue; it falls
+ * toward blue, which is why both ends sit at L 0.575 rather than at the accent's
+ * own L 0.591. See packages/tokens/tests/iridescent-endpoint.test.ts, which
+ * walks the interpolation and contracts all 61 samples.
+ *
+ * Measured: 4.817:1 at the magenta end, 4.641:1 at the violet end, against
+ * white. These two hexes are that test's output; changing either one fails it.
+ */
+
+[data-lat-theme][data-lat-direction='iridescent'] {
+  --_iridescent-from: #954fd5;
+  --_iridescent-to: #5b65ec;
+
+  /* Surfaces read as objects here, so corners soften rather than tighten. */
+  --lat-radius-md: 0.75rem;
+  --lat-radius-lg: 1rem;
+
+  /*
+   * Every level moves up one step. This is the direction that spends elevation
+   * rather than rationing it — the opposite of Instrument's argument, and the
+   * reason the two are worth seeing side by side.
+   */
+  --lat-elevation-raised-shadow: 0 4px 8px -1px rgb(0 0 0 / 0.12);
+  --lat-elevation-overlay-shadow: 0 12px 24px -4px rgb(0 0 0 / 0.16);
+  --lat-elevation-modal-shadow: 0 12px 24px -4px rgb(0 0 0 / 0.22);
+}
+
+/*
+ * Only the accent is iridescent.
+ *
+ * A gradient on `danger` would make a status harder to recognise, and severity
+ * has the stronger claim — the same argument the tabstop spec makes when it
+ * refuses a second brand hue. Status fills stay flat, so this is scoped to the
+ * accent tone rather than applied to every solid.
+ *
+ * The literals are deliberate. A var() into a themed token would move between
+ * light and dark, and step 9 is mode-invariant by design — a solid fill is the
+ * same colour in both themes, and only the surfaces around it move.
+ */
+[data-lat-direction='iridescent'] .lat-button[data-variant='solid'][data-tone='accent'] {
+  background-image: linear-gradient(
+    100deg,
+    var(--_iridescent-from) 0%,
+    var(--_iridescent-to) 100%
+  );
+}
+
+/* Overlays arrive rather than appear. Still inside the no-preference gate —
+   there is no exception here and the direction does not ask for one. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-lat-direction='iridescent'] .lat-dialog,
+  [data-lat-direction='iridescent'] .lat-menu {
+    transition-duration: var(--lat-duration-base);
+    transition-timing-function: var(--lat-easing-entrance);
+  }
+}
