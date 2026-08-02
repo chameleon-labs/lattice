@@ -37,7 +37,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json && tsx scripts/build-css.ts",
-    "build-storybook": "storybook build",
+    "build-storybook": "pnpm --filter @chameleon-labs/lattice-tokens build && storybook build",
     "dev": "pnpm --filter @chameleon-labs/lattice-tokens build && storybook dev -p 6006",
     "typecheck": "tsc --noEmit",
     "test": "vitest run && playwright test",

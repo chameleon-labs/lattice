@@ -28,23 +28,39 @@ const storyFiles = readdirSync(src, { recursive: true, encoding: 'utf8' }).filte
   entry.endsWith('.stories.tsx')
 )
 
-const stories = storyFiles.map((file) => readFileSync(new URL(file, src), 'utf8')).join('\n')
+/**
+ * Story sources with their import statements removed.
+ *
+ * Searching the whole file would let a component that is imported and never
+ * rendered satisfy the check below — the very defect it exists to catch,
+ * passing because of the line that introduces the name. Stripping imports means
+ * a name found here is a name the story actually uses.
+ */
+const IMPORT_STATEMENT = /^import\b[\s\S]*?\bfrom\s+'[^']+'/gm
+
+const storyBodies = storyFiles
+  .map((file) => readFileSync(new URL(file, src), 'utf8').replace(IMPORT_STATEMENT, ''))
+  .join('\n')
 
 /**
  * Value exports only.
  *
  * `export type { ButtonProps }` is a type and has nothing to render, so
- * demanding a story for it would force noise into the gallery. The barrel keeps
- * the two forms on separate statements, which is what makes this separable.
+ * demanding a story for it would force noise into the gallery.
+ *
+ * The pattern matches the `type` form deliberately and then discards it, rather
+ * than declining to match it at all. Excluding types by writing a pattern they
+ * happen not to fit works, but it rests on a property of the regex that nothing
+ * states and no test covers — and it leaves a filter here that can never run.
+ * Matching both and rejecting one makes the rule visible and testable.
  */
 const exportedComponents = (): string[] => {
   const names = new Set<string>()
 
-  for (const match of barrel.matchAll(/export\s*\{([^}]*)\}\s*from/g)) {
-    const clause = match[0]
-    if (clause.startsWith('export type')) continue
+  for (const match of barrel.matchAll(/export\s+(type\s+)?\{([^}]*)\}\s*from/g)) {
+    if (match[1] !== undefined) continue
 
-    for (const name of (match[1] ?? '').split(',')) {
+    for (const name of (match[2] ?? '').split(',')) {
       const trimmed = name.trim().split(/\s+as\s+/).pop()?.trim()
       // `export { type Foo, Bar }` — an inline type specifier inside a value
       // clause is still a type.
@@ -77,9 +93,23 @@ describe('story coverage', () => {
     expect(without).toEqual([])
   })
 
-  it('renders every exported component in at least one story', () => {
+  it('drops type-only exports, which have nothing to render', () => {
+    const exported = exportedComponents()
+
+    // Named rather than pattern-matched: these are real entries in the barrel's
+    // `export type` clauses, so if the type filter stopped working they would
+    // appear here and demand stories that cannot exist.
+    expect(exported).not.toContain('ButtonProps')
+    expect(exported).not.toContain('BadgeTone')
+    expect(exported).not.toContain('TableOptions')
+
+    // …while the value export sitting beside them is still found.
+    expect(exported).toContain('Button')
+  })
+
+  it('uses every exported component in the body of at least one story', () => {
     const missing = exportedComponents().filter(
-      (name) => !new RegExp(`\\b${name}\\b`).test(stories)
+      (name) => !new RegExp(`\\b${name}\\b`).test(storyBodies)
     )
 
     expect(missing).toEqual([])
