@@ -125,3 +125,64 @@ test.describe('instrument', () => {
     expect(pressTransforms.every((value) => value === 'none')).toBe(true)
   })
 })
+
+test.describe('blueprint', () => {
+  /**
+   * The claim this direction is built to make.
+   *
+   * WCAG 2.2 SC 2.4.13 Focus Appearance (AAA) asks for an indicator at least as
+   * large as a 2px-thick perimeter of the focused control. The shipped 2px ring
+   * at 2px offset sits at the edge of that; 3px clears it with room.
+   *
+   * This is a measurement, not an assertion of intent. If it fails, the claim
+   * fails with it.
+   */
+  test('the focus ring is thick enough to clear SC 2.4.13', async ({ page }) => {
+    await page.goto(storyUrl('components-button--default', 'light', 'blueprint'))
+    await page.locator('.lat-button').waitFor()
+
+    // Keyboard-driven: a programmatic .focus() does not set the heuristic
+    // Firefox uses for :focus-visible, so the ring would not be showing.
+    await page.keyboard.press('Tab')
+
+    const focus = await page.evaluate(() => {
+      const el = document.activeElement
+      if (el === null) return null
+      const style = getComputedStyle(el)
+      return {
+        matchesFocusVisible: el.matches(':focus-visible'),
+        width: parseFloat(style.outlineWidth),
+        offset: parseFloat(style.outlineOffset),
+        style: style.outlineStyle
+      }
+    })
+
+    expect(focus).not.toBeNull()
+    expect(focus?.matchesFocusVisible).toBe(true)
+    expect(focus?.style).not.toBe('none')
+    expect(focus?.width).toBeGreaterThanOrEqual(3)
+    expect(focus?.offset).toBeGreaterThanOrEqual(3)
+  })
+
+  test('the selected tab carries a rail, not only a colour', async ({ page }) => {
+    await page.goto(storyUrl('components-tabs--default', 'light', 'blueprint'))
+    await page.locator('.lat-tab').first().waitFor()
+
+    const rail = await page
+      .locator(".lat-tab[aria-selected='true']")
+      .evaluate((el) => getComputedStyle(el, '::before').inlineSize)
+
+    // `auto` means the pseudo-element never rendered.
+    expect(rail).not.toBe('auto')
+    expect(parseFloat(rail)).toBeGreaterThan(0)
+  })
+
+  test('it keeps Instrument’s elevation rule', async ({ page }) => {
+    await page.goto(storyUrl('components-card--default', 'light', 'blueprint'))
+    await page.locator('.lat-card').waitFor()
+
+    const shadow = await page.locator('.lat-card').evaluate((el) => getComputedStyle(el).boxShadow)
+
+    expect(shadow).toBe('none')
+  })
+})

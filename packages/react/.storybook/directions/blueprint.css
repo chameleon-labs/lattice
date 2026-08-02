@@ -1,0 +1,102 @@
+/*
+ * Blueprint — Instrument's base, with one loud move.
+ *
+ * Every other system minimises focus. A system whose README opens with
+ * "Accessibility is the constraint, not the feature" has the standing to do the
+ * opposite: here the focus ring is the ornament, and the thing that makes the
+ * system recognisable is the thing that makes it usable.
+ *
+ * It also cashes in the name. A lattice is a grid, and the grid shows.
+ */
+
+[data-lat-theme][data-lat-direction='blueprint'] {
+  --lat-radius-sm: 0.125rem;
+  --lat-radius-md: 0.25rem;
+  --lat-radius-lg: 0.25rem;
+
+  --lat-elevation-raised-shadow: none;
+  --lat-elevation-overlay-shadow: none;
+  --lat-elevation-modal-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.1);
+}
+
+[data-lat-direction='blueprint'] .lat-button[data-variant='solid'] {
+  border-color: var(--_solid);
+}
+
+[data-lat-direction='blueprint'] .lat-button[data-variant='soft'],
+[data-lat-direction='blueprint'] .lat-button[data-variant='ghost'] {
+  border-color: var(--lat-border);
+}
+
+[data-lat-direction='blueprint'] .lat-button[data-size='md'] {
+  padding: var(--lat-space-1) var(--lat-space-3);
+}
+
+[data-lat-direction='blueprint'] .lat-table td,
+[data-lat-direction='blueprint'] .lat-table th,
+[data-lat-direction='blueprint'] .lat-badge {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-lat-direction='blueprint'] .lat-button:active {
+    transition-property: background-color, border-color, color, box-shadow;
+    transform: none;
+  }
+}
+
+/*
+ * The move.
+ *
+ * 3px at 3px offset clears SC 2.4.13 Focus Appearance (AAA), which asks for an
+ * indicator at least as large as a 2px perimeter of the control. The 1px halo
+ * is drawn with box-shadow because `outline` cannot express two rings, and a
+ * shadow does not affect layout — so the ring reads against a light and a dark
+ * surface alike without needing to know which it is on.
+ *
+ * Scoped through `[data-lat-theme]` as well, for specificity rather than for
+ * reach. `[data-lat-direction] :focus-visible` is 0,2,0 — exactly the weight of
+ * the shipped `.lat-button:focus-visible` — so it ties and then loses on load
+ * order, because the glob injects direction stylesheets before src/styles.css.
+ * Both attributes sit on the same wrapper element, so this costs nothing.
+ */
+[data-lat-theme][data-lat-direction='blueprint'] :focus-visible {
+  outline: 3px solid var(--lat-focus-ring);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 1px var(--lat-border-interactive);
+}
+
+/*
+ * Selection is a rail, never only a fill.
+ *
+ * The same argument the system already makes about severity: a state carried
+ * only by colour is a state some people cannot see. The shipped tab already
+ * uses a bottom border for this; the rail adds a second, orthogonal signal.
+ */
+[data-lat-direction='blueprint'] .lat-tab {
+  position: relative;
+}
+
+[data-lat-direction='blueprint'] .lat-tab[aria-selected='true']::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 3px;
+  background-color: var(--lat-solid);
+}
+
+/*
+ * The grid shows.
+ *
+ * A 1px structural rule at the subtle-border step, in the region that is
+ * otherwise empty. Decoration made of the same material as the borders around
+ * it rather than applied on top of them — which is also why it is safe: the
+ * subtle-border step is the faintest in the scale, and text sits on the card's
+ * own surface colour above it.
+ */
+[data-lat-direction='blueprint'] .lat-card {
+  background-image: linear-gradient(to right, var(--lat-border-subtle) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--lat-border-subtle) 1px, transparent 1px);
+  background-size: var(--lat-space-6) var(--lat-space-6);
+}
