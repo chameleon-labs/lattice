@@ -12,6 +12,11 @@
  * Order is alphabetical and carries no cascade meaning:
  * no rule here depends on another family's specificity.
  */
+
+/* The base layer comes first and is the one @import whose position carries
+   meaning: every family below assumes bare elements are already sane. */
+@import './base.css';
+
 @import './badge/badge.css';
 @import './button/button.css';
 @import './callout/callout.css';

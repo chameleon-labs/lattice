@@ -7,17 +7,15 @@
  * so a scope that only sets the attribute renders its text on Storybook's white
  * canvas — which axe correctly reports as a contrast failure in dark mode. A
  * consumer scoping a theme to part of a page has to do exactly the same thing.
+ *
+ * `.lat-surface` (src/base.css) now owns the background, foreground and font —
+ * this rule only adds the story-only padding and sizing.
  */
 
 .lat-story {
   box-sizing: border-box;
   min-block-size: 100vh;
   padding: var(--lat-space-6);
-  background-color: var(--lat-bg);
-  color: var(--lat-text);
-  font-family: var(--lat-text-body-font-family);
-  font-size: var(--lat-text-body-font-size);
-  line-height: var(--lat-text-body-line-height);
 }
 
 /* Stories lay their examples out in wrapping rows. The gap is a token so the
