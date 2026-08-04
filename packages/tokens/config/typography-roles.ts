@@ -53,14 +53,16 @@ export type TypographyRoleName = keyof typeof TYPOGRAPHY_ROLES
 
 export const TYPOGRAPHY_BREAKPOINT_REM = 40
 
-// NOTE: these three keys ('heading-1'/'heading-2'/'heading-3') were role names
-// in the pre-Meridian matrix. The brief's replacement TYPOGRAPHY_ROLES has no
-// such roles (headings are now h1-h4), so this object is stale — left as-is
-// rather than inventing new narrow-breakpoint sizes the brief doesn't specify.
-// See task-6-report.md for detail. generate/typography-roles.ts still imports
-// these two exports, so removing them would break that module's import.
+/**
+ * Heading sizes below {@link TYPOGRAPHY_BREAKPOINT_REM}.
+ *
+ * Meridian's own hero is `text-5xl md:text-6xl`, so responsive display sizing
+ * is part of the identity rather than an addition to it. Each role steps down
+ * one rung; `h4` and the mono roles are already small enough to leave alone.
+ */
 export const NARROW_HEADING_SIZES = {
-  'heading-1': '3xl',
-  'heading-2': '2xl',
-  'heading-3': 'xl'
-} as const
+  display: '3xl',
+  h1: '2xl',
+  h2: 'xl',
+  h3: 'lg'
+} as const satisfies Partial<Record<TypographyRoleName, keyof typeof FONT_SIZES>>

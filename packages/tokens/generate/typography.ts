@@ -16,7 +16,7 @@ import {
 
 export interface DimensionToken {
   readonly $type: 'dimension'
-  readonly $value: { readonly value: number; readonly unit: 'rem' }
+  readonly $value: { readonly value: number; readonly unit: 'rem' | 'em' }
 }
 
 export interface NumberToken {
@@ -62,7 +62,7 @@ export function typographyCss(): string {
     ([name, value]) => `  --lat-line-height-${name}: ${value};`
   )
   const letterSpacings = Object.entries(LETTER_SPACINGS).map(
-    ([name, value]) => `  --lat-letter-spacing-${name}: ${value}rem;`
+    ([name, value]) => `  --lat-letter-spacing-${name}: ${value}em;`
   )
   const weights = Object.entries(FONT_WEIGHTS).map(
     ([name, value]) => `  --lat-font-weight-${name}: ${value};`
@@ -93,7 +93,7 @@ export function typographyTokens(): TypographyTokenGroups {
   const letterSpacing = Object.fromEntries(
     Object.entries(LETTER_SPACINGS).map(([name, value]) => [
       name,
-      { $type: 'dimension', $value: { value, unit: 'rem' } } satisfies DimensionToken
+      { $type: 'dimension', $value: { value, unit: 'em' } } satisfies DimensionToken
     ])
   )
   const fontWeight = Object.fromEntries(
