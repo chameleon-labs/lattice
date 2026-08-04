@@ -13,16 +13,20 @@
  * `forMode` measures the grey and accent pairs, plus the tinted triple for
  * every chromatic scale — a scale's solid as text on its own tint, composited
  * over `bg-raised`, which is what every Badge, the destructive Button and
- * every Callout are built from.
+ * every Callout are built from — and, since 2026-08-04, the severity ramp's
+ * own tinted triple: `critical`, `serious` and `moderate` each carry their own
+ * tint tokens rather than reusing a chromatic scale, and `minor` aliases to
+ * text-subtle on wash. Phase 2 shipped these without adding them here.
  *
  * Alpha values are composited over their surface before measuring, because that
  * is what a viewer sees.
  */
-import { ALPHA_CHANNEL, FOCUS_RING_ALPHA, HAIRLINE, TINT_FRACTIONS } from '../config/alpha.js'
+import { ALPHA_CHANNEL, FOCUS_RING_ALPHA, HAIRLINE, TINT_FRACTIONS, WASH } from '../config/alpha.js'
 import { CHROMATIC_SCALES, GRAY_ANCHORS, ON_SOLID_ANCHORS, SOLID_ANCHORS } from '../config/anchors.js'
 import { MODES, type Mode } from '../config/modes.js'
 import { apcaLc, contrastRatio } from './contrast.js'
 import { formatHex, parseHex, type Rgb } from './oklch.js'
+import { buildSeverity } from './severity.js'
 
 export interface LedgerEntry {
   readonly name: string
@@ -89,6 +93,30 @@ function forMode(mode: Mode): LedgerEntry[] {
     return entry(`${mode} ${scale} text on its tint`, scaleSolid, tint, 4.5)
   })
 
+  // The severity ramp's own tinted triple — Phase 2 gave severity its own
+  // tint tokens rather than reusing a chromatic scale, so these four pairs
+  // are not covered by `tints` above and were never measured until now.
+  // `critical` and `serious` are anchored the same colours as `danger` and
+  // `warning`, so they duplicate rows already in this ledger; `moderate` is
+  // Meridian's one derived severity colour (see severity.ts), which is
+  // exactly where an unmeasured pair is most likely to be wrong.
+  const severityColoured = buildSeverity(mode).map((swatch) => {
+    const swatchSolid = parseHex(swatch.hex)
+    const tint = over(swatchSolid, TINT_FRACTIONS.default.fill, raised)
+    return entry(`${mode} severity ${swatch.role} text on its tint`, swatchSolid, tint, 4.5)
+  })
+
+  // `minor` carries no swatch of its own — it aliases to text-subtle on wash
+  // (see resolveSeverityTints in severity.ts) — so it is measured the same
+  // way the hairline row above composites an alpha layer over `bg-raised`,
+  // rather than through buildSeverity.
+  const severityMinor = entry(
+    `${mode} severity minor text on its tint`,
+    parseHex(gray['text-subtle']),
+    over(hairline, WASH, raised),
+    4.5
+  )
+
   return [
     entry(`${mode} text on bg`, parseHex(gray.text), bg, 4.5),
     entry(`${mode} text-subtle on bg-raised`, parseHex(gray['text-subtle']), raised, 4.5),
@@ -97,7 +125,9 @@ function forMode(mode: Mode): LedgerEntry[] {
     // SC 1.4.11: a focus indicator needs 3:1 against what surrounds it.
     entry(`${mode} focus ring on bg-raised`, ring, raised, 3),
     entry(`${mode} hairline on bg-raised`, over(hairline, HAIRLINE[mode], raised), raised, 1),
-    ...tints
+    ...tints,
+    ...severityColoured,
+    severityMinor
   ]
 }
 

@@ -396,6 +396,10 @@ WCAG 2.x on the delivered values:
 | dark success text on its 10% tint | 8.25 | passes |
 | dark warning text on its 10% tint | 7.13 | passes |
 | light decorative text on its 10% tint | 4.91 | passes |
+| dark severity critical text on its tint | 5.23 | passes (duplicates dark danger) |
+| dark severity serious text on its tint | 7.13 | passes (duplicates dark warning) |
+| dark severity moderate text on its tint | 9.34 | passes |
+| light severity minor text on its tint | 5.92 | passes |
 | **light `primary-foreground` (#fff) on `primary` (#6a9b00)** | **3.33** | **fails AA for the button label** |
 | **dark `muted-foreground` on `card`** | **3.67** | **fails AA for body text** |
 | **light `primary` as text on `background`** | **2.94** | **fails AA** |
@@ -404,19 +408,30 @@ WCAG 2.x on the delivered values:
 | **light warning text on its 10% tint** | **3.15** | **fails AA** |
 | **light success text on its 10% tint** | **3.34** | **fails AA** |
 | **light info text on its 10% tint** | **3.61** | **fails AA** |
+| **light severity critical text on its tint** | **4.49** | **fails AA (duplicates light danger)** |
+| **light severity serious text on its tint** | **3.15** | **fails AA (duplicates light warning)** |
+| **light severity moderate text on its tint** | **2.26** | **fails AA — the worst pair in the ledger, and Meridian's one derived severity colour** |
+| **dark severity minor text on its tint** | **3.27** | **fails AA** |
 | **light focus ring `primary/40` vs `card`** | **1.55** | **fails SC 1.4.11 (needs 3:1)** |
 | dark focus ring `primary/40` vs `card` | 3.20 | passes SC 1.4.11 |
 | hairline border vs its surface | 1.20 / 1.19 | decorative; see below |
 
-**Nine failures ship**, not four. *Corrected 2026-08-04, during a second
-implementation pass.* The original count of four covered only the six grey and
-accent pairs `forMode()` measured. It never measured the tinted triple — a
-scale's solid as text on its own tint, composited over `bg-raised` — which is
-what every Badge, the destructive Button and every Callout are built from.
-Measuring it added five more failures: in light mode, every chromatic scale
-except `decorative` misses 4.5:1 on its own tint, `danger` by the narrowest
-possible margin, 4.49 against a minimum of 4.5. Meridian's values did not
-change; what changed is that the ledger now counts what it always should have.
+**Thirteen failures ship**, not nine. *Corrected 2026-08-04, during the
+whole-phase component review.* The count of nine (itself corrected up from an
+original four earlier the same day) covered the six grey and accent pairs plus
+the chromatic tinted triple. It never measured the severity ramp's own tinted
+triple — Phase 2 gave severity its own tint tokens rather than reusing a
+chromatic scale, so these four pairs per mode were new and unmeasured.
+`critical` and `serious` are anchored to the same colours as `danger` and
+`warning` and so duplicate rows already in this ledger, in both directions.
+`moderate` and `minor` do not: light `moderate` is a new failure and the worst
+pair anywhere in this table, at 2.26 against a minimum of 4.5 — and it is
+Meridian's one *derived* severity colour (see `severity.ts`'s
+`LIGHT_LIGHTNESS_DELTA`), which is exactly where an unmeasured pair is most
+likely to be wrong. Dark `minor` is also a new failure, at 3.27 — it aliases
+to text-subtle on the wash tint rather than to a scale swatch, so it was not
+caught by measuring the coloured severity levels either. Meridian's values did
+not change; measuring more of them did.
 
 A second, unrelated correction lands in the same pass: the chart palettes were
 being validated against `#fdfdfd` / `#111112` — `gray-1` from the retired
@@ -427,9 +442,9 @@ this ledger, in the chart-palette checks the build also prints, because it is a
 category-4 check (contrast against the app surface) rather than a text-contrast
 pair — see `packages/tokens/config/charts.ts`.
 
-Nine is still nine more than a system with a hard gate would ship. That is the
-consequence of the decision in §"The premise", taken knowingly, and the ledger
-exists so it stays visible rather than becoming folklore.
+Thirteen is still thirteen more than a system with a hard gate would ship.
+That is the consequence of the decision in §"The premise", taken knowingly,
+and the ledger exists so it stays visible rather than becoming folklore.
 
 The figures above are the build's own output, not hand arithmetic — reproduce
 them with `pnpm --filter @chameleon-labs/lattice-tokens build`.

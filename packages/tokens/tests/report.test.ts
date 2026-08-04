@@ -2,10 +2,16 @@ import { describe, expect, it } from 'vitest'
 import { buildLedger } from '../generate/report.js'
 
 describe('contrast ledger', () => {
-  it('records exactly the nine known failures, in emission order', () => {
-    // Five of these are the tinted triple, added when forMode() started
-    // measuring each scale's solid as text on its own tint (§9 of the design).
-    // Meridian's values did not change; measuring more of them did.
+  it('records exactly the thirteen known failures, in emission order', () => {
+    // Five of the original nine are the chromatic tinted triple, added when
+    // forMode() started measuring each scale's solid as text on its own tint
+    // (§9 of the design). Four more join here: the severity ramp has its own
+    // tint tokens rather than reusing a chromatic scale, so its text-on-tint
+    // pairs were never measured until now. `critical`/`serious` duplicate the
+    // already-accepted `danger`/`warning` rows; `moderate` and `minor` are
+    // new failures, `moderate` the worst pair in the whole ledger and the
+    // system's one derived severity colour. Meridian's values did not
+    // change; measuring more of them did.
     const failing = buildLedger().filter((e) => !e.passes).map((e) => e.name)
     expect(failing).toEqual([
       'light on-solid on solid',
@@ -16,7 +22,11 @@ describe('contrast ledger', () => {
       'light warning text on its tint',
       'light success text on its tint',
       'light info text on its tint',
-      'dark text-subtle on bg-raised'
+      'light severity critical text on its tint',
+      'light severity serious text on its tint',
+      'light severity moderate text on its tint',
+      'dark text-subtle on bg-raised',
+      'dark severity minor text on its tint'
     ])
   })
 
