@@ -564,6 +564,26 @@
 
 /* ─── Nav ──────────────────────────────────────────────────────────────── */
 
+/*
+ * The stacking order for every sticky chrome element on these pages.
+ *
+ * `position: sticky` alone is not enough. A sticky element with `z-index: auto`
+ * paints in DOM order against other positioned elements, so anything later in
+ * the document that is merely `position: relative` — the hero's audit card, for
+ * one — scrolls straight over it. Meridian's own header carries `z-50` for
+ * exactly this reason.
+ *
+ * 50 rather than 1 so page content can still be layered beneath deliberately
+ * without colliding, and it matches the source's value. This is a page concern:
+ * no component in the library positions itself, so the token package has no
+ * layering scale to draw on.
+ */
+.landing-page__nav,
+.system-page__sidebar,
+.system-page__topbar {
+  z-index: 50;
+}
+
 .landing-page__nav {
   position: sticky;
   inset-block-start: 0;
