@@ -11,7 +11,7 @@ import { buildSeverity } from './severity.js'
 /**
  * Build entrypoint. Emits `dist/lattice.css` and `dist/tokens.json`.
  *
- * This build does not gate. Meridian's values are the identity, and five of its
+ * This build does not gate. Meridian's values are the identity, and four of its
  * documented pairs miss WCAG; refusing to write them would refuse to ship the
  * design. Every pair is still measured and printed — see generate/report.ts.
  */
@@ -55,9 +55,15 @@ console.log('  all-pairs cap: %d slots', allPairsCap(MODES))
 const css = emitCss()
 const tokens = `${JSON.stringify(emitTokens(), null, 2)}\n`
 
+// `dist` is a filesystem path, so it is joined as one. Interpolating it back into
+// a `file:` URL would treat `#` and `?` in any parent directory name as a fragment
+// or query and silently truncate the path — writing lattice.css somewhere else
+// entirely, with no error.
 await writeFile(join(dist, 'lattice.css'), css, 'utf8')
 await writeFile(join(dist, 'tokens.json'), tokens, 'utf8')
 
+// Byte length, not string length: the header's em dash is one UTF-16 code unit
+// and three UTF-8 bytes, so `.length` under-reports what was actually written.
 console.log(
   '\nlattice: wrote dist/lattice.css (%d bytes) and dist/tokens.json (%d bytes)',
   Buffer.byteLength(css, 'utf8'),

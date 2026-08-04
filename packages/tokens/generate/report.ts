@@ -2,10 +2,10 @@
  * The contrast ledger.
  *
  * Until 2026-08-03 a missed contract stopped the build. Meridian's values are
- * the identity and five of its documented pairs miss WCAG, so the check became a
+ * the identity and four of its documented pairs miss WCAG, so the check became a
  * report: measured, printed, and shipped anyway.
  *
- * The ledger exists so those five stay visible. A number nobody prints becomes
+ * The ledger exists so those four stay visible. A number nobody prints becomes
  * folklore within a release, and the light-mode focus ring in particular — a
  * focus indicator a keyboard user cannot see — is not something to rediscover.
  *
