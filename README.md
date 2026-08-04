@@ -2,7 +2,7 @@
 
 > The design system behind [tabstop](https://github.com/chameleon-labs/tabstop) and whatever comes next. Accessibility is the constraint, not the feature.
 
-**Status: early development.** Colour, typography, spacing/motion and elevation are specified and built, and fourteen component families ship on top of them; nothing is published yet.
+**Status: early development.** Colour, typography, spacing/motion and elevation are specified and built, and eighteen component families ship on top of them; nothing is published yet.
 
 ## The name
 
@@ -17,7 +17,7 @@ Two packages.
 | Package | What it is |
 |---|---|
 | `@chameleon-labs/lattice-tokens` | foundational design tokens — colour, typography, spacing, sizing, elevation, and motion |
-| `@chameleon-labs/lattice-react` | the component layer on [Ariakit](https://github.com/ariakit/ariakit) — fourteen component families |
+| `@chameleon-labs/lattice-react` | the component layer on [Ariakit](https://github.com/ariakit/ariakit) — eighteen component families |
 
 They are separate because tokens carry no framework dependency and should stay installable by a consumer that never touches React.
 
@@ -41,25 +41,33 @@ Systems that skip the semantic tier end up unable to add a second theme without 
 
 ### Accepted contrast failures
 
-Reported, not hidden, and not fixed by nudging a Meridian value — the values are the identity. Reproduce these with `pnpm --filter @chameleon-labs/lattice-tokens build`; the full ledger is in [the design spec's §9](./docs/superpowers/specs/2026-08-03-meridian-identity-design.md#9-the-contrast-ledger).
+Reported, not hidden, and not fixed by nudging a Meridian value — the values are the identity. **Thirteen documented pairs fail AA**, by explicit approved decision. Reproduce these with `pnpm --filter @chameleon-labs/lattice-tokens build`; the full ledger, including how the count was twice corrected upward as more of the palette was measured, is in [the design spec's §9](./docs/superpowers/specs/2026-08-03-meridian-identity-design.md#9-the-contrast-ledger).
 
 | pair | ratio | needs |
 | --- | --- | --- |
 | light focus ring vs `bg-raised` | **1.55:1** | 3:1 (SC 1.4.11) |
+| light severity moderate text on its own tint | 2.26:1 | 4.5:1 |
 | light `solid` as text on `bg` | 2.94:1 | 4.5:1 |
 | light accent text on its own tint | 2.84:1 | 4.5:1 |
 | light `on-solid` on `solid` | 3.33:1 | 4.5:1 |
 | light warning text on its own tint | 3.15:1 | 4.5:1 |
+| light warning severity text on its own tint | 3.15:1 | 4.5:1 |
 | light success text on its own tint | 3.34:1 | 4.5:1 |
 | light info text on its own tint | 3.61:1 | 4.5:1 |
 | dark `text-subtle` on `bg-raised` | 3.67:1 | 4.5:1 |
+| dark severity minor text on its own tint | 3.27:1 | 4.5:1 |
 | light danger text on its own tint | 4.49:1 | 4.5:1 |
+| light danger severity text on its own tint | 4.49:1 | 4.5:1 |
 
 The light-mode focus ring is the most serious of these: a focus indicator a keyboard user cannot see is not a cosmetic miss, it is a loss of orientation. It ships as delivered because Meridian's own components focus at `ring-primary/40`, and a token nobody reaches for guarantees nothing.
 
+The severity ramp's `critical` and `serious` levels are anchored to the same colours as `danger` and `warning`, so their rows above duplicate them by construction rather than being independent failures — `moderate` and `minor` do not duplicate anything and are the two failures added when the count was corrected from nine to thirteen.
+
+**Anything outside these thirteen is a real defect, not an accepted one.** The `Pages/System` and `Pages/Landing` Storybook stories — see [Development](#development) — are the acceptance test that checks for exactly that distinction: both bundle pages rebuilt from this package's public components alone, swept by the same axe-core suite. See [`docs/superpowers/plans/2026-08-03-meridian-gaps.md`](./docs/superpowers/plans/2026-08-03-meridian-gaps.md) for the full triage of every axe finding against this ledger, the resulting library gap list, and the deliberate omissions (`ScoreArc`, the score-history chart, the untouched shadcn components).
+
 ## Scope
 
-**In:** colour scales, semantic colour tokens, light and dark modes, a per-scale computed on-solid, an ordered severity ramp, validated categorical and sequential chart palettes, primitive and semantic typography tokens, primitive spacing, breakpoints, containers and radii tokens, primitive motion tokens, four elevation roles (theme-independent), and fourteen component families on Ariakit.
+**In:** colour scales, semantic colour tokens, light and dark modes (dark is the default), a per-scale computed on-solid, an ordered severity ramp, validated categorical and sequential chart palettes, primitive and semantic typography tokens, primitive spacing, breakpoints, containers and radii tokens, primitive motion tokens, four elevation roles (theme-independent), and eighteen component families on Ariakit.
 
 **Not yet:** semantic spacing roles, wide-gamut output, forced-colors handling. Each is tracked separately.
 
@@ -87,6 +95,15 @@ pnpm build-storybook # the same gallery, built for production
 
 `pnpm storybook` builds the tokens first, because the gallery imports the emitted
 stylesheet and `dist/` is not committed.
+
+Storybook is also where the acceptance test for this whole identity lives: the
+`Pages/System` and `Pages/Landing` stories are the Meridian documentation site
+and the tabstop landing page, rebuilt using nothing but this package's exported
+components. `tests/browser/a11y.spec.ts` sweeps both, in both themes, with the
+same axe-core suite that checks every component story — see the [accepted
+contrast failures](#accepted-contrast-failures) above for what is expected to
+still fail there, and the [gap list](./docs/superpowers/plans/2026-08-03-meridian-gaps.md)
+for what building them found the library still lacks.
 
 A pnpm workspace. Root scripts fan out to every package; run them inside a package directory to work on one.
 
