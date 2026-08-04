@@ -20,5 +20,4 @@ value repeated across a dozen stylesheets is a value that drifts.
 as a sibling `<span>` rather than a border on the component itself, so it
 never fights a header row's own `border-bottom`.
 
-**Classes:** `.lat-eyebrow`, with `data-rule`; `.lat-eyebrow__rule`,
-`.lat-eyebrow__text`.
+**Classes:** `.lat-eyebrow`; `.lat-eyebrow__rule`, `.lat-eyebrow__text`.

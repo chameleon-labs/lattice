@@ -19,7 +19,6 @@ export function Eyebrow({ rule = false, className, children, ...props }: Eyebrow
     <div
       {...props}
       className={className === undefined ? 'lat-eyebrow' : `lat-eyebrow ${className}`}
-      data-rule={rule ? '' : undefined}
     >
       {rule ? <span className="lat-eyebrow__rule" aria-hidden="true" /> : null}
       <span className="lat-eyebrow__text">{children}</span>
