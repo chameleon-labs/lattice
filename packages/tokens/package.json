@@ -28,6 +28,7 @@
   "exports": {
     "./lattice.css": "./dist/lattice.css",
     "./tokens.json": "./dist/tokens.json",
+    "./contrast-ledger.json": "./dist/contrast-ledger.json",
     "./fonts/*": "./dist/fonts/*",
     "./package.json": "./package.json"
   },

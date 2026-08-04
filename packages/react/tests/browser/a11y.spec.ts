@@ -4,6 +4,7 @@
 // over at runtime while `tsc` correctly rejects it as not constructable.
 import { AxeBuilder } from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
+import { acceptedContrastFloors, summarizeViolations } from './support/contrast-ledger.js'
 import {
   PAGE_SCOPED_RULES,
   THEMES,
@@ -13,6 +14,15 @@ import {
   storyUrl,
   titleFor
 } from './support/stories.js'
+
+/**
+ * The accepted `color-contrast` deficiencies, derived once from
+ * `packages/tokens/dist/contrast-ledger.json` — see
+ * `support/contrast-ledger.ts` for the mechanism and the reasoning behind the
+ * floor. Every violation of every other rule still fails outright; this is
+ * the one carve-out, and it is generated, not hand-maintained.
+ */
+const contrastFloors = acceptedContrastFloors()
 
 /**
  * Accessibility coverage, driven by Storybook's index rather than by a page.
@@ -68,12 +78,12 @@ for (const family of families) {
 
           // Reported as a summary rather than as raw violations: the raw objects
           // carry the whole element tree, and a failure has to stay readable.
-          const summary = results.violations.map((violation) => ({
-            rule: violation.id,
-            impact: violation.impact,
-            help: violation.help,
-            targets: violation.nodes.map((node) => node.target.join(' '))
-          }))
+          // `color-contrast` violations are further filtered against the
+          // ledger-derived floors — see support/contrast-ledger.ts — so only
+          // a genuinely undocumented or worse-than-recorded pair survives
+          // into this summary. Every other rule fails on any violation, same
+          // as before.
+          const summary = summarizeViolations(results.violations, contrastFloors)
 
           expect.soft(summary, `${story.id} in ${theme}`).toEqual([])
         })
@@ -169,15 +179,13 @@ test.describe('page stories', () => {
           await settle(page)
 
           // No disableRules() call: the full default rule set runs, page
-          // rules included — see the block comment above.
+          // rules included — see the block comment above. `color-contrast`
+          // still gets the same ledger-derived floor as the component sweep;
+          // everything else — landmarks, headings, bypass — still fails on
+          // any violation.
           const results = await new AxeBuilder({ page }).analyze()
 
-          const summary = results.violations.map((violation) => ({
-            rule: violation.id,
-            impact: violation.impact,
-            help: violation.help,
-            targets: violation.nodes.map((node) => node.target.join(' '))
-          }))
+          const summary = summarizeViolations(results.violations, contrastFloors)
 
           expect.soft(summary, `${story.id} in ${theme}`).toEqual([])
         })

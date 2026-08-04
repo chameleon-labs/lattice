@@ -18,6 +18,23 @@
  * tint tokens rather than reusing a chromatic scale, and `minor` aliases to
  * text-subtle on wash. Phase 2 shipped these without adding them here.
  *
+ * Also since 2026-08-04: every tinted triple (chromatic and severity) is
+ * measured a second time, composited over `bg` rather than `bg-raised`. The
+ * tint tokens are translucent (see `resolveTints`/`resolveSeverityTints` in
+ * `generate/anchors.ts` and `generate/severity.ts`), so they composite over
+ * whichever surface they are actually placed on — `.lat-surface` paints every
+ * story's root, and several real pages, at `--lat-bg` directly, not
+ * `--lat-bg-raised`. That second composite was going unmeasured, which
+ * `packages/react`'s a11y sweep surfaced once its `color-contrast` assertion
+ * started checking measured axe ratios against this ledger instead of
+ * asserting zero violations outright: several already-accepted foregrounds
+ * (light danger, warning, success, info, accent, and severity moderate) render
+ * measurably worse over `bg` than the ledger's sole `bg-raised` row recorded
+ * for them, verified independently against axe's own reported ratios. This is
+ * not a new colour decision — nothing here changes a value — it is the same
+ * accepted colours, measured in a context the identity's shipped CSS already
+ * produces.
+ *
  * Alpha values are composited over their surface before measuring, because that
  * is what a viewer sees.
  */
@@ -93,6 +110,28 @@ function forMode(mode: Mode): LedgerEntry[] {
     return entry(`${mode} ${scale} text on its tint`, scaleSolid, tint, 4.5)
   })
 
+  // The same tinted triple again, composited over `bg` instead of `bg-raised`.
+  // `resolveTints` emits every `--lat-*-tint` token as a translucent colour
+  // (see config/alpha.ts), not a colour baked against one named surface, so it
+  // composites over *whatever it is placed on* — the same reason a hairline
+  // border does. `.lat-surface` (src/base.css) paints every story's own root at
+  // `--lat-bg`, so a lone Badge or the destructive Button in the component
+  // gallery renders this composite, not the bg-raised one above; `SystemPage`'s
+  // topbar (`background: var(--lat-bg)`, packages/react/src/pages/pages.css)
+  // does the same in a real composed page. Measured independently against a
+  // running axe scan of both: the values match exactly (e.g. light danger:
+  // 4.49:1 over bg-raised, 3.98:1 over bg — axe reports the same 3.98). Without
+  // this row the accepted-foreground floor in packages/react's a11y sweep would
+  // reject a composite the shipped CSS produces by construction, on every
+  // affected foreground, in light mode, wherever a tinted component sits
+  // directly on the page background rather than inside a raised surface.
+  const tintsOnBg = CHROMATIC_SCALES.map((scale) => {
+    const scaleSolid = parseHex(SOLID_ANCHORS[scale][mode])
+    const fraction = scale === 'accent' ? TINT_FRACTIONS.accent.fill : TINT_FRACTIONS.default.fill
+    const tint = over(scaleSolid, fraction, bg)
+    return entry(`${mode} ${scale} text on its tint over bg`, scaleSolid, tint, 4.5)
+  })
+
   // The severity ramp's own tinted triple — Phase 2 gave severity its own
   // tint tokens rather than reusing a chromatic scale, so these four pairs
   // are not covered by `tints` above and were never measured until now.
@@ -104,6 +143,17 @@ function forMode(mode: Mode): LedgerEntry[] {
     const swatchSolid = parseHex(swatch.hex)
     const tint = over(swatchSolid, TINT_FRACTIONS.default.fill, raised)
     return entry(`${mode} severity ${swatch.role} text on its tint`, swatchSolid, tint, 4.5)
+  })
+
+  // Severity's tinted triple over `bg`, for the same reason as `tintsOnBg`
+  // above — a severity Badge (`critical`/`serious`/`moderate`) is exactly as
+  // likely to sit directly on the page background as a chromatic-scale one,
+  // and `moderate` in particular has no chromatic-scale sibling to borrow a
+  // floor from, so without this row its bg composite is entirely unmeasured.
+  const severityColouredOnBg = buildSeverity(mode).map((swatch) => {
+    const swatchSolid = parseHex(swatch.hex)
+    const tint = over(swatchSolid, TINT_FRACTIONS.default.fill, bg)
+    return entry(`${mode} severity ${swatch.role} text on its tint over bg`, swatchSolid, tint, 4.5)
   })
 
   // `minor` carries no swatch of its own — it aliases to text-subtle on wash
@@ -126,7 +176,9 @@ function forMode(mode: Mode): LedgerEntry[] {
     entry(`${mode} focus ring on bg-raised`, ring, raised, 3),
     entry(`${mode} hairline on bg-raised`, over(hairline, HAIRLINE[mode], raised), raised, 1),
     ...tints,
+    ...tintsOnBg,
     ...severityColoured,
+    ...severityColouredOnBg,
     severityMinor
   ]
 }

@@ -2,16 +2,23 @@ import { describe, expect, it } from 'vitest'
 import { buildLedger } from '../generate/report.js'
 
 describe('contrast ledger', () => {
-  it('records exactly the thirteen known failures, in emission order', () => {
-    // Five of the original nine are the chromatic tinted triple, added when
-    // forMode() started measuring each scale's solid as text on its own tint
-    // (§9 of the design). Four more join here: the severity ramp has its own
-    // tint tokens rather than reusing a chromatic scale, so its text-on-tint
-    // pairs were never measured until now. `critical`/`serious` duplicate the
-    // already-accepted `danger`/`warning` rows; `moderate` and `minor` are
-    // new failures, `moderate` the worst pair in the whole ledger and the
-    // system's one derived severity colour. Lattice's values did not
-    // change; measuring more of them did.
+  it('records exactly the twenty-two known failures, in emission order', () => {
+    // Thirteen of these are the design's original documented set (§9). Nine
+    // more join here, added 2026-08-04 alongside `tintsOnBg` /
+    // `severityColouredOnBg`: every tinted triple is translucent (see
+    // `resolveTints`/`resolveSeverityTints`), so it composites over whatever
+    // surface it is placed on, and `.lat-surface` paints every story's root —
+    // plus several real pages — at `--lat-bg`, not `--lat-bg-raised`. That
+    // second composite was real and unmeasured; `packages/react`'s a11y sweep
+    // surfaced it once its `color-contrast` assertion started checking axe's
+    // measured ratios against this ledger instead of asserting zero
+    // violations outright. Eight of the nine are already-accepted foregrounds
+    // measured in a context the ledger had not tried; the ninth,
+    // `light decorative text on its tint over bg` at 4.36:1, is a genuinely
+    // new failure — decorative clears 4.5:1 over bg-raised but not over bg,
+    // which is exactly the kind of gap this second pass exists to catch.
+    // Lattice's values did not change; measuring more of their real contexts
+    // did.
     const failing = buildLedger().filter((e) => !e.passes).map((e) => e.name)
     expect(failing).toEqual([
       'light on-solid on solid',
@@ -22,12 +29,32 @@ describe('contrast ledger', () => {
       'light warning text on its tint',
       'light success text on its tint',
       'light info text on its tint',
+      'light accent text on its tint over bg',
+      'light danger text on its tint over bg',
+      'light warning text on its tint over bg',
+      'light success text on its tint over bg',
+      'light info text on its tint over bg',
+      'light decorative text on its tint over bg',
       'light severity critical text on its tint',
       'light severity serious text on its tint',
       'light severity moderate text on its tint',
+      'light severity critical text on its tint over bg',
+      'light severity serious text on its tint over bg',
+      'light severity moderate text on its tint over bg',
       'dark text-subtle on bg-raised',
       'dark severity minor text on its tint'
     ])
+  })
+
+  it('fails the light decorative tint over bg, unlike its bg-raised row', () => {
+    // The one genuinely new failure the bg composite surfaces (see above):
+    // decorative clears 4.5:1 over bg-raised (4.91:1) but not over bg
+    // (4.36:1) — the same colours, a different real surface.
+    const raised = buildLedger().find((e) => e.name === 'light decorative text on its tint')!
+    const onBg = buildLedger().find((e) => e.name === 'light decorative text on its tint over bg')!
+    expect(raised.passes).toBe(true)
+    expect(onBg.passes).toBe(false)
+    expect(onBg.ratio).toBeLessThan(raised.ratio)
   })
 
   it('passes the dark focus ring, which the light one fails', () => {

@@ -9,11 +9,20 @@ import { buildLedger, formatLedger } from './report.js'
 import { buildSeverity } from './severity.js'
 
 /**
- * Build entrypoint. Emits `dist/lattice.css` and `dist/tokens.json`.
+ * Build entrypoint. Emits `dist/lattice.css`, `dist/tokens.json` and
+ * `dist/contrast-ledger.json`.
  *
  * This build does not gate. Lattice's values are the identity, and a number of
  * its documented pairs miss WCAG; refusing to write them would refuse to ship
  * the design. Every pair is still measured and printed — see generate/report.ts.
+ *
+ * `dist/contrast-ledger.json` is that same measurement, written out as data.
+ * `packages/react`'s a11y sweep reads it to know which `color-contrast` axe
+ * violations are documented, accepted deficiencies rather than new defects —
+ * see `packages/react/tests/browser/support/contrast-ledger.ts`. Emitting it
+ * here, next to `tokens.json`, means the accepted set is generated from this
+ * package's own ledger and cannot drift from it the way a hand-copied list in
+ * the react package would.
  */
 const dist = fileURLToPath(new URL('../dist/', import.meta.url))
 await mkdir(dist, { recursive: true })
@@ -54,6 +63,11 @@ console.log('  all-pairs cap: %d slots', allPairsCap(MODES))
 
 const css = emitCss()
 const tokens = `${JSON.stringify(emitTokens(), null, 2)}\n`
+// The full ledger, passes and failures alike — a consumer deriving an
+// accepted set from this needs to see what passes too, so that a colour
+// which starts failing tomorrow is a new failing entry rather than a colour
+// silently absent from the file.
+const ledgerJson = `${JSON.stringify(ledger, null, 2)}\n`
 
 // `dist` is a filesystem path, so it is joined as one. Interpolating it back into
 // a `file:` URL would treat `#` and `?` in any parent directory name as a fragment
@@ -64,11 +78,14 @@ await cp(fontsSource, join(dist, 'fonts'), { recursive: true })
 
 await writeFile(join(dist, 'lattice.css'), css, 'utf8')
 await writeFile(join(dist, 'tokens.json'), tokens, 'utf8')
+await writeFile(join(dist, 'contrast-ledger.json'), ledgerJson, 'utf8')
 
 // Byte length, not string length: the header's em dash is one UTF-16 code unit
 // and three UTF-8 bytes, so `.length` under-reports what was actually written.
 console.log(
-  '\nlattice: wrote dist/lattice.css (%d bytes) and dist/tokens.json (%d bytes)',
+  '\nlattice: wrote dist/lattice.css (%d bytes), dist/tokens.json (%d bytes) and ' +
+    'dist/contrast-ledger.json (%d bytes)',
   Buffer.byteLength(css, 'utf8'),
-  Buffer.byteLength(tokens, 'utf8')
+  Buffer.byteLength(tokens, 'utf8'),
+  Buffer.byteLength(ledgerJson, 'utf8')
 )
