@@ -18,6 +18,13 @@
   padding: var(--lat-space-6);
 }
 
+/* The page stories own their own padding and layout, so the decorator's is
+   removed for them. Inert until Task 2 introduces .lat-page — see the
+   Phase 3 plan. */
+.lat-story:has(> .lat-page) {
+  padding: 0;
+}
+
 /* Stories lay their examples out in wrapping rows. The gap is a token so the
    gallery cannot drift from the spacing scale it is demonstrating. */
 .lat-story__row {
