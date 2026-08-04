@@ -908,10 +908,12 @@
   flex: 0 0 auto;
   color: var(--lat-text-subtle);
   font-family: var(--lat-font-mono);
-  /* No text role sits at 9px — the nearest is the eyebrow/meta primitive at
-     10px (`--lat-font-size-3xs`). One px short of the source's literal 9px,
-     accepted rather than adding a one-off size token for a single label. */
-  font-size: var(--lat-font-size-3xs);
+  /* `--lat-font-size-4xs`, the source's exact 9px — see typography.ts for
+     why the primitive exists. Previously the eyebrow/meta primitive at 10px
+     (`--lat-font-size-3xs`), one px short and documented as accepted; the
+     trust bar below hit the identical gap, closed here too rather than left
+     as the one instance still absorbing it. */
+  font-size: var(--lat-font-size-4xs);
   opacity: 0.4;
 }
 
@@ -1128,6 +1130,36 @@
    eyebrow override above carries one). */
 .landing-page__trust-stat .lat-stat__value[class] {
   font-size: var(--lat-font-size-xl);
+}
+
+/* The source's stat label is `text-[9px] uppercase tracking-widest` — 9px,
+   not `Stat`'s own eyebrow-role default (`--lat-font-size-3xs`, 10px, the
+   identity's signature size used for every other eyebrow on both pages).
+   `--lat-font-size-4xs` closes the size gap; see typography.ts. Tracking is
+   its own, separate gap: `tracking-widest` is 0.1em (`--lat-letter-spacing-wider`),
+   not the eyebrow role's own 0.2em (`--lat-letter-spacing-eyebrow`) that
+   `Stat`'s label otherwise carries — the same departure from the page's own
+   eyebrow convention the hero kicker's override above already documents, so
+   this rule restates both properties rather than only the font-size. The
+   1px-per-line overshoot from absorbing both as 10px/11px roles was the
+   actual cause of the row's mobile wrap: five stats each a few px wider than
+   the source's own, enough to push the row from two lines to three at
+   428px. At the source's true 9px both properties shrink back and the row
+   wraps at the same point the source's does. Not promoted to a shared role:
+   every 9px instance this page carries (this label/sub, the audit card's
+   timestamp) is a page-local decorative label already reached via
+   page-owned overrides, not a generic library consumer — the eyebrow/meta
+   roles stay 10px/11px for every other, non-landing-page consumer. */
+.landing-page__trust-stat .lat-stat__label[class] {
+  font-size: var(--lat-font-size-4xs);
+  letter-spacing: var(--lat-letter-spacing-wider);
+}
+
+/* The sub line carries no tracking in the source (`text-[9px]` plain) —
+   `Stat`'s own meta role already sets none, so only the size needs
+   restating. */
+.landing-page__trust-stat .lat-stat__sub[class] {
+  font-size: var(--lat-font-size-4xs);
 }
 
 /* ─── Section heads shared by How it works / Why / v1 scope ─────────────── */

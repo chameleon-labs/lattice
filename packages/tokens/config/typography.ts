@@ -18,6 +18,15 @@ export const FONT_FAMILIES = {
 } as const
 
 export const FONT_SIZES = {
+  /**
+   * 9px — the source bundle's own smallest literal (`text-[9px]`), one rung
+   * below the identity's signature 10px. It recurs across unrelated
+   * components — a trust-bar stat's label and sub, an audit card's
+   * timestamp — each of which previously absorbed it as a 1px-short stand-in
+   * on `3xs` rather than carry its own primitive. Added once that stand-in
+   * needed documenting a second time, rather than a third.
+   */
+  '4xs': 0.5625,
   /** 10px — eyebrows, badges, table headers. The identity's signature size. */
   '3xs': 0.625,
   /** 11px — metadata lines. */

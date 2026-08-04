@@ -86,6 +86,7 @@ global.font-size.2xs
 global.font-size.3xl
 global.font-size.3xs
 global.font-size.4xl
+global.font-size.4xs
 global.font-size.5xl
 global.font-size.6xl
 global.font-size.base
