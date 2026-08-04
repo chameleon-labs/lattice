@@ -23,14 +23,23 @@ import { assembleCss } from '../scripts/assemble-css.js'
 
 const css = await assembleCss(fileURLToPath(new URL('../src/styles.css', import.meta.url)))
 
-// Scoped to the exact selector, not a substring another component's rule
-// could also satisfy — .lat-eyebrow__text is unique to this component, and
-// requiring exactly one match guards against a duplicated block silently
-// shadowing a broken one.
-function eyebrowTextBlock(source: string): string {
-  const matches = [...source.matchAll(/\.lat-eyebrow__text\s*\{([^}]*)\}/g)]
+// Scoped to the exact selector — matched whole, not as a substring, so the
+// `[data-tone='accent'] .lat-eyebrow__text` compound (which contains this
+// string too) doesn't also match here. Comments are stripped first so a
+// block comment sitting between the previous rule's `}` and this selector
+// doesn't get swept into the "selector" capture. Requiring exactly one hit
+// guards against a duplicated block silently shadowing a broken one.
+function selectorBlock(source: string, selector: string): string {
+  const stripped = source.replace(/\/\*[\s\S]*?\*\//g, '')
+  const matches = [...stripped.matchAll(/([^{}]+)\{([^}]*)\}/g)].filter(
+    (match) => (match[1] ?? '').trim() === selector
+  )
   expect(matches).toHaveLength(1)
-  return matches[0]?.[1] ?? ''
+  return matches[0]?.[2] ?? ''
+}
+
+function eyebrowTextBlock(source: string): string {
+  return selectorBlock(source, '.lat-eyebrow__text')
 }
 
 describe("Eyebrow's stylesheet", () => {
@@ -39,5 +48,25 @@ describe("Eyebrow's stylesheet", () => {
 
     expect(rule).toContain('letter-spacing: var(--lat-text-eyebrow-letter-spacing);')
     expect(rule).not.toMatch(/letter-spacing:\s*var\(--lat-letter-spacing-/)
+  })
+
+  // The landing page's `SectionEyebrow` (lime, `text-primary`) and the docs
+  // page's `SectionLabel` (`text-muted-foreground`) are the same construction
+  // in two colours in the source bundle. `tone` is what tells them apart, so
+  // this pins which token each side reads — the default block covers the
+  // untagged `.lat-eyebrow__text` rule above, and the accent block covers the
+  // `[data-tone='accent']` override, so a future edit that pointed either one
+  // at the wrong token, or collapsed them into a single colour, fails here.
+  it("default tone reads --lat-text-subtle", () => {
+    const rule = eyebrowTextBlock(css)
+
+    expect(rule).toContain('color: var(--lat-text-subtle);')
+  })
+
+  it("tone='accent' reads --lat-solid", () => {
+    const rule = selectorBlock(css, ".lat-eyebrow[data-tone='accent'] .lat-eyebrow__text")
+
+    expect(rule).toContain('color: var(--lat-solid);')
+    expect(rule).not.toContain('--lat-text-subtle')
   })
 })

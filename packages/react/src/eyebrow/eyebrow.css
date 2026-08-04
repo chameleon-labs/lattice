@@ -28,3 +28,11 @@
   font-weight: var(--lat-text-eyebrow-font-weight);
   color: var(--lat-text-subtle);
 }
+
+/* `accent` — the landing page's `SectionEyebrow` (`text-primary`, lime),
+   used for every section label on that page plus both "Early access"
+   kickers. `subtle` needs no rule of its own: it is the default set on
+   `.lat-eyebrow__text` above. */
+.lat-eyebrow[data-tone='accent'] .lat-eyebrow__text {
+  color: var(--lat-solid);
+}

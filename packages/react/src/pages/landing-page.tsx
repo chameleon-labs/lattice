@@ -272,7 +272,7 @@ function Hero() {
       <div className="landing-page__hero-grid">
         <div className="landing-page__hero-copy">
           <div className="landing-page__hero-kicker">
-            <Eyebrow>Early access</Eyebrow>
+            <Eyebrow tone="accent">Early access</Eyebrow>
             <span className="landing-page__hero-dot" aria-hidden="true" />
             <span className="landing-page__hero-kicker-sub">Building in public</span>
           </div>
@@ -388,7 +388,7 @@ function TrustBar() {
 function HowItWorks() {
   return (
     <Section id="how" className="landing-page__how">
-      <Eyebrow rule className="landing-page__section-eyebrow">
+      <Eyebrow rule tone="accent" className="landing-page__section-eyebrow">
         How it works
       </Eyebrow>
       <h2 className="landing-page__heading landing-page__heading--how">
@@ -464,7 +464,7 @@ function ScoreHistory() {
 function Why() {
   return (
     <Section id="why" className="landing-page__why">
-      <Eyebrow rule className="landing-page__section-eyebrow">
+      <Eyebrow rule tone="accent" className="landing-page__section-eyebrow">
         Why tabstop
       </Eyebrow>
 
@@ -535,7 +535,7 @@ function Why() {
 function V1Scope() {
   return (
     <Section id="scope" className="landing-page__scope">
-      <Eyebrow rule className="landing-page__section-eyebrow">
+      <Eyebrow rule tone="accent" className="landing-page__section-eyebrow">
         v1 scope
       </Eyebrow>
       <h2 className="landing-page__heading landing-page__heading--scope">Deliberately scoped.</h2>
@@ -577,7 +577,9 @@ function CTA() {
   return (
     <div className="landing-page__cta">
       <Section className="landing-page__cta-inner">
-        <Eyebrow className="landing-page__cta-eyebrow">Early access — free</Eyebrow>
+        <Eyebrow tone="accent" className="landing-page__cta-eyebrow">
+          Early access — free
+        </Eyebrow>
         <h2 className="landing-page__heading landing-page__heading--cta">
           Know the moment you break accessibility.
         </h2>
