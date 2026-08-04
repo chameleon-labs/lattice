@@ -1039,7 +1039,7 @@ import { ALPHA_CHANNEL, FOCUS_RING_ALPHA } from '../config/alpha.js'
 import { GRAY_ANCHORS, ON_SOLID_ANCHORS, SOLID_ANCHORS } from '../config/anchors.js'
 import { MODES, type Mode } from '../config/modes.js'
 import { apcaLc, contrastRatio } from './contrast.js'
-import { parseHex, type Rgb } from './oklch.js'
+import { formatHex, parseHex, type Rgb } from './oklch.js'
 
 export interface LedgerEntry {
   readonly name: string
@@ -1051,12 +1051,18 @@ export interface LedgerEntry {
   readonly passes: boolean
 }
 
-/** Composite a translucent colour over an opaque one. */
+/**
+ * Composite a translucent colour over an opaque one.
+ *
+ * `parseHex` returns channels in **0..1**, not 0..255, and `contrastRatio`
+ * expects the same. Do not round here — rounding a 0..1 channel collapses it to
+ * 0 or 1 and every ratio below becomes fiction.
+ */
 function over(fg: Rgb, alpha: number, bg: Rgb): Rgb {
   return {
-    r: Math.round(alpha * fg.r + (1 - alpha) * bg.r),
-    g: Math.round(alpha * fg.g + (1 - alpha) * bg.g),
-    b: Math.round(alpha * fg.b + (1 - alpha) * bg.b)
+    r: alpha * fg.r + (1 - alpha) * bg.r,
+    g: alpha * fg.g + (1 - alpha) * bg.g,
+    b: alpha * fg.b + (1 - alpha) * bg.b
   }
 }
 
@@ -1064,8 +1070,10 @@ function entry(name: string, text: Rgb, background: Rgb, minimum: number): Ledge
   const ratio = contrastRatio(text, background)
   return {
     name,
-    text: `rgb(${text.r} ${text.g} ${text.b})`,
-    background: `rgb(${background.r} ${background.g} ${background.b})`,
+    // formatHex, not a manual rgb() string: the channels are 0..1 floats and
+    // would otherwise print as `rgb(0.811764 0.949019 0.227450)`.
+    text: formatHex(text),
+    background: formatHex(background),
     ratio,
     apca: apcaLc(text, background),
     minimum,
@@ -1082,7 +1090,9 @@ function forMode(mode: Mode): LedgerEntry[] {
   const solid = parseHex(SOLID_ANCHORS.accent[mode])
   const onSolid = parseHex(ON_SOLID_ANCHORS.accent![mode])
   const ring = over(solid, FOCUS_RING_ALPHA, raised)
-  const channel = ALPHA_CHANNEL[mode].split(' ').map(Number)
+  // ALPHA_CHANNEL holds 0..255 strings for CSS output; normalise to the 0..1
+  // the colour maths uses.
+  const channel = ALPHA_CHANNEL[mode].split(' ').map((v) => Number(v) / 255)
   const hairline = { r: channel[0]!, g: channel[1]!, b: channel[2]! }
 
   return [
