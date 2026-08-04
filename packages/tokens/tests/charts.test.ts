@@ -74,12 +74,37 @@ describe('the categorical palette', () => {
 })
 
 describe('the six categorical checks', () => {
-  it.each(MODES)('all pass in %s mode', (mode) => {
-    const report = validateCategorical(buildCategorical(mode), mode)
+  it('all pass in dark mode', () => {
+    const report = validateCategorical(buildCategorical('dark'), 'dark')
 
     expect(report.checks).toHaveLength(6)
     expect(report.ok).toBe(true)
     for (const check of report.checks) {
+      expect(check.state, `${check.name}: ${check.detail}`).toBe('pass')
+    }
+  })
+
+  // Light mode passes ok — a WARN never sets it false — but one check is not a
+  // clean pass, and this pins that explicitly rather than lumping it into the
+  // dark-mode assertion above. CHART_SURFACES was corrected from a fake,
+  // lighter gray-1 hex to Meridian's real background (#f0f0f8, darker), and
+  // measured against the real surface aqua drops just below 3:1. Recorded,
+  // accepted state: a future colour or threshold change that fixes or hides
+  // this must edit this test too, in the open.
+  it('passes ok in light mode, with an accepted relief warning on aqua', () => {
+    const report = validateCategorical(buildCategorical('light'), 'light')
+
+    expect(report.checks).toHaveLength(6)
+    expect(report.ok).toBe(true)
+
+    const contrast = report.checks.find((check) => check.name === 'Contrast vs surface')
+    expect(contrast?.state).toBe('warn')
+    expect(contrast?.detail).toContain('aqua 2.94:1')
+
+    for (const check of report.checks) {
+      if (check.name === 'Contrast vs surface') {
+        continue
+      }
       expect(check.state, `${check.name}: ${check.detail}`).toBe('pass')
     }
   })
@@ -121,14 +146,32 @@ describe('the six categorical checks', () => {
     expect(worstNormal).toBeCloseTo(18.3, 1)
   })
 
-  // "All 8 clear 3:1 in both modes — no relief obligation." The alternative
+  // "All 8 clear 3:1 in dark mode — no relief obligation." The alternative
   // ordering considered during design reached a better CVD number and left four
   // dark slots below 3:1, which would have obliged direct labels forever.
-  it.each(MODES)('needs no relief in %s mode, every slot clearing 3:1', (mode) => {
-    for (const swatch of buildCategorical(mode)) {
-      expect(ratio(swatch.hex, CHART_SURFACES[mode]), swatch.name).toBeGreaterThanOrEqual(
+  it('needs no relief in dark mode, every slot clearing 3:1', () => {
+    for (const swatch of buildCategorical('dark')) {
+      expect(ratio(swatch.hex, CHART_SURFACES.dark), swatch.name).toBeGreaterThanOrEqual(
         CHECKS.contrastMin
       )
+    }
+  })
+
+  // Light mode does not clear this cleanly once measured against the real
+  // surface: aqua needs relief (a visible label, a gap, or a table view — see
+  // the "Contrast vs surface" WARN above), and this pins its exact ratio as an
+  // accepted, recorded state rather than leaving the shortfall unasserted.
+  // Every other light slot still clears 3:1 outright.
+  it('needs relief for aqua alone in light mode; every other slot clears 3:1', () => {
+    for (const swatch of buildCategorical('light')) {
+      const measured = ratio(swatch.hex, CHART_SURFACES.light)
+
+      if (swatch.name === 'aqua') {
+        expect(measured, swatch.name).toBeCloseTo(2.94, 2)
+        expect(measured, swatch.name).toBeLessThan(CHECKS.contrastMin)
+      } else {
+        expect(measured, swatch.name).toBeGreaterThanOrEqual(CHECKS.contrastMin)
+      }
     }
   })
 
@@ -231,8 +274,8 @@ describe('the sequential ramp', () => {
   // Ordinal encoding measures the clamped range, not the full ramp. The full
   // ramp fails the light-end floor by construction — which is precisely the
   // failure the clamp exists to prevent — so the two are asserted separately.
-  it.each(MODES)('passes the ordinal checks over its clamped range in %s mode', (mode) => {
-    const report = validateSequential(ordinalRange(mode), mode)
+  it('passes every ordinal check over its clamped range in dark mode', () => {
+    const report = validateSequential(ordinalRange('dark'), 'dark')
 
     expect(report.checks).toHaveLength(4)
     for (const check of report.checks) {
@@ -240,11 +283,51 @@ describe('the sequential ramp', () => {
     }
   })
 
-  it.each(MODES)('fails the ordinal light-end floor unclamped in %s mode', (mode) => {
-    const report = validateSequential(buildSequential(), mode)
+  // Light mode does not clear its own clamp once measured against the real
+  // surface (#f0f0f8, corrected from a fake, lighter gray-1 hex): step 300 —
+  // the clamp's own light boundary — measures 1.83:1 against the 2:1 floor.
+  // This is the headline chart finding from validating against the real
+  // background; recorded here as an accepted failure rather than left
+  // unasserted, same as the contrast ledger's accepted failures in
+  // tests/report.test.ts. It must not be "fixed" by moving ORDINAL_CLAMP or
+  // any chart colour — see docs/superpowers/specs/2026-08-03-meridian-identity-design.md §9.
+  it('fails its own light-end clamp floor in light mode, recorded and accepted', () => {
+    const report = validateSequential(ordinalRange('light'), 'light')
+
+    expect(report.checks).toHaveLength(4)
+    const lightEnd = report.checks.find((check) => check.name === 'Light-end contrast')
+    expect(lightEnd?.state).toBe('fail')
+    expect(lightEnd?.detail).toBe('300 at 1.83:1 against #f0f0f8')
+    expect(report.ok).toBe(false)
+
+    for (const check of report.checks) {
+      if (check.name === 'Light-end contrast') {
+        continue
+      }
+      expect(check.state, `${check.name}: ${check.detail}`).toBe('pass')
+    }
+  })
+
+  it('fails the ordinal light-end floor unclamped in light mode', () => {
+    const report = validateSequential(buildSequential(), 'light')
     const lightEnd = report.checks.find((check) => check.name === 'Light-end contrast')
 
     expect(lightEnd?.state).toBe('fail')
+  })
+
+  // Unclamped dark now *passes* the light-end floor: the real dark background
+  // (#0c0c14) is slightly darker than the fake gray-1 hex this used to be
+  // measured against, and the ramp's palest step (100) is not what's tested
+  // here — it's the darkest unclamped end, step 700, at 2.06:1, just above the
+  // 2:1 floor. Recorded explicitly rather than silently dropped from the
+  // it.each above, so a future surface or ramp change that pushes this back
+  // under the floor is forced into the open rather than passing quietly.
+  it('passes the ordinal light-end floor unclamped in dark mode', () => {
+    const report = validateSequential(buildSequential(), 'dark')
+    const lightEnd = report.checks.find((check) => check.name === 'Light-end contrast')
+
+    expect(lightEnd?.state).toBe('pass')
+    expect(lightEnd?.detail).toBe('700 at 2.06:1 against #0c0c14')
   })
 
   it('drops the end that would vanish into the surface', () => {
@@ -346,13 +429,31 @@ describe('a ramp declared the other way round', () => {
 
 describe('the ordinal clamp', () => {
   // The full range is for sequential encoding, where the palest step may recede
-  // into the surface. Ordinal marks each have to read, so the ends clamp.
-  it.each(MODES)('names a step that clears the ordinal floor in %s mode', (mode) => {
-    const clamp = ORDINAL_CLAMP[mode]
+  // into the surface. Ordinal marks each have to read, so the ends clamp — in
+  // dark mode this still holds against the real surface.
+  it('names a step that clears the ordinal floor in dark mode', () => {
+    const clamp = ORDINAL_CLAMP.dark
     const swatch = buildSequential().find((entry) => entry.step === clamp)!
 
     expect(swatch).toBeDefined()
-    expect(ratio(swatch.hex, CHART_SURFACES[mode])).toBeGreaterThanOrEqual(CHECKS.ordinalLightFloor)
+    expect(ratio(swatch.hex, CHART_SURFACES.dark)).toBeGreaterThanOrEqual(CHECKS.ordinalLightFloor)
+  })
+
+  // In light mode the clamp's own boundary step no longer clears the floor
+  // once measured against Meridian's real background (#f0f0f8) instead of the
+  // fake, lighter gray-1 hex this used to be checked against — this is the
+  // same accepted failure as "fails its own light-end clamp floor in light
+  // mode" above and in the chart-check output `build.ts` prints. Recorded
+  // explicitly rather than silently no longer clearing an assertion that used
+  // to hold for both modes.
+  it('no longer clears the ordinal floor in light mode, recorded and accepted', () => {
+    const clamp = ORDINAL_CLAMP.light
+    const swatch = buildSequential().find((entry) => entry.step === clamp)!
+
+    expect(swatch).toBeDefined()
+    const measured = ratio(swatch.hex, CHART_SURFACES.light)
+    expect(measured).toBeCloseTo(1.83, 2)
+    expect(measured).toBeLessThan(CHECKS.ordinalLightFloor)
   })
 
   it('clamps the light end at 300 and the dark end at 600', () => {
@@ -362,13 +463,17 @@ describe('the ordinal clamp', () => {
     expect(SEQUENTIAL.map((entry) => entry.step)).toContain(ORDINAL_CLAMP.dark)
   })
 
-  it('reports the documented ratios at the clamped ends', () => {
+  it('reports the measured ratios at the clamped ends', () => {
     const ramp = buildSequential()
     const at = (step: number): string => ramp.find((entry) => entry.step === step)!.hex
 
-    // The spec quotes 2.04:1 at step 300 on light and 3.28:1 at 600 on dark.
-    expect(ratio(at(300), CHART_SURFACES.light)).toBeCloseTo(2.04, 1)
-    expect(ratio(at(600), CHART_SURFACES.dark)).toBeCloseTo(3.28, 1)
+    // Both figures moved when CHART_SURFACES was corrected from the retired,
+    // fake gray-1 hexes to Meridian's real backgrounds. The spec used to quote
+    // 2.04:1 at step 300 on light and 3.28:1 at 600 on dark; measured against
+    // the real surfaces those are now 1.83:1 (light — below the 2:1 floor, an
+    // accepted failure, see above) and 3.39:1 (dark — still clears comfortably).
+    expect(ratio(at(300), CHART_SURFACES.light)).toBeCloseTo(1.83, 1)
+    expect(ratio(at(600), CHART_SURFACES.dark)).toBeCloseTo(3.39, 1)
   })
 })
 
