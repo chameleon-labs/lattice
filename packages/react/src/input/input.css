@@ -32,3 +32,21 @@
   cursor: not-allowed;
   opacity: 0.5;
 }
+
+/*
+ * An invalid field must look invalid, not merely announce itself as invalid.
+ * The border carries it because the field already has one at rest — a state
+ * that only added a shadow would vanish under forced-colors, where the UA
+ * strips shadows.
+ *
+ * Colour is not the only cue: TextField renders its error message in the meta
+ * role beneath the control, and the two work together. This is the visual half.
+ */
+.lat-input[aria-invalid='true'] {
+  border-color: var(--lat-danger-solid);
+}
+
+.lat-input[aria-invalid='true']:focus-visible {
+  border-color: var(--lat-danger-solid);
+  box-shadow: 0 0 0 1px var(--lat-danger-solid);
+}

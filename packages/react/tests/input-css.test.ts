@@ -7,7 +7,7 @@
  * jsdom, where the global URL resolves relative imports against the
  * document's base instead of import.meta.url.
  *
- * This file exists because two plausible-but-wrong token references would be
+ * This file exists because plausible-but-wrong token references would be
  * invisible to everything else in the suite. `stylesheet.test.ts`'s
  * "references only tokens the token package declares" only checks that a
  * referenced var() name is declared *somewhere* — `--lat-bg` and
@@ -19,6 +19,16 @@
  * instead of `code`'s — an easy slip, since both roles exist side by side in
  * the token package and a `ui`-role reference is exactly as "declared
  * somewhere" as a `code`-role one.
+ *
+ * The `aria-invalid` block guards a real regression: an earlier version of
+ * this file dropped invalid-state styling entirely, so a field could carry
+ * `aria-invalid="true"` and look identical to a valid one — the error was
+ * announced to assistive technology but invisible to a sighted user filling
+ * the form. Nothing DOM-level catches that, since `aria-invalid` was still
+ * set correctly; only reading the CSS shows the border never changed colour.
+ * The focus-visible half matters separately: without it, focusing an invalid
+ * field would replace the danger border with the ordinary accent focus ring,
+ * and the cue would vanish at exactly the moment someone is correcting it.
  */
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
@@ -49,5 +59,20 @@ describe("Input's stylesheet", () => {
 
     expect(rule).toContain('font-family: var(--lat-text-code-font-family);')
     expect(rule).not.toContain('font-family: var(--lat-text-ui-font-family);')
+  })
+
+  it('turns an invalid field visibly invalid, in --lat-danger-solid, not the ordinary border', () => {
+    const rule = block(`.lat-input[aria-invalid='true']`)
+
+    expect(rule).toContain('border-color: var(--lat-danger-solid);')
+    expect(rule).not.toMatch(/border-color:\s*var\(--lat-border\);/)
+  })
+
+  it('keeps the danger cue through focus, rather than losing it to the accent focus ring', () => {
+    const rule = block(`.lat-input[aria-invalid='true']:focus-visible`)
+
+    expect(rule).toContain('border-color: var(--lat-danger-solid);')
+    expect(rule).toContain('box-shadow: 0 0 0 1px var(--lat-danger-solid);')
+    expect(rule).not.toMatch(/var\(--lat-focus-ring\)/)
   })
 })

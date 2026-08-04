@@ -53,7 +53,7 @@
 
 .lat-switch:disabled {
   background-color: var(--lat-gray-component);
-  border-color: var(--lat-gray-border);
+  border-color: var(--lat-border);
   cursor: not-allowed;
 }
 

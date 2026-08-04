@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Input, type InputSize } from './input.js'
-
-const SIZES: readonly InputSize[] = ['sm', 'md', 'lg']
+import { Input } from './input.js'
 
 /**
  * A bare input, with no label of its own.
@@ -18,9 +16,6 @@ const meta = {
   args: {
     'aria-label': 'Page URL',
     placeholder: 'https://example.com/checkout'
-  },
-  argTypes: {
-    size: { control: 'inline-radio', options: SIZES }
   }
 } satisfies Meta<typeof Input>
 
@@ -30,18 +25,7 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
-/** `size` still sets `data-size`; Meridian's field styling does not vary by it. */
-export const Sizes: Story = {
-  render: (args) => (
-    <div className="lat-story__stack">
-      {SIZES.map((size) => (
-        <Input {...args} key={size} size={size} aria-label={`Page URL ${size}`} />
-      ))}
-    </div>
-  )
-}
-
-/** `invalid` sets `aria-invalid`; the red is the confirmation, never the message. */
+/** `invalid` sets `aria-invalid`; the red border is the confirmation, never the message. */
 export const Invalid: Story = {
   args: { invalid: true, 'aria-label': 'Page URL, invalid' }
 }

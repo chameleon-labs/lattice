@@ -4,11 +4,10 @@ import { Input } from '../src/input/input.js'
 import { TextField } from '../src/text-field/text-field.js'
 
 describe('Input', () => {
-  it('defaults to medium and is not invalid', () => {
+  it('is not invalid by default', () => {
     render(<Input aria-label="URL" />)
     const input = screen.getByLabelText('URL')
 
-    expect(input.dataset['size']).toBe('md')
     expect(input.getAttribute('aria-invalid')).toBeNull()
   })
 
@@ -16,6 +15,15 @@ describe('Input', () => {
     render(<Input aria-label="URL" invalid />)
 
     expect(screen.getByLabelText('URL').getAttribute('aria-invalid')).toBe('true')
+  })
+
+  // There is no size prop: every field in Meridian's source design renders at
+  // one size, so this system doesn't offer a knob the design never turns.
+  it('does not accept a size prop', () => {
+    render(<Input aria-label="URL" />)
+    const input = screen.getByLabelText('URL')
+
+    expect(input.dataset['size']).toBeUndefined()
   })
 
   it('adds className rather than replacing it', () => {
