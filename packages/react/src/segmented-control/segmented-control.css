@@ -6,7 +6,14 @@
   border-radius: var(--lat-radius-none);
 }
 
-.lat-segmented-control__item { cursor: pointer; }
+/* Establishes the containing block for the absolutely-positioned hidden input
+   below. No offsets are set today, so this is inert in practice — but without
+   it, the input's containing block would silently fall back to whatever
+   positioned ancestor happens to exist, which is a trap the moment one does. */
+.lat-segmented-control__item {
+  position: relative;
+  cursor: pointer;
+}
 
 /* The input carries the semantics and the focus target; the label carries the
    appearance. It is not display:none, which would take it out of the

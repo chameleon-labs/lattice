@@ -27,7 +27,15 @@ export const Default: Story = {
   )
 }
 
-/** A disabled item stays in the roving-focus order; it just cannot be selected. */
+/**
+ * A disabled item is skipped entirely by arrow-key navigation, not merely
+ * unselectable within it. Ariakit's radio store, unlike its `Tab`, does not
+ * default `accessibleWhenDisabled` to true — verified directly: from "This
+ * page", ArrowRight skips the disabled "User flow" and wraps to "Whole
+ * site". That is also how a native `<input type="radio" disabled>` behaves
+ * in a browser's own arrow-key handling for a radio group, so this is the
+ * correct default here, not a gap to paper over.
+ */
 export const WithDisabledItem: Story = {
   args: { children: null },
   render: () => (
