@@ -44,7 +44,7 @@ export const TINT_FRACTIONS = {
  * `ring-primary/40`. The value components actually use is the one emitted, since
  * a token nobody reaches for guarantees nothing.
  *
- * Recorded consequence: in light mode this lands at 1.56:1 against the card,
+ * Recorded consequence: in light mode this lands at 1.55:1 against the card,
  * below the 3:1 that SC 1.4.11 requires of a focus indicator. It ships as
  * delivered — see the spec's §9 ledger.
  */
