@@ -7,17 +7,16 @@
  * jsdom, where the global URL resolves relative imports against the
  * document's base instead of import.meta.url.
  *
- * This file exists because SegmentedControl's selected state — background
- * plus box-shadow, nothing positional — has nothing left once forced-colors
- * strips box-shadow and overrides background: unlike Switch (whose checked
- * state is a *transform*, which survives) or Tabs (whose selected state is a
- * real border that stays distinguishable because forced-colors preserves
- * `transparent` rather than overriding it), every segment would render
- * identically. No unit test in segmented-control.test.tsx evaluates CSS, and
- * segmented-control-css.test.ts only covers the non-forced-colors rules, so
- * neither would catch the `@media (forced-colors: active)` block going
- * missing, or its checked-label rule losing the `background`/`color` pair
- * that carries the entire signal in that mode.
+ * This file exists because Menu's active-item marker — `[data-active-item]`
+ * with a `--lat-wash` background and no border — has nothing left once
+ * forced-colors strips box-shadow (moot here, there is none) and overrides
+ * background: the same shape SegmentedControl's checked state took, which
+ * segmented-control-forced-colors-css.test.ts guards for the same reason.
+ * No unit test in menu.test.tsx evaluates CSS, and no other test in this
+ * suite would catch the `@media (forced-colors: active)` block going
+ * missing, or its rule losing the `background`/`color` pair that carries the
+ * entire signal in that mode — leaving every menu item, active or not,
+ * rendered identically to a forced-colors user.
  */
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
@@ -46,10 +45,12 @@ function balancedBlock(source: string, openBraceIndex: number): string {
 
 // Each of the two components with a forced-colors fallback declares its own
 // `@media (forced-colors: active)` block in its own file, so the assembled
-// stylesheet contains more than one. Concatenating every match rather than
-// returning only the first is what keeps this test correct regardless of
-// import order — a regex anchored to the first occurrence would silently
-// start reading a sibling component's block once a second one existed.
+// stylesheet contains more than one — Menu's and SegmentedControl's.
+// Concatenating every match rather than returning only the first is what
+// keeps this test correct regardless of import order — a regex anchored to
+// the first occurrence would silently start reading a sibling component's
+// block once a second one existed, which is exactly what broke
+// segmented-control-forced-colors-css.test.ts when this one was added.
 function mediaBlock(query: string): string {
   const pattern = new RegExp(`${escapeRegExp(query)}\\s*\\{`, 'g')
   const blocks: string[] = []
@@ -74,14 +75,14 @@ function block(source: string, selector: string): string {
   return match[1] ?? ''
 }
 
-describe("SegmentedControl's forced-colors fallback", () => {
+describe("Menu's forced-colors fallback", () => {
   it('declares a forced-colors block', () => {
     expect(css).toMatch(/@media \(forced-colors: active\)\s*\{/)
   })
 
-  it('gives the checked label both a background and a colour inside that block, from the system palette', () => {
+  it('gives the active item both a background and a colour inside that block, from the system palette', () => {
     const media = mediaBlock('@media (forced-colors: active)')
-    const rule = block(media, '.lat-segmented-control__input:checked + .lat-segmented-control__label')
+    const rule = block(media, ".lat-menu__item[data-active-item]")
 
     expect(rule).toContain('background: Highlight;')
     expect(rule).toContain('color: HighlightText;')

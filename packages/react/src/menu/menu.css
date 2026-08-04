@@ -5,16 +5,17 @@
   padding: var(--lat-space-1);
 
   color: var(--lat-text);
-  /* The overlay elevation role: surface, border and shadow together. */
-  background-color: var(--lat-elevation-overlay-surface);
-  border: 1px solid var(--lat-elevation-overlay-border);
-  border-radius: var(--lat-radius-md);
-  box-shadow: var(--lat-elevation-overlay-shadow);
+  background: var(--lat-bg-raised);
+  /* The hairline is the edge that survives forced-colors, where the user agent
+     strips shadows and flattens surfaces. The shadow is the enhancement. */
+  border: 1px solid var(--lat-border);
+  border-radius: var(--lat-radius-none);
+  box-shadow: var(--lat-elevation-overlay);
 
   opacity: 0;
   transition-property: opacity;
-  transition-duration: var(--lat-duration-slow);
-  transition-timing-function: var(--lat-easing-entrance);
+  transition-duration: var(--lat-duration-default);
+  transition-timing-function: var(--lat-easing-out);
 }
 
 .lat-menu[data-enter] {
@@ -33,24 +34,28 @@
 
   font-family: var(--lat-text-ui-font-family);
   font-size: var(--lat-text-ui-font-size);
+  font-weight: var(--lat-text-ui-font-weight);
   line-height: var(--lat-text-ui-line-height);
+  color: var(--lat-text);
 
   padding: var(--lat-space-2) var(--lat-space-3);
-  border-radius: var(--lat-radius-sm);
+  border-radius: var(--lat-radius-none);
   cursor: pointer;
 }
 
 /* Ariakit marks the roving-focus item with data-active-item, which is the
    keyboard user's position — it must look focused even though DOM focus stays
-   on the menu. */
+   on the menu. This is a background with no border, the same shape
+   SegmentedControl's selected state took: nothing here survives
+   forced-colors unassisted, so the block below restates it explicitly. */
 .lat-menu__item[data-active-item] {
-  background-color: var(--lat-component-hover);
+  background: var(--lat-wash);
 }
 
 .lat-menu__separator {
   margin: var(--lat-space-1) 0;
   border: none;
-  border-block-start: 1px solid var(--lat-border-subtle);
+  border-top: 1px solid var(--lat-border);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -61,5 +66,21 @@
 
   .lat-menu[data-enter] {
     transform: translateY(0);
+  }
+}
+
+/*
+ * Forced-colors strips box-shadow and overrides background, which between
+ * them are the entire active-item signal above — there is no border and no
+ * positional cue to fall back on, the same shape SegmentedControl's checked
+ * state took. Highlight/HighlightText are the system pair for exactly this:
+ * a selected item within a set, using the colours the user's own
+ * high-contrast theme has already chosen for that meaning.
+ */
+@media (forced-colors: active) {
+  .lat-menu__item[data-active-item] {
+    background: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
   }
 }
