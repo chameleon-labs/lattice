@@ -87,3 +87,6 @@ export type { EyebrowProps } from './eyebrow/eyebrow.js'
 
 export { Stat } from './stat/stat.js'
 export type { StatProps } from './stat/stat.js'
+
+export { CodeBlock } from './code-block/code-block.js'
+export type { CodeBlockProps } from './code-block/code-block.js'
