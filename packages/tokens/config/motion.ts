@@ -1,15 +1,9 @@
 /**
  * Theme-independent motion primitives.
  *
- * Values come from the approved motion spec. Durations are stored as the numeric
- * part of a `ms` duration and easings as the four-number tuple a `cubic-bezier()`
- * takes, so the CSS and DTCG emitters format the same source without parsing
- * strings.
- *
- * The ceiling is deliberate: nothing here exceeds `400ms`, which is the point at
- * which a transition stops reading as feedback and starts reading as a wait.
- * `instant` exists so a state change that must not animate can say so with a
- * token rather than by omitting one.
+ * Durations are stored as the numeric part of a `ms` duration and easings as the
+ * four-number tuple a `cubic-bezier()` takes, so the CSS and DTCG emitters format
+ * the same source without parsing strings.
  *
  * What this file does **not** carry is reduced-motion behavior. Honouring
  * `prefers-reduced-motion` means removing transform and positional movement while
@@ -21,18 +15,32 @@
 /** The four control-point components a `cubic-bezier()` takes. */
 export type EasingCurve = readonly [number, number, number, number]
 
+/**
+ * Motion.
+ *
+ * Meridian's five presets, from its documentation site's motion section.
+ *
+ * `expressive` is a duration and nothing else. Its listed easing is "spring",
+ * which no CSS timing function reproduces, and Lattice does not take a
+ * JavaScript animation dependency to provide one. The token records the 500ms
+ * intent; a caller wanting true spring behaviour brings its own library. No
+ * component in this system uses it.
+ */
 export const DURATIONS = {
   instant: 0,
-  fast: 100,
-  base: 150,
-  slow: 250,
-  slower: 400
+  swift: 100,
+  default: 200,
+  deliberate: 350,
+  expressive: 500
 } as const satisfies Readonly<Record<string, number>>
 
+/**
+ * Two curves, because Meridian names two: `ease-out` for entrances and state
+ * changes, `ease-in-out` for the deliberate tier.
+ */
 export const EASINGS = {
-  standard: [0.2, 0, 0, 1],
-  entrance: [0, 0, 0, 1],
-  exit: [0.3, 0, 1, 1]
+  out: [0, 0, 0.2, 1],
+  'in-out': [0.4, 0, 0.2, 1]
 } as const satisfies Readonly<Record<string, EasingCurve>>
 
 export type DurationName = keyof typeof DURATIONS
