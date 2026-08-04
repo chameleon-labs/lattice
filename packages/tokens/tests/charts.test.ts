@@ -8,7 +8,7 @@ import {
   ORDINAL_CLAMP,
   SEQUENTIAL
 } from '../config/charts.js'
-import { MODES, type Mode } from '../config/lightness.js'
+import { MODES, type Mode } from '../config/modes.js'
 import {
   allPairsCap,
   buildCategorical,

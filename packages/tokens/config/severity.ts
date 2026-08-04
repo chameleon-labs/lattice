@@ -27,7 +27,7 @@
  * something to rely on, which is what the usage rule above exists for.
  */
 
-import type { Mode } from './lightness.js'
+import type { Mode } from './modes.js'
 
 /** Ordered from least to most severe. The order is the point. */
 export const SEVERITY_LEVELS = ['minor', 'moderate', 'serious', 'critical'] as const

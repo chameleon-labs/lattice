@@ -12,7 +12,7 @@
  * what it produced is config.
  */
 
-import type { Mode } from './lightness.js'
+import type { Mode } from './modes.js'
 
 export type Tier = 'hi' | 'lo'
 

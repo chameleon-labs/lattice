@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { CHART_SURFACES } from '../config/charts.js'
-import { MODES } from '../config/lightness.js'
+import { MODES } from '../config/modes.js'
 import {
   SEVERITY_CONTRAST_MIN,
   SEVERITY_DARK,

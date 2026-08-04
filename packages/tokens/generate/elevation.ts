@@ -16,7 +16,7 @@ import {
   type ShadowName,
   type ShadowRecipe
 } from '../config/elevation.js'
-import type { Mode } from '../config/lightness.js'
+import type { Mode } from '../config/modes.js'
 
 /**
  * The shadow's colour.

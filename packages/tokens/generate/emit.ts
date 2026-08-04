@@ -12,7 +12,7 @@
  */
 
 import { ORDINAL_CLAMP } from '../config/charts.js'
-import { MODES, STEPS, type Mode } from '../config/lightness.js'
+import { MODES, STEPS, type Mode } from '../config/modes.js'
 import { ON_SOLID_ROLE, ROLE_ALIASES, STEP_SLUGS } from '../config/semantic.js'
 import { SCALE_JOBS, STEP_JOBS } from '../config/steps.js'
 import { buildCategorical, buildSequential } from './charts.js'

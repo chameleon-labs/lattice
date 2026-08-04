@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { MODES, STEPS } from '../config/lightness.js'
+import { MODES, STEPS } from '../config/modes.js'
 import { SCALE_NAMES } from '../config/scales.js'
 import { ON_SOLID_ROLE, ROLE_ALIASES, ROLE_NAMES, STEP_SLUGS } from '../config/semantic.js'
 import { emitCss } from '../generate/emit.js'

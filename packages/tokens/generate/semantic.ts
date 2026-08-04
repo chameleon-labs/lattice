@@ -6,7 +6,7 @@
  * carries meaning, and the primitives carry the values.
  */
 
-import { STEPS, type Mode } from '../config/lightness.js'
+import { STEPS, type Mode } from '../config/modes.js'
 import { SCALE_NAMES } from '../config/scales.js'
 import { ON_SOLID_ROLE, ROLE_ALIASES, STEP_SLUGS } from '../config/semantic.js'
 import type { OnSolid, Scale } from './scale.js'

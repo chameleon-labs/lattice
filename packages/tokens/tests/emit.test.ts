@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { MODES, STEPS } from '../config/lightness.js'
+import { MODES, STEPS } from '../config/modes.js'
 import { SCALE_NAMES } from '../config/scales.js'
 import { SEVERITY_LEVELS } from '../config/severity.js'
 import { TYPOGRAPHY_ROLES } from '../config/typography-roles.js'

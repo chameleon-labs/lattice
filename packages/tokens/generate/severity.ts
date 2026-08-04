@@ -7,7 +7,7 @@
  */
 
 import { CHART_SURFACES } from '../config/charts.js'
-import type { Mode } from '../config/lightness.js'
+import type { Mode } from '../config/modes.js'
 import {
   SEVERITY,
   SEVERITY_CONTRAST_MIN,

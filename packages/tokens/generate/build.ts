@@ -2,7 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { MODES } from '../config/lightness.js'
+import { MODES } from '../config/modes.js'
 import {
   allPairsCap,
   buildCategorical,
