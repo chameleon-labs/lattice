@@ -1306,28 +1306,37 @@ becoming folklore."
 // packages/tokens/tests/typography.test.ts
 import { describe, expect, it } from 'vitest'
 import { FONT_FAMILIES, FONT_SIZES, FONT_WEIGHTS, LETTER_SPACINGS } from '../config/typography.js'
+import { typographyCss } from '../generate/typography.js'
 
 describe('typography primitives', () => {
   it('leads the sans stack with Instrument Sans', () => {
-    expect(FONT_FAMILIES.sans).toContain("'Instrument Sans'")
+    expect(FONT_FAMILIES.sans[0]).toBe('Instrument Sans')
   })
 
   it('leads the mono stack with JetBrains Mono', () => {
-    expect(FONT_FAMILIES.mono).toContain("'JetBrains Mono'")
+    expect(FONT_FAMILIES.mono[0]).toBe('JetBrains Mono')
   })
 
   it("carries Meridian's scale including the 10px micro size", () => {
-    expect(FONT_SIZES['3xs'].rem).toBe(0.625)
-    expect(FONT_SIZES.base.rem).toBe(1)
-    expect(FONT_SIZES['5xl'].rem).toBe(3)
+    expect(FONT_SIZES['3xs']).toBe(0.625)
+    expect(FONT_SIZES.base).toBe(1)
+    expect(FONT_SIZES['5xl']).toBe(3)
   })
 
   it('carries the 0.2em eyebrow tracking', () => {
-    expect(LETTER_SPACINGS.eyebrow.em).toBe(0.2)
+    expect(LETTER_SPACINGS.eyebrow).toBe(0.2)
   })
 
   it('carries the four weights Meridian uses', () => {
-    expect(Object.values(FONT_WEIGHTS).map((w) => w.value).sort()).toEqual([400, 500, 600, 700])
+    expect(Object.values(FONT_WEIGHTS).sort()).toEqual([400, 500, 600, 700])
+  })
+
+  it('emits tracking in em, not rem', () => {
+    // Tracking must scale with the text it tracks. The eyebrow's 0.2em at 10px
+    // is 2px; the same value as rem would be 3.2px regardless of font size,
+    // and would grow relative to the glyphs at every size below 1rem —
+    // which is every size the mono roles use.
+    expect(typographyCss()).toContain('--lat-letter-spacing-eyebrow: 0.2em;')
   })
 })
 ```
@@ -1339,7 +1348,18 @@ Expected: FAIL — `FONT_SIZES['3xs']` is undefined
 
 - [ ] **Step 3: Rewrite `config/typography.ts`**
 
-Keep the existing exported shapes (`{ rem: number }`, `{ value: number }`, `{ em: number }`) so the generators are untouched. Replace the values:
+**Corrected 2026-08-04.** An earlier draft of this step claimed the existing
+exports were wrapper objects (`{ rem: number }`, `{ value: number }`,
+`{ em: number }`) and that keeping them would leave the generators untouched.
+That was wrong — the existing config uses **plain numbers**, and
+`FONT_FAMILIES` holds **arrays of strings** which `generate/typography.ts`
+joins with a `cssFamily` helper that quotes any name containing a space.
+Introducing wrappers made `typographyCss()` throw on `stack.map` and emit
+`[object Object]` for every other group, so no typography primitive reached the
+stylesheet at all.
+
+Keep the plain shapes. The only unit that changes is letter-spacing, from rem
+to em — see Step 3b.
 
 ```ts
 /**
@@ -1353,56 +1373,104 @@ Keep the existing exported shapes (`{ rem: number }`, `{ value: number }`, `{ em
  * components use that the specimen does not list — 10px and 11px, which carry
  * every eyebrow, badge and table header in both demo pages.
  */
+const SYSTEM_SANS = ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif']
+
 export const FONT_FAMILIES = {
-  sans: "'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif",
-  mono: "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+  sans: ['Instrument Sans', ...SYSTEM_SANS],
+  mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace']
 } as const
 
 export const FONT_SIZES = {
   /** 10px — eyebrows, badges, table headers. The identity's signature size. */
-  '3xs': { rem: 0.625 },
+  '3xs': 0.625,
   /** 11px — metadata lines. */
-  '2xs': { rem: 0.6875 },
-  xs: { rem: 0.75 },
-  sm: { rem: 0.875 },
-  base: { rem: 1 },
-  lg: { rem: 1.125 },
-  xl: { rem: 1.25 },
-  '2xl': { rem: 1.5 },
-  '3xl': { rem: 1.875 },
-  '5xl': { rem: 3 }
+  '2xs': 0.6875,
+  xs: 0.75,
+  sm: 0.875,
+  base: 1,
+  lg: 1.125,
+  xl: 1.25,
+  '2xl': 1.5,
+  '3xl': 1.875,
+  '5xl': 3
 } as const
 
 export const FONT_WEIGHTS = {
-  regular: { value: 400 },
-  medium: { value: 500 },
-  semibold: { value: 600 },
-  bold: { value: 700 }
+  regular: 400,
+  medium: 500,
+  semibold: 600,
+  bold: 700
 } as const
 
+/**
+ * Tracking, in **em**.
+ *
+ * Previously rem, which was wrong for this property: tracking has to scale with
+ * the text it tracks. The eyebrow's 0.2em at 10px is 2px; as rem it would be a
+ * fixed 3.2px at every size, growing relative to the glyphs at each of the
+ * sub-1rem sizes the mono roles use.
+ */
 export const LETTER_SPACINGS = {
   /** Display and headings. Meridian's `tracking-tight`. */
-  tight: { em: -0.025 },
-  normal: { em: 0 },
+  tight: -0.025,
+  normal: 0,
   /** Badges. `tracking-wider`. */
-  wide: { em: 0.05 },
+  wide: 0.05,
   /** Panel labels. `tracking-widest`. */
-  wider: { em: 0.1 },
+  wider: 0.1,
   /** Eyebrows. The literal `tracking-[0.2em]` the bundle writes out. */
-  eyebrow: { em: 0.2 }
+  eyebrow: 0.2
 } as const
 
 export const LINE_HEIGHTS = {
   /** Display only. `leading-none`. */
-  none: { value: 1 },
+  none: 1,
   /** Headings. `leading-[1.05]` on the hero. */
-  tight: { value: 1.05 },
-  snug: { value: 1.25 },
+  tight: 1.05,
+  snug: 1.25,
   /** Meridian's base-layer default for every heading, label and control. */
-  normal: { value: 1.5 },
-  relaxed: { value: 1.625 }
+  normal: 1.5,
+  relaxed: 1.625
 } as const
 ```
+
+- [ ] **Step 3b: Emit tracking in em, and repoint the responsive overrides**
+
+Two edits outside `config/typography.ts`, both consequences of Step 3.
+
+In `generate/typography.ts`, letter-spacing is the one group whose unit changes.
+In `typographyCss()`:
+
+```ts
+  const letterSpacings = Object.entries(LETTER_SPACINGS).map(
+    ([name, value]) => `  --lat-letter-spacing-${name}: ${value}em;`
+  )
+```
+
+and in `typographyTokens()`, the `letterSpacing` group's `unit` becomes `'em'`.
+No other group changes — sizes stay rem, weights and line-heights stay unitless.
+
+In `config/typography-roles.ts`, `NARROW_HEADING_SIZES` is keyed by the old role
+names `heading-1`/`heading-2`/`heading-3`, which no longer exist. Repoint it to
+the new names, stepping each down one rung of the scale:
+
+```ts
+/**
+ * Heading sizes below {@link TYPOGRAPHY_BREAKPOINT_REM}.
+ *
+ * Meridian's own hero is `text-5xl md:text-6xl`, so responsive display sizing
+ * is part of the identity rather than an addition to it. Each role steps down
+ * one rung; `h4` and the mono roles are already small enough to leave alone.
+ */
+export const NARROW_HEADING_SIZES = {
+  display: '3xl',
+  h1: '2xl',
+  h2: 'xl',
+  h3: 'lg'
+} as const
+```
+
+`TYPOGRAPHY_BREAKPOINT_REM` stays at 40.
 
 - [ ] **Step 4: Write the failing role test**
 
