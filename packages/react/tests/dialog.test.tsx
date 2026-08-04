@@ -82,6 +82,19 @@ describe('Dialog', () => {
       expect(dialog.contains(document.activeElement)).toBe(true)
     })
   })
+
+  // Regression: the trigger used to carry `data-variant="soft"` and
+  // `data-tone="accent"`, neither of which button.css has a rule for, so the
+  // trigger rendered unstyled. `secondary` is the variant button.css defines.
+  it('renders its trigger with a variant button.css actually styles', () => {
+    setup()
+
+    const trigger = screen.getByRole('button', { name: 'Remove page' })
+
+    expect(trigger.className).toContain('lat-button')
+    expect(trigger.dataset.variant).toBe('secondary')
+    expect(trigger.dataset.tone).toBeUndefined()
+  })
 })
 
 // Focus *return* is asserted in tests/browser/a11y.spec.ts, not here. Ariakit

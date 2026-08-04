@@ -74,4 +74,17 @@ describe('Menu', () => {
 
     expect(screen.getByRole('separator')).toBeDefined()
   })
+
+  // Regression: the trigger used to carry `data-variant="soft"` and
+  // `data-tone="accent"`, neither of which button.css has a rule for, so the
+  // trigger rendered unstyled. `secondary` is the variant button.css defines.
+  it('renders its button with a variant button.css actually styles', () => {
+    setup()
+
+    const trigger = screen.getByRole('button', { name: 'Actions' })
+
+    expect(trigger.className).toContain('lat-button')
+    expect(trigger.dataset.variant).toBe('secondary')
+    expect(trigger.dataset.tone).toBeUndefined()
+  })
 })

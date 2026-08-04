@@ -51,9 +51,8 @@ export function MenuButton<T extends ElementType = 'button'>({
     <AriakitMenuButton
       {...props}
       className={className === undefined ? 'lat-button' : `lat-button ${className}`}
-      data-variant="soft"
+      data-variant="secondary"
       data-size="md"
-      data-tone="accent"
     />
   )
 }
