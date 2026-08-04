@@ -210,15 +210,14 @@ function BoolCell({ value }: { value: boolean }) {
 function UrlField({ inputLabel }: { inputLabel: string }) {
   return (
     <div className="landing-page__url-row">
-      <div className="landing-page__url-field">
-        <Globe size={14} />
-        <Input
-          type="url"
-          aria-label={inputLabel}
-          placeholder="https://yoursite.com"
-          className="landing-page__url-input"
-        />
-      </div>
+      <Input
+        type="url"
+        addonStart={<Globe size={14} aria-hidden="true" />}
+        aria-label={inputLabel}
+        placeholder="https://yoursite.com"
+        className="landing-page__url-field"
+        inputClassName="landing-page__url-input"
+      />
       <Button variant="primary" size="lg">
         Audit now
         <Zap size={13} />
@@ -584,7 +583,7 @@ function CTA() {
         </h2>
         <p className="landing-page__muted">No account needed to run your first audit.</p>
 
-        <UrlField inputLabel="Website URL" />
+        <UrlField inputLabel="Website URL (early access)" />
 
         <p className="landing-page__meta">MIT licensed · Built in public · Follow DECISIONS.md</p>
       </Section>
