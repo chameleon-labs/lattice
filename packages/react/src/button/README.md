@@ -31,3 +31,10 @@ one on the same row.
 
 Under `prefers-reduced-motion: reduce` there is nothing to strip: colour and
 opacity feedback is unconditional, and neither is what causes vestibular harm.
+
+The disabled look keys on both `:disabled` and `[aria-disabled='true']`.
+Ariakit renders the latter — leaving the element natively enabled — when
+`accessibleWhenDisabled` keeps a disabled control focusable, which is the
+accessible default: a control dropped from the tab order can't announce why
+it's unavailable. Styling only `:disabled` would leave that control looking
+and behaving enabled while assistive technology is told the opposite.

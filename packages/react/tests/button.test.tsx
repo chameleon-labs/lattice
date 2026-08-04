@@ -51,4 +51,18 @@ describe('Button', () => {
 
     expect(link.classList.contains('lat-button')).toBe(true)
   })
+
+  it('marks an aria-disabled button as disabled, not just a natively disabled one', () => {
+    // Ariakit keeps a disabled-but-focusable control in the tab order and
+    // marks it with aria-disabled. Styling that keys only on :disabled would
+    // render it as though it were available.
+    render(
+      <Button disabled accessibleWhenDisabled>
+        Save
+      </Button>
+    )
+    const button = screen.getByRole('button', { name: 'Save' })
+    expect(button.getAttribute('aria-disabled')).toBe('true')
+    expect(button.hasAttribute('disabled')).toBe(false)
+  })
 })
