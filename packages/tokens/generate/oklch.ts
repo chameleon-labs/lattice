@@ -195,3 +195,22 @@ export function fitToGamut(color: Oklch): Oklch {
 
   return { ...color, c: fits }
 }
+
+/** A requested colour, resolved to what sRGB can actually show. */
+export interface Shipped {
+  readonly oklch: Oklch
+  readonly hex: string
+}
+
+/**
+ * Fits a requested colour into sRGB and reports it alongside the hex it emits.
+ *
+ * Chart palettes are the last thing still generated rather than anchored, so
+ * this is where a requested colour becomes a shippable one. It lived in
+ * `generate/solve.ts` until the contrast solver that surrounded it was retired.
+ */
+export function ship(request: Oklch): Shipped {
+  const fitted = fitToGamut(request)
+
+  return { oklch: fitted, hex: formatHex(oklchToSrgb(fitted)) }
+}

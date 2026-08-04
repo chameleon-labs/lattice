@@ -2,7 +2,7 @@
   "name": "@chameleon-labs/lattice-tokens",
   "version": "0.0.0",
   "private": true,
-  "description": "The token layer of Lattice, an accessibility-first design system. Reviewed contracts guard colour, typography, and layout values at build time.",
+  "description": "The token layer of Lattice, an accessibility-first design system. Colour, typography, and layout values are generated from reviewed config; contrast is measured and reported at build time, not gated.",
   "license": "MIT",
   "author": "George Karan",
   "homepage": "https://github.com/chameleon-labs/lattice#readme",
@@ -28,6 +28,8 @@
   "exports": {
     "./lattice.css": "./dist/lattice.css",
     "./tokens.json": "./dist/tokens.json",
+    "./contrast-ledger.json": "./dist/contrast-ledger.json",
+    "./fonts/*": "./dist/fonts/*",
     "./package.json": "./package.json"
   },
   "sideEffects": [

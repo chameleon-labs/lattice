@@ -8,14 +8,16 @@
   inline-size: var(--lat-space-8);
   block-size: var(--lat-space-5);
 
-  background-color: var(--lat-component);
+  /* The switch is one of only two places a pill radius is correct, because
+     it is a track rather than a panel. */
+  background-color: var(--lat-switch-track);
   border: 1px solid var(--lat-border);
   border-radius: var(--lat-radius-full);
   cursor: pointer;
 
-  transition-property: background-color, border-color;
-  transition-duration: var(--lat-duration-fast);
-  transition-timing-function: var(--lat-easing-standard);
+  transition-property: background-color;
+  transition-duration: var(--lat-duration-swift);
+  transition-timing-function: var(--lat-easing-out);
 }
 
 .lat-switch::before {
@@ -27,8 +29,9 @@
   inline-size: var(--lat-space-4);
   block-size: var(--lat-space-4);
 
-  background-color: var(--lat-bg);
+  background-color: var(--lat-bg-raised);
   border-radius: var(--lat-radius-full);
+  box-shadow: var(--lat-elevation-raised);
 
   /* Static, not animated. The thumb's position IS the state signal, so it must
      be correct under prefers-reduced-motion: reduce exactly as it is otherwise.
@@ -36,30 +39,55 @@
   transform: translateY(-50%);
 }
 
-.lat-switch[aria-checked='true'] {
-  background-color: var(--lat-solid);
-  border-color: var(--lat-solid);
-}
+.lat-switch[aria-checked='true'] { background-color: var(--lat-solid); }
 
 .lat-switch[aria-checked='true']::before {
   transform: translateY(-50%) translateX(var(--lat-space-3));
 }
 
 .lat-switch:focus-visible {
-  outline: 2px solid var(--lat-focus-ring);
-  outline-offset: 2px;
+  outline: none;
+  border-color: var(--lat-focus-ring);
+  box-shadow: 0 0 0 1px var(--lat-focus-ring);
 }
 
 .lat-switch:disabled {
-  background-color: var(--lat-gray-component);
-  border-color: var(--lat-gray-border);
+  background-color: var(--lat-component);
+  border-color: var(--lat-border);
   cursor: not-allowed;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .lat-switch::before {
     transition-property: transform;
-    transition-duration: var(--lat-duration-fast);
-    transition-timing-function: var(--lat-easing-standard);
+    transition-duration: var(--lat-duration-swift);
+    transition-timing-function: var(--lat-easing-out);
+  }
+}
+
+/*
+ * Two failures stack here under forced-colors. First, the focus recipe shared
+ * with Button/Input/CodeBlock relies on box-shadow and border-color, both
+ * neutralised the same way — see button.css. Second, and specific to Switch:
+ * the checked/unchecked signal is the track's background (forced to
+ * `transparent` in both states, so on and off render identically) plus the
+ * thumb's background-and-shadow (no border), which computes to white-on-white
+ * Canvas with the shadow stripped. The positional cue survives, but the thing
+ * that moves is invisible, so both track and thumb need an explicit repaint.
+ */
+@media (forced-colors: active) {
+  .lat-switch:focus-visible {
+    outline: 2px solid CanvasText;
+    outline-offset: 2px;
+  }
+
+  .lat-switch::before {
+    background-color: CanvasText;
+    forced-color-adjust: none;
+  }
+
+  .lat-switch[aria-checked='true'] {
+    background-color: Highlight;
+    forced-color-adjust: none;
   }
 }

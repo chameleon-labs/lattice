@@ -3,14 +3,18 @@
  *
  * Two standards with deliberately unequal authority:
  *
- * - **WCAG 2.x** relative luminance and ratio are the **gate**. A contract that
- *   misses its minimum fails the build.
- * - **APCA** `Lc` is computed and reported and **never** gated on. It is
- *   perceptually more accurate, particularly in dark mode, but it is not a
- *   conformance standard, and the audit engines a consuming product is measured
- *   by report WCAG 2. A palette justified by a different standard than the one
- *   it will be audited against would be indefensible. Reporting both keeps the
- *   gap between them visible rather than hidden.
+ * - **WCAG 2.x** relative luminance and ratio decide **pass or fail** in every
+ *   printed check — the contrast ledger (generate/report.ts) and the chart
+ *   palette checks (generate/charts.ts) both label an entry this way. Neither
+ *   stops the build on a miss: Lattice's values are the identity, several of
+ *   its pairs miss their WCAG minimum, and the build ships them anyway with
+ *   the miss printed rather than hidden. See the design spec's §9.
+ * - **APCA** `Lc` is computed and reported alongside and **never** decides
+ *   pass or fail. It is perceptually more accurate, particularly in dark mode,
+ *   but it is not a conformance standard, and the audit engines a consuming
+ *   product is measured by report WCAG 2. A palette justified by a different
+ *   standard than the one it will be audited against would be indefensible.
+ *   Reporting both keeps the gap between them visible rather than hidden.
  */
 
 import { srgbToLinear, type Rgb } from './oklch.js'

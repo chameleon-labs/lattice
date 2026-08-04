@@ -1,3 +1,7 @@
+/* The ghost button construction: transparent with a hairline, washed on
+   hover — the same treatment button.css gives .lat-button[data-variant=
+   'ghost'], reproduced here rather than shared because Disclosure is not a
+   Button and carries its own aria-expanded state instead of a variant prop. */
 .lat-disclosure {
   display: inline-flex;
   align-items: center;
@@ -5,23 +9,23 @@
 
   font-family: var(--lat-text-ui-font-family);
   font-size: var(--lat-text-ui-font-size);
-  font-weight: var(--lat-font-weight-semibold);
+  font-weight: var(--lat-font-weight-medium);
   line-height: var(--lat-text-ui-line-height);
 
   padding: var(--lat-space-2) var(--lat-space-3);
   color: var(--lat-text);
-  background-color: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--lat-radius-md);
+  background: transparent;
+  border: 1px solid var(--lat-border);
+  border-radius: var(--lat-radius-none);
   cursor: pointer;
 
   transition-property: background-color, border-color, color;
-  transition-duration: var(--lat-duration-fast);
-  transition-timing-function: var(--lat-easing-standard);
+  transition-duration: var(--lat-duration-default);
+  transition-timing-function: var(--lat-easing-out);
 }
 
 .lat-disclosure:hover {
-  background-color: var(--lat-component-hover);
+  background: var(--lat-wash);
 }
 
 .lat-disclosure:focus-visible {
@@ -32,4 +36,10 @@
 .lat-disclosure__content {
   padding: var(--lat-space-3);
   color: var(--lat-text);
+
+  /* The rule that ties expanded content back to the trigger above it, the
+     same edge Card gives its header — a real border, not a shadow, so it
+     survives forced-colors. */
+  border-left: 1px solid var(--lat-border);
+  padding-left: var(--lat-space-4);
 }

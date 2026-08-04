@@ -31,13 +31,13 @@ export function TextField({ label, description, error, className, ...props }: Te
     .join(' ')
 
   return (
-    <div className={className === undefined ? 'lat-field' : `lat-field ${className}`}>
-      <label className="lat-field__label" htmlFor={inputId}>
+    <div className={className === undefined ? 'lat-text-field' : `lat-text-field ${className}`}>
+      <label className="lat-text-field__label" htmlFor={inputId}>
         {label}
       </label>
 
       {description === undefined ? null : (
-        <p className="lat-field__description" id={descriptionId}>
+        <p className="lat-text-field__description" id={descriptionId}>
           {description}
         </p>
       )}
@@ -54,7 +54,7 @@ export function TextField({ label, description, error, className, ...props }: Te
         context, which is the same reasoning Callout follows.
       */}
       {error === undefined ? null : (
-        <p className="lat-field__error" id={errorId}>
+        <p className="lat-text-field__error" id={errorId}>
           {error}
         </p>
       )}

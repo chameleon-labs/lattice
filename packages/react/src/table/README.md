@@ -28,5 +28,11 @@ the build.
 Presentational only: no sorting, selection or grid navigation. A sortable header
 is a different accessibility contract and should arrive with its consumer.
 
+**Header cells are the eyebrow role at normal weight.** The casing and tracking
+already carry the emphasis; bolding on top of both reads as shouting. Rows
+divide with the hairline border, and a body row washes on hover — a pointer
+affordance only, not a state that carries information, so it needs no
+forced-colors fallback.
+
 **Classes:** `.lat-table`, `.lat-table__caption`, `.lat-table__head`,
 `.lat-table__body`, `.lat-table__row`, `.lat-table__header`, `.lat-table__cell`.

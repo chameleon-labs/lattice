@@ -27,6 +27,18 @@ describe('findColourLiterals', () => {
   it('ignores anything inside a comment', () => {
     expect(findColourLiterals(`/* was #ff0000 */ .a { color: var(--lat-text); }`)).toEqual([])
   })
+
+  // The dialog backdrop's scrim: the one literal this system permits, because
+  // it is a scrim rather than a palette value. The exemption is exact-string,
+  // not "any rgb() with these channels" — a differently-spaced or -valued
+  // rgb() is still a hand-written colour and still gets flagged.
+  it('permits exactly the dialog backdrop scrim', () => {
+    expect(findColourLiterals(`.lat-dialog__backdrop { background: rgb(0 0 0 / 0.6); }`)).toEqual([])
+  })
+
+  it('still flags an rgb() that only resembles the permitted scrim', () => {
+    expect(findColourLiterals(`.a { background: rgb(0 0 0 / 0.5); }`)).toEqual(['rgb('])
+  })
 })
 
 describe('findTokenReferences', () => {
@@ -117,6 +129,16 @@ describe('findBareFocusOutlines', () => {
   it('permits an outline on :focus-visible', () => {
     expect(
       findBareFocusOutlines(`.a:focus-visible { outline: 2px solid var(--lat-focus-ring); }`)
+    ).toEqual([])
+  })
+
+  // A wrapper reacting to focus landing on a descendant control — Input's
+  // field wrapper is exactly this — isn't the bare-:focus problem this check
+  // exists to catch. A naive `:focus\b` match would misfire here, since
+  // ":focus-within" contains ":focus" at a word boundary.
+  it('permits an outline on :focus-within', () => {
+    expect(
+      findBareFocusOutlines(`.a:focus-within { outline: 2px solid var(--lat-focus-ring); }`)
     ).toEqual([])
   })
 

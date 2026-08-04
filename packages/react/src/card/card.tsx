@@ -1,15 +1,15 @@
-import type { ComponentPropsWithRef } from 'react'
+import type { ComponentPropsWithRef, HTMLAttributes, ReactNode } from 'react'
 
 export type CardProps = ComponentPropsWithRef<'div'>
 
 /**
- * The `raised` elevation role as a component: surface, border and shadow
- * together.
+ * A `--lat-bg-raised` surface with a hairline border. Flat by default — no
+ * shadow — with `data-elevation="floating"` as the escape hatch for the rare
+ * instance that needs one, such as the Figma bundle's hero audit card.
  *
- * All three ship because each covers a case the others cannot. A shadow reads
- * on light and is effectively absent on dark; the surface step reads on dark;
- * the border is the only one that survives `forced-colors`, where the user
- * agent strips shadows and flattens surfaces.
+ * The hairline, not the shadow, is the edge that survives `forced-colors`,
+ * where the user agent strips shadows and flattens surfaces to the system
+ * canvas — the shadow is the enhancement.
  *
  * A card never takes `role="button"`. An interactive card exposes its action
  * through a real control inside it — a link whose hit area is stretched in CSS
@@ -18,5 +18,36 @@ export type CardProps = ComponentPropsWithRef<'div'>
 export function Card({ className, ...props }: CardProps) {
   return (
     <div {...props} className={className === undefined ? 'lat-card' : `lat-card ${className}`} />
+  )
+}
+
+export interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {
+  /** The eyebrow label. Every panel in Lattice carries one. */
+  label: string
+  /** An optional leading icon, rendered before the label. */
+  icon?: ReactNode
+}
+
+export function CardHeader({ label, icon, children, className, ...props }: CardHeaderProps) {
+  return (
+    <div
+      {...props}
+      className={className === undefined ? 'lat-card__header' : `lat-card__header ${className}`}
+    >
+      {icon}
+      <span className="lat-card__label">{label}</span>
+      {children}
+    </div>
+  )
+}
+
+export type CardBodyProps = HTMLAttributes<HTMLDivElement>
+
+export function CardBody({ className, ...props }: CardBodyProps) {
+  return (
+    <div
+      {...props}
+      className={className === undefined ? 'lat-card__body' : `lat-card__body ${className}`}
+    />
   )
 }

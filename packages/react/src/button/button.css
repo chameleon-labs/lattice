@@ -1,18 +1,4 @@
 .lat-button {
-  /* Tone selects which family the variant rules read, so the variant rules stay
-     tone-agnostic and a new tone is six declarations rather than a copy of every
-     variant. Every later family reuses this mechanism. */
-  --_solid: var(--lat-accent-solid);
-  --_solid-hover: var(--lat-accent-solid-hover);
-  --_component: var(--lat-accent-component);
-  --_component-hover: var(--lat-accent-component-hover);
-  --_component-active: var(--lat-accent-component-active);
-  --_text: var(--lat-accent-text);
-  /* Each family's own measured text colour. White clears 4.5:1 on the accent
-     fill and misses it on every other scale, so a solid button in any other
-     tone must not reuse the accent's answer. */
-  --_on-solid: var(--lat-accent-on-solid);
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -20,101 +6,103 @@
 
   font-family: var(--lat-text-ui-font-family);
   font-size: var(--lat-text-ui-font-size);
-  font-weight: var(--lat-text-ui-font-weight);
   line-height: var(--lat-text-ui-line-height);
-  letter-spacing: var(--lat-text-ui-letter-spacing);
 
   border: 1px solid transparent;
-  border-radius: var(--lat-radius-md);
+  border-radius: var(--lat-radius-none);
   cursor: pointer;
 
-  /* Colour feedback is unconditional — it is never what causes vestibular harm. */
-  transition-property: background-color, border-color, color, box-shadow;
-  transition-duration: var(--lat-duration-fast);
-  transition-timing-function: var(--lat-easing-standard);
+  /* Colour and opacity feedback is unconditional — neither is what causes
+     vestibular harm. */
+  transition-property: background-color, border-color, color, opacity;
+  transition-duration: var(--lat-duration-default);
+  transition-timing-function: var(--lat-easing-out);
 }
 
-.lat-button[data-tone='neutral'] {
-  --_solid: var(--lat-gray-solid);
-  --_solid-hover: var(--lat-gray-solid-hover);
-  --_component: var(--lat-gray-component);
-  --_component-hover: var(--lat-gray-component-hover);
-  --_component-active: var(--lat-gray-component-active);
-  --_text: var(--lat-gray-text);
-  --_on-solid: var(--lat-gray-on-solid);
-}
+.lat-button[data-size='sm'] { padding: var(--lat-space-1) var(--lat-space-3); }
+.lat-button[data-size='md'] { padding: var(--lat-space-2) var(--lat-space-4); }
+.lat-button[data-size='lg'] { padding: var(--lat-space-3) var(--lat-space-5); }
 
-.lat-button[data-tone='danger'] {
-  --_solid: var(--lat-danger-solid);
-  --_solid-hover: var(--lat-danger-solid-hover);
-  --_component: var(--lat-danger-component);
-  --_component-hover: var(--lat-danger-component-hover);
-  --_component-active: var(--lat-danger-component-active);
-  --_text: var(--lat-danger-text);
-  --_on-solid: var(--lat-danger-on-solid);
+/* Primary: the solid fill. Semibold, because Lattice's is the only button
+   weighted above medium. */
+.lat-button[data-variant='primary'] {
+  background: var(--lat-solid);
+  color: var(--lat-on-solid);
+  font-weight: var(--lat-font-weight-semibold);
 }
+.lat-button[data-variant='primary']:hover:not(:disabled):not([aria-disabled='true']) { opacity: 0.9; }
 
-.lat-button[data-size='sm'] {
-  padding: var(--lat-space-1) var(--lat-space-2);
+/* Secondary: the component fill with a hairline. */
+.lat-button[data-variant='secondary'] {
+  background: var(--lat-component);
+  border-color: var(--lat-border);
+  color: var(--lat-text);
+  font-weight: var(--lat-font-weight-medium);
 }
+/* 0.95 is the Figma bundle's own literal secondary-hover treatment, not a value with
+   a semantic token name — there is no brightness scale to reach for. */
+.lat-button[data-variant='secondary']:hover:not(:disabled):not([aria-disabled='true']) { filter: brightness(0.95); }
 
-.lat-button[data-size='md'] {
-  padding: var(--lat-space-2) var(--lat-space-3);
-}
-
-.lat-button[data-size='lg'] {
-  padding: var(--lat-space-3) var(--lat-space-5);
-}
-
-.lat-button[data-variant='solid'] {
-  background-color: var(--_solid);
-  color: var(--_on-solid);
-}
-
-.lat-button[data-variant='solid']:hover {
-  background-color: var(--_solid-hover);
-}
-
-.lat-button[data-variant='soft'] {
-  background-color: var(--_component);
-  color: var(--_text);
-}
-
-.lat-button[data-variant='soft']:hover {
-  background-color: var(--_component-hover);
-}
-
-.lat-button[data-variant='soft']:active {
-  background-color: var(--_component-active);
-}
-
+/* Ghost: transparent with a hairline, washed on hover. */
 .lat-button[data-variant='ghost'] {
-  background-color: transparent;
-  color: var(--_text);
+  background: transparent;
+  border-color: var(--lat-border);
+  color: var(--lat-text);
+  font-weight: var(--lat-font-weight-medium);
 }
+.lat-button[data-variant='ghost']:hover:not(:disabled):not([aria-disabled='true']) { background: var(--lat-wash); }
 
-.lat-button[data-variant='ghost']:hover {
-  background-color: var(--_component-hover);
+/* Destructive: the tinted triple, not a solid fill. */
+.lat-button[data-variant='destructive'] {
+  background: var(--lat-danger-tint);
+  border-color: var(--lat-danger-tint-border);
+  color: var(--lat-danger-solid);
+  font-weight: var(--lat-font-weight-medium);
 }
+.lat-button[data-variant='destructive']:hover:not(:disabled):not([aria-disabled='true']) { opacity: 0.9; }
 
-/* :focus-visible only, and the outline is replaced rather than removed. */
-.lat-button:focus-visible {
-  outline: 2px solid var(--lat-focus-ring);
-  outline-offset: 2px;
+/* Link: text with a hairline underline. */
+.lat-button[data-variant='link'] {
+  background: transparent;
+  color: var(--lat-text-subtle);
+  font-weight: var(--lat-font-weight-medium);
+  text-decoration: underline;
+  text-decoration-color: var(--lat-border);
+  text-underline-offset: 2px;
 }
+.lat-button[data-variant='link']:hover:not(:disabled):not([aria-disabled='true']) { color: var(--lat-text); }
 
+/*
+ * Both spellings, deliberately. Ariakit renders `aria-disabled="true"` rather
+ * than the native attribute when a disabled control must remain focusable —
+ * which is the accessible default, since a control removed from the tab order
+ * cannot announce why it is unavailable. Keying only on :disabled would leave
+ * that control looking and behaving enabled while telling assistive technology
+ * the opposite.
+ */
 .lat-button:disabled,
 .lat-button[aria-disabled='true'] {
-  background-color: var(--lat-gray-component);
-  color: var(--lat-gray-text-subtle);
+  background: var(--lat-wash);
+  border-color: transparent;
+  color: var(--lat-text-subtle);
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
-/* Movement is authored only where it is welcome. Under `reduce` there is
-   nothing to strip, which is why no global reset is needed. */
-@media (prefers-reduced-motion: no-preference) {
-  .lat-button:active {
-    transition-property: background-color, border-color, color, box-shadow, transform;
-    transform: translateY(1px);
+.lat-button:focus-visible {
+  outline: none;
+  border-color: var(--lat-focus-ring);
+  box-shadow: 0 0 0 1px var(--lat-focus-ring);
+}
+
+/* The shared focus recipe above relies on two properties forced-colors
+   removes: box-shadow is forced to `none`, and border-color resolves to the
+   same system value the resting border already uses, so neither carries any
+   signal. `outline: none` is honoured rather than overridden, so nothing
+   falls back on its own — the ring must be restated explicitly here. */
+@media (forced-colors: active) {
+  .lat-button:focus-visible {
+    outline: 2px solid CanvasText;
+    outline-offset: 2px;
   }
 }

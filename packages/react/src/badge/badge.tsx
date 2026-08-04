@@ -1,25 +1,34 @@
 import type { ComponentPropsWithRef, ReactNode } from 'react'
 
 /**
- * Four semantic tones plus the four severity levels.
+ * The six chromatic scales, a neutral default, and the four severity levels.
+ * Every variant is the same tinted triple — a 10-15% fill, a 20-25% border,
+ * full-strength text — so a new variant is three custom-property
+ * declarations in badge.css, never a new shape.
  *
- * The severity names are here so tabstop can pass an axe impact string straight
- * through — `<Badge tone={violation.impact}>` — rather than maintaining a
- * mapping that could drift from the ramp the token system already publishes.
+ * The severity levels are their own variants rather than a mapping onto the
+ * six chromatic scales above: `moderate` is amber (hue 84), and there is no
+ * chromatic scale at that hue to borrow — the nearest candidate, `info`, is
+ * blue (hue 232), which would break both the ramp's hue ordering and the
+ * lightness safety net the severity tokens are built on. `minor` carries no
+ * colour of its own and reads identically to `default`, but keeps its own
+ * name so a caller labelling an impact level never has to know that its
+ * lowest level happens to be neutral.
  */
-export type BadgeTone =
-  | 'neutral'
-  | 'accent'
+export type BadgeVariant =
+  | 'default'
+  | 'primary'
+  | 'info'
   | 'success'
-  | 'warning'
   | 'danger'
+  | 'warning'
   | 'critical'
   | 'serious'
   | 'moderate'
   | 'minor'
 
 export interface BadgeOptions {
-  tone?: BadgeTone
+  variant?: BadgeVariant
 }
 
 // `children` is required rather than optional, which is the whole guarantee:
@@ -27,12 +36,12 @@ export interface BadgeOptions {
 export type BadgeProps = Omit<ComponentPropsWithRef<'span'>, 'children'> &
   BadgeOptions & { children: ReactNode }
 
-export function Badge({ tone = 'neutral', className, ...props }: BadgeProps) {
+export function Badge({ variant = 'default', className, ...props }: BadgeProps) {
   return (
     <span
       {...props}
       className={className === undefined ? 'lat-badge' : `lat-badge ${className}`}
-      data-tone={tone}
+      data-variant={variant}
     />
   )
 }

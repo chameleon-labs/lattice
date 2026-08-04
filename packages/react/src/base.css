@@ -1,0 +1,79 @@
+/*
+ * The base layer.
+ *
+ * The Figma bundle sets defaults on bare elements — body, h1-h4, label, button, input —
+ * rather than requiring a class for each. Porting that is not cosmetic: without
+ * it, unclassed prose inside a Lattice surface falls through to the browser
+ * serif, which shipped as a real defect in the Dialog story for the whole of the
+ * previous component library's life.
+ *
+ * Everything here is scoped to `.lat-surface` rather than to `body`, so a
+ * consumer embedding Lattice in a page it does not own is not restyling that
+ * page. A consumer who does own the page puts the class on <body>.
+ */
+.lat-surface {
+  background: var(--lat-bg);
+  color: var(--lat-text);
+  font-family: var(--lat-text-body-font-family);
+  font-size: var(--lat-text-body-font-size);
+  font-weight: var(--lat-text-body-font-weight);
+  line-height: var(--lat-text-body-line-height);
+}
+
+.lat-surface :where(h1) {
+  font-family: var(--lat-text-h1-font-family);
+  font-size: var(--lat-text-h1-font-size);
+  font-weight: var(--lat-text-h1-font-weight);
+  letter-spacing: var(--lat-text-h1-letter-spacing);
+  line-height: var(--lat-text-h1-line-height);
+}
+
+.lat-surface :where(h2) {
+  font-family: var(--lat-text-h2-font-family);
+  font-size: var(--lat-text-h2-font-size);
+  font-weight: var(--lat-text-h2-font-weight);
+  letter-spacing: var(--lat-text-h2-letter-spacing);
+  line-height: var(--lat-text-h2-line-height);
+}
+
+/* h3/h4 intentionally carry no letter-spacing rule, unlike h1/h2 above — this
+   is not an oversight. The Figma bundle tracks only display and the two large
+   headings tight; h3/h4 use the font's own default spacing. */
+.lat-surface :where(h3) {
+  font-family: var(--lat-text-h3-font-family);
+  font-size: var(--lat-text-h3-font-size);
+  font-weight: var(--lat-text-h3-font-weight);
+  line-height: var(--lat-text-h3-line-height);
+}
+
+.lat-surface :where(h4) {
+  font-family: var(--lat-text-h4-font-family);
+  font-size: var(--lat-text-h4-font-size);
+  font-weight: var(--lat-text-h4-font-weight);
+  line-height: var(--lat-text-h4-line-height);
+}
+
+/*
+ * `:where()` keeps every rule above at zero specificity, so a role class on the
+ * same element wins without needing !important and a component stylesheet never
+ * has to out-specify the base layer.
+ *
+ * The Figma bundle sizes the interactive elements too, not just headings — 16px at
+ * line-height 1.5, medium for the two that carry a label and normal for the
+ * one that carries user input. Without these an unclassed control falls back
+ * to the browser's own font-size, which on most engines is smaller than the
+ * surrounding prose and reads as a rendering bug rather than a default.
+ */
+.lat-surface :where(label, button) {
+  font-family: inherit;
+  font-size: var(--lat-font-size-base);
+  font-weight: var(--lat-font-weight-medium);
+  line-height: var(--lat-line-height-normal);
+}
+
+.lat-surface :where(input, select, textarea) {
+  font-family: inherit;
+  font-size: var(--lat-font-size-base);
+  font-weight: var(--lat-font-weight-regular);
+  line-height: var(--lat-line-height-normal);
+}

@@ -7,17 +7,22 @@
  * so a scope that only sets the attribute renders its text on Storybook's white
  * canvas — which axe correctly reports as a contrast failure in dark mode. A
  * consumer scoping a theme to part of a page has to do exactly the same thing.
+ *
+ * `.lat-surface` (src/base.css) now owns the background, foreground and font —
+ * this rule only adds the story-only padding and sizing.
  */
 
 .lat-story {
   box-sizing: border-box;
   min-block-size: 100vh;
   padding: var(--lat-space-6);
-  background-color: var(--lat-bg);
-  color: var(--lat-text);
-  font-family: var(--lat-text-body-font-family);
-  font-size: var(--lat-text-body-font-size);
-  line-height: var(--lat-text-body-line-height);
+}
+
+/* The page stories own their own padding and layout, so the decorator's is
+   removed for them. Inert until Task 2 introduces .lat-page — see the
+   Phase 3 plan. */
+.lat-story:has(> .lat-page) {
+  padding: 0;
 }
 
 /* Stories lay their examples out in wrapping rows. The gap is a token so the
@@ -38,13 +43,24 @@
 
 /* Input and TextField are full-width by design — a form field fills its column.
    The stories lay them out in rows, so they constrain them here rather than the
-   component guessing a width it cannot know. */
-.lat-story .lat-input,
-.lat-story .lat-field {
+   component guessing a width it cannot know.
+
+   Both caps below are *gallery presentation*, not design: a lone component on a
+   blank canvas would otherwise stretch the full viewport. They must not reach
+   the page stories, which lay their own components out inside real page
+   containers — a page's Card fills its column by design, and capping it here
+   made the score-history panel render at 480px against the source's 928px.
+   That was a Storybook artifact rather than a page defect: the same markup in a
+   consuming app was always correct.
+
+   `:not(:has(> .lat-page))` rather than a `.lat-page` reset, so the exclusion
+   sits with the rule it qualifies instead of being undone somewhere else. */
+.lat-story:not(:has(> .lat-page)) .lat-input,
+.lat-story:not(:has(> .lat-page)) .lat-text-field {
   max-inline-size: 22rem;
 }
 
-.lat-story .lat-callout,
-.lat-story .lat-card {
+.lat-story:not(:has(> .lat-page)) .lat-callout,
+.lat-story:not(:has(> .lat-page)) .lat-card {
   max-inline-size: 30rem;
 }

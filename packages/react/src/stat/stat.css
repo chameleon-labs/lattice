@@ -1,0 +1,39 @@
+.lat-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lat-space-1);
+}
+
+/* The numeric role, including `font-variant-numeric` — the whole reason the
+   role exists. Tabular figures keep every digit the same width, so a row of
+   stats does not jitter sideways as its values change. */
+.lat-stat__value {
+  font-family: var(--lat-text-numeric-font-family);
+  font-size: var(--lat-text-numeric-font-size);
+  font-weight: var(--lat-text-numeric-font-weight);
+  letter-spacing: var(--lat-text-numeric-letter-spacing);
+  line-height: var(--lat-text-numeric-line-height);
+  font-variant-numeric: var(--lat-text-numeric-font-variant-numeric);
+  color: var(--lat-text);
+}
+
+/* The eyebrow construction, same as Card's `__label` and Table's `__header`. */
+.lat-stat__label {
+  font-family: var(--lat-text-eyebrow-font-family);
+  font-size: var(--lat-text-eyebrow-font-size);
+  letter-spacing: var(--lat-text-eyebrow-letter-spacing);
+  line-height: var(--lat-text-eyebrow-line-height);
+  text-transform: var(--lat-text-eyebrow-text-transform);
+  /* The role token, not the primitive — see table.css's __header. */
+  font-weight: var(--lat-text-eyebrow-font-weight);
+  color: var(--lat-text-subtle);
+}
+
+.lat-stat__sub {
+  font-family: var(--lat-text-meta-font-family);
+  font-size: var(--lat-text-meta-font-size);
+  font-weight: var(--lat-text-meta-font-weight);
+  letter-spacing: var(--lat-text-meta-letter-spacing);
+  line-height: var(--lat-text-meta-line-height);
+  color: var(--lat-text-subtle);
+}

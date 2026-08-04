@@ -1,154 +1,35 @@
 import { describe, expect, it } from 'vitest'
-
-import {
-  FONT_FAMILIES,
-  FONT_SIZE_GRID_REM,
-  FONT_SIZE_RATIO_RANGE,
-  FONT_SIZES,
-  FONT_WEIGHTS,
-  LETTER_SPACINGS,
-  LINE_HEIGHTS
-} from '../config/typography.js'
-import {
-  TYPOGRAPHY_PRIMITIVE_COUNT,
-  typographyCss,
-  typographyTokens
-} from '../generate/typography.js'
+import { FONT_FAMILIES, FONT_SIZES, FONT_WEIGHTS, LETTER_SPACINGS } from '../config/typography.js'
+import { typographyCss } from '../generate/typography.js'
 
 describe('typography primitives', () => {
-  it('carries the approved family stacks in fallback order', () => {
-    expect(FONT_FAMILIES.sans).toEqual([
-      'ui-sans-serif',
-      'system-ui',
-      '-apple-system',
-      'Segoe UI',
-      'Roboto',
-      'Helvetica Neue',
-      'Arial',
-      'sans-serif'
-    ])
-    expect(FONT_FAMILIES.inter).toEqual([
-      'InterVariable',
-      'Inter Variable',
-      'Inter',
-      'ui-sans-serif',
-      'system-ui',
-      '-apple-system',
-      'Segoe UI',
-      'Roboto',
-      'Helvetica Neue',
-      'Arial',
-      'sans-serif'
-    ])
-    expect(FONT_FAMILIES.mono).toEqual([
-      'ui-monospace',
-      'SFMono-Regular',
-      'SF Mono',
-      'Menlo',
-      'Consolas',
-      'Liberation Mono',
-      'monospace'
-    ])
+  it('leads the sans stack with Instrument Sans', () => {
+    expect(FONT_FAMILIES.sans[0]).toBe('Instrument Sans')
   })
 
-  it('keeps every size on the 0.125rem grid and inside the ratio band', () => {
-    const sizes = Object.values(FONT_SIZES)
-
-    for (const size of sizes) {
-      expect(Number.isInteger(size / FONT_SIZE_GRID_REM), String(size)).toBe(true)
-    }
-    for (let index = 1; index < sizes.length; index++) {
-      const ratio = sizes[index]! / sizes[index - 1]!
-      expect(ratio).toBeGreaterThanOrEqual(FONT_SIZE_RATIO_RANGE.min)
-      expect(ratio).toBeLessThanOrEqual(FONT_SIZE_RATIO_RANGE.max)
-    }
+  it('leads the mono stack with JetBrains Mono', () => {
+    expect(FONT_FAMILIES.mono[0]).toBe('JetBrains Mono')
   })
 
-  it('keeps all nine approved sizes', () => {
-    expect(FONT_SIZES).toEqual({
-      '2xs': 0.625,
-      xs: 0.75,
-      sm: 0.875,
-      base: 1,
-      lg: 1.125,
-      xl: 1.25,
-      '2xl': 1.5,
-      '3xl': 1.875,
-      '4xl': 2.25
-    })
+  it("carries the Figma bundle's scale including the 10px micro size", () => {
+    expect(FONT_SIZES['3xs']).toBe(0.625)
+    expect(FONT_SIZES.base).toBe(1)
+    expect(FONT_SIZES['5xl']).toBe(3)
   })
 
-  it('uses only unitless line heights and the approved weights', () => {
-    expect(LINE_HEIGHTS).toEqual({
-      tight: 1.25,
-      snug: 1.375,
-      normal: 1.5,
-      relaxed: 1.625,
-      loose: 1.75
-    })
-    expect(Object.values(LINE_HEIGHTS).every(Number.isFinite)).toBe(true)
-    expect(FONT_WEIGHTS).toEqual({ regular: 400, semibold: 600, bold: 700 })
+  it('carries the 0.2em eyebrow tracking', () => {
+    expect(LETTER_SPACINGS.eyebrow).toBe(0.2)
   })
 
-  it('provides the zero-tracking primitive required by every role', () => {
-    expect(LETTER_SPACINGS).toEqual({ normal: 0 })
-    expect(typographyCss()).toContain('--lat-letter-spacing-normal: 0rem;')
-    expect(typographyTokens()['letter-spacing'].normal).toEqual({
-      $type: 'dimension',
-      $value: { value: 0, unit: 'rem' }
-    })
+  it('carries the four weights the Figma bundle uses', () => {
+    expect(Object.values(FONT_WEIGHTS).sort()).toEqual([400, 500, 600, 700])
   })
 
-  it('formats the exact CSS primitive names and values', () => {
-    const css = typographyCss()
-
-    expect(css).toContain(
-      "--lat-font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, " +
-        "'Helvetica Neue', Arial, sans-serif;"
-    )
-    expect(css).toContain(
-      "--lat-font-inter: InterVariable, 'Inter Variable', Inter, ui-sans-serif, system-ui, " +
-        "-apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;"
-    )
-    expect(css).toContain('--lat-font-size-2xs: 0.625rem;')
-    expect(css).toContain('--lat-font-size-base: 1rem;')
-    expect(css).toContain('--lat-line-height-normal: 1.5;')
-    expect(css).toContain('--lat-font-weight-semibold: 600;')
-    expect(css.match(/--lat-/g)).toHaveLength(TYPOGRAPHY_PRIMITIVE_COUNT)
-  })
-
-  it('does not make the token package responsible for loading fonts', () => {
-    expect(typographyCss()).not.toContain('@font-face')
-  })
-
-  it('builds mechanically named DTCG groups', () => {
-    const tokens = typographyTokens()
-
-    expect(tokens['font-size'].base).toEqual({
-      $type: 'dimension',
-      $value: { value: 1, unit: 'rem' }
-    })
-    expect(tokens['line-height'].normal).toEqual({ $type: 'number', $value: 1.5 })
-    expect(tokens['font-weight'].semibold).toEqual({ $type: 'fontWeight', $value: 600 })
-    expect(tokens.font.sans).toEqual({
-      $type: 'fontFamily',
-      $value: [...FONT_FAMILIES.sans]
-    })
-    expect(tokens.font.inter).toEqual({
-      $type: 'fontFamily',
-      $value: [
-        'InterVariable',
-        'Inter Variable',
-        'Inter',
-        'ui-sans-serif',
-        'system-ui',
-        '-apple-system',
-        'Segoe UI',
-        'Roboto',
-        'Helvetica Neue',
-        'Arial',
-        'sans-serif'
-      ]
-    })
+  it('emits tracking in em, not rem', () => {
+    // Tracking must scale with the text it tracks. The eyebrow's 0.2em at 10px
+    // is 2px; the same value as rem would be 3.2px regardless of font size,
+    // and would grow relative to the glyphs at every size below 1rem —
+    // which is every size the mono roles use.
+    expect(typographyCss()).toContain('--lat-letter-spacing-eyebrow: 0.2em;')
   })
 })

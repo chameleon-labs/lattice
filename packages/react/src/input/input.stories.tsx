@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Input, type InputSize } from './input.js'
-
-const SIZES: readonly InputSize[] = ['sm', 'md', 'lg']
+import { Input } from './input.js'
 
 /**
  * A bare input, with no label of its own.
@@ -18,9 +16,6 @@ const meta = {
   args: {
     'aria-label': 'Page URL',
     placeholder: 'https://example.com/checkout'
-  },
-  argTypes: {
-    size: { control: 'inline-radio', options: SIZES }
   }
 } satisfies Meta<typeof Input>
 
@@ -30,21 +25,42 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
-export const Sizes: Story = {
-  render: (args) => (
-    <div className="lat-story__stack">
-      {SIZES.map((size) => (
-        <Input {...args} key={size} size={size} aria-label={`Page URL ${size}`} />
-      ))}
-    </div>
-  )
-}
-
-/** `invalid` sets `aria-invalid`; the red is the confirmation, never the message. */
+/** `invalid` sets `aria-invalid`; the red border is the confirmation, never the message. */
 export const Invalid: Story = {
   args: { invalid: true, 'aria-label': 'Page URL, invalid' }
 }
 
 export const Disabled: Story = {
   args: { disabled: true, 'aria-label': 'Page URL, unavailable' }
+}
+
+/**
+ * `addonStart` renders inside the same wrapper that carries the border and
+ * the focus ring, so the icon sits inside the field rather than glued
+ * beside it — focus the control and the highlight encloses the icon too.
+ *
+ * The icon carries `aria-hidden`: it is decorative, and the accessible name
+ * still comes from `aria-label` alone.
+ */
+export const WithLeadingIcon: Story = {
+  args: {
+    'aria-label': 'Page URL',
+    addonStart: (
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <line x1="2" x2="22" y1="12" y2="12" />
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+      </svg>
+    )
+  }
 }

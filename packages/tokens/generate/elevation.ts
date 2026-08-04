@@ -1,146 +1,130 @@
-/**
- * Turning the calibrated recipes into the two artefacts.
- *
- * Two families with different scopes. Shadow primitives are theme-independent —
- * the same neutral black in both modes — so they emit once in the global tier.
- * Elevation roles reference per-scope step aliases, so they are repeated inside
- * every theme block for the reason the semantic colour tier already establishes:
- * a custom property holding a `var()` reference resolves on the element that
- * declares it, so one root declaration would freeze to the root theme.
- */
-
-import {
-  ELEVATION_LEVELS,
-  ELEVATION_SCALE,
-  SHADOWS,
-  type ShadowName,
-  type ShadowRecipe
-} from '../config/elevation.js'
-import type { Mode } from '../config/lightness.js'
-
-/**
- * The shadow's colour.
- *
- * Neutral by decision, and written in OKLCH so the stylesheet holds no hex and
- * no second colour syntax. `hex` is deliberately absent: DTCG makes it optional
- * and it cannot express alpha, so carrying one would publish an opaque black
- * next to a translucent one.
- */
-export interface ShadowColor {
-  readonly colorSpace: 'oklch'
-  readonly components: readonly [number, number, number]
-  readonly alpha: number
-}
-
-export interface ShadowDimension {
-  readonly value: number
-  readonly unit: 'px'
-}
-
-export interface ShadowToken {
-  readonly $type: 'shadow'
-  readonly $value: {
-    readonly color: ShadowColor
-    readonly offsetX: ShadowDimension
-    readonly offsetY: ShadowDimension
-    readonly blur: ShadowDimension
-    readonly spread: ShadowDimension
-  }
-}
+import { ELEVATION_ROLES, SHADOWS, type ShadowLayer, type ShadowName } from '../config/elevation.js'
 
 export const SHADOW_PRIMITIVE_COUNT = Object.keys(SHADOWS).length
+export const ELEVATION_ROLE_COUNT = Object.keys(ELEVATION_ROLES).length
 
-const px = (value: number): ShadowDimension => ({ value, unit: 'px' })
+/**
+ * Formats one shadow length for the `box-shadow` shorthand: a literal zero
+ * carries no unit, matching how a browser round-trips the value, and every
+ * non-zero length is `px` — Lattice's shadows are unitless design values,
+ * not rem-relative ones.
+ */
+function px(value: number): string {
+  return value === 0 ? '0' : `${value}px`
+}
 
-const shadowToken = (recipe: ShadowRecipe): ShadowToken => ({
-  $type: 'shadow',
-  $value: {
-    color: { colorSpace: 'oklch', components: [0, 0, 0], alpha: recipe.alpha },
-    offsetX: px(recipe.offsetX),
-    offsetY: px(recipe.offsetY),
-    blur: px(recipe.blur),
-    spread: px(recipe.spread)
-  }
+/** One shadow layer as a `box-shadow` value fragment. */
+function layerCss(layer: ShadowLayer): string {
+  return `${px(layer.offsetX)} ${px(layer.offsetY)} ${px(layer.blur)} ${px(layer.spread)} rgb(0 0 0 / ${layer.alpha})`
+}
+
+/** A full, possibly multi-layer, shadow as CSS — layers joined by `, `. */
+function shadowToCss(layers: readonly ShadowLayer[]): string {
+  return layers.map(layerCss).join(', ')
+}
+
+const SHADOW_CSS = Object.fromEntries(
+  Object.entries(SHADOWS).map(([name, layers]) => [name, shadowToCss(layers)])
+) as Record<ShadowName, string>
+
+/**
+ * Elevation tokens.
+ *
+ * Emitted once on `:root` rather than per theme. The prior system varied shadow
+ * by mode; Lattice declares one set and uses it in both.
+ */
+export function elevationCss(): string {
+  return [
+    ...Object.entries(SHADOW_CSS).map(([name, css]) => `  --lat-shadow-${name}: ${css};`),
+    ...Object.entries(ELEVATION_ROLES).map(
+      ([role, key]) => `  --lat-elevation-${role}: ${key === 'none' ? 'none' : SHADOW_CSS[key]};`
+    )
+  ].join('\n')
+}
+
+/** A DTCG dimension value in pixels — every shadow measurement here is one. */
+const pxValue = (value: number): { readonly value: number; readonly unit: 'px' } => ({
+  value,
+  unit: 'px'
 })
 
-export function shadowCss(): string {
-  return Object.entries(SHADOWS)
-    .map(
-      ([name, recipe]) =>
-        `  --lat-shadow-${name}: ${recipe.offsetX}px ${recipe.offsetY}px ` +
-        `${recipe.blur}px ${recipe.spread}px oklch(0 0 0 / ${recipe.alpha});`
-    )
-    .join('\n')
+/**
+ * A DTCG colour value for a shadow layer. Every shadow in this package is
+ * black at some alpha, so this stays a one-argument helper rather than a
+ * general colour builder.
+ */
+function blackAt(alpha: number): {
+  readonly colorSpace: 'srgb'
+  readonly components: readonly [number, number, number]
+  readonly alpha: number
+  readonly hex: string
+} {
+  return { colorSpace: 'srgb', components: [0, 0, 0], alpha, hex: '#000000' }
 }
 
-export function shadowTokens(): Readonly<Record<ShadowName, ShadowToken>> {
-  return Object.fromEntries(
-    Object.entries(SHADOWS).map(([name, recipe]) => [name, shadowToken(recipe)])
-  ) as Readonly<Record<ShadowName, ShadowToken>>
+/** One layer of a DTCG `shadow` token's `$value` array. */
+export interface ShadowLayerValue {
+  readonly color: ReturnType<typeof blackAt>
+  readonly offsetX: ReturnType<typeof pxValue>
+  readonly offsetY: ReturnType<typeof pxValue>
+  readonly blur: ReturnType<typeof pxValue>
+  readonly spread: ReturnType<typeof pxValue>
 }
 
-/** A DTCG role: always a reference, never a value. */
-export interface ElevationReference {
-  readonly $type: 'color' | 'shadow'
+/** A DTCG shadow token: always an array, even for `2xl`'s single layer — the
+ * format accepts a bare object or an array, and using the array form
+ * uniformly means a consumer never has to branch on which one it got. */
+export interface ShadowToken {
+  readonly $type: 'shadow'
+  readonly $description?: string
+  readonly $value: readonly ShadowLayerValue[]
+}
+
+/** A DTCG token whose `$value` is a reference to a shadow token. */
+export interface ShadowAliasToken {
+  readonly $type: 'shadow'
+  readonly $description?: string
   readonly $value: string
 }
 
-export type ElevationRoleTokens = Readonly<
-  Record<string, Readonly<Record<string, ElevationReference>>>
->
-
-export const ELEVATION_ROLE_COUNT = ELEVATION_LEVELS.reduce(
-  (total, level) => total + 1 + (level.border ? 1 : 0) + (level.shadow ? 1 : 0),
-  0
-)
-
-/**
- * The role declarations for one theme scope.
- *
- * Takes no mode: every value is a reference to a step alias that is itself
- * redeclared per scope, so the text is identical in the light block, the dark
- * block and the preference-driven block, and resolves differently in each.
- */
-export function elevationCss(indent = '  '): string {
-  const lines: string[] = []
-
-  for (const level of ELEVATION_LEVELS) {
-    lines.push(
-      `${indent}--lat-elevation-${level.level}-surface: var(--lat-${ELEVATION_SCALE}-${level.surface});`
-    )
-    if (level.border) {
-      lines.push(
-        `${indent}--lat-elevation-${level.level}-border: var(--lat-${ELEVATION_SCALE}-${level.border});`
-      )
-    }
-    if (level.shadow) {
-      lines.push(`${indent}--lat-elevation-${level.level}-shadow: var(--lat-shadow-${level.shadow});`)
-    }
+function shadowToken(layers: readonly ShadowLayer[]): ShadowToken {
+  return {
+    $type: 'shadow',
+    $value: layers.map((layer) => ({
+      color: blackAt(layer.alpha),
+      offsetX: pxValue(layer.offsetX),
+      offsetY: pxValue(layer.offsetY),
+      blur: pxValue(layer.blur),
+      spread: pxValue(layer.spread)
+    }))
   }
-
-  return lines.join('\n')
 }
 
-export function elevationTokens(mode: Mode): ElevationRoleTokens {
-  const groups: Record<string, Record<string, ElevationReference>> = {}
+/**
+ * The DTCG shape: raw shadows keyed by name, and elevation roles that alias
+ * one of them.
+ *
+ * `flat` is omitted from `elevation` — DTCG's shadow value schema requires at
+ * least one layer (`oneOf` a single shadow object or a non-empty array), so
+ * there is no legal value for "no shadow" to alias. The CSS
+ * `--lat-elevation-flat: none;` is the artefact of record for that role;
+ * `ELEVATION_ROLES.flat` in config is the source of truth that it has none.
+ */
+export function elevationTokens(): {
+  readonly shadow: Readonly<Record<ShadowName, ShadowToken>>
+  readonly elevation: Readonly<Record<string, ShadowAliasToken>>
+} {
+  const shadow = Object.fromEntries(
+    Object.entries(SHADOWS).map(([name, layers]) => [name, shadowToken(layers)])
+  ) as Record<ShadowName, ShadowToken>
 
-  for (const level of ELEVATION_LEVELS) {
-    const signals: Record<string, ElevationReference> = {
-      surface: { $type: 'color', $value: `{${mode}.${ELEVATION_SCALE}.${level.surface}}` }
+  const elevation: Record<string, ShadowAliasToken> = {}
+  for (const [role, key] of Object.entries(ELEVATION_ROLES)) {
+    if (key === 'none') {
+      continue
     }
-    if (level.border) {
-      signals['border'] = {
-        $type: 'color',
-        $value: `{${mode}.${ELEVATION_SCALE}.${level.border}}`
-      }
-    }
-    if (level.shadow) {
-      // Theme-independent by design, so this is the one role that points out of
-      // its own mode and into the global tier.
-      signals['shadow'] = { $type: 'shadow', $value: `{global.shadow.${level.shadow}}` }
-    }
-    groups[level.level] = signals
+    elevation[role] = { $type: 'shadow', $value: `{global.shadow.${key}}` }
   }
 
-  return groups as ElevationRoleTokens
+  return { shadow, elevation }
 }

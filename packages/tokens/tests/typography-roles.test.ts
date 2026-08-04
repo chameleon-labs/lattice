@@ -1,208 +1,64 @@
 import { describe, expect, it } from 'vitest'
+import { TYPOGRAPHY_ROLES } from '../config/typography-roles.js'
+import { typographyRoleCss } from '../generate/typography-roles.js'
 
-import {
-  FONT_FAMILIES,
-  FONT_SIZES,
-  FONT_WEIGHTS,
-  LETTER_SPACINGS,
-  LINE_HEIGHTS
-} from '../config/typography.js'
-import {
-  NARROW_HEADING_SIZES,
-  TYPOGRAPHY_BREAKPOINT_REM,
-  TYPOGRAPHY_ROLES
-} from '../config/typography-roles.js'
-import {
-  typographyRoleCss,
-  typographyRoleResponsiveCss,
-  typographyRoleTokens
-} from '../generate/typography-roles.js'
-
-describe('typography semantic roles', () => {
-  it('carries the approved eleven-role matrix', () => {
-    expect(TYPOGRAPHY_ROLES).toEqual({
-      body: {
-        fontFamily: 'sans',
-        fontSize: 'base',
-        fontWeight: 'regular',
-        letterSpacing: 'normal',
-        lineHeight: 'normal',
-        classification: 'prose'
-      },
-      'body-strong': {
-        fontFamily: 'sans',
-        fontSize: 'base',
-        fontWeight: 'semibold',
-        letterSpacing: 'normal',
-        lineHeight: 'normal',
-        classification: 'prose'
-      },
-      lead: {
-        fontFamily: 'sans',
-        fontSize: 'lg',
-        fontWeight: 'regular',
-        letterSpacing: 'normal',
-        lineHeight: 'relaxed',
-        classification: 'prose'
-      },
-      ui: {
-        fontFamily: 'sans',
-        fontSize: 'sm',
-        fontWeight: 'semibold',
-        letterSpacing: 'normal',
-        lineHeight: 'snug',
-        classification: 'ui'
-      },
-      caption: {
-        fontFamily: 'sans',
-        fontSize: 'xs',
-        fontWeight: 'regular',
-        letterSpacing: 'normal',
-        lineHeight: 'normal',
-        classification: 'supporting'
-      },
-      micro: {
-        fontFamily: 'sans',
-        fontSize: '2xs',
-        fontWeight: 'regular',
-        letterSpacing: 'normal',
-        lineHeight: 'normal',
-        classification: 'restricted'
-      },
-      code: {
-        fontFamily: 'mono',
-        fontSize: 'sm',
-        fontWeight: 'regular',
-        letterSpacing: 'normal',
-        lineHeight: 'normal',
-        classification: 'code'
-      },
-      'heading-1': {
-        fontFamily: 'sans',
-        fontSize: '4xl',
-        fontWeight: 'bold',
-        letterSpacing: 'normal',
-        lineHeight: 'tight',
-        classification: 'display'
-      },
-      'heading-2': {
-        fontFamily: 'sans',
-        fontSize: '3xl',
-        fontWeight: 'bold',
-        letterSpacing: 'normal',
-        lineHeight: 'tight',
-        classification: 'display'
-      },
-      'heading-3': {
-        fontFamily: 'sans',
-        fontSize: '2xl',
-        fontWeight: 'semibold',
-        letterSpacing: 'normal',
-        lineHeight: 'snug',
-        classification: 'display'
-      },
-      'heading-4': {
-        fontFamily: 'sans',
-        fontSize: 'xl',
-        fontWeight: 'semibold',
-        letterSpacing: 'normal',
-        lineHeight: 'snug',
-        classification: 'display'
-      }
-    })
-  })
-
-  it('references an existing primitive for every emitted property', () => {
-    for (const role of Object.values(TYPOGRAPHY_ROLES)) {
-      expect(FONT_FAMILIES).toHaveProperty(role.fontFamily)
-      expect(FONT_SIZES).toHaveProperty(role.fontSize)
-      expect(FONT_WEIGHTS).toHaveProperty(role.fontWeight)
-      expect(LETTER_SPACINGS).toHaveProperty(role.letterSpacing)
-      expect(LINE_HEIGHTS).toHaveProperty(role.lineHeight)
+describe('typography roles', () => {
+  it('defines the five mono roles', () => {
+    for (const role of ['eyebrow', 'meta', 'tag', 'numeric', 'code'] as const) {
+      expect(TYPOGRAPHY_ROLES[role]!.fontFamily).toBe('mono')
     }
   })
 
-  it('keeps prose roles at the approved size and leading floors', () => {
-    const proseRoles = Object.values(TYPOGRAPHY_ROLES).filter(
-      (role) => role.classification === 'prose'
-    )
-
-    expect(proseRoles).toHaveLength(3)
-    for (const role of proseRoles) {
-      expect(FONT_SIZES[role.fontSize]).toBeGreaterThanOrEqual(FONT_SIZES.base)
-      expect(LINE_HEIGHTS[role.lineHeight]).toBeGreaterThanOrEqual(LINE_HEIGHTS.normal)
-    }
+  it('gives the eyebrow uppercase at 0.2em', () => {
+    const eyebrow = TYPOGRAPHY_ROLES.eyebrow!
+    expect(eyebrow.fontSize).toBe('3xs')
+    expect(eyebrow.letterSpacing).toBe('eyebrow')
+    expect(eyebrow.textTransform).toBe('uppercase')
   })
 
-  it('reserves 2xs for the restricted micro role', () => {
-    const smallest = Object.entries(TYPOGRAPHY_ROLES).filter(
-      ([, role]) => role.fontSize === '2xs'
-    )
-
-    expect(smallest).toEqual([['micro', expect.objectContaining({ classification: 'restricted' })]])
+  it('gives the numeric role tabular figures', () => {
+    expect(TYPOGRAPHY_ROLES.numeric!.fontVariantNumeric).toBe('tabular-nums')
   })
 
-  it('keeps Inter opt-in and the public hierarchy at four headings', () => {
-    const usedFamilies: readonly string[] = Object.values(TYPOGRAPHY_ROLES).map(
-      (role) => role.fontFamily
-    )
-
-    expect(usedFamilies).not.toContain('inter')
-    expect(Object.keys(TYPOGRAPHY_ROLES).filter((name) => name.startsWith('heading-'))).toEqual([
-      'heading-1',
-      'heading-2',
-      'heading-3',
-      'heading-4'
-    ])
+  it("matches the Figma bundle's specimen for the sans roles", () => {
+    expect(TYPOGRAPHY_ROLES.display!.fontSize).toBe('5xl')
+    expect(TYPOGRAPHY_ROLES.display!.fontWeight).toBe('bold')
+    expect(TYPOGRAPHY_ROLES.h1!.fontSize).toBe('3xl')
+    expect(TYPOGRAPHY_ROLES.h1!.fontWeight).toBe('semibold')
+    expect(TYPOGRAPHY_ROLES.h2!.fontWeight).toBe('medium')
+    expect(TYPOGRAPHY_ROLES.body!.fontSize).toBe('base')
   })
 
-  it('steps exactly the first three headings below 40rem', () => {
-    expect(TYPOGRAPHY_BREAKPOINT_REM).toBe(40)
-    expect(NARROW_HEADING_SIZES).toEqual({
-      'heading-1': '3xl',
-      'heading-2': '2xl',
-      'heading-3': 'xl'
-    })
-  })
+  // The three below assert the emitted CSS, not the config object. Everything
+  // above would pass unchanged if Step 6's emission code were deleted outright —
+  // the config fields were already true before it existed. These are what
+  // actually cover the generator.
 
-  it('emits five mechanically named CSS aliases per role', () => {
+  it('emits the optional properties for the roles that declare them', () => {
     const css = typographyRoleCss()
+    expect(css).toContain('--lat-text-eyebrow-text-transform: uppercase;')
+    expect(css).toContain('--lat-text-tag-text-transform: uppercase;')
+    expect(css).toContain('--lat-text-numeric-font-variant-numeric: tabular-nums;')
+  })
 
-    expect(css).toContain(
-      '  --lat-text-body-font-family: var(--lat-font-sans);\n' +
-        '  --lat-text-body-font-size: var(--lat-font-size-base);\n' +
-        '  --lat-text-body-font-weight: var(--lat-font-weight-regular);\n' +
-        '  --lat-text-body-letter-spacing: var(--lat-letter-spacing-normal);\n' +
-        '  --lat-text-body-line-height: var(--lat-line-height-normal);'
+  it('emits nothing extra for a role that declares neither', () => {
+    // The failure this catches is a leaked `undefined` declaration, which is
+    // silently invalid CSS rather than an error.
+    const css = typographyRoleCss()
+    expect(css).not.toContain('--lat-text-body-text-transform')
+    expect(css).not.toContain('--lat-text-body-font-variant-numeric')
+    expect(css).not.toContain('undefined')
+  })
+
+  it('carries the eyebrow tracking through to the emitted role', () => {
+    // typographyRoleCss() aliases every one of the five base properties to its
+    // primitive via var() — same as body-font-family -> var(--lat-font-sans)
+    // above — rather than inlining the resolved value. The literal 0.2em lives
+    // in config/typography.ts and is only ever inlined by typographyCss(), the
+    // separate primitives generator. This assertion checks the alias is wired
+    // to the right primitive name, which is what this generator can promise.
+    expect(typographyRoleCss()).toContain(
+      '--lat-text-eyebrow-letter-spacing: var(--lat-letter-spacing-eyebrow);'
     )
-    expect(css.match(/--lat-text-/g)).toHaveLength(11 * 5)
-    expect(css).not.toContain('classification')
-  })
-
-  it('emits default roles as complete DTCG typography composites', () => {
-    const tokens = typographyRoleTokens()
-
-    expect(tokens.body).toEqual({
-      $type: 'typography',
-      $value: {
-        fontFamily: '{global.font.sans}',
-        fontSize: '{global.font-size.base}',
-        fontWeight: '{global.font-weight.regular}',
-        letterSpacing: '{global.letter-spacing.normal}',
-        lineHeight: '{global.line-height.normal}'
-      }
-    })
-    expect(Object.keys(tokens)).toHaveLength(11)
-    expect(JSON.stringify(tokens)).not.toContain('classification')
-  })
-
-  it('emits only the approved responsive heading overrides', () => {
-    expect(typographyRoleResponsiveCss()).toBe(`@media (width < 40rem) {
-  :root {
-    --lat-text-heading-1-font-size: var(--lat-font-size-3xl);
-    --lat-text-heading-2-font-size: var(--lat-font-size-2xl);
-    --lat-text-heading-3-font-size: var(--lat-font-size-xl);
-  }
-}`)
   })
 })

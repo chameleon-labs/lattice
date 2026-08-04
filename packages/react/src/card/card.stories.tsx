@@ -1,13 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Badge } from '../badge/badge.js'
 import { Button } from '../button/button.js'
-import { Card } from './card.js'
+import { Card, CardBody, CardHeader } from './card.js'
 
 /**
- * The `raised` elevation role as a component: surface, border and shadow
- * together. All three ship because each covers a case the others cannot — the
- * shadow reads on light and is effectively absent on dark, the surface step
- * reads on dark, and the border is the only one that survives `forced-colors`.
+ * A `--lat-bg-raised` surface with a hairline border. Every panel in both
+ * demo pages is this construction: the surface, a `border-bottom` header
+ * row carrying an uppercase mono eyebrow label, and a body. The hairline is
+ * the edge that survives `forced-colors`, where the user agent strips shadows
+ * and flattens surfaces — the shadow `Card` adds under `data-elevation`
+ * is the enhancement, not the guarantee.
  */
 const meta = {
   title: 'Components/Card',
@@ -22,8 +24,42 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   render: (args) => (
     <Card {...args}>
-      <h3>example.com/checkout</h3>
-      <p>Score 72 — 3 critical, 5 serious.</p>
+      <CardHeader label="Audit" />
+      <CardBody>
+        <h3>example.com/checkout</h3>
+        <p>Score 72 — 3 critical, 5 serious.</p>
+      </CardBody>
+    </Card>
+  )
+}
+
+/**
+ * `data-elevation="floating"` is the escape hatch, not a default — the one
+ * instance the Figma bundle's landing page uses it for is the hero audit card.
+ */
+export const Floating: Story = {
+  render: (args) => (
+    <Card {...args} data-elevation="floating">
+      <CardHeader label="Audit" />
+      <CardBody>
+        <h3>example.com/checkout</h3>
+        <p>Score 72 — 3 critical, 5 serious.</p>
+      </CardBody>
+    </Card>
+  )
+}
+
+/**
+ * `CardHeader`'s children render after the label, so a caller can put a count
+ * or a control on the right of the header row.
+ */
+export const HeaderWithAside: Story = {
+  render: (args) => (
+    <Card {...args}>
+      <CardHeader label="Tokens">
+        <Badge variant="info">12</Badge>
+      </CardHeader>
+      <CardBody>content</CardBody>
     </Card>
   )
 }
@@ -43,11 +79,14 @@ export const Default: Story = {
 export const WithAction: Story = {
   render: (args) => (
     <Card {...args}>
-      <h3>example.com/pricing</h3>
-      <p>
-        Score 84 <Badge tone="success">up 3</Badge>
-      </p>
-      <Button render={<a href="#story" />}>Open the report</Button>
+      <CardHeader label="Pricing" />
+      <CardBody>
+        <h3>example.com/pricing</h3>
+        <p>
+          Score 84 <Badge variant="success">up 3</Badge>
+        </p>
+        <Button render={<a href="#story" />}>Open the report</Button>
+      </CardBody>
     </Card>
   )
 }

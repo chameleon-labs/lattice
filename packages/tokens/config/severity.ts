@@ -1,71 +1,63 @@
 /**
- * The severity ramp: four ordered levels for accessibility impact.
+ * The severity ramp.
  *
- * Accessibility audit engines report impact on a four-level scale, and those
- * levels are **ordered**. Semantic `danger` and `warning` cannot express an
- * order — they are two categories, not four rungs — so severity gets its own
- * ramp.
+ * Taken from the impact badges on the Figma bundle's tabstop landing page. `minor`
+ * carries no colour of its own — it uses `--lat-text-subtle`, which is what the
+ * bundle does — so it is not anchored here.
  *
- * ## The usage rule
+ * ## The rule that makes this safe
  *
- * **Colour never carries severity alone. Every severity mark ships with an icon
- * and a text label.** This is a rule, not a suggestion, and it is load-bearing
- * rather than defensive: in dark mode two adjacent levels differ by roughly
- * 0.5 ΔE under deuteranopia, which is indistinguishable. A reader who cannot
- * separate the hues has only the icon and the label.
- *
- * ## Why the two modes differ
- *
- * Light moves lightness *and* chroma monotonically, so the ramp reads as ordered
- * in greyscale, under CVD simulation, and in forced-colors mode.
- *
- * Dark holds lightness flat at 0.70 and lets hue and chroma carry the ramp.
- * Forcing lightness to climb with severity there produced a pale pink for
- * `critical` — making the most urgent level the least urgent-looking, which is
- * worse than losing the greyscale cue. The residual greyscale ordering dark
- * still has is incidental and about eight times weaker than light's; it is not
- * something to rely on, which is what the usage rule above exists for.
+ * Colour never carries severity alone. Every severity indicator ships an icon
+ * **and** a text label. That is a hard rule, not a recommendation. The lightness
+ * ordering below is a safety net for when hue fails — `serious` at hue 56 and
+ * `moderate` at hue 84 are 28 degrees apart, which protanopia and deuteranopia
+ * do not preserve — and the net is not the defence.
  */
+import type { Mode } from './modes.js'
 
-import type { Mode } from './lightness.js'
-
-/** Ordered from least to most severe. The order is the point. */
-export const SEVERITY_LEVELS = ['minor', 'moderate', 'serious', 'critical'] as const
+export const SEVERITY_LEVELS = ['critical', 'serious', 'moderate', 'minor'] as const
 
 export type SeverityLevel = (typeof SEVERITY_LEVELS)[number]
 
-export interface SeverityConfig {
-  readonly level: SeverityLevel
-  /**
-   * Hue rotates yellow to red as severity rises. This is a *secondary* cue:
-   * hue alone is what CVD takes away.
-   */
-  readonly hue: number
-  /** Light mode moves both of these, which is what keeps the ramp ordered. */
-  readonly light: { readonly l: number; readonly c: number }
+/**
+ * `undefined` means the Figma bundle did not declare it and the generator must derive
+ * it. Only light `moderate` is in that position.
+ */
+export const SEVERITY_ANCHORS: Record<Mode, Record<SeverityLevel, string | undefined>> = {
+  dark: {
+    critical: '#ff4d6a',
+    serious: '#fb923c',
+    moderate: '#fbbf24',
+    minor: undefined
+  },
+  light: {
+    critical: '#d41240',
+    serious: '#ea580c',
+    moderate: undefined,
+    minor: undefined
+  }
 }
 
-export const SEVERITY: readonly SeverityConfig[] = [
-  { level: 'minor', hue: 88, light: { l: 0.64, c: 0.13 } },
-  { level: 'moderate', hue: 62, light: { l: 0.585, c: 0.15 } },
-  { level: 'serious', hue: 36, light: { l: 0.53, c: 0.17 } },
-  { level: 'critical', hue: 14, light: { l: 0.475, c: 0.19 } }
-]
-
 /**
- * Dark mode is flat in lightness and uniform in chroma, so only hue separates
- * the levels. See the module comment for why, and for what that costs.
- */
-export const SEVERITY_DARK = { lightness: 0.7, chroma: 0.17 } as const
-
-/** Every severity mark must clear this against its surface. */
-export const SEVERITY_CONTRAST_MIN = 3
-
-/**
- * The smallest greyscale gap the light ramp must keep between adjacent levels.
+ * How far light sits below dark for the same level.
  *
- * Set from the measured ramp, whose tightest gap is 0.042. It exists so a change
- * that flattens the ramp toward dark mode's incidental 0.0055 fails rather than
- * quietly removing the one cue that survives without colour.
+ * The Figma bundle declares two levels in both modes, so this is a choice rather than
+ * the only available measurement:
+ *
+ * | level | dark L | light L | delta |
+ * | --- | --- | --- | --- |
+ * | critical | 0.678 | 0.556 | −0.122 |
+ * | serious | 0.758 | 0.646 | **−0.112** |
+ *
+ * `serious` is the basis because it is `moderate`'s neighbour in both the ramp
+ * and the colour wheel — serious sits at hue 56 and moderate at 84, both warm,
+ * while critical is red at 16. How far a colour can drop in lightness between
+ * modes depends on how much gamut headroom its hue has, so extrapolating from
+ * the nearest hue is the smaller leap. Using critical's −0.122 instead would
+ * put the derived value at L ≈ 0.715.
+ *
+ * Applied to dark `moderate` to place its light counterpart, so the derived
+ * value sits where the palette's own arithmetic puts it rather than where it
+ * looked right.
  */
-export const SEVERITY_MIN_LUMINANCE_GAP: Record<Mode, number> = { light: 0.04, dark: 0 }
+export const LIGHT_LIGHTNESS_DELTA = -0.112

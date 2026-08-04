@@ -10,7 +10,8 @@ import {
 
 /**
  * Focus trapped, focus returned, scroll locked, labelled — all four owned by
- * Ariakit. Lattice supplies the surface, which uses the `modal` elevation role.
+ * Ariakit. Lattice supplies the surface, which shares `--lat-elevation-overlay`
+ * with Menu.
  *
  * `tests/browser/a11y.spec.ts` drives the `Closed` story: it clicks the trigger,
  * tabs past the last control to prove the trap holds, presses Escape, and
@@ -33,8 +34,8 @@ function Confirmation() {
       <DialogHeading>Remove this page?</DialogHeading>
       <p>This cannot be undone. Its audit history is removed with it.</p>
       <div className="lat-story__row">
-        <DialogDismiss render={<Button tone="neutral" />}>Cancel</DialogDismiss>
-        <DialogDismiss render={<Button variant="solid" tone="danger" />}>Remove</DialogDismiss>
+        <DialogDismiss render={<Button variant="secondary" />}>Cancel</DialogDismiss>
+        <DialogDismiss render={<Button variant="destructive" />}>Remove</DialogDismiss>
       </div>
     </>
   )

@@ -25,9 +25,9 @@ export type DialogDisclosureProps<T extends ElementType = 'button'> =
  *
  * #20 states its confirmation must not be `window.confirm`, and this is what
  * makes that practical rather than aspirational. Ariakit owns every one of
- * those four behaviours; this supplies the surface, which uses the `modal`
- * elevation role — surface, border and shadow together, because on a dark
- * surface a shadow is not subtle but absent.
+ * those four behaviours; this supplies the surface, which shares
+ * `--lat-elevation-overlay` with Menu — surface, border and shadow together,
+ * because on a dark surface a shadow is not subtle but absent.
  */
 export function Dialog<T extends ElementType = 'div'>({ className, ...props }: DialogProps<T>) {
   return (
@@ -71,9 +71,8 @@ export function DialogDisclosure<T extends ElementType = 'button'>({
     <AriakitDialogDisclosure
       {...props}
       className={className === undefined ? 'lat-button' : `lat-button ${className}`}
-      data-variant="soft"
+      data-variant="secondary"
       data-size="md"
-      data-tone="accent"
     />
   )
 }

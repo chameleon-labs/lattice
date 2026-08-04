@@ -12,27 +12,26 @@ describe('motion primitive contracts', () => {
   it('carries the exact five-duration scale', () => {
     expect(DURATIONS).toEqual({
       instant: 0,
-      fast: 100,
-      base: 150,
-      slow: 250,
-      slower: 400
+      swift: 100,
+      default: 200,
+      deliberate: 350,
+      expressive: 500
     })
   })
 
-  it('keeps every duration finite, non-negative and within the ceiling', () => {
+  it('keeps every duration finite and non-negative', () => {
     const values = Object.values(DURATIONS)
 
     expect(values).toHaveLength(5)
     expect(values.every(Number.isFinite)).toBe(true)
     expect(values.every((value) => value >= 0)).toBe(true)
-    expect(Math.max(...values)).toBe(400)
+    expect(Math.max(...values)).toBe(500)
   })
 
-  it('carries the exact three easing curves', () => {
+  it('carries the exact two easing curves', () => {
     expect(EASINGS).toEqual({
-      standard: [0.2, 0, 0, 1],
-      entrance: [0, 0, 0, 1],
-      exit: [0.3, 0, 1, 1]
+      out: [0, 0, 0.2, 1],
+      'in-out': [0.4, 0, 0.2, 1]
     })
   })
 
@@ -47,20 +46,19 @@ describe('motion primitive contracts', () => {
 
 describe('motion primitive generation', () => {
   it('derives the exact family and total counts', () => {
-    expect(MOTION_PRIMITIVE_COUNTS).toEqual({ duration: 5, easing: 3 })
-    expect(MOTION_PRIMITIVE_COUNT).toBe(8)
+    expect(MOTION_PRIMITIVE_COUNTS).toEqual({ duration: 5, easing: 2 })
+    expect(MOTION_PRIMITIVE_COUNT).toBe(7)
   })
 
   it('emits exactly one CSS value per primitive', () => {
     const css = motionCss()
 
-    expect(css.match(/--lat-/g)).toHaveLength(8)
+    expect(css.match(/--lat-/g)).toHaveLength(7)
     expect(css).toContain('--lat-duration-instant: 0ms;')
-    expect(css).toContain('--lat-duration-base: 150ms;')
-    expect(css).toContain('--lat-duration-slower: 400ms;')
-    expect(css).toContain('--lat-easing-standard: cubic-bezier(0.2, 0, 0, 1);')
-    expect(css).toContain('--lat-easing-entrance: cubic-bezier(0, 0, 0, 1);')
-    expect(css).toContain('--lat-easing-exit: cubic-bezier(0.3, 0, 1, 1);')
+    expect(css).toContain('--lat-duration-default: 200ms;')
+    expect(css).toContain('--lat-duration-expressive: 500ms;')
+    expect(css).toContain('--lat-easing-out: cubic-bezier(0, 0, 0.2, 1);')
+    expect(css).toContain('--lat-easing-in-out: cubic-bezier(0.4, 0, 0.2, 1);')
     expect(css).not.toContain('prefers-reduced-motion')
     expect(css).not.toContain('transition')
   })
@@ -69,13 +67,13 @@ describe('motion primitive generation', () => {
     const tokens = motionTokens()
 
     expect(Object.keys(tokens)).toEqual(['duration', 'easing'])
-    expect(tokens.duration.base).toEqual({
+    expect(tokens.duration.default).toEqual({
       $type: 'duration',
-      $value: { value: 150, unit: 'ms' }
+      $value: { value: 200, unit: 'ms' }
     })
-    expect(tokens.easing.standard).toEqual({
+    expect(tokens.easing.out).toEqual({
       $type: 'cubicBezier',
-      $value: [0.2, 0, 0, 1]
+      $value: [0, 0, 0.2, 1]
     })
   })
 
@@ -98,5 +96,21 @@ describe('motion primitive generation', () => {
   it('is deterministic', () => {
     expect(motionCss()).toBe(motionCss())
     expect(JSON.stringify(motionTokens())).toBe(JSON.stringify(motionTokens()))
+  })
+})
+
+describe('Lattice motion presets', () => {
+  it('carries the five named durations', () => {
+    expect(DURATIONS).toEqual({
+      instant: 0,
+      swift: 100,
+      default: 200,
+      deliberate: 350,
+      expressive: 500
+    })
+  })
+
+  it('carries out and in-out, and no spring curve', () => {
+    expect(Object.keys(EASINGS).sort()).toEqual(['in-out', 'out'])
   })
 })

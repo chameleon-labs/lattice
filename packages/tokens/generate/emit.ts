@@ -1,28 +1,29 @@
 /**
- * Turning generated scales into the two shippable artefacts.
+ * Turning anchors and derived values into the two shippable artefacts.
  *
  * `lattice.css` is what a consumer imports; `tokens.json` is the machine-readable
  * form, in the Design Tokens Community Group format.
  *
- * Emits the **primitive tier**, the **chart palettes**, the **severity ramp** and
- * the **semantic tier** — step aliases and role aliases — in both artefacts. The
- * stylesheet expresses aliases as `var()` references and the JSON as DTCG
- * `{group.token}` references, so a consumer reading only the JSON sees the same
- * two tiers rather than primitives with no meaning attached.
+ * Emits the **primitive tier** (the Figma bundle's anchored roles), the **chart
+ * palettes**, the **severity ramp** and the **semantic tier** — alpha and role
+ * aliases — in both artefacts. The stylesheet expresses aliases as `var()`
+ * references and the JSON as DTCG `{group.token}` references, so a consumer
+ * reading only the JSON sees the same tiers rather than primitives with no
+ * meaning attached.
  */
 
-import { ORDINAL_CLAMP } from '../config/charts.js'
-import { MODES, STEPS, type Mode } from '../config/lightness.js'
-import { ON_SOLID_ROLE, ROLE_ALIASES, STEP_SLUGS } from '../config/semantic.js'
-import { SCALE_JOBS, STEP_JOBS } from '../config/steps.js'
+import { CHROMATIC_SCALES, GRAY_ROLES } from '../config/anchors.js'
+import { MODES, type Mode } from '../config/modes.js'
+import { ROLE_ALIASES } from '../config/semantic.js'
 import { buildCategorical, buildSequential } from './charts.js'
+import { CHECKS, ORDINAL_CLAMP } from '../config/charts.js'
+import { deltaE } from './cvd.js'
+import { parseHex, srgbToOklch } from './oklch.js'
 import {
   ELEVATION_ROLE_COUNT,
   SHADOW_PRIMITIVE_COUNT,
   elevationCss,
-  elevationTokens,
-  shadowCss,
-  shadowTokens
+  elevationTokens
 } from './elevation.js'
 import {
   LAYOUT_PRIMITIVE_COUNTS,
@@ -34,9 +35,12 @@ import {
   motionCss,
   motionTokens
 } from './motion.js'
-import type { Scale, Swatch } from './scale.js'
-import { accentOnSolid, semanticBlock } from './semantic.js'
-import { buildSeverity } from './severity.js'
+import { resolveAlpha, resolveAll, resolveTints } from './anchors.js'
+import type { AlphaToken, Swatch } from './anchors.js'
+import { formatOklch } from './format.js'
+import { fontFaceCss } from './fonts.js'
+import { semanticBlock } from './semantic.js'
+import { buildSeverity, resolveSeverityTints } from './severity.js'
 import {
   TYPOGRAPHY_PRIMITIVE_COUNT,
   typographyCss,
@@ -56,37 +60,14 @@ import {
  */
 export const DTCG_SCHEMA = 'https://www.designtokens.org/schemas/2025.10/format.json'
 
+export { formatOklch }
+
 /**
- * Decimal places kept in an emitted colour.
- *
- * Not cosmetic. At three places — the precision the spec's own tables print — 21
- * of the 120 generated colours re-emit as a different byte, and at five places two
- * still do: the solved success steps, whose lightness comes off a binary search
- * rather than the curve. Six round-trips all 120 exactly, so the colour a browser
- * computes is the colour whose contrast was verified.
+ * The semantic block for one theme, plus the chart palettes and severity ramp
+ * that are also theme-dependent. `semanticBlock` itself already covers
+ * primitives, the alpha tier and the role aliases.
  */
-const PLACES = 6
-
-function trim(value: number): string {
-  // toFixed then back through Number drops trailing zeros, so a hue stays `305`
-  // rather than becoming `305.000000`.
-  return String(Number(value.toFixed(PLACES)))
-}
-
-/** A swatch as a CSS `oklch()` value. */
-export function formatOklch(swatch: Pick<Swatch, 'l' | 'c' | 'h'>): string {
-  return `oklch(${trim(swatch.l)} ${trim(swatch.c)} ${trim(swatch.h)})`
-}
-
-const customProperty = (scale: Scale, swatch: Swatch): string =>
-  `  --lat-${scale.name}-${swatch.step}: ${formatOklch(swatch)};`
-
-function themedBlock(scales: readonly Scale[], mode: Mode): string {
-  const primitives = scales
-    .filter((scale) => scale.mode === mode)
-    .map((scale) => scale.steps.map((swatch) => customProperty(scale, swatch)).join('\n'))
-    .join('\n\n')
-
+function themedBlock(mode: Mode): string {
   const categorical = buildCategorical(mode)
     .map((swatch) => `  --lat-chart-${swatch.slot}: ${formatOklch(swatch)};`)
     .join('\n')
@@ -99,22 +80,22 @@ function themedBlock(scales: readonly Scale[], mode: Mode): string {
     .map((swatch) => `  --lat-chart-sequential-${swatch.step}: ${formatOklch(swatch)};`)
     .join('\n')
 
-  const severity = buildSeverity(mode)
-    .map((swatch) => `  --lat-severity-${swatch.level}: ${formatOklch(swatch)};`)
-    .join('\n')
+  const severity = [
+    ...buildSeverity(mode).map((swatch) => `  --lat-severity-${swatch.role}: ${formatOklch(swatch)};`),
+    // `minor` has no colour of its own — it borrows the subdued text role.
+    '  --lat-severity-minor: var(--lat-text-subtle);',
+    ...resolveSeverityTints(mode).map((t) => `  --lat-${t.role}: ${t.value};`),
+    // `minor`'s tint pair borrows the neutral pair rather than computing one,
+    // the same way its solid borrows --lat-text-subtle above.
+    '  --lat-severity-minor-tint: var(--lat-wash);',
+    '  --lat-severity-minor-tint-border: var(--lat-border);'
+  ].join('\n')
 
   // The semantic tier goes in every block rather than once on :root. An alias
   // holding a var() reference resolves on the element that declares it, so a
   // single root declaration would freeze to the root theme and keep that value
   // inside a nested scope that redefines the primitive underneath.
-  return [
-    primitives,
-    categorical,
-    sequential,
-    severity,
-    semanticBlock(scales, mode),
-    elevationCss()
-  ].join('\n\n')
+  return [categorical, sequential, severity, semanticBlock(mode)].join('\n\n')
 }
 
 /**
@@ -140,31 +121,33 @@ function themedBlock(scales: readonly Scale[], mode: Mode): string {
  * the one an 8-bit display produces, and the unquantised colour differs from it
  * by less than a single step.
  */
-export function emitCss(scales: readonly Scale[]): string {
+export function emitCss(): string {
   const [light, dark] = MODES
 
   return `/* Lattice tokens — generated by generate/emit.ts. Do not edit by hand. */
-/* Colour primitives: ${scales.length / MODES.length} scales x ${STEPS} steps, both modes. */
+/* Colour: ${GRAY_ROLES.length} grey roles + ${CHROMATIC_SCALES.length} chromatic solids, both modes. */
 /* Typography: ${TYPOGRAPHY_PRIMITIVE_COUNT} primitives; ${TYPOGRAPHY_ROLE_COUNT} semantic roles x ${TYPOGRAPHY_ROLE_PROPERTY_COUNT} properties. */
 /* Layout primitives: ${LAYOUT_PRIMITIVE_COUNTS.space} spacing; ${LAYOUT_PRIMITIVE_COUNTS.breakpoint} breakpoints; ${LAYOUT_PRIMITIVE_COUNTS.container} containers; ${LAYOUT_PRIMITIVE_COUNTS.radius} radii. */
 /* Motion primitives: ${MOTION_PRIMITIVE_COUNTS.duration} durations; ${MOTION_PRIMITIVE_COUNTS.easing} easings. */
-/* Elevation: ${SHADOW_PRIMITIVE_COUNT} shadows; ${ELEVATION_ROLE_COUNT} role tokens per theme. */
+/* Elevation: ${SHADOW_PRIMITIVE_COUNT} shadows; ${ELEVATION_ROLE_COUNT} role tokens, emitted once for both modes. */
+
+${fontFaceCss()}
 
 :root {
 ${typographyCss()}
 ${layoutCss()}
 ${motionCss()}
-${shadowCss()}
 ${typographyRoleCss()}
+${elevationCss()}
 }
 
 :root,
 [data-lat-theme='${light}'] {
-${themedBlock(scales, light!)}
+${themedBlock(light!)}
 }
 
 [data-lat-theme='${dark}'] {
-${themedBlock(scales, dark!)}
+${themedBlock(dark!)}
 }
 
 /* The OS preference supplies the default and an explicit stamp overrides it in
@@ -172,7 +155,7 @@ ${themedBlock(scales, dark!)}
    element that has asked for light. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-lat-theme='${light}']) {
-${themedBlock(scales, dark!)
+${themedBlock(dark!)
     .split('\n')
     .map((line) => (line ? `  ${line}` : line))
     .join('\n')}
@@ -183,10 +166,22 @@ ${typographyRoleResponsiveCss()}
 `
 }
 
+/**
+ * How an emitted colour token knows whether it came from the Figma bundle directly or
+ * was computed here. Namespaced under the org so a reader parsing `tokens.json`
+ * with a generic DTCG tool does not mistake it for a spec-defined field.
+ */
+export interface OriginExtension {
+  readonly 'com.chameleon-labs.lattice': {
+    readonly origin: Swatch['origin']
+  }
+}
+
 /** A DTCG colour token. */
 export interface ColorToken {
   readonly $type: 'color'
   readonly $description?: string
+  readonly $extensions?: OriginExtension
   readonly $value: {
     readonly colorSpace: 'oklch'
     /** `[lightness, chroma, hue]`. */
@@ -201,9 +196,9 @@ export interface ColorToken {
  * A DTCG token whose value is a reference to another token.
  *
  * The format's own alias mechanism, `{group.token}`. The semantic tier is
- * expressed with it so `tokens.json` carries the same two tiers the stylesheet
- * does — a consumer reading only the JSON would otherwise see primitives and no
- * meaning.
+ * expressed with it so `tokens.json` carries the same reference structure the
+ * stylesheet does — a consumer reading only the JSON would otherwise see
+ * primitives and no meaning.
  */
 export interface AliasToken {
   readonly $type: 'color'
@@ -217,7 +212,20 @@ export interface DesignTokens {
   readonly [mode: string]: unknown
 }
 
-function colorValue(l: number, c: number, h: number, hex: string): ColorToken['$value'] {
+/**
+ * Decimal places kept in an emitted colour. Six round-trips every anchor
+ * exactly, so the colour a browser computes is the colour whose contrast was
+ * measured. Mirrors the private constant in `./format.ts`.
+ */
+const PLACES = 6
+
+function colorValue(
+  l: number,
+  c: number,
+  h: number,
+  hex: string,
+  alpha: number = 1
+): ColorToken['$value'] {
   return {
     colorSpace: 'oklch',
     components: [
@@ -225,17 +233,107 @@ function colorValue(l: number, c: number, h: number, hex: string): ColorToken['$
       Number(c.toFixed(PLACES)),
       Number(h.toFixed(PLACES))
     ],
-    alpha: 1,
+    alpha,
     hex
   }
+}
+
+function extensionsFor(origin: Swatch['origin']): OriginExtension {
+  return { 'com.chameleon-labs.lattice': { origin } }
 }
 
 function token(swatch: Swatch): ColorToken {
   return {
     $type: 'color',
-    $description: STEP_JOBS[swatch.step - 1] ?? `step ${swatch.step}`,
-    $value: colorValue(swatch.l, swatch.c, swatch.h, swatch.hex)
+    $value: colorValue(swatch.l, swatch.c, swatch.h, swatch.hex),
+    $extensions: extensionsFor(swatch.origin)
   }
+}
+
+/**
+ * Human-readable text for one alpha-tier token, by role name.
+ *
+ * `resolveAlpha`/`resolveTints` name a token by its full CSS suffix
+ * (`border`, `accent-tint`, `danger-tint-border`, …), so the scale — if any —
+ * is recovered from the name rather than passed separately.
+ */
+function alphaDescription(role: string): string {
+  switch (role) {
+    case 'border':
+      return 'Resting hairline edge. Decorative — composites over whatever surface it sits on.'
+    case 'border-strong':
+      return 'Hover hairline edge.'
+    case 'wash':
+      return 'Hover fill wash.'
+    case 'focus-ring':
+      return 'The focus ring, composited from the accent solid at its declared alpha.'
+    default: {
+      const scale = role.replace(/-tint(-border)?$/, '')
+      return role.endsWith('-border')
+        ? `Tint border for the ${scale} scale — the wider fraction of the tinted triple.`
+        : `Tint fill for the ${scale} scale — the first layer of the tinted triple.`
+    }
+  }
+}
+
+/**
+ * A DTCG colour token for one alpha-tier primitive: a hairline, wash, the
+ * focus ring, or a scale's tinted-triple fill/border.
+ *
+ * These are not opaque swatches — the alpha channel carries the fraction, and
+ * `hex` is the *base* colour (white, black, or a scale's solid) before it is
+ * applied. The CSS pairs with these one-to-one: `--lat-${role}` is
+ * `rgb(<channels of hex> / <alpha>)`, exactly what {@link resolveAlpha} and
+ * {@link resolveTints} already compute for the stylesheet.
+ */
+function alphaColorToken(t: AlphaToken): ColorToken {
+  const { l, c, h } = srgbToOklch(parseHex(t.hex))
+  return {
+    $type: 'color',
+    $description: alphaDescription(t.role),
+    // The fraction is copied verbatim from the Figma bundle, same as every
+    // other alpha value in config/alpha.ts — see its module comment.
+    $extensions: extensionsFor('anchored'),
+    $value: colorValue(l, c, c === 0 ? 0 : h, t.hex, t.alpha)
+  }
+}
+
+/**
+ * Human-readable group labels. Purely descriptive — nothing downstream parses
+ * these — so a scale with no entry here just falls back to its own name.
+ */
+const SCALE_DESCRIPTIONS: Partial<Record<string, string>> = {
+  gray: 'Grey. Background, surface and text roles.',
+  accent: 'The accent scale: solid fill, the text that sits on it, and the brand vivid.',
+  danger: 'The danger scale: solid fill, plus the tinted triple built from it — the destructive button and error states.',
+  warning: 'The warning scale: solid fill, plus the tinted triple built from it — caution states.',
+  success: 'The success scale: solid fill, plus the tinted triple built from it — confirmation states.',
+  info: 'The info scale: solid fill, plus the tinted triple built from it — informational states.',
+  decorative: 'The decorative scale: solid fill, plus the tinted triple built from it — colour with no semantic meaning.'
+}
+
+/**
+ * Splits a `RoleAlias.source` such as `gray-bg-raised` into the scale it names
+ * (`gray`) and the role within that scale (`bg-raised`). Scale names never
+ * contain a hyphen, so the first segment is always the scale.
+ */
+function splitSource(source: string): { readonly scale: string; readonly role: string } {
+  const [scale, ...rest] = source.split('-')
+  return { scale: scale!, role: rest.join('-') }
+}
+
+/**
+ * Worst adjacent deuteranopia separation in a severity ramp, so the emitted
+ * description states a measured number rather than an assertion. `minor`
+ * carries no colour of its own and is excluded by {@link buildSeverity}
+ * already returning only the coloured levels.
+ */
+function worstAdjacentDeutan(ramp: readonly Swatch[]): number {
+  let worst = Number.POSITIVE_INFINITY
+  for (let i = 1; i < ramp.length; i++) {
+    worst = Math.min(worst, deltaE(parseHex(ramp[i - 1]!.hex), parseHex(ramp[i]!.hex), 'deutan'))
+  }
+  return worst
 }
 
 /**
@@ -244,86 +342,62 @@ function token(swatch: Swatch): ColorToken {
  * Modes are top-level groups because DTCG defines no mechanism for themes — that
  * gap is acknowledged in the format module itself, so any shape here is a local
  * convention. Groups keep the same names the CSS uses, so a token's path and its
- * custom property are mechanically related: `light.accent.9` is
- * `--lat-accent-9` under the light theme.
+ * custom property are mechanically related: `light.accent.solid` is
+ * `--lat-accent-solid` under the light theme.
  */
-export function emitTokens(scales: readonly Scale[]): DesignTokens {
+export function emitTokens(): DesignTokens {
   const modes: Record<string, unknown> = {}
 
   for (const mode of MODES) {
     const group: Record<string, unknown> = {
-      $description: `Primitive colour scales, ${mode} mode. Generated — never hand-edited.`
+      $description: `Primitive colours and semantic roles, ${mode} mode. Generated — never hand-edited.`
     }
 
-    for (const scale of scales.filter((entry) => entry.mode === mode)) {
-      const steps: Record<string, ColorToken> = {}
-
-      for (const swatch of scale.steps) {
-        steps[String(swatch.step)] = token(swatch)
-      }
-
-      // Step aliases sit in the same group as the numbers they name, so
-      // `light.gray.2` and `light.gray.bg-subtle` are neighbours and the second
-      // explains the first.
-      const named: Record<string, AliasToken> = {}
-      for (const [index, slug] of STEP_SLUGS.entries()) {
-        named[slug] = {
-          $type: 'color',
-          $description: `${STEP_JOBS[index] ?? `step ${index + 1}`} — step ${index + 1}.`,
-          $value: `{${mode}.${scale.name}.${index + 1}}`
-        }
-      }
-
-      // Each scale carries the text colour measured against its own fill. The
-      // answers differ — white clears 4.5:1 on the accent and misses it on every
-      // other scale — so a component offering a solid fill in any tone needs
-      // that tone's answer rather than the accent's.
-      const scaleOnSolid: ColorToken = {
-        $type: 'color',
-        $description:
-          `Text on --lat-${scale.name}-solid. Computed rather than assumed: ` +
-          `${scale.onSolid.text} wins at ${scale.onSolid.ratio.toFixed(2)}:1 against this fill.`,
-        $value:
-          scale.onSolid.text === 'white'
-            ? { colorSpace: 'oklch', components: [1, 0, 0], alpha: 1, hex: '#ffffff' }
-            : { colorSpace: 'oklch', components: [0, 0, 0], alpha: 1, hex: '#000000' }
-      }
-
-      group[scale.name] = {
-        $description: SCALE_JOBS[scale.name] ?? scale.name,
-        ...steps,
-        ...named,
-        'on-solid': scaleOnSolid
+    // Primitives: the Figma bundle's anchored roles, grouped by scale. Each carries
+    // whether it was anchored directly or derived here.
+    const byScale = new Map<string, Record<string, ColorToken>>()
+    for (const swatch of resolveAll(mode)) {
+      const roles = byScale.get(swatch.scale) ?? {}
+      roles[swatch.role] = token(swatch)
+      byScale.set(swatch.scale, roles)
+    }
+    for (const [scaleName, roles] of byScale) {
+      group[scaleName] = {
+        $description: SCALE_DESCRIPTIONS[scaleName] ?? scaleName,
+        ...roles
       }
     }
 
     // Roles: what a component reaches for first.
-    const roles: Record<string, ColorToken | AliasToken> = {}
+    const roles: Record<string, AliasToken> = {}
     for (const alias of ROLE_ALIASES) {
+      const { scale, role } = splitSource(alias.source)
       roles[alias.role] = {
         $type: 'color',
-        $value: `{${mode}.${alias.scale}.${alias.slug}}`
+        $value: `{${mode}.${scale}.${role}}`
       }
-    }
-    // Read from the scales already built rather than rebuilding the accent, so
-    // the JSON and the stylesheet cannot disagree about what sits on the fill.
-    const onSolid = accentOnSolid(scales, mode)
-    roles[ON_SOLID_ROLE] = {
-      $type: 'color',
-      $description:
-        `Text on --lat-solid. Computed rather than assumed: ${onSolid.text} wins at ` +
-        `${onSolid.ratio.toFixed(2)}:1 against the accent fill.`,
-      $value:
-        onSolid.text === 'white'
-          ? { colorSpace: 'oklch', components: [1, 0, 0], alpha: 1, hex: '#ffffff' }
-          : { colorSpace: 'oklch', components: [0, 0, 0], alpha: 1, hex: '#000000' }
     }
 
     group['role'] = {
-      $description:
-        'The semantic roles a component reaches for first. Step aliases inside each ' +
-        'scale cover the cases these do not.',
+      $description: 'The semantic roles a component reaches for first.',
       ...roles
+    }
+
+    // The alpha tier: hairlines, wash, the focus ring, the tinted triple per
+    // chromatic scale, and the severity ramp's own tint/tint-border pair.
+    // Emitted here so it reaches tokens.json as well as the stylesheet —
+    // previously it only reached the CSS, which the module docstring claimed
+    // was not the case.
+    const alphaGroup: Record<string, ColorToken> = {}
+    for (const t of [...resolveAlpha(mode), ...resolveTints(mode), ...resolveSeverityTints(mode)]) {
+      alphaGroup[t.role] = alphaColorToken(t)
+    }
+
+    group['alpha'] = {
+      $description:
+        "Alpha-tier primitives. `hex` is the base colour before its alpha is applied; " +
+        'the composited result is what a viewer sees, and is what generate/report.ts measures.',
+      ...alphaGroup
     }
 
     const categorical: Record<string, ColorToken> = {}
@@ -350,23 +424,25 @@ export function emitTokens(scales: readonly Scale[]): DesignTokens {
 
     const severity: Record<string, ColorToken> = {}
     const ramp = buildSeverity(mode)
-    for (const swatch of ramp) {
-      severity[swatch.level] = {
+    ramp.forEach((swatch, index) => {
+      severity[swatch.role] = {
         $type: 'color',
-        // The total is read off the ramp rather than written in, so this cannot
-        // outlive a change to the level list.
         $description:
-          `Impact level ${swatch.rank} of ${ramp.length} — ${swatch.level}. ` +
+          `Impact level ${index + 1} of ${ramp.length} — ${swatch.role}. ` +
           'Must ship with an icon and a text label: colour never carries severity alone.',
-        $value: colorValue(swatch.l, swatch.c, swatch.h, swatch.hex)
+        $value: colorValue(swatch.l, swatch.c, swatch.h, swatch.hex),
+        $extensions: extensionsFor(swatch.origin)
       }
-    }
+    })
 
+    const worstDeutan = worstAdjacentDeutan(ramp)
     group['severity'] = {
       $description:
         'Ordered impact levels, least to most severe. Colour never carries severity ' +
-        'alone — every mark needs an icon and a label. In dark mode adjacent levels ' +
-        'are indistinguishable under deuteranopia, so this is a rule, not advice.',
+        'alone — every mark needs an icon and a label. Worst adjacent ' +
+        `${mode}-mode deuteranopia separation is ${worstDeutan.toFixed(1)}, ` +
+        `${worstDeutan >= CHECKS.cvdFloor ? 'above' : 'below'} the package's floor of ` +
+        `${CHECKS.cvdFloor} — the icon-and-label rule is mandatory regardless.`,
       ...severity
     }
 
@@ -381,30 +457,32 @@ export function emitTokens(scales: readonly Scale[]): DesignTokens {
       }
     }
 
-    group['elevation'] = {
-      $description:
-        'Elevation levels. Every level above flat bundles a surface, a border and a ' +
-        'shadow: the shadow reads on light, the surface step reads on dark, and the ' +
-        'border is the only one that survives forced-colors.',
-      ...elevationTokens(mode)
-    }
-
     modes[mode] = group
   }
+
+  const elevation = elevationTokens()
 
   return {
     $schema: DTCG_SCHEMA,
     $description:
-      'Lattice design tokens. Generated from reviewed config and guarded by ' +
-      'build-time contracts. Do not edit by hand.',
+      'Lattice design tokens. Generated from reviewed config. Colour contrast is ' +
+      'measured and reported at build time, not gated — see the contrast ledger ' +
+      'in generate/report.ts and the design spec, section 9. Do not edit by hand.',
     global: {
       $description:
-        'Theme-independent typography, layout, motion and shadow primitives, plus semantic typography. Emitted once.',
+        'Theme-independent typography, layout, motion and shadow primitives, plus ' +
+        'semantic typography and elevation roles. Emitted once.',
       ...typographyTokens(),
       ...layoutTokens(),
       ...motionTokens(),
-      shadow: shadowTokens(),
-      text: typographyRoleTokens()
+      text: typographyRoleTokens(),
+      shadow: elevation.shadow,
+      elevation: {
+        $description:
+          'Elevation roles. `flat` has no shadow — see generate/elevation.ts for why ' +
+          "it isn't a token here — and is the CSS-only `--lat-elevation-flat: none;`.",
+        ...elevation.elevation
+      }
     },
     ...modes
   }

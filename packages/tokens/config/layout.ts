@@ -3,6 +3,11 @@ export interface SpaceValue {
   readonly rem: number
 }
 
+/**
+ * Lattice uses 4, 8, 12, 16, 24, 32, 48, 64, 96 and 128 — `1`, `2`, `3`, `4`,
+ * `6`, `8`, `12`, `16`, `24` and `32` below. The half-steps and the odd
+ * multiples remain available but appear nowhere in the identity.
+ */
 export const SPACES = {
   '0': { multiplier: 0, rem: 0 },
   '0-5': { multiplier: 0.5, rem: 0.125 },
@@ -35,11 +40,22 @@ export const CONTAINERS = {
   wide: 80
 } as const
 
+/**
+ * Radii.
+ *
+ * Three values, because the Figma bundle renders as a square system. Its `--radius` is
+ * 3px, but the `--radius-sm` its components actually use is
+ * `calc(var(--radius) - 4px)` — negative, so it computes to zero. Across both
+ * demo pages the only radii that appear are that zero and `rounded-full`.
+ *
+ * The intermediate steps this scale used to carry (0.25rem, 0.5rem, 0.75rem)
+ * have nothing to express here and are removed rather than left as tokens
+ * nobody should reach for.
+ */
 export const RADII = {
   none: 0,
-  sm: 0.25,
-  md: 0.5,
-  lg: 0.75,
+  /** The declared `--radius`. Available for large surfaces; nothing uses it yet. */
+  sm: 0.1875,
   full: 9999
 } as const
 
@@ -47,13 +63,3 @@ export type SpaceName = keyof typeof SPACES
 export type BreakpointName = keyof typeof BREAKPOINTS
 export type ContainerName = keyof typeof CONTAINERS
 export type RadiusName = keyof typeof RADII
-
-export interface NestedRadiusPairing {
-  readonly outer: RadiusName
-  readonly gap: SpaceName
-  readonly inner: RadiusName
-}
-
-export const NESTED_RADIUS_PAIRINGS = [
-  { outer: 'lg', gap: '2', inner: 'sm' }
-] as const satisfies readonly NestedRadiusPairing[]

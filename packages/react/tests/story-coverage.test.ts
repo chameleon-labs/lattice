@@ -72,11 +72,21 @@ const exportedComponents = (): string[] => {
   return [...names].sort()
 }
 
+/**
+ * `pages/` is the one directory under src/ that is not a component family —
+ * see the matching exclusion and comment in `tests/exports.test.ts`. It
+ * already carries its own stories file, so excluding it here changes nothing
+ * about "gives every component directory a stories file" below; it exists so
+ * that check keeps meaning what its name says.
+ */
+const NON_COMPONENT_DIRECTORIES = ['pages']
+
 /** Directories under src/ that hold a component, i.e. everything but the barrel. */
 const componentDirectories = (): string[] =>
   readdirSync(src, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
+    .filter((name) => !NON_COMPONENT_DIRECTORIES.includes(name))
     .sort()
 
 describe('story coverage', () => {
@@ -115,13 +125,14 @@ describe('story coverage', () => {
     expect(missing).toEqual([])
   })
 
-  it('titles every story file under the Components namespace', () => {
+  it('titles every story file under the Components or Pages namespace', () => {
     const untitled = storyFiles.filter(
-      (file) => !/title:\s*'Components\/\w+'/.test(readFileSync(new URL(file, src), 'utf8'))
+      (file) => !/title:\s*'(Components|Pages)\/\w+'/.test(readFileSync(new URL(file, src), 'utf8'))
     )
 
-    // The browser sweep matches stories by `Components/<Family>`, so a story
-    // titled anything else would be indexed, rendered, and never scanned.
+    // The browser sweep matches stories by `Components/<Family>` and
+    // `Pages/<Page>`, so a story titled anything else would be indexed,
+    // rendered, and never scanned.
     expect(untitled).toEqual([])
   })
 })

@@ -1,0 +1,47 @@
+.lat-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--lat-space-3);
+}
+
+/* `align="center"` — for an eyebrow inside a `text-align: center` ancestor
+   (the landing page's CTA kicker). Flex containers size to their own
+   `justify-content`, not the inherited text alignment their block
+   siblings pick up for free, so a centred eyebrow needs this rather than
+   the ancestor's `text-align` alone. */
+.lat-eyebrow[data-align='center'] {
+  justify-content: center;
+}
+
+.lat-eyebrow__rule {
+  width: var(--lat-space-8);
+  height: 1px;
+  background: var(--lat-solid);
+  opacity: 0.4;
+}
+
+/* The eyebrow construction — the same five properties Card's `__label` and
+   Table's `__header` use. Uppercase mono, letter-spaced at 0.2em, so this is
+   the value's one home rather than a literal repeated wherever a label needs
+   to read as metadata. */
+.lat-eyebrow__text {
+  font-family: var(--lat-text-eyebrow-font-family);
+  font-size: var(--lat-text-eyebrow-font-size);
+  letter-spacing: var(--lat-text-eyebrow-letter-spacing);
+  line-height: var(--lat-text-eyebrow-line-height);
+  text-transform: var(--lat-text-eyebrow-text-transform);
+  /* Normal weight is deliberate: the casing and tracking already carry the
+     emphasis, and bolding on top of both reads as shouting. The role token,
+     not the primitive it happens to alias to today — see table.css's
+     __header. */
+  font-weight: var(--lat-text-eyebrow-font-weight);
+  color: var(--lat-text-subtle);
+}
+
+/* `accent` — the landing page's `SectionEyebrow` (`text-primary`, lime),
+   used for every section label on that page plus both "Early access"
+   kickers. `subtle` needs no rule of its own: it is the default set on
+   `.lat-eyebrow__text` above. */
+.lat-eyebrow[data-tone='accent'] .lat-eyebrow__text {
+  color: var(--lat-solid);
+}

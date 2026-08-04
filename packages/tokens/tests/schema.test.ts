@@ -5,7 +5,6 @@ import { Ajv } from 'ajv'
 import { describe, expect, it } from 'vitest'
 
 import { DTCG_SCHEMA, emitTokens } from '../generate/emit.js'
-import { buildAllScales } from '../generate/scale.js'
 
 /**
  * The published DTCG schema, vendored.
@@ -28,7 +27,7 @@ const schema = JSON.parse(
 describe('tokens.json against the published DTCG schema', () => {
   const ajv = new Ajv({ strict: false, allErrors: true })
   const validate = ajv.compile(schema)
-  const tokens = emitTokens(buildAllScales())
+  const tokens = emitTokens()
 
   it('validates', () => {
     const valid = validate(tokens)
@@ -51,8 +50,8 @@ describe('tokens.json against the published DTCG schema', () => {
   it('accepts both value shapes the artefact emits', () => {
     const light = tokens['light'] as Record<string, Record<string, unknown>>
 
-    expect((light['gray']?.['1'] as { $value: unknown }).$value).toBeTypeOf('object')
-    expect((light['gray']?.['bg'] as { $value: unknown }).$value).toBe('{light.gray.1}')
+    expect((light['gray']?.['bg'] as { $value: unknown }).$value).toBeTypeOf('object')
+    expect((light['role']?.['text'] as { $value: unknown }).$value).toBe('{light.gray.text}')
   })
 
   it('accepts every typography primitive value shape', () => {
@@ -64,22 +63,20 @@ describe('tokens.json against the published DTCG schema', () => {
     expect(global['font']?.['sans']?.$value).toBeInstanceOf(Array)
     expect(global['font-size']?.['base']?.$value).toEqual({ value: 1, unit: 'rem' })
     expect(global['line-height']?.['normal']?.$value).toBe(1.5)
-    expect(global['letter-spacing']?.['normal']?.$value).toEqual({ value: 0, unit: 'rem' })
+    expect(global['letter-spacing']?.['normal']?.$value).toBe(0)
     expect(global['font-weight']?.['bold']?.$value).toBe(700)
     expect(global['space']?.['0-5']?.$value).toEqual({ value: 0.125, unit: 'rem' })
     expect(global['breakpoint']?.['sm']?.$value).toEqual({ value: 30, unit: 'rem' })
     expect(global['container']?.['prose']?.$value).toEqual({ value: 42, unit: 'rem' })
     expect(global['radius']?.['full']?.$value).toEqual({ value: 9999, unit: 'rem' })
-    expect(global['duration']?.['base']?.$value).toEqual({ value: 150, unit: 'ms' })
-    expect(global['easing']?.['standard']?.$value).toEqual([0.2, 0, 0, 1])
+    expect(global['duration']?.['default']?.$value).toEqual({ value: 200, unit: 'ms' })
+    expect(global['easing']?.['out']?.$value).toEqual([0, 0, 0.2, 1])
     expect(global['container']).not.toHaveProperty('full')
-    expect(global['shadow']?.['medium']?.$value).toEqual({
-      color: { colorSpace: 'oklch', components: [0, 0, 0], alpha: 0.12 },
-      offsetX: { value: 0, unit: 'px' },
-      offsetY: { value: 4, unit: 'px' },
-      blur: { value: 8, unit: 'px' },
-      spread: { value: -1, unit: 'px' }
-    })
+    // `sm` is two stacked layers — SHADOWS carries them as data, and the DTCG
+    // shadow value accepts either a bare object or a non-empty array, so this
+    // is the array form with two entries.
+    expect((global['shadow']?.['sm']?.$value as unknown[])).toHaveLength(2)
+    expect(global['elevation']?.['raised']?.$value).toBe('{global.shadow.sm}')
     expect(global['text']?.['body']).toEqual({
       $type: 'typography',
       $value: {
@@ -96,14 +93,17 @@ describe('tokens.json against the published DTCG schema', () => {
   it('rejects a shadow missing a required field', () => {
     const broken = structuredClone(tokens) as Record<string, unknown>
     const global = broken['global'] as Record<string, Record<string, Record<string, unknown>>>
-    global['shadow']!['medium'] = {
+    global['shadow']!['2xl'] = {
       $type: 'shadow',
-      $value: {
-        color: { colorSpace: 'oklch', components: [0, 0, 0], alpha: 0.12 },
-        offsetX: { value: 0, unit: 'px' },
-        offsetY: { value: 4, unit: 'px' },
-        blur: { value: 8, unit: 'px' }
-      }
+      $value: [
+        {
+          color: { colorSpace: 'srgb', components: [0, 0, 0], alpha: 0.25 },
+          offsetX: { value: 0, unit: 'px' },
+          offsetY: { value: 25, unit: 'px' },
+          blur: { value: 50, unit: 'px' }
+          // spread omitted — required by the shadowObject schema.
+        }
+      ]
     }
 
     expect(validate(broken)).toBe(false)
@@ -112,8 +112,9 @@ describe('tokens.json against the published DTCG schema', () => {
   it('rejects a shadow dimension unit the format cannot represent', () => {
     const broken = structuredClone(tokens) as Record<string, unknown>
     const global = broken['global'] as Record<string, Record<string, Record<string, unknown>>>
-    const shadow = global['shadow']!['medium'] as Record<string, Record<string, unknown>>
-    shadow['$value']!['blur'] = { value: 8, unit: 'furlongs' }
+    const shadow = global['shadow']!['2xl'] as Record<string, unknown[]>
+    const layer = shadow['$value']![0] as Record<string, Record<string, unknown>>
+    layer['blur'] = { value: 50, unit: 'furlongs' }
 
     expect(validate(broken)).toBe(false)
   })
@@ -139,7 +140,7 @@ describe('tokens.json against the published DTCG schema', () => {
   it('rejects a token whose value is neither a colour nor a reference', () => {
     const broken = structuredClone(tokens) as Record<string, unknown>
     const light = broken['light'] as Record<string, Record<string, Record<string, unknown>>>
-    light['gray']!['1'] = { $type: 'color', $value: 42 }
+    light['gray']!['bg'] = { $type: 'color', $value: 42 }
 
     expect(validate(broken)).toBe(false)
   })
@@ -158,9 +159,9 @@ describe('tokens.json against the published DTCG schema', () => {
   it('rejects a duration unit the format cannot represent', () => {
     const broken = structuredClone(tokens) as Record<string, unknown>
     const global = broken['global'] as Record<string, Record<string, Record<string, unknown>>>
-    global['duration']!['base'] = {
+    global['duration']!['default'] = {
       $type: 'duration',
-      $value: { value: 150, unit: 'frames' }
+      $value: { value: 200, unit: 'frames' }
     }
 
     expect(validate(broken)).toBe(false)
@@ -169,7 +170,7 @@ describe('tokens.json against the published DTCG schema', () => {
   it('rejects a cubicBezier x coordinate outside the format range', () => {
     const broken = structuredClone(tokens) as Record<string, unknown>
     const global = broken['global'] as Record<string, Record<string, Record<string, unknown>>>
-    global['easing']!['standard'] = {
+    global['easing']!['out'] = {
       $type: 'cubicBezier',
       $value: [1.1, 0, 0, 1]
     }
@@ -179,7 +180,7 @@ describe('tokens.json against the published DTCG schema', () => {
 
   it('rejects a group name the format reserves', () => {
     const broken = structuredClone(tokens) as Record<string, unknown>
-    broken['$notAKnownProperty'] = { $type: 'color', $value: '{light.gray.1}' }
+    broken['$notAKnownProperty'] = { $type: 'color', $value: '{light.gray.bg}' }
 
     expect(validate(broken)).toBe(false)
   })

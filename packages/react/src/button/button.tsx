@@ -1,22 +1,32 @@
 import { Button as AriakitButton, type ButtonProps as AriakitButtonProps } from '@ariakit/react'
 import type { ElementType } from 'react'
 
-export type ButtonVariant = 'solid' | 'soft' | 'ghost'
+/**
+ * Lattice's five variants.
+ *
+ * This replaces the previous `variant × tone` matrix. A neutral button is
+ * `secondary`; a dangerous one is `destructive`. Lattice names five buttons and
+ * this component offers five, because a system that follows a design strictly
+ * cannot also offer combinations the design never drew.
+ *
+ * `destructive` is a *tinted* button — danger at 10% with a 20% border and
+ * full-strength danger text — not a solid red fill. That is what the design
+ * shows, and it is what keeps a destructive action from outweighing the primary
+ * one on the same row.
+ */
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'link'
 export type ButtonSize = 'sm' | 'md' | 'lg'
-export type ButtonTone = 'accent' | 'neutral' | 'danger'
 
 export interface ButtonOptions {
   variant?: ButtonVariant
   size?: ButtonSize
-  tone?: ButtonTone
 }
 
 export type ButtonProps<T extends ElementType = 'button'> = AriakitButtonProps<T> & ButtonOptions
 
 export function Button<T extends ElementType = 'button'>({
-  variant = 'soft',
+  variant = 'secondary',
   size = 'md',
-  tone = 'accent',
   className,
   ...props
 }: ButtonProps<T>) {
@@ -26,7 +36,6 @@ export function Button<T extends ElementType = 'button'>({
       className={className === undefined ? 'lat-button' : `lat-button ${className}`}
       data-variant={variant}
       data-size={size}
-      data-tone={tone}
     />
   )
 }

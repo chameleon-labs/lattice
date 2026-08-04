@@ -9,7 +9,7 @@
   <Dialog>
     <DialogHeading>Remove this page?</DialogHeading>
     <p>This cannot be undone.</p>
-    <DialogDismiss render={<Button tone="neutral" />}>Cancel</DialogDismiss>
+    <DialogDismiss render={<Button variant="secondary" />}>Cancel</DialogDismiss>
   </Dialog>
 </DialogProvider>
 ```
@@ -24,6 +24,7 @@ dialog, so the accessible name is not left to whichever text node the browser
 finds first.
 
 **Classes:** `.lat-dialog`, `.lat-dialog__backdrop`, `.lat-dialog__heading`,
-`.lat-dialog__dismiss`. Uses the **modal** elevation role. The centring transform
+`.lat-dialog__dismiss`. Uses the **overlay** elevation role, shared with Menu.
+The centring transform
 is static; only the entrance lift is gated behind `no-preference`, so under
 `reduce` the dialog still fades in and is still centred.

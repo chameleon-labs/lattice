@@ -4,7 +4,6 @@ import type { DimensionToken } from '../generate/layout.js'
 import {
   BREAKPOINTS,
   CONTAINERS,
-  NESTED_RADIUS_PAIRINGS,
   RADII,
   SPACES
 } from '../config/layout.js'
@@ -40,7 +39,7 @@ describe('layout primitive contracts', () => {
   it('carries the exact breakpoints, containers and radii', () => {
     expect(BREAKPOINTS).toEqual({ sm: 30, md: 48, lg: 64, xl: 80 })
     expect(CONTAINERS).toEqual({ prose: 42, content: 64, wide: 80 })
-    expect(RADII).toEqual({ none: 0, sm: 0.25, md: 0.5, lg: 0.75, full: 9999 })
+    expect(RADII).toEqual({ none: 0, sm: 0.1875, full: 9999 })
   })
 
   it('keeps every spacing value equal to its multiplier times one quarter rem', () => {
@@ -62,14 +61,7 @@ describe('layout primitive contracts', () => {
     expect(CONTAINERS).not.toHaveProperty('full')
   })
 
-  it('derives every documented finite inner radius from outer minus gap', () => {
-    expect(NESTED_RADIUS_PAIRINGS).toEqual([{ outer: 'lg', gap: '2', inner: 'sm' }])
-
-    for (const pairing of NESTED_RADIUS_PAIRINGS) {
-      expect(RADII[pairing.inner]).toBe(RADII[pairing.outer] - SPACES[pairing.gap].rem)
-      expect(pairing.outer).not.toBe('full')
-      expect(pairing.inner).not.toBe('full')
-    }
+  it('keeps radius.full at the declared value', () => {
     expect(RADII.full).toBe(9999)
   })
 
@@ -86,15 +78,15 @@ describe('layout primitive generation', () => {
       space: 16,
       breakpoint: 4,
       container: 3,
-      radius: 5
+      radius: 3
     })
-    expect(LAYOUT_PRIMITIVE_COUNT).toBe(28)
+    expect(LAYOUT_PRIMITIVE_COUNT).toBe(26)
   })
 
   it('emits exactly one CSS dimension per primitive', () => {
     const css = layoutCss()
 
-    expect(css.match(/--lat-/g)).toHaveLength(28)
+    expect(css.match(/--lat-/g)).toHaveLength(26)
     expect(css).toContain('--lat-space-0: 0rem;')
     expect(css).toContain('--lat-space-0-5: 0.125rem;')
     expect(css).toContain('--lat-space-1-5: 0.375rem;')
@@ -131,5 +123,16 @@ describe('layout primitive generation', () => {
         )
       }
     }
+  })
+})
+
+describe('radii', () => {
+  it('is square by default', () => {
+    expect(RADII.none).toBe(0)
+    expect(Object.keys(RADII)).toEqual(['none', 'sm', 'full'])
+  })
+
+  it('keeps the declared 3px for large surfaces', () => {
+    expect(RADII.sm).toBe(0.1875)
   })
 })

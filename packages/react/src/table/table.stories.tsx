@@ -27,9 +27,9 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 const rows = [
-  { date: '30 July', score: 72, change: 'down 12', tone: 'danger' },
-  { date: '29 July', score: 84, change: 'up 3', tone: 'success' },
-  { date: '28 July', score: 81, change: 'no change', tone: 'neutral' }
+  { date: '30 July', score: 72, change: 'down 12', variant: 'danger' },
+  { date: '29 July', score: 84, change: 'up 3', variant: 'success' },
+  { date: '28 July', score: 81, change: 'no change', variant: 'default' }
 ] as const
 
 export const Default: Story = {
@@ -48,7 +48,7 @@ export const Default: Story = {
             <Th scope="row">{row.date}</Th>
             <Td>{row.score}</Td>
             <Td>
-              <Badge tone={row.tone}>{row.change}</Badge>
+              <Badge variant={row.variant}>{row.change}</Badge>
             </Td>
           </Tr>
         ))}

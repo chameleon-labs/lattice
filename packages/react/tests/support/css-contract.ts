@@ -12,6 +12,13 @@ const stripComments = (css: string): string => css.replace(COMMENTS, '')
 // the rule exists to catch a hand-written value, not to be a CSS parser.
 const NAMED = ['red', 'blue', 'green', 'black', 'white', 'gray', 'grey', 'orange', 'yellow']
 
+// The dialog backdrop's scrim is the one colour literal this system permits —
+// a fixed, mode-independent dim rather than a palette value, standing in for
+// a role no token declares. dialog.css records the reason on the rule itself;
+// this is the narrow allowance for it, not a general escape hatch. Everything
+// else a stylesheet writes still gets flagged below.
+const PERMITTED_COLOUR_LITERALS = new Set(['rgb(0 0 0 / 0.6)'])
+
 export const findColourLiterals = (css: string): string[] => {
   const source = stripComments(css)
   const found: string[] = []
@@ -20,8 +27,10 @@ export const findColourLiterals = (css: string): string[] => {
     found.push(match[0])
   }
 
-  for (const match of source.matchAll(/\b(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/g)) {
-    found.push(match[0])
+  for (const match of source.matchAll(/\b(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\([^)]*\)/g)) {
+    const value = match[0].replace(/\s+/g, ' ').trim()
+    if (PERMITTED_COLOUR_LITERALS.has(value)) continue
+    found.push(`${match[1]}(`)
   }
 
   for (const name of NAMED) {
@@ -116,8 +125,19 @@ export const findAnimatedTransformsOutsideNoPreference = (css: string): string[]
 // Whether a *click* matches :focus-visible is the browser's heuristic, not
 // something this system implements — so asserting that in a browser test would
 // be measuring Firefox rather than Lattice. What Lattice controls is that the
-// ring is scoped to :focus-visible and never to bare :focus, which is a
-// property of the stylesheet and therefore deterministic.
+// ring is scoped to :focus-visible — or, for a wrapper reacting to focus
+// landing on a descendant control, :focus-within — and never to bare :focus,
+// which is a property of the stylesheet and therefore deterministic.
+//
+// :focus-within is permitted alongside :focus-visible, not merely tolerated:
+// unlike bare :focus, it isn't the "shows a ring on a mouse click" problem
+// this check exists to catch on its own — see Input's wrapper (input.css),
+// where a comment records why :focus-within is the correct choice there.
+// The pattern below matches only a genuinely bare `:focus` — one not
+// immediately followed by `-visible` or `-within` — rather than matching
+// `:focus\b` broadly and subtracting `:focus-visible` back out, which is
+// exactly the shape of bug that let `:focus-within` slip through as if it
+// were bare `:focus` the first time this file was written.
 export const findBareFocusOutlines = (css: string): string[] => {
   const found: string[] = []
 
@@ -126,8 +146,7 @@ export const findBareFocusOutlines = (css: string): string[] => {
     const body = match[2] ?? ''
 
     if (!/outline/.test(body)) continue
-    if (!/:focus\b/.test(selector)) continue
-    if (/:focus-visible/.test(selector)) continue
+    if (!/:focus(?!-visible|-within)\b/.test(selector)) continue
 
     found.push(selector)
   }
