@@ -4,7 +4,7 @@ import { typographyRoleCss } from '../generate/typography-roles.js'
 
 describe('typography roles', () => {
   it('defines the five mono roles', () => {
-    for (const role of ['eyebrow', 'meta', 'tag', 'numeric', 'code']) {
+    for (const role of ['eyebrow', 'meta', 'tag', 'numeric', 'code'] as const) {
       expect(TYPOGRAPHY_ROLES[role]!.fontFamily).toBe('mono')
     }
   })
