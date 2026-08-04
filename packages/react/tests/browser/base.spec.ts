@@ -30,24 +30,39 @@ test('unclassed prose inside a surface inherits the sans stack', async ({ page }
   expect(family).not.toContain('Times')
 })
 
-test('an unclassed label inside a surface adopts Meridian\'s base size', async ({ page }) => {
+test('an unclassed label takes the base size, not its ancestor’s', async ({ page }) => {
   await page.goto('/iframe.html?id=components-button--variants&globals=theme:dark')
   await page.locator('.lat-surface').first().waitFor()
-  const { labelFontSize, rootFontSize } = await page.evaluate(() => {
+
+  const sizes = await page.evaluate(() => {
+    const surface = document.querySelector('.lat-surface')!
+    // A wrapper deliberately sized away from the root. Without the base
+    // layer's label rule, the label would inherit this 32px and the
+    // assertion below would fail — which is the point: inheritance and the
+    // rule disagree here, so only the rule can produce the root size.
+    const wrapper = document.createElement('div')
+    wrapper.style.fontSize = '32px'
     const label = document.createElement('label')
-    label.textContent = 'Unclassed label'
-    document.querySelector('.lat-surface')!.appendChild(label)
-    const labelFontSize = getComputedStyle(label).fontSize
-    const rootFontSize = getComputedStyle(document.documentElement).fontSize
-    label.remove()
-    return { labelFontSize, rootFontSize }
+    label.textContent = 'Token name'
+    wrapper.append(label)
+    surface.append(wrapper)
+
+    const result = {
+      label: getComputedStyle(label).fontSize,
+      wrapper: getComputedStyle(wrapper).fontSize,
+      root: getComputedStyle(document.documentElement).fontSize
+    }
+    wrapper.remove()
+    return result
   })
+
+  expect(sizes.wrapper).toBe('32px')
+  expect(sizes.label).not.toBe('32px')
   // --lat-font-size-base is 1rem, not a literal 16px — this suite runs both a
   // 16px and a 20px root (playwright.config.ts, so every component is checked
   // at a non-default user font size for free), and a hardcoded '16px' would be
-  // false on the second project. Comparing against the root's own computed
-  // font-size is what "resolves to 1rem" actually means at either size.
-  expect(labelFontSize).toBe(rootFontSize)
+  // false on the second project.
+  expect(sizes.label).toBe(sizes.root)
 })
 
 test('a surface paints the Meridian page colour', async ({ page }) => {
