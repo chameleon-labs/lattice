@@ -1018,7 +1018,15 @@ lightness delta that separates declared light and dark serious."
 - Create: `packages/tokens/generate/report.ts`
 - Modify: `packages/tokens/generate/build.ts`
 - Test: `packages/tokens/tests/report.test.ts`
-- Delete: `packages/tokens/tests/contrast.test.ts` — it asserts contracts that no longer exist. `generate/contrast.ts` itself stays.
+
+`packages/tokens/tests/contrast.test.ts` **stays**. An earlier draft of this plan
+deleted it, claiming it asserted contracts that no longer exist. That was wrong:
+it tests `generate/contrast.ts`'s *maths* — WCAG coefficients against the
+matrix-derived alternative, APCA reference values, sign and symmetry invariants,
+low-clip behaviour, NaN rejection — and `generate/contrast.ts` not only survives
+but becomes more load-bearing, since every figure in the new ledger comes out of
+it. Deleting it would have left those primitives with no direct coverage while
+increasing what depends on them.
 
 **Interfaces:**
 - Consumes: `contrastRatio`, `apcaLc` from `generate/contrast.js`; `parseHex` from `generate/oklch.js`.
@@ -1084,10 +1092,10 @@ Expected: FAIL — `Cannot find module '../generate/report.js'`
  * The contrast ledger.
  *
  * Until 2026-08-03 a missed contract stopped the build. Meridian's values are
- * the identity and five of its documented pairs miss WCAG, so the check became a
+ * the identity and four of its documented pairs miss WCAG, so the check became a
  * report: measured, printed, and shipped anyway.
  *
- * The ledger exists so those five stay visible. A number nobody prints becomes
+ * The ledger exists so those four stay visible. A number nobody prints becomes
  * folklore within a release, and the light-mode focus ring in particular — a
  * focus indicator a keyboard user cannot see — is not something to rediscover.
  *
@@ -1200,7 +1208,7 @@ import { buildSeverity } from './severity.js'
 /**
  * Build entrypoint. Emits `dist/lattice.css` and `dist/tokens.json`.
  *
- * This build does not gate. Meridian's values are the identity, and five of its
+ * This build does not gate. Meridian's values are the identity, and four of its
  * documented pairs miss WCAG; refusing to write them would refuse to ship the
  * design. Every pair is still measured and printed — see generate/report.ts.
  */
@@ -1255,11 +1263,13 @@ console.log(
 
 `emitCss()` and `emitTokens()` lose their `scales` parameter — Task 11 changes their signatures to match. Until then the build will not typecheck; that is expected.
 
-- [ ] **Step 5: Delete the retired contrast test**
+- [ ] **Step 5: Confirm the contrast maths tests still pass**
 
-```bash
-cd packages/tokens && git rm tests/contrast.test.ts
-```
+`tests/contrast.test.ts` is not deleted. It may import something Task 1 removed;
+if so, repoint those imports and keep every assertion.
+
+Run: `cd packages/tokens && npx vitest run tests/contrast.test.ts`
+Expected: PASS, unchanged from before this plan began.
 
 - [ ] **Step 6: Run test to verify it passes**
 
