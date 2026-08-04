@@ -36,15 +36,7 @@
 }
 
 /* Selection is signalled by the border and by aria-selected together, never by
-   colour alone — assistive technology reads the second.
-   No separate forced-colors block is needed here, unlike SegmentedControl:
-   forced-colors preserves `transparent` rather than overriding it, so a rest
-   tab's transparent border-bottom stays genuinely invisible, while a selected
-   tab's --lat-solid resolves to a real, forced-palette border colour. The
-   signal survives as presence versus absence of a line, not as a hue
-   difference between two comparably-weighted author colours — which is
-   exactly the distinction SegmentedControl's background-only selected state
-   does not have. */
+   colour alone — assistive technology reads the second. */
 .lat-tab[aria-selected='true'] {
   color: var(--lat-text);
   border-bottom-color: var(--lat-solid);
@@ -64,4 +56,27 @@
 .lat-tab-panel:focus-visible {
   outline: 2px solid var(--lat-focus-ring);
   outline-offset: 2px;
+}
+
+/*
+ * The selected tab needs a forced-colors override, and the reason is not
+ * obvious. Forced-colors leaves literal `transparent` alone, so a rest tab's
+ * own border-bottom stays invisible — but `.lat-tab-list`'s hairline is an
+ * ordinary author colour sitting at the *same pixel row* (that is what the
+ * -1px margin above is for), and it gets forced to a visible system colour.
+ * So a line paints under every tab, not only the selected one, and the
+ * selected tab's own forced border-colour is liable to resolve to that same
+ * system value. The distinction has to come from somewhere the UA will not
+ * flatten.
+ */
+@media (forced-colors: active) {
+  .lat-tab[aria-selected='true'] {
+    border-bottom-color: Highlight;
+    forced-color-adjust: none;
+  }
+
+  .lat-tab:focus-visible {
+    outline: 2px solid CanvasText;
+    outline-offset: -2px;
+  }
 }
