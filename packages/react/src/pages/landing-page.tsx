@@ -273,7 +273,7 @@ function Hero() {
             <span className="landing-page__hero-kicker-sub">Building in public</span>
           </div>
 
-          <h1 className="landing-page__display">
+          <h1 className="lat-page__display landing-page__display">
             Accessibility
             <br />
             monitoring

@@ -17,14 +17,26 @@
  * The one deliberate exception is the `display` role (48px): it has no
  * bare-element rule in base.css and no component of its own, so a page
  * headline builds it directly from `--lat-text-display-*`, same as the
- * h1–h4 rules base.css already ships. `.system-page__display` was first;
- * `.landing-page__display` repeats the identical five-declaration recipe
- * under its own page's namespace rather than sharing one class, because this
- * page's brief may modify this file and `icons.tsx` only — renaming
- * `system-page.tsx`'s markup to share a generalised class is out of scope for
- * that file list. Same recipe, two owners, by construction rather than by
- * accident.
+ * h1–h4 rules base.css already ships. The recipe lives once, in
+ * `.lat-page__display` below, and both pages compose it onto their `<h1>`
+ * alongside a page-owned class that carries only `margin-block-end` — the
+ * one declaration that legitimately differs per page, being page layout
+ * rather than part of the display role itself. (It briefly existed as two
+ * copies, `.system-page__display` and `.landing-page__display`, because the
+ * landing page's task could touch this file but not `system-page.tsx`'s
+ * markup; folded into one class once both pages could be edited together.)
  */
+
+/* The shared display-role recipe — see the file header comment. Compose with
+   a page-owned class (`.system-page__display`, `.landing-page__display`)
+   that supplies only `margin-block-end`. */
+.lat-page__display {
+  font-family: var(--lat-text-display-font-family);
+  font-size: var(--lat-text-display-font-size);
+  font-weight: var(--lat-text-display-font-weight);
+  letter-spacing: var(--lat-text-display-letter-spacing);
+  line-height: var(--lat-text-display-line-height);
+}
 
 .system-page {
   display: flex;
@@ -186,11 +198,6 @@
 }
 
 .system-page__display {
-  font-family: var(--lat-text-display-font-family);
-  font-size: var(--lat-text-display-font-size);
-  font-weight: var(--lat-text-display-font-weight);
-  letter-spacing: var(--lat-text-display-letter-spacing);
-  line-height: var(--lat-text-display-line-height);
   margin-block-end: var(--lat-space-4);
 }
 
@@ -614,13 +621,7 @@
   font-size: var(--lat-text-meta-font-size);
 }
 
-/* The sanctioned display-role exception — see the file header comment. */
 .landing-page__display {
-  font-family: var(--lat-text-display-font-family);
-  font-size: var(--lat-text-display-font-size);
-  font-weight: var(--lat-text-display-font-weight);
-  letter-spacing: var(--lat-text-display-letter-spacing);
-  line-height: var(--lat-text-display-line-height);
   margin-block-end: var(--lat-space-6);
 }
 

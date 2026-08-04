@@ -163,7 +163,7 @@ function OverviewSection() {
               <Badge variant="primary">v1.0.0</Badge>
               <Badge variant="success">Stable</Badge>
             </div>
-            <h1 className="system-page__display">
+            <h1 className="lat-page__display system-page__display">
               Meridian
               <br />
               <span className="system-page__display-accent">Design System</span>
