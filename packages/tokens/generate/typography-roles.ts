@@ -44,12 +44,18 @@ const roleEntries = Object.entries(TYPOGRAPHY_ROLES) as [
 
 export function typographyRoleCss(): string {
   return roleEntries
-    .flatMap(([roleName, role]) =>
-      PROPERTIES.map(
+    .flatMap(([roleName, role]) => [
+      ...PROPERTIES.map(
         ({ key, css, group }) =>
           `  --lat-text-${roleName}-${css}: var(--lat-${group}-${role[key]});`
-      )
-    )
+      ),
+      ...(role.textTransform === undefined
+        ? []
+        : [`  --lat-text-${roleName}-text-transform: ${role.textTransform};`]),
+      ...(role.fontVariantNumeric === undefined
+        ? []
+        : [`  --lat-text-${roleName}-font-variant-numeric: ${role.fontVariantNumeric};`])
+    ])
     .join('\n')
 }
 

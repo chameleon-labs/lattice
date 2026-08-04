@@ -20,106 +20,47 @@ export interface TypographyRole {
   readonly fontWeight: keyof typeof FONT_WEIGHTS
   readonly letterSpacing: keyof typeof LETTER_SPACINGS
   readonly lineHeight: keyof typeof LINE_HEIGHTS
+  /** Emitted only when present. Carries the eyebrow and tag casing. */
+  readonly textTransform?: 'uppercase'
+  /** Emitted only when present. Keeps a column of figures from jittering. */
+  readonly fontVariantNumeric?: 'tabular-nums'
   readonly classification: 'prose' | 'ui' | 'supporting' | 'restricted' | 'code' | 'display'
 }
 
 export const TYPOGRAPHY_ROLES = {
-  body: {
-    fontFamily: 'sans',
-    fontSize: 'base',
-    fontWeight: 'regular',
-    letterSpacing: 'normal',
-    lineHeight: 'normal',
-    classification: 'prose'
-  },
-  'body-strong': {
-    fontFamily: 'sans',
-    fontSize: 'base',
-    fontWeight: 'semibold',
-    letterSpacing: 'normal',
-    lineHeight: 'normal',
-    classification: 'prose'
-  },
-  lead: {
-    fontFamily: 'sans',
-    fontSize: 'lg',
-    fontWeight: 'regular',
-    letterSpacing: 'normal',
-    lineHeight: 'relaxed',
-    classification: 'prose'
-  },
-  ui: {
-    fontFamily: 'sans',
-    fontSize: 'sm',
-    fontWeight: 'semibold',
-    letterSpacing: 'normal',
-    lineHeight: 'snug',
-    classification: 'ui'
-  },
-  caption: {
-    fontFamily: 'sans',
-    fontSize: 'xs',
-    fontWeight: 'regular',
-    letterSpacing: 'normal',
-    lineHeight: 'normal',
-    classification: 'supporting'
-  },
-  micro: {
-    fontFamily: 'sans',
-    fontSize: '2xs',
-    fontWeight: 'regular',
-    letterSpacing: 'normal',
-    lineHeight: 'normal',
-    classification: 'restricted'
-  },
-  code: {
-    fontFamily: 'mono',
-    fontSize: 'sm',
-    fontWeight: 'regular',
-    letterSpacing: 'normal',
-    lineHeight: 'normal',
-    classification: 'code'
-  },
-  'heading-1': {
-    fontFamily: 'sans',
-    fontSize: '4xl',
-    fontWeight: 'bold',
-    letterSpacing: 'normal',
-    lineHeight: 'tight',
-    classification: 'display'
-  },
-  'heading-2': {
-    fontFamily: 'sans',
-    fontSize: '3xl',
-    fontWeight: 'bold',
-    letterSpacing: 'normal',
-    lineHeight: 'tight',
-    classification: 'display'
-  },
-  'heading-3': {
-    fontFamily: 'sans',
-    fontSize: '2xl',
-    fontWeight: 'semibold',
-    letterSpacing: 'normal',
-    lineHeight: 'snug',
-    classification: 'display'
-  },
-  'heading-4': {
-    fontFamily: 'sans',
-    fontSize: 'xl',
-    fontWeight: 'semibold',
-    letterSpacing: 'normal',
-    lineHeight: 'snug',
-    classification: 'display'
-  }
-} as const satisfies Readonly<Record<string, TypographyRole>>
+  display: { fontFamily: 'sans', fontSize: '5xl', fontWeight: 'bold', letterSpacing: 'tight', lineHeight: 'none', classification: 'display' },
+  h1: { fontFamily: 'sans', fontSize: '3xl', fontWeight: 'semibold', letterSpacing: 'tight', lineHeight: 'tight', classification: 'display' },
+  h2: { fontFamily: 'sans', fontSize: '2xl', fontWeight: 'medium', letterSpacing: 'tight', lineHeight: 'normal', classification: 'display' },
+  h3: { fontFamily: 'sans', fontSize: 'xl', fontWeight: 'medium', letterSpacing: 'normal', lineHeight: 'normal', classification: 'display' },
+  h4: { fontFamily: 'sans', fontSize: 'base', fontWeight: 'medium', letterSpacing: 'normal', lineHeight: 'normal', classification: 'display' },
+  body: { fontFamily: 'sans', fontSize: 'base', fontWeight: 'regular', letterSpacing: 'normal', lineHeight: 'normal', classification: 'prose' },
+  'body-strong': { fontFamily: 'sans', fontSize: 'base', fontWeight: 'semibold', letterSpacing: 'normal', lineHeight: 'normal', classification: 'prose' },
+  lead: { fontFamily: 'sans', fontSize: 'lg', fontWeight: 'regular', letterSpacing: 'normal', lineHeight: 'relaxed', classification: 'prose' },
+  small: { fontFamily: 'sans', fontSize: 'sm', fontWeight: 'regular', letterSpacing: 'normal', lineHeight: 'relaxed', classification: 'prose' },
+  ui: { fontFamily: 'sans', fontSize: 'sm', fontWeight: 'medium', letterSpacing: 'normal', lineHeight: 'normal', classification: 'ui' },
+  'ui-strong': { fontFamily: 'sans', fontSize: 'sm', fontWeight: 'semibold', letterSpacing: 'normal', lineHeight: 'normal', classification: 'ui' },
+  caption: { fontFamily: 'sans', fontSize: 'xs', fontWeight: 'regular', letterSpacing: 'normal', lineHeight: 'snug', classification: 'supporting' },
+
+  // The mono roles. These carry the identity — see the spec's §2.
+  eyebrow: { fontFamily: 'mono', fontSize: '3xs', fontWeight: 'regular', letterSpacing: 'eyebrow', lineHeight: 'normal', textTransform: 'uppercase', classification: 'restricted' },
+  tag: { fontFamily: 'mono', fontSize: '3xs', fontWeight: 'regular', letterSpacing: 'wide', lineHeight: 'normal', textTransform: 'uppercase', classification: 'restricted' },
+  meta: { fontFamily: 'mono', fontSize: '2xs', fontWeight: 'regular', letterSpacing: 'normal', lineHeight: 'normal', classification: 'supporting' },
+  numeric: { fontFamily: 'mono', fontSize: 'base', fontWeight: 'bold', letterSpacing: 'normal', lineHeight: 'none', fontVariantNumeric: 'tabular-nums', classification: 'ui' },
+  code: { fontFamily: 'mono', fontSize: 'sm', fontWeight: 'regular', letterSpacing: 'normal', lineHeight: 'relaxed', classification: 'code' }
+} as const satisfies Record<string, TypographyRole>
 
 export type TypographyRoleName = keyof typeof TYPOGRAPHY_ROLES
 
 export const TYPOGRAPHY_BREAKPOINT_REM = 40
 
+// NOTE: these three keys ('heading-1'/'heading-2'/'heading-3') were role names
+// in the pre-Meridian matrix. The brief's replacement TYPOGRAPHY_ROLES has no
+// such roles (headings are now h1-h4), so this object is stale — left as-is
+// rather than inventing new narrow-breakpoint sizes the brief doesn't specify.
+// See task-6-report.md for detail. generate/typography-roles.ts still imports
+// these two exports, so removing them would break that module's import.
 export const NARROW_HEADING_SIZES = {
   'heading-1': '3xl',
   'heading-2': '2xl',
   'heading-3': 'xl'
-} as const satisfies Partial<Record<TypographyRoleName, keyof typeof FONT_SIZES>>
+} as const
