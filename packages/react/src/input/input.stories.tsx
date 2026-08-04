@@ -30,6 +30,7 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
+/** `size` still sets `data-size`; Meridian's field styling does not vary by it. */
 export const Sizes: Story = {
   render: (args) => (
     <div className="lat-story__stack">

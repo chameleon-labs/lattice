@@ -1,18 +1,24 @@
-.lat-field {
+.lat-text-field {
   display: flex;
   flex-direction: column;
   gap: var(--lat-space-1);
 }
 
-.lat-field__label {
-  font-family: var(--lat-text-ui-font-family);
-  font-size: var(--lat-text-ui-font-size);
-  font-weight: var(--lat-font-weight-semibold);
-  line-height: var(--lat-text-ui-line-height);
-  color: var(--lat-text);
+/* The eyebrow construction — the same five properties Card's `__label` uses.
+   Uppercase mono, letter-spaced, so a field's name reads as metadata about
+   the mono value beneath it rather than as another line of prose. */
+.lat-text-field__label {
+  display: block;
+  margin-bottom: var(--lat-space-2);
+
+  font-family: var(--lat-text-eyebrow-font-family);
+  font-size: var(--lat-text-eyebrow-font-size);
+  letter-spacing: var(--lat-text-eyebrow-letter-spacing);
+  line-height: var(--lat-text-eyebrow-line-height);
+  text-transform: var(--lat-text-eyebrow-text-transform);
 }
 
-.lat-field__description {
+.lat-text-field__description {
   margin: 0;
   font-family: var(--lat-text-caption-font-family);
   font-size: var(--lat-text-caption-font-size);
@@ -20,10 +26,12 @@
   color: var(--lat-text-subtle);
 }
 
-.lat-field__error {
+.lat-text-field__error {
   margin: 0;
-  font-family: var(--lat-text-caption-font-family);
-  font-size: var(--lat-text-caption-font-size);
-  line-height: var(--lat-text-caption-line-height);
-  color: var(--lat-danger-text);
+  font-family: var(--lat-text-meta-font-family);
+  font-size: var(--lat-text-meta-font-size);
+  font-weight: var(--lat-text-meta-font-weight);
+  letter-spacing: var(--lat-text-meta-letter-spacing);
+  line-height: var(--lat-text-meta-line-height);
+  color: var(--lat-danger-solid);
 }

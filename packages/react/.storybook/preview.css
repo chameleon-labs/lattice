@@ -38,7 +38,7 @@
    The stories lay them out in rows, so they constrain them here rather than the
    component guessing a width it cannot know. */
 .lat-story .lat-input,
-.lat-story .lat-field {
+.lat-story .lat-text-field {
   max-inline-size: 22rem;
 }
 

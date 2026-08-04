@@ -28,5 +28,7 @@ technology at nothing.
 The error carries no live role. One present on first render would announce out
 of context; see [`Callout`](../callout/README.md) for the same reasoning.
 
-**Classes:** `.lat-field`, `.lat-field__label`, `.lat-field__description`,
-`.lat-field__error`.
+**Classes:** `.lat-text-field`, `.lat-text-field__label`,
+`.lat-text-field__description`, `.lat-text-field__error`. The label is an
+uppercase mono eyebrow; the error takes the `meta` role in
+`--lat-danger-solid`.
