@@ -1,11 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Button, type ButtonSize, type ButtonTone, type ButtonVariant } from './button.js'
+import { Button, type ButtonSize, type ButtonVariant } from './button.js'
 
 // Declared as the union rather than as a literal array, so a variant added to
 // the type without a story here becomes a type error instead of a silent gap in
 // the accessibility sweep.
-const VARIANTS: readonly ButtonVariant[] = ['solid', 'soft', 'ghost']
-const TONES: readonly ButtonTone[] = ['accent', 'neutral', 'danger']
+const VARIANTS: readonly ButtonVariant[] = ['primary', 'secondary', 'ghost', 'destructive', 'link']
 const SIZES: readonly ButtonSize[] = ['sm', 'md', 'lg']
 
 const meta = {
@@ -17,7 +16,6 @@ const meta = {
   },
   argTypes: {
     variant: { control: 'inline-radio', options: VARIANTS },
-    tone: { control: 'inline-radio', options: TONES },
     size: { control: 'inline-radio', options: SIZES }
   }
 } satisfies Meta<typeof Button>
@@ -35,30 +33,27 @@ type Story = StoryObj<typeof meta>
  */
 export const Default: Story = {}
 
+/**
+ * Meridian's five variants, side by side, plus the disabled state each one
+ * loses its identity to. `tests/browser/base.spec.ts` navigates here directly.
+ */
 export const Variants: Story = {
   render: (args) => (
-    <div className="lat-story__row">
-      {VARIANTS.map((variant) => (
-        <Button {...args} key={variant} variant={variant}>
-          {variant}
-        </Button>
-      ))}
-    </div>
-  )
-}
-
-export const Tones: Story = {
-  render: (args) => (
     <div className="lat-story__stack">
-      {VARIANTS.map((variant) => (
-        <div className="lat-story__row" key={variant}>
-          {TONES.map((tone) => (
-            <Button {...args} key={tone} variant={variant} tone={tone}>
-              {variant} {tone}
-            </Button>
-          ))}
-        </div>
-      ))}
+      <div className="lat-story__row">
+        {VARIANTS.map((variant) => (
+          <Button {...args} key={variant} variant={variant}>
+            {variant}
+          </Button>
+        ))}
+      </div>
+      <div className="lat-story__row">
+        {VARIANTS.map((variant) => (
+          <Button {...args} key={variant} variant={variant} disabled>
+            {variant}
+          </Button>
+        ))}
+      </div>
     </div>
   )
 }
