@@ -2,18 +2,24 @@
  * The contrast ledger.
  *
  * Until 2026-08-03 a missed contract stopped the build. Meridian's values are
- * the identity and four of its documented pairs miss WCAG, so the check became a
- * report: measured, printed, and shipped anyway.
+ * the identity and a number of its documented pairs miss WCAG, so the check
+ * became a report: measured, printed, and shipped anyway.
  *
- * The ledger exists so those four stay visible. A number nobody prints becomes
- * folklore within a release, and the light-mode focus ring in particular — a
- * focus indicator a keyboard user cannot see — is not something to rediscover.
+ * The ledger exists so those misses stay visible. A number nobody prints
+ * becomes folklore within a release, and the light-mode focus ring in
+ * particular — a focus indicator a keyboard user cannot see — is not something
+ * to rediscover.
+ *
+ * `forMode` measures the grey and accent pairs, plus the tinted triple for
+ * every chromatic scale — a scale's solid as text on its own tint, composited
+ * over `bg-raised`, which is what every Badge, the destructive Button and
+ * every Callout are built from.
  *
  * Alpha values are composited over their surface before measuring, because that
  * is what a viewer sees.
  */
-import { ALPHA_CHANNEL, FOCUS_RING_ALPHA } from '../config/alpha.js'
-import { GRAY_ANCHORS, ON_SOLID_ANCHORS, SOLID_ANCHORS } from '../config/anchors.js'
+import { ALPHA_CHANNEL, FOCUS_RING_ALPHA, HAIRLINE, TINT_FRACTIONS } from '../config/alpha.js'
+import { CHROMATIC_SCALES, GRAY_ANCHORS, ON_SOLID_ANCHORS, SOLID_ANCHORS } from '../config/anchors.js'
 import { MODES, type Mode } from '../config/modes.js'
 import { apcaLc, contrastRatio } from './contrast.js'
 import { formatHex, parseHex, type Rgb } from './oklch.js'
@@ -72,6 +78,17 @@ function forMode(mode: Mode): LedgerEntry[] {
   const channel = ALPHA_CHANNEL[mode].split(' ').map((v) => Number(v) / 255)
   const hairline = { r: channel[0]!, g: channel[1]!, b: channel[2]! }
 
+  // The tinted triple: a scale's solid as text on its own tint, composited over
+  // bg-raised — what every Badge, the destructive Button and every Callout are
+  // built from. Accent tints richer (15%) than the status scales (10%); see
+  // TINT_FRACTIONS.
+  const tints = CHROMATIC_SCALES.map((scale) => {
+    const scaleSolid = parseHex(SOLID_ANCHORS[scale][mode])
+    const fraction = scale === 'accent' ? TINT_FRACTIONS.accent.fill : TINT_FRACTIONS.default.fill
+    const tint = over(scaleSolid, fraction, raised)
+    return entry(`${mode} ${scale} text on its tint`, scaleSolid, tint, 4.5)
+  })
+
   return [
     entry(`${mode} text on bg`, parseHex(gray.text), bg, 4.5),
     entry(`${mode} text-subtle on bg-raised`, parseHex(gray['text-subtle']), raised, 4.5),
@@ -79,7 +96,8 @@ function forMode(mode: Mode): LedgerEntry[] {
     entry(`${mode} solid as text on bg`, solid, bg, 4.5),
     // SC 1.4.11: a focus indicator needs 3:1 against what surrounds it.
     entry(`${mode} focus ring on bg-raised`, ring, raised, 3),
-    entry(`${mode} hairline on bg-raised`, over(hairline, 0.08, raised), raised, 1)
+    entry(`${mode} hairline on bg-raised`, over(hairline, HAIRLINE[mode], raised), raised, 1),
+    ...tints
   ]
 }
 

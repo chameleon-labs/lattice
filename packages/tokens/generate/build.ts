@@ -11,9 +11,9 @@ import { buildSeverity } from './severity.js'
 /**
  * Build entrypoint. Emits `dist/lattice.css` and `dist/tokens.json`.
  *
- * This build does not gate. Meridian's values are the identity, and four of its
- * documented pairs miss WCAG; refusing to write them would refuse to ship the
- * design. Every pair is still measured and printed — see generate/report.ts.
+ * This build does not gate. Meridian's values are the identity, and a number of
+ * its documented pairs miss WCAG; refusing to write them would refuse to ship
+ * the design. Every pair is still measured and printed — see generate/report.ts.
  */
 const dist = fileURLToPath(new URL('../dist/', import.meta.url))
 await mkdir(dist, { recursive: true })
