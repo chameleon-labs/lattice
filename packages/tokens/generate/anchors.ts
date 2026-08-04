@@ -14,6 +14,14 @@ import {
 } from '../config/anchors.js'
 import type { Mode } from '../config/modes.js'
 import { parseHex, srgbToOklch } from './oklch.js'
+import {
+  ALPHA_CHANNEL,
+  FOCUS_RING_ALPHA,
+  HAIRLINE,
+  HAIRLINE_STRONG,
+  TINT_FRACTIONS,
+  WASH
+} from '../config/alpha.js'
 
 export interface Swatch {
   readonly scale: string
@@ -62,4 +70,42 @@ export function resolveAll(mode: Mode): Swatch[] {
     ...resolveOnSolids(mode),
     swatch('accent', 'vivid', mode, ACCENT_VIVID)
   ]
+}
+
+export interface AlphaToken {
+  readonly role: string
+  readonly value: string
+}
+
+const rgbChannels = (hex: string): string => {
+  const { r, g, b } = parseHex(hex)
+  return `${Math.round(r * 255)} ${Math.round(g * 255)} ${Math.round(b * 255)}`
+}
+
+const alpha = (channels: string, fraction: number): string =>
+  `rgb(${channels} / ${String(fraction)})`
+
+export function resolveAlpha(mode: Mode): AlphaToken[] {
+  const channels = ALPHA_CHANNEL[mode]
+  return [
+    { role: 'border', value: alpha(channels, HAIRLINE[mode]) },
+    { role: 'border-strong', value: alpha(channels, HAIRLINE_STRONG) },
+    { role: 'wash', value: alpha(channels, WASH) },
+    {
+      role: 'focus-ring',
+      value: alpha(rgbChannels(SOLID_ANCHORS.accent[mode]), FOCUS_RING_ALPHA)
+    }
+  ]
+}
+
+export function resolveTints(mode: Mode): AlphaToken[] {
+  return CHROMATIC_SCALES.flatMap((scale) => {
+    const channels = rgbChannels(SOLID_ANCHORS[scale][mode])
+    const { fill, border } =
+      scale === 'accent' ? TINT_FRACTIONS.accent : TINT_FRACTIONS.default
+    return [
+      { role: `${scale}-tint`, value: alpha(channels, fill) },
+      { role: `${scale}-tint-border`, value: alpha(channels, border) }
+    ]
+  })
 }
