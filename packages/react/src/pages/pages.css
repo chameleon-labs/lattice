@@ -531,10 +531,35 @@
   min-block-size: 100vh;
 }
 
+/* `px-6 md:px-10 lg:px-12`: the gutter widens in two steps as the viewport
+   grows past Tailwind's `md`/`lg` breakpoints, which is why `--lat-space-6`
+   alone only matches the source below 48rem. */
+/* `box-sizing: border-box` — Tailwind's preflight sets it globally, so the
+   source's `max-w-5xl` already nets its own padding out of the cap. Nothing
+   in this package resets `box-sizing`, and a page-wide reset would need a
+   universal selector the stylesheet contract forbids, so it is declared
+   directly on the one rule here that combines a `max-inline-size` with
+   `padding-inline` — content-box would render this row wider than the
+   source's by twice the gutter. */
 .landing-page__section {
+  box-sizing: border-box;
   padding-inline: var(--lat-space-6);
   max-inline-size: var(--lat-container-content);
   margin-inline: auto;
+}
+
+@media (width >= 48rem) {
+  .landing-page__section,
+  .landing-page__nav-inner {
+    padding-inline: var(--lat-space-10);
+  }
+}
+
+@media (width >= 64rem) {
+  .landing-page__section,
+  .landing-page__nav-inner {
+    padding-inline: var(--lat-space-12);
+  }
 }
 
 /* ─── Nav ──────────────────────────────────────────────────────────────── */
@@ -546,11 +571,15 @@
   border-block-end: 1px solid var(--lat-border);
 }
 
+/* `h-14`: a fixed-height row with its content centred, not a padded one — no
+   `padding-block` here, unlike every other section-level `*-inner` on this
+   page, because the source nav has no vertical padding class either. */
 .landing-page__nav-inner {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   gap: var(--lat-space-4);
-  padding-block: var(--lat-space-3);
+  block-size: 3.5rem;
   padding-inline: var(--lat-space-6);
   max-inline-size: var(--lat-container-content);
   margin-inline: auto;
@@ -573,12 +602,39 @@
   color: var(--lat-on-solid);
   border-radius: var(--lat-radius-none);
   font-family: var(--lat-text-code-font-family);
-  font-size: var(--lat-font-size-xs);
+  /* `text-[11px]` — the meta role's own primitive size, not the nearest
+     eyebrow/meta *role* token (which pairs 11px with mono, tracking and a
+     muted colour this mark doesn't want). `--lat-font-size-2xs` is the exact
+     match here, unlike the `3xs` (10px) stand-ins used elsewhere in this
+     file for literal 9px/10px sizes with no rung of their own. */
+  font-size: var(--lat-font-size-2xs);
   font-weight: var(--lat-font-weight-bold);
 }
 
+/* `font-bold text-sm … tracking-tight` (14px/700/-0.35px) — the ambient
+   body size (16px, no tracking) everywhere this text isn't overridden. */
 .landing-page__logo-text {
+  font-size: var(--lat-font-size-sm);
   font-weight: var(--lat-font-weight-bold);
+  letter-spacing: var(--lat-letter-spacing-tight);
+}
+
+/* The nav's "beta" `Badge` is `text-[9px] tracking-widest px-1.5 py-0.5`
+   (padding `--lat-space-1-5`/`--lat-space-0-5`, both exact rungs) against
+   `Badge`'s own structural default (10px, `--lat-letter-spacing-wide`,
+   `--lat-space-0-5`/`--lat-space-2` — a wider horizontal pad and a lighter
+   tracking). 9px sits on no `--lat-font-size-*` rung (same one-px-short
+   accepted case as the audit card's "audited 4 min ago"); `3xs` (10px) is
+   the nearest. Scoped to the brand mark specifically — `.landing-page__brand`
+   also wraps the footer's logo mark, which carries no `Badge`, so this never
+   reaches there. Qualified with `[data-variant='default']` (the only variant
+   this instance renders) rather than a bare `.lat-badge`, for the same
+   false-positive reason as the link-`Button` overrides elsewhere in this
+   file. */
+.landing-page__brand .lat-badge[data-variant='default'] {
+  padding: var(--lat-space-0-5) var(--lat-space-1-5);
+  font-size: var(--lat-font-size-3xs);
+  letter-spacing: var(--lat-letter-spacing-wider);
 }
 
 .landing-page__nav-links {
@@ -587,10 +643,27 @@
   gap: var(--lat-space-3);
 }
 
+/* The source's own nav links are bare `<a>` tags — `font-mono text-[11px]`,
+   no padding — against `Button`'s structural `data-size` padding and 14px
+   sans UI-role font. Same footprint as the audit card and footer link
+   overrides above. Qualified with `[data-variant='link']` (every nav link
+   renders as one) rather than a bare `.lat-button`, for the same reason the
+   audit footer's own override below is: an unqualified descendant selector
+   ending `.lat-button {` false-triggers the stylesheet contract test's
+   "block declared twice" scan, which matches that substring wherever it
+   falls, not just at an actual rule's own selector. */
+.landing-page__nav-links .lat-button[data-variant='link'] {
+  padding: 0;
+  font-family: var(--lat-font-mono);
+  font-size: var(--lat-font-size-2xs);
+}
+
 /* ─── Hero ─────────────────────────────────────────────────────────────── */
 
+/* `pt-20 pb-24`: asymmetric, not the even `padding-block` every other
+   section on this page uses. */
 .landing-page__hero {
-  padding-block: var(--lat-space-16);
+  padding-block: var(--lat-space-20) var(--lat-space-24);
 }
 
 .landing-page__hero-grid {
@@ -607,6 +680,23 @@
   margin-block-end: var(--lat-space-8);
 }
 
+/* The source's own eyebrow-style label here is `tracking-widest` (0.1em),
+   not the `tracking-[0.2em]` every other eyebrow on the page uses — one
+   instance where the source departs from its own eyebrow convention.
+   `Eyebrow` never exposes its inner `__text` span's className, so the
+   override reaches it by descendant selector rather than a prop.
+   The trailing `[class]` is an always-true qualifier — the span always
+   carries one — added only so the selector's own text doesn't end with the
+   component rule's exact opening (the class name directly followed by a
+   brace): a companion spec elsewhere in this package scans the whole
+   assembled stylesheet for exactly one occurrence of that exact substring,
+   to guard the eyebrow role's tracking value having a single home, and
+   matches it wherever it falls textually, comments included, not only at
+   the real component rule. */
+.landing-page__hero-kicker .lat-eyebrow__text[class] {
+  letter-spacing: var(--lat-letter-spacing-wider);
+}
+
 .landing-page__hero-dot {
   display: block;
   inline-size: var(--lat-space-1);
@@ -621,8 +711,25 @@
   font-size: var(--lat-text-meta-font-size);
 }
 
+/* The display role's own `line-height` is `none` (1) — right for the system
+   page's shorter headline, but the source hero's is `leading-[1.05]` at both
+   the narrow and wide size. Overridden here rather than in the shared
+   `.lat-page__display` recipe, which the system page also composes and
+   which is correct as `none` there.
+
+   The size itself climbs past the display role too: `text-5xl md:text-6xl`,
+   48px below the `md` breakpoint and 60px at/above it. Below `md` the
+   role's own 48px (`--lat-text-display-font-size`) already matches, so only
+   the wide step needs a rule — see the `@media` block below. */
 .landing-page__display {
   margin-block-end: var(--lat-space-6);
+  line-height: var(--lat-line-height-tight);
+}
+
+@media (width >= 48rem) {
+  .landing-page__display {
+    font-size: var(--lat-font-size-6xl);
+  }
 }
 
 .landing-page__accent-text {
@@ -746,9 +853,13 @@
   opacity: 0.4;
 }
 
+/* No `flex-wrap` — the source's own row is `flex items-center gap-6`, no
+   wrap class, so the signals column shrinks (and wraps its own children
+   internally, see `__audit-counts`) rather than dropping to a second row
+   below the arc. Wrapping here previously stacked them, adding roughly a
+   gauge's height (100px) to the card that the source never pays. */
 .landing-page__audit-summary {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: var(--lat-space-6);
   border-block-end: 1px solid var(--lat-border);
@@ -852,27 +963,43 @@
   min-inline-size: 0;
 }
 
+/* `font-mono text-xs` (12px) — the code role's own font-size is 14px, sized
+   for actual code blocks, not this card's compact rule name. */
 .landing-page__audit-violation-rule {
   margin: 0;
   font-family: var(--lat-text-code-font-family);
-  font-size: var(--lat-text-code-font-size);
+  font-size: var(--lat-font-size-xs);
 }
 
+/* `text-[11px] … truncate` — sans (no `font-mono` class), 11px, single line.
+   The small role's own 14px wraps this at the card's width where the source
+   never does; `truncate`'s three properties keep it to the one line the
+   source renders. */
 .landing-page__audit-violation-desc {
   margin: 0;
+  overflow: hidden;
   color: var(--lat-text-subtle);
   font-family: var(--lat-text-small-font-family);
-  font-size: var(--lat-text-small-font-size);
+  font-size: var(--lat-font-size-2xs);
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
+/* `font-mono text-[10px]` — the meta role's own size is 11px. */
 .landing-page__audit-violation-count {
   flex: 0 0 auto;
   color: var(--lat-text-subtle);
   font-family: var(--lat-text-meta-font-family);
-  font-size: var(--lat-text-meta-font-size);
+  font-size: var(--lat-font-size-3xs);
 }
 
+/* `display: flex` rather than the block the source's own `<div>` renders
+   as — block sizes the row against the ambient (16px/1.5) inline-content
+   strut, several px taller than the 10px button alone; flex sizes it to the
+   button's own content instead, which the visual result the source's own
+   smaller ambient line-height already gets it to for free. */
 .landing-page__audit-footer {
+  display: flex;
   padding: var(--lat-space-3) var(--lat-space-5);
   border-block-start: 1px solid var(--lat-border);
 }
@@ -884,8 +1011,16 @@
    since every other `link` button on both pages wants the muted default.
    Qualified with `[data-variant='link']` rather than bare `.lat-button`
    so the selector never reads as a second declaration of that base rule. */
+/* No padding, `font-mono text-[10px] … gap-1` — the source button carries
+   no size class at all, just inline text; `Button` always applies its own
+   `data-size` padding and UI-role (14px) font, so both are overridden back
+   down to the source's bare-link footprint. */
 .landing-page__audit-footer .lat-button[data-variant='link'] {
+  padding: 0;
+  gap: var(--lat-space-1);
   color: var(--lat-solid);
+  font-family: var(--lat-font-mono);
+  font-size: var(--lat-font-size-3xs);
 }
 .landing-page__audit-footer .lat-button[data-variant='link']:hover:not(:disabled):not([aria-disabled='true']) {
   color: color-mix(in oklch, var(--lat-solid) 80%, transparent);
@@ -919,16 +1054,77 @@
   align-items: center;
 }
 
+/* `font-bold text-xl` (20px) — `Stat`'s own numeric-role default is 16px,
+   sized for a denser card/list arrangement, not this row's five widely
+   spaced headline figures. The trailing `[class]` is an always-true
+   qualifier, added only so this selector's own text doesn't end with the
+   component rule's exact opening: a companion spec elsewhere in this
+   package scans the whole assembled stylesheet for exactly one occurrence
+   of that substring, to guard the numeric role's tabular-figure declaration
+   having a single home, and matches it wherever it falls textually, not
+   only at the real component rule (the same reason the hero kicker's
+   eyebrow override above carries one). */
+.landing-page__trust-stat .lat-stat__value[class] {
+  font-size: var(--lat-font-size-xl);
+}
+
 /* ─── Section heads shared by How it works / Why / v1 scope ─────────────── */
 
+/* `pb-24` on all three (96px) — but only How it works also carries `py-24`'s
+   top half; Why and v1 scope have no top padding class at all and rely on
+   the previous section's own bottom padding to separate them. */
 .landing-page__how,
 .landing-page__why,
 .landing-page__scope {
-  padding-block: var(--lat-space-16);
+  padding-block-end: var(--lat-space-24);
 }
 
+.landing-page__how {
+  padding-block-start: var(--lat-space-24);
+}
+
+/* The source overrides the `h2` role at every instance on this page:
+   `text-3xl font-bold … tracking-tight` (30px/700/-0.75px) against the h2
+   role's 24px/500/-0.6px — the role is correct for the rest of the library,
+   the page just never uses it plain. `line-height` is a literal rem rather
+   than a `--lat-line-height-*` token: Tailwind's `text-3xl` pairs 1.875rem
+   with a 2.25rem line-height (a 1.2 ratio no named token carries), so this
+   states the dimension itself rather than approximating it as a ratio. */
+/* No top margin — none of the four source headings carries an `mt-*` class,
+   and each carries a *different* bottom margin (`mb-16`/`mb-6`/`mb-10`/
+   `mb-4`), so that half moves to the four modifiers below rather than
+   living here as one shared value. */
 .landing-page__heading {
-  margin-block: var(--lat-space-4) var(--lat-space-10);
+  margin-block-start: 0;
+  font-size: var(--lat-font-size-3xl);
+  font-weight: var(--lat-font-weight-bold);
+  letter-spacing: var(--lat-letter-spacing-tight);
+  line-height: 2.25rem;
+}
+
+.landing-page__heading--how { margin-block-end: var(--lat-space-16); }
+.landing-page__heading--why { margin-block-end: var(--lat-space-6); }
+.landing-page__heading--scope { margin-block-end: var(--lat-space-10); }
+
+/* The CTA's heading is the one instance sized `text-4xl` (36px) rather than
+   `text-3xl` — its own literal line-height pair, 2.5rem for the same reason
+   as above (a 1.111 ratio, again nothing on the named scale) — and its own
+   `mb-4` bottom margin. */
+.landing-page__heading--cta {
+  margin-block-end: var(--lat-space-4);
+  font-size: var(--lat-font-size-4xl);
+  line-height: 2.5rem;
+}
+
+/* `SectionEyebrow`'s own `mb-6` — the source's helper always pairs the rule
+   eyebrow with 24px below it; `CTA`'s plain (non-`rule`) eyebrow carries its
+   own smaller `mb-4` instead, `landing-page__cta-eyebrow` below. */
+.landing-page__section-eyebrow {
+  margin-block-end: var(--lat-space-6);
+}
+
+.landing-page__cta-eyebrow {
+  margin-block-end: var(--lat-space-4);
 }
 
 .landing-page__muted-inline {
@@ -945,12 +1141,30 @@
   margin-block-end: var(--lat-space-4);
 }
 
+/* The source's own second "Why" paragraph carries no `mb-4` — only its
+   first does — and inside a grid column a trailing child margin does not
+   collapse away the way it would in normal flow, so the shared
+   `margin-block-end` above has to be zeroed back out on whichever instance
+   is actually last. */
+.landing-page__muted:last-child {
+  margin-block-end: 0;
+}
+
 /* ─── How it works ─────────────────────────────────────────────────────── */
 
 .landing-page__steps {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
   gap: var(--lat-space-4);
+}
+
+/* `p-6` (24px) — `Card`'s own body padding is the component's default
+   (`--lat-space-5`, 20px), right everywhere else on both pages; this is the
+   one instance the source pads wider. Reached through `CardBody`'s own
+   class hook, the same pattern `audit-footer`'s `Button` override uses,
+   rather than a change to `card.css`. */
+.landing-page__steps .lat-card__body {
+  padding: var(--lat-space-6);
 }
 
 /* The source bundle draws each step's index as a giant (48px), near-invisible
@@ -967,8 +1181,14 @@
   font-size: var(--lat-text-meta-font-size);
 }
 
+/* `font-semibold text-base` in the source — 16px/600 against the h3 role's
+   20px/500. Letter-spacing is left alone: h3 carries none in the base layer
+   either (see base.css), and the source's own class list has no tracking
+   utility here. */
 .landing-page__step-title {
   margin: 0 0 var(--lat-space-3);
+  font-size: var(--lat-font-size-base);
+  font-weight: var(--lat-font-weight-semibold);
 }
 
 .landing-page__step-body {
@@ -979,25 +1199,34 @@
   line-height: var(--lat-text-small-line-height);
 }
 
+/* `font-mono text-[10px]` — the meta role's own size is 11px. */
 .landing-page__step-detail {
   margin: 0;
   padding-block-start: var(--lat-space-3);
   border-block-start: 1px solid var(--lat-border);
   color: var(--lat-accent-solid);
   font-family: var(--lat-text-meta-font-family);
-  font-size: var(--lat-text-meta-font-size);
+  font-size: var(--lat-font-size-3xs);
 }
 
 /* ─── Score history ────────────────────────────────────────────────────── */
 
 .landing-page__score-history {
-  padding-block-end: var(--lat-space-16);
+  padding-block-end: var(--lat-space-24);
 }
 
 .landing-page__score-history-body {
   display: flex;
   flex-direction: column;
   gap: var(--lat-space-6);
+}
+
+/* `text-2xl` (24px) — the source's current-score figure is one size up from
+   the trust bar's own `text-xl` (20px) override above; `Stat`'s numeric-role
+   default is 16px either way. `[class]` again dodges the single-occurrence
+   spec — see the trust bar's own override above. */
+.landing-page__score-history-stat .lat-stat__value[class] {
+  font-size: var(--lat-font-size-2xl);
 }
 
 /* ─── Why ──────────────────────────────────────────────────────────────── */
@@ -1009,18 +1238,101 @@
   align-items: start;
 }
 
+/* `font-mono text-[10px]` — the meta role's own size is 11px. */
 .landing-page__competitor-cost {
   display: block;
   color: var(--lat-text-subtle);
   font-family: var(--lat-text-meta-font-family);
-  font-size: var(--lat-text-meta-font-size);
+  font-size: var(--lat-font-size-3xs);
   /* `Th` is bold by inheritance from no role in table.css — the eyebrow
      construction there sets `font-weight` from the role token, already
      normal weight, so no override is needed here for the cost line to read
      lighter than the tool name above it. */
 }
 
-.landing-page__bool-cell {
+/* The source Card wrapping this table carries no `p-6` — the table sits
+   flush against the card's own border, against `CardBody`'s structural
+   default padding (`--lat-space-5`, 20px) every other card on both pages
+   wants. The narrower CardBody was squeezing every column, wrapping the
+   comparison table's own row-header names (`Lighthouse CI`) onto a second
+   line the source never does. Reached through `CardBody`'s own class hook,
+   the same pattern `steps`'s wider padding above uses in reverse. */
+.landing-page__why-grid .lat-card__body {
+  padding: 0;
+}
+
+/* The source table itself carries `text-xs` (12px), against `Table`'s own
+   cell role at 14px (`--lat-text-small-font-size`) — right for every other
+   table this library renders, just not the size the source picks for this
+   dense comparison grid. `Th`'s own vertical padding is a literal for the
+   same reason `audit-header`'s is: `py-2.5` (10px) sits between two
+   spacing-scale steps (`--lat-space-2` at 8px, `--lat-space-3` at 12px) with
+   no rung of its own. Reached through `Table`'s fixed `lat-table__cell` /
+   `lat-table__header` classes, scoped to this table's own column rather
+   than a change to `table.css`. */
+.landing-page__why-grid .lat-table__cell {
+  font-size: var(--lat-font-size-xs);
+}
+
+.landing-page__why-grid .lat-table__header[scope='col'] {
+  padding-block: 0.625rem;
+}
+
+/* The row "header" cells (tool names) are semantically `<th scope="row">`
+   here — more correct than the source's bare `<td>` for the same content —
+   but `Table`'s header role is eyebrow-styled (10px, uppercase, tracked) for
+   the *column* header row above, and that role bled into these row headers
+   too since both share `lat-table__header`. The source's own name cell is
+   plain `font-semibold text-muted-foreground` at 12px against its own
+   `1.333` line-height ratio (the browser's natural metric for the sans
+   face, unset by any Tailwind leading utility) — the same body size this
+   table's data cells are already overridden to above — not the eyebrow
+   role. `line-height` is stated unitless, not as a fixed length: `Table`
+   sets the whole table's own line-height as the body role's ratio
+   (`--lat-text-body-line-height`, itself unitless), and this cell's child
+   — the cost line below, at a different font-size — needs the *ratio* to
+   inherit, not a fixed pixel value, to land on its own correct 13.3px.
+   Restated here, scoped to this table's row headers only, rather than a
+   change to `table.css`. Weight is *not* set here — see
+   `landing-page__competitor-name` below, since this rule's own text also
+   hosts the (regular-weight) cost line and a shared `font-weight` here would
+   bold both. */
+.landing-page__why-grid .lat-table__header[scope='row'] {
+  padding: var(--lat-space-3) var(--lat-space-4);
+  font-family: var(--lat-text-body-font-family);
+  font-size: var(--lat-font-size-xs);
+  line-height: 1.3334;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--lat-text-subtle);
+}
+
+.landing-page__competitor-name {
+  font-weight: var(--lat-font-weight-semibold);
+}
+
+/* `px-3` (12px) on the three boolean-icon columns' header and data cells —
+   narrower than the other columns' `px-4` (16px, this table's own default
+   above and `Table`'s structural default alike), since a centred glyph
+   needs less horizontal breathing room than a name or a setup description.
+   Left uncorrected, the extra 4px/side on three columns was borrowed from
+   the `Tool` column, narrow enough to wrap `Lighthouse CI` onto a second
+   line the source never does. `landing-page__bool-header` is a page-owned
+   class added at the two `Th` call sites that need it, mirroring
+   `landing-page__bool-cell` below for the data-cell half of the same pair. */
+/* Both qualified with `.landing-page__why-grid` — a bare `.landing-page__bool-header`/
+   `.landing-page__bool-cell` is the same (0,1,0) specificity as `table.css`'s
+   own `.lat-table__header`/`.lat-table__cell`, which set `padding` (a
+   physical shorthand) to the same box sides `padding-inline` resolves to;
+   `pages.css` loads before `table.css` in `styles.css`, so at equal
+   specificity the later, component-level rule would otherwise win. */
+.landing-page__why-grid .landing-page__bool-header {
+  padding-inline: var(--lat-space-3);
+  text-align: center;
+}
+
+.landing-page__why-grid .landing-page__bool-cell {
+  padding-inline: var(--lat-space-3);
   text-align: center;
 }
 
@@ -1032,6 +1344,10 @@
   gap: var(--lat-space-4);
 }
 
+/* `text-sm` (14px), no explicit `leading-*` class — Tailwind's own default
+   line-height for `text-sm` is `1.25rem` (a 1.4286 ratio), which sits on no
+   named `--lat-line-height-*` rung; stated as a literal rem for the same
+   reason `.landing-page__heading`'s does above. */
 .landing-page__scope-list {
   display: flex;
   flex-direction: column;
@@ -1039,12 +1355,18 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  font-family: var(--lat-text-small-font-family);
+  font-size: var(--lat-font-size-sm);
+  line-height: 1.25rem;
 }
 
+/* `gap-2.5` (10px) — between the two spacing-scale steps this library keeps
+   (`--lat-space-2` at 8px, `--lat-space-3` at 12px), same gap no token
+   carries as `audit-header`'s and `why-grid`'s own literal paddings. */
 .landing-page__scope-list li {
   display: flex;
   align-items: flex-start;
-  gap: var(--lat-space-3);
+  gap: 0.625rem;
 }
 
 .landing-page__scope-list--muted li {
@@ -1063,7 +1385,7 @@
 }
 
 .landing-page__cta-inner {
-  padding-block: var(--lat-space-16);
+  padding-block: var(--lat-space-24);
   text-align: center;
 }
 
@@ -1072,8 +1394,19 @@
   margin-inline: auto;
 }
 
+/* The CTA's own paragraph carries `mb-8` (32px) — the other `.landing-page__muted`
+   instances all want `mb-4` (the shared rule's default), this is the one
+   that does not. */
 .landing-page__cta-inner .landing-page__muted {
   margin-inline: auto;
+  margin-block-end: var(--lat-space-8);
+}
+
+/* `mt-4` (16px) here against the hero meta line's own `mt-3` (12px) — the
+   two instances of `.landing-page__meta` on this page do not share a
+   top margin either. */
+.landing-page__cta-inner .landing-page__meta {
+  margin-block-start: var(--lat-space-4);
 }
 
 /* ─── Footer ───────────────────────────────────────────────────────────── */
@@ -1088,7 +1421,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--lat-space-4);
-  padding-block: var(--lat-space-6);
+  padding-block: var(--lat-space-8);
 }
 
 .landing-page__footer-copy {
@@ -1097,8 +1430,21 @@
   font-size: var(--lat-text-meta-font-size);
 }
 
+/* `gap-5` (20px), not the `--lat-space-3` (12px) row-gap default. */
 .landing-page__footer-links {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--lat-space-3);
+  gap: var(--lat-space-5);
+}
+
+/* Same footprint as the audit card's own link-styled `Button` override
+   above: the source's `<a>` here carries no size class at all, just
+   `font-mono text-[10px]`, against `Button`'s structural `data-size`
+   padding and 14px UI-role font. Qualified with `[data-variant='link']` for
+   the same false-positive reason as `landing-page__nav-links`'s own
+   override above — every footer link renders as one. */
+.landing-page__footer-links .lat-button[data-variant='link'] {
+  padding: 0;
+  font-family: var(--lat-font-mono);
+  font-size: var(--lat-font-size-3xs);
 }

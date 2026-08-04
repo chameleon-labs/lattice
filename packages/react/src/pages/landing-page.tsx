@@ -219,7 +219,7 @@ function UrlField({ inputLabel }: { inputLabel: string }) {
           className="landing-page__url-input"
         />
       </div>
-      <Button variant="primary">
+      <Button variant="primary" size="lg">
         Audit now
         <Zap size={13} />
       </Button>
@@ -389,8 +389,12 @@ function TrustBar() {
 function HowItWorks() {
   return (
     <Section id="how" className="landing-page__how">
-      <Eyebrow rule>How it works</Eyebrow>
-      <h2 className="landing-page__heading">Zero setup. Baseline in thirty seconds.</h2>
+      <Eyebrow rule className="landing-page__section-eyebrow">
+        How it works
+      </Eyebrow>
+      <h2 className="landing-page__heading landing-page__heading--how">
+        Zero setup. Baseline in thirty seconds.
+      </h2>
 
       <div className="landing-page__steps">
         {STEPS.map((s) => (
@@ -426,7 +430,12 @@ function ScoreHistory() {
           </Badge>
         </CardHeader>
         <CardBody className="landing-page__score-history-body">
-          <Stat value="71" label="Current score" sub="down from 91 on Jul 1" />
+          <Stat
+            value="71"
+            label="Current score"
+            sub="down from 91 on Jul 1"
+            className="landing-page__score-history-stat"
+          />
 
           <Table
             caption="Score history for ariakit.org, nine audits from Jul 1 to Aug 2"
@@ -456,11 +465,13 @@ function ScoreHistory() {
 function Why() {
   return (
     <Section id="why" className="landing-page__why">
-      <Eyebrow rule>Why tabstop</Eyebrow>
+      <Eyebrow rule className="landing-page__section-eyebrow">
+        Why tabstop
+      </Eyebrow>
 
       <div className="landing-page__why-grid">
         <div>
-          <h2 className="landing-page__heading">
+          <h2 className="landing-page__heading landing-page__heading--why">
             CI catches regressions
             <br />
             if you set it up.
@@ -489,16 +500,22 @@ function Why() {
                 <Tr>
                   <Th scope="col">Tool</Th>
                   <Th scope="col">Setup</Th>
-                  <Th scope="col">Trend</Th>
-                  <Th scope="col">Alerts</Th>
-                  <Th scope="col">0-cfg</Th>
+                  <Th scope="col" className="landing-page__bool-header">
+                    Trend
+                  </Th>
+                  <Th scope="col" className="landing-page__bool-header">
+                    Alerts
+                  </Th>
+                  <Th scope="col" className="landing-page__bool-header">
+                    0-cfg
+                  </Th>
                 </Tr>
               </THead>
               <TBody>
                 {COMPETITORS.map((c) => (
                   <Tr key={c.name}>
                     <Th scope="row">
-                      {c.name}
+                      <span className="landing-page__competitor-name">{c.name}</span>
                       <span className="landing-page__competitor-cost">{c.cost}</span>
                     </Th>
                     <Td>{c.setup}</Td>
@@ -519,8 +536,10 @@ function Why() {
 function V1Scope() {
   return (
     <Section id="scope" className="landing-page__scope">
-      <Eyebrow rule>v1 scope</Eyebrow>
-      <h2 className="landing-page__heading">Deliberately scoped.</h2>
+      <Eyebrow rule className="landing-page__section-eyebrow">
+        v1 scope
+      </Eyebrow>
+      <h2 className="landing-page__heading landing-page__heading--scope">Deliberately scoped.</h2>
 
       <div className="landing-page__scope-grid">
         <Card>
@@ -559,8 +578,10 @@ function CTA() {
   return (
     <div className="landing-page__cta">
       <Section className="landing-page__cta-inner">
-        <Eyebrow>Early access — free</Eyebrow>
-        <h2 className="landing-page__heading">Know the moment you break accessibility.</h2>
+        <Eyebrow className="landing-page__cta-eyebrow">Early access — free</Eyebrow>
+        <h2 className="landing-page__heading landing-page__heading--cta">
+          Know the moment you break accessibility.
+        </h2>
         <p className="landing-page__muted">No account needed to run your first audit.</p>
 
         <UrlField inputLabel="Website URL" />
