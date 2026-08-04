@@ -1373,7 +1373,7 @@ to em — see Step 3b.
  * components use that the specimen does not list — 10px and 11px, which carry
  * every eyebrow, badge and table header in both demo pages.
  */
-const SYSTEM_SANS = ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif']
+const SYSTEM_SANS = ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'] as const
 
 export const FONT_FAMILIES = {
   sans: ['Instrument Sans', ...SYSTEM_SANS],
@@ -1504,6 +1504,31 @@ describe('typography roles', () => {
     expect(TYPOGRAPHY_ROLES.h1!.fontWeight).toBe('semibold')
     expect(TYPOGRAPHY_ROLES.h2!.fontWeight).toBe('medium')
     expect(TYPOGRAPHY_ROLES.body!.fontSize).toBe('base')
+  })
+
+  // The three below assert the emitted CSS, not the config object. Everything
+  // above would pass unchanged if Step 6's emission code were deleted outright —
+  // the config fields were already true before it existed. These are what
+  // actually cover the generator.
+
+  it('emits the optional properties for the roles that declare them', () => {
+    const css = typographyRoleCss()
+    expect(css).toContain('--lat-text-eyebrow-text-transform: uppercase;')
+    expect(css).toContain('--lat-text-tag-text-transform: uppercase;')
+    expect(css).toContain('--lat-text-numeric-font-variant-numeric: tabular-nums;')
+  })
+
+  it('emits nothing extra for a role that declares neither', () => {
+    // The failure this catches is a leaked `undefined` declaration, which is
+    // silently invalid CSS rather than an error.
+    const css = typographyRoleCss()
+    expect(css).not.toContain('--lat-text-body-text-transform')
+    expect(css).not.toContain('--lat-text-body-font-variant-numeric')
+    expect(css).not.toContain('undefined')
+  })
+
+  it('carries the eyebrow tracking through to the emitted role', () => {
+    expect(typographyRoleCss()).toContain('--lat-text-eyebrow-letter-spacing: 0.2em;')
   })
 })
 ```
