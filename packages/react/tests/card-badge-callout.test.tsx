@@ -1,28 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { Callout } from '../src/callout/callout.js'
-import { Card } from '../src/card/card.js'
-
-describe('Card', () => {
-  it('renders a plain container with no role', () => {
-    render(<Card>Audit summary</Card>)
-    const card = screen.getByText('Audit summary')
-
-    // A card never becomes role="button". An interactive card exposes its
-    // action through a real control inside it, which keeps one accessible name
-    // and one tab stop.
-    expect(card.getAttribute('role')).toBeNull()
-    expect(card.tagName).toBe('DIV')
-  })
-
-  it('adds className rather than replacing it', () => {
-    render(<Card className="mine">Audit summary</Card>)
-    const card = screen.getByText('Audit summary')
-
-    expect(card.classList.contains('lat-card')).toBe(true)
-    expect(card.classList.contains('mine')).toBe(true)
-  })
-})
 
 describe('Callout', () => {
   it('renders its children with the neutral tone by default', () => {

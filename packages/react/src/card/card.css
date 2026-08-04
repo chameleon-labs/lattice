@@ -1,19 +1,30 @@
-/*
- * The raised elevation role: all three signals together.
- *
- * Each covers a case the others cannot. The shadow reads on light and is
- * effectively absent on dark; the surface step reads on dark; the border is the
- * only one that survives forced-colors, where the user agent strips shadows and
- * flattens surfaces to the system canvas. Shipping fewer than three gives a card
- * that disappears in one mode or one user setting.
- */
 .lat-card {
-  display: block;
-  padding: var(--lat-space-5);
-
-  color: var(--lat-text);
-  background-color: var(--lat-elevation-raised-surface);
-  border: 1px solid var(--lat-elevation-raised-border);
-  border-radius: var(--lat-radius-lg);
-  box-shadow: var(--lat-elevation-raised-shadow);
+  background: var(--lat-bg-raised);
+  border: 1px solid var(--lat-border);
+  border-radius: var(--lat-radius-none);
+  /* The hairline is the edge that survives forced-colors, where the user agent
+     strips shadows and flattens surfaces. The shadow is the enhancement. */
+  box-shadow: var(--lat-elevation-flat);
+  overflow: hidden;
 }
+
+.lat-card[data-elevation='floating'] { box-shadow: var(--lat-elevation-floating); }
+
+.lat-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--lat-space-2);
+  padding: var(--lat-space-3) var(--lat-space-5);
+  border-bottom: 1px solid var(--lat-border);
+  color: var(--lat-text-subtle);
+}
+
+.lat-card__label {
+  font-family: var(--lat-text-eyebrow-font-family);
+  font-size: var(--lat-text-eyebrow-font-size);
+  letter-spacing: var(--lat-text-eyebrow-letter-spacing);
+  line-height: var(--lat-text-eyebrow-line-height);
+  text-transform: var(--lat-text-eyebrow-text-transform);
+}
+
+.lat-card__body { padding: var(--lat-space-5); }
