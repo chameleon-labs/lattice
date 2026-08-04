@@ -189,6 +189,7 @@ function OverviewSection() {
       <CodeBlock
         code={`npm install @chameleon-labs/lattice-react\n\n# Then import in your entrypoint:\nimport '@chameleon-labs/lattice-react/styles.css'`}
         copyLabel="Copy install command"
+        regionLabel="Install command"
       />
     </section>
   )
@@ -285,6 +286,7 @@ function TypographySection() {
       <CodeBlock
         code={`/* Font stack */\n--lat-font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;\n--lat-font-mono: 'JetBrains Mono', ui-monospace, monospace;`}
         copyLabel="Copy font stack"
+        regionLabel="Font stack"
       />
     </section>
   )

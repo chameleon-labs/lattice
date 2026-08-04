@@ -408,9 +408,37 @@
   padding: var(--lat-space-2) var(--lat-space-4);
 }
 
-.system-page__palette-row[data-active] {
-  background: var(--lat-accent-tint);
-}
+/*
+ * `[data-active]` deliberately carries no background of its own. Two things
+ * tried here first, both wrong for the same underlying reason:
+ *
+ * 1. `--lat-accent-tint` — the tint half of the accent tinted triple, built
+ *    to pair with `--lat-solid` as text (that pairing is measured: the
+ *    ledger's "accent text on its tint" row). The default `Badge` inside
+ *    this row reads `--lat-text-subtle`, a colour sized for Lattice's
+ *    *neutral* surfaces, not an accent wash — a pairing no ledger row,
+ *    chromatic triple or severity triple measures. Contrast 2.2:1.
+ * 2. `--lat-wash` — the same neutral overlay the default Badge's own tint
+ *    already uses, on the theory that stacking two instances of the same
+ *    token would land on the pairing the severity-minor tint row measures.
+ *    It does not: the row's wash and the Badge's own wash compound into a
+ *    *third*, still-unmeasured surface, better but still novel. Contrast
+ *    2.85:1.
+ *
+ * Both are instances of one rule: a neutral-variant component placed on
+ * *any* added tint is an unmeasured pairing, because the ledger measures
+ * token pairs, not page compositions, and cannot enumerate every surface a
+ * composition might invent. The only pairing this row's `Badge` is
+ * guaranteed to match a ledger row on is the one every other default
+ * `Badge` on this page already uses: `--lat-text-subtle` directly on the
+ * `Card`'s own `--lat-bg-raised`, no overlay in between — "muted-foreground
+ * on card" (3.67:1, an accepted, documented failure).
+ *
+ * "Active" still reads without it: the source bundle's own primary signal is
+ * the `ChevronRight` turning accent-coloured (`system-page.tsx`), which
+ * this page already does and the `Tag`/`Badge` never picks up in the
+ * source either, active row or not.
+ */
 
 .system-page__palette-spacer {
   display: inline-block;
