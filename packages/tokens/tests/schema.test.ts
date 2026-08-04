@@ -63,7 +63,7 @@ describe('tokens.json against the published DTCG schema', () => {
     expect(global['font']?.['sans']?.$value).toBeInstanceOf(Array)
     expect(global['font-size']?.['base']?.$value).toEqual({ value: 1, unit: 'rem' })
     expect(global['line-height']?.['normal']?.$value).toBe(1.5)
-    expect(global['letter-spacing']?.['normal']?.$value).toEqual({ value: 0, unit: 'rem' })
+    expect(global['letter-spacing']?.['normal']?.$value).toBe(0)
     expect(global['font-weight']?.['bold']?.$value).toBe(700)
     expect(global['space']?.['0-5']?.$value).toEqual({ value: 0.125, unit: 'rem' })
     expect(global['breakpoint']?.['sm']?.$value).toEqual({ value: 30, unit: 'rem' })
@@ -72,11 +72,11 @@ describe('tokens.json against the published DTCG schema', () => {
     expect(global['duration']?.['default']?.$value).toEqual({ value: 200, unit: 'ms' })
     expect(global['easing']?.['out']?.$value).toEqual([0, 0, 0.2, 1])
     expect(global['container']).not.toHaveProperty('full')
-    // Shadow is no longer part of tokens.json — Task 11 retired it. Meridian's
-    // SHADOWS are raw, possibly multi-layer box-shadow strings (sm and lg each
-    // stack two declarations), and DTCG's `shadow` $type models exactly one
-    // layer, so there is no lossless composite value to hand it. `elevationCss()`
-    // is the artefact of record for elevation and shadow; see generate/elevation.ts.
+    // `sm` is two stacked layers — SHADOWS carries them as data, and the DTCG
+    // shadow value accepts either a bare object or a non-empty array, so this
+    // is the array form with two entries.
+    expect((global['shadow']?.['sm']?.$value as unknown[])).toHaveLength(2)
+    expect(global['elevation']?.['raised']?.$value).toBe('{global.shadow.sm}')
     expect(global['text']?.['body']).toEqual({
       $type: 'typography',
       $value: {
@@ -90,10 +90,34 @@ describe('tokens.json against the published DTCG schema', () => {
     expect(validate(tokens)).toBe(true)
   })
 
-  // 'rejects a shadow missing a required field' and 'rejects a shadow dimension
-  // unit the format cannot represent' are retired: Task 11 removed shadow from
-  // tokens.json entirely (see the comment above), so there is no longer a
-  // shadow token in the artefact to corrupt for either test.
+  it('rejects a shadow missing a required field', () => {
+    const broken = structuredClone(tokens) as Record<string, unknown>
+    const global = broken['global'] as Record<string, Record<string, Record<string, unknown>>>
+    global['shadow']!['2xl'] = {
+      $type: 'shadow',
+      $value: [
+        {
+          color: { colorSpace: 'srgb', components: [0, 0, 0], alpha: 0.25 },
+          offsetX: { value: 0, unit: 'px' },
+          offsetY: { value: 25, unit: 'px' },
+          blur: { value: 50, unit: 'px' }
+          // spread omitted — required by the shadowObject schema.
+        }
+      ]
+    }
+
+    expect(validate(broken)).toBe(false)
+  })
+
+  it('rejects a shadow dimension unit the format cannot represent', () => {
+    const broken = structuredClone(tokens) as Record<string, unknown>
+    const global = broken['global'] as Record<string, Record<string, Record<string, unknown>>>
+    const shadow = global['shadow']!['2xl'] as Record<string, unknown[]>
+    const layer = shadow['$value']![0] as Record<string, Record<string, unknown>>
+    layer['blur'] = { value: 50, unit: 'furlongs' }
+
+    expect(validate(broken)).toBe(false)
+  })
 
   it('rejects a typography composite missing a required property', () => {
     const broken = structuredClone(tokens) as Record<string, unknown>

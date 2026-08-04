@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { CHROMATIC_SCALES, GRAY_ROLES } from '../config/anchors.js'
+import { ELEVATION_ROLES, SHADOWS } from '../config/elevation.js'
 import { MODES } from '../config/modes.js'
 import { ROLE_ALIASES } from '../config/semantic.js'
 import { SEVERITY_LEVELS } from '../config/severity.js'
@@ -326,7 +327,7 @@ describe('tokens.json', () => {
 
     expect(global['font-size']?.['base']?.$value).toEqual({ value: 1, unit: 'rem' })
     expect(global['line-height']?.['normal']?.$value).toBe(1.5)
-    expect(global['letter-spacing']?.['normal']?.$value).toEqual({ value: 0, unit: 'rem' })
+    expect(global['letter-spacing']?.['normal']?.$value).toBe(0)
     expect(global['font-weight']?.['bold']?.$value).toBe(700)
     expect(tokens['light']).toBeDefined()
     expect(tokens['dark']).toBeDefined()
@@ -340,13 +341,61 @@ describe('tokens.json', () => {
     expect(tokens['dark']).not.toHaveProperty('space')
   })
 
-  it('keeps shadow and elevation out of tokens.json — CSS is the artefact of record', () => {
-    const global = tokens['global'] as Record<string, unknown>
-    expect(global).not.toHaveProperty('shadow')
+  // Elevation is theme-independent — elevationCss() emits it once on :root,
+  // not per mode block — so its DTCG home is global, alongside shadow, not
+  // repeated under light/dark.
+  it('keeps shadow and elevation global, not per colour mode', () => {
+    const global = tokens['global'] as Record<string, Record<string, unknown>>
+
+    expect(global['shadow']).toHaveProperty('sm')
+    expect(global['shadow']).toHaveProperty('lg')
+    expect(global['shadow']).toHaveProperty('2xl')
+    expect(global['elevation']).toHaveProperty('raised')
+    expect(global['elevation']).toHaveProperty('overlay')
+    expect(global['elevation']).toHaveProperty('floating')
+    // flat has no shadow — DTCG's shadow value requires at least one layer,
+    // so there is no legal value for "none" to alias.
+    expect(global['elevation']).not.toHaveProperty('flat')
 
     for (const mode of MODES) {
       const group = tokens[mode] as Record<string, unknown>
+      expect(group).not.toHaveProperty('shadow')
       expect(group).not.toHaveProperty('elevation')
+    }
+  })
+
+  it('emits every shadow as a DTCG shadow token whose layers match the CSS', () => {
+    const global = tokens['global'] as Record<
+      string,
+      Record<string, { $type: string; $value: unknown }>
+    >
+
+    for (const [name, layers] of Object.entries(SHADOWS)) {
+      const token = global['shadow']?.[name]!
+      expect(token.$type, name).toBe('shadow')
+      const value = token.$value as readonly {
+        readonly color: { readonly alpha: number }
+        readonly offsetX: { readonly value: number }
+        readonly offsetY: { readonly value: number }
+        readonly blur: { readonly value: number }
+        readonly spread: { readonly value: number }
+      }[]
+
+      expect(value, name).toHaveLength(layers.length)
+      layers.forEach((layer, index) => {
+        expect(value[index]!.offsetX.value, `${name}[${index}].offsetX`).toBe(layer.offsetX)
+        expect(value[index]!.offsetY.value, `${name}[${index}].offsetY`).toBe(layer.offsetY)
+        expect(value[index]!.blur.value, `${name}[${index}].blur`).toBe(layer.blur)
+        expect(value[index]!.spread.value, `${name}[${index}].spread`).toBe(layer.spread)
+        expect(value[index]!.color.alpha, `${name}[${index}].alpha`).toBe(layer.alpha)
+      })
+    }
+
+    for (const [role, key] of Object.entries(ELEVATION_ROLES)) {
+      if (key === 'none') {
+        continue
+      }
+      expect(global['elevation']?.[role]?.$value, role).toBe(`{global.shadow.${key}}`)
     }
   })
 

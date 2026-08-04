@@ -21,6 +21,7 @@ export interface DimensionToken {
 
 export interface NumberToken {
   readonly $type: 'number'
+  readonly $description?: string
   readonly $value: number
 }
 
@@ -38,7 +39,7 @@ export interface TypographyTokenGroups {
   readonly font: Readonly<Record<string, FontFamilyToken>>
   readonly 'font-size': Readonly<Record<string, DimensionToken>>
   readonly 'line-height': Readonly<Record<string, NumberToken>>
-  readonly 'letter-spacing': Readonly<Record<string, DimensionToken>>
+  readonly 'letter-spacing': Readonly<Record<string, NumberToken>>
   readonly 'font-weight': Readonly<Record<string, FontWeightToken>>
 }
 
@@ -92,13 +93,23 @@ export function typographyTokens(): TypographyTokenGroups {
   )
   // The published DTCG dimension schema's `unit` enum is `px` | `rem` only —
   // `em` is not a legal value, even though it is exactly right for CSS
-  // letter-spacing and is what `typographyCss()` emits below. `rem` carries the
-  // same number under the unit DTCG actually accepts; a consumer reading the
-  // JSON directly needs to know it means em, same as the CSS does.
+  // letter-spacing and is what `typographyCss()` emits below. Recording it as
+  // `rem` would keep the schema happy but silently change the value: 0.2 means
+  // a different length depending on whether it scales with the root or with
+  // the element's own font-size, and tracking must do the latter. So this
+  // carries the bare number, with the unit stated in the description instead
+  // of misreported in a field the format only lets mean px or rem.
   const letterSpacing = Object.fromEntries(
     Object.entries(LETTER_SPACINGS).map(([name, value]) => [
       name,
-      { $type: 'dimension', $value: { value, unit: 'rem' } } satisfies DimensionToken
+      {
+        $type: 'number',
+        $value: value,
+        $description:
+          'Tracking, in em. DTCG dimension permits only px and rem, and tracking ' +
+          'must scale with the text it tracks — so the unit is carried here rather ' +
+          'than misreported as rem, which would change the value.'
+      } satisfies NumberToken
     ])
   )
   const fontWeight = Object.fromEntries(

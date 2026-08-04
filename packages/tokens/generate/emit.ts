@@ -17,7 +17,12 @@ import { MODES, type Mode } from '../config/modes.js'
 import { ROLE_ALIASES } from '../config/semantic.js'
 import { buildCategorical, buildSequential } from './charts.js'
 import { ORDINAL_CLAMP } from '../config/charts.js'
-import { ELEVATION_ROLE_COUNT, SHADOW_PRIMITIVE_COUNT, elevationCss } from './elevation.js'
+import {
+  ELEVATION_ROLE_COUNT,
+  SHADOW_PRIMITIVE_COUNT,
+  elevationCss,
+  elevationTokens
+} from './elevation.js'
 import {
   LAYOUT_PRIMITIVE_COUNTS,
   layoutCss,
@@ -352,14 +357,10 @@ export function emitTokens(): DesignTokens {
       }
     }
 
-    // Elevation and shadow are CSS-only. `SHADOWS` values are raw, possibly
-    // multi-layer `box-shadow` strings — Meridian's `sm`/`lg`/`2xl` each stack
-    // two declarations — and DTCG's `shadow` $type models exactly one layer, so
-    // there is no lossless composite value to hand it here. `elevationCss()` is
-    // the artefact of record for elevation; see `generate/elevation.ts`.
-
     modes[mode] = group
   }
+
+  const elevation = elevationTokens()
 
   return {
     $schema: DTCG_SCHEMA,
@@ -368,13 +369,19 @@ export function emitTokens(): DesignTokens {
       'build-time contracts. Do not edit by hand.',
     global: {
       $description:
-        'Theme-independent typography, layout and motion primitives, plus semantic ' +
-        'typography. Shadow and elevation are CSS-only — see generate/elevation.ts. ' +
-        'Emitted once.',
+        'Theme-independent typography, layout, motion and shadow primitives, plus ' +
+        'semantic typography and elevation roles. Emitted once.',
       ...typographyTokens(),
       ...layoutTokens(),
       ...motionTokens(),
-      text: typographyRoleTokens()
+      text: typographyRoleTokens(),
+      shadow: elevation.shadow,
+      elevation: {
+        $description:
+          'Elevation roles. `flat` has no shadow — see generate/elevation.ts for why ' +
+          "it isn't a token here — and is the CSS-only `--lat-elevation-flat: none;`.",
+        ...elevation.elevation
+      }
     },
     ...modes
   }

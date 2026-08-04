@@ -56,6 +56,9 @@ global.duration.instant
 global.duration.swift
 global.easing.in-out
 global.easing.out
+global.elevation.floating
+global.elevation.overlay
+global.elevation.raised
 global.font-size.2xl
 global.font-size.2xs
 global.font-size.3xl
@@ -85,6 +88,9 @@ global.line-height.tight
 global.radius.full
 global.radius.none
 global.radius.sm
+global.shadow.2xl
+global.shadow.lg
+global.shadow.sm
 global.space.0
 global.space.0-5
 global.space.1
