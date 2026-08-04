@@ -75,3 +75,9 @@ export type { LiveRegionProps } from './live-region/live-region.js'
 
 export { VisuallyHidden } from './visually-hidden/visually-hidden.js'
 export type { VisuallyHiddenProps } from './visually-hidden/visually-hidden.js'
+
+export { SegmentedControl, SegmentedControlItem } from './segmented-control/segmented-control.js'
+export type {
+  SegmentedControlItemProps,
+  SegmentedControlProps
+} from './segmented-control/segmented-control.js'

@@ -1,0 +1,50 @@
+.lat-segmented-control {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--lat-bg-subtle);
+  border-radius: var(--lat-radius-none);
+}
+
+.lat-segmented-control__item { cursor: pointer; }
+
+/* The input carries the semantics and the focus target; the label carries the
+   appearance. It is not display:none, which would take it out of the
+   accessibility tree and off the keyboard. */
+.lat-segmented-control__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.lat-segmented-control__label {
+  display: block;
+  padding: var(--lat-space-1) var(--lat-space-4);
+
+  font-family: var(--lat-text-code-font-family);
+  font-size: var(--lat-text-code-font-size);
+  line-height: var(--lat-text-code-line-height);
+
+  color: var(--lat-text-subtle);
+  border-radius: var(--lat-radius-none);
+
+  transition-property: background-color, color;
+  transition-duration: var(--lat-duration-swift);
+  transition-timing-function: var(--lat-easing-out);
+}
+
+.lat-segmented-control__item:hover .lat-segmented-control__label { color: var(--lat-text); }
+
+.lat-segmented-control__input:checked + .lat-segmented-control__label {
+  background: var(--lat-bg-raised);
+  box-shadow: var(--lat-elevation-raised);
+  color: var(--lat-text);
+}
+
+.lat-segmented-control__input:focus-visible + .lat-segmented-control__label {
+  outline: 1px solid var(--lat-focus-ring);
+  outline-offset: 1px;
+}
