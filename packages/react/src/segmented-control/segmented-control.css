@@ -48,3 +48,30 @@
   outline: 1px solid var(--lat-focus-ring);
   outline-offset: 1px;
 }
+
+/*
+ * Forced-colors strips box-shadow and overrides background, which between them
+ * are the entire selected state above. Nothing here moves, so unlike Switch
+ * there is no positional cue to fall back on — without this block every
+ * segment renders identically and the control has no visible selection.
+ *
+ * Highlight/HighlightText are the system pair for exactly this: a selected
+ * item within a set. They are the colours the user's own high-contrast theme
+ * has already chosen for that meaning.
+ */
+@media (forced-colors: active) {
+  .lat-segmented-control {
+    border: 1px solid CanvasText;
+  }
+
+  .lat-segmented-control__input:checked + .lat-segmented-control__label {
+    background: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+
+  .lat-segmented-control__input:focus-visible + .lat-segmented-control__label {
+    outline: 2px solid CanvasText;
+    outline-offset: 2px;
+  }
+}
