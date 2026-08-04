@@ -263,13 +263,14 @@ function Nav() {
         <Button
           variant="ghost"
           size="sm"
+          className="landing-page__theme-toggle"
           aria-label="Preview the other theme"
           onClick={() => setIsDark((v) => !v)}
         >
           {isDark ? <Sun size={13} /> : <Moon size={13} />}
         </Button>
 
-        <Button variant="primary" size="sm">
+        <Button variant="primary" size="sm" className="landing-page__nav-cta">
           Try it free
           <ArrowRight size={13} />
         </Button>

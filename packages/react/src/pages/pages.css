@@ -637,10 +637,75 @@
   letter-spacing: var(--lat-letter-spacing-wider);
 }
 
+/* The source's own nav links (`DECISIONS.md`, `How it works`) are
+   `hidden sm:block` — invisible below Tailwind's `sm`, 640px. Below that
+   width the header has no room for both the links and the CTA: the CTA
+   wraps to two lines and roughly triples the header's height, which is the
+   actual mobile bug this rule exists to prevent.
+
+   640px (40rem) sits on no rung of this package's own `BREAKPOINTS` scale
+   (`sm` 30rem/480px, `md` 48rem/768px) — the same gap `TYPOGRAPHY_BREAKPOINT_REM`
+   in `@chameleon-labs/lattice-tokens` already hit for this identical source
+   breakpoint (the hero heading's `md:text-6xl` step) and resolved the same
+   way: a one-off `40rem` literal rather than a new rung on the shared scale,
+   because minting a named breakpoint token for a value only Tailwind's own
+   `sm` ever needs, with a single consumer here and a single (unrelated)
+   consumer there, is the premature-abstraction case this package elsewhere
+   avoids for a single-consumer construction. Restated as the same literal
+   here rather than expanding `BREAKPOINTS`, whose four rungs are otherwise
+   the ones every other responsive rule on this page composes with. */
 .landing-page__nav-links {
-  display: flex;
+  display: none;
   align-items: center;
   gap: var(--lat-space-3);
+}
+
+@media (width >= 40rem) {
+  .landing-page__nav-links {
+    display: flex;
+  }
+}
+
+/* `Button` has no icon-only square treatment — its three sizes all pair a
+   larger inline padding with a smaller block one (`sm`: `--lat-space-1`
+   `--lat-space-3`, 4px/12px), right for text-plus-icon content but not for
+   the source's theme toggle, which is icon-only and `p-2` (8px) on every
+   side: `rounded-sm border border-border`, no size class, so the CSS in
+   `button.css` never overrides its own padding for this case, only pages.css
+   here can. Uniform padding plus the shared 1px border and the 13px icon
+   `Nav()` already passes nets out to the source's exact 31×31 square
+   (8 + 13 + 8 + 1 + 1 = 31 on each axis) without stating a width or height
+   directly — the source markup carries no responsive class on this button
+   either, so the square treatment applies at every viewport, not only
+   mobile. Compounded onto `.lat-button` rather than standing alone: a bare
+   `.landing-page__theme-toggle` is (0,1,0), lower specificity than
+   `.lat-button[data-size='sm']`'s own (0,2,0) padding rule in `button.css`
+   and would lose to it regardless of import order; the compound selector
+   ties at (0,2,0), and `pages.css` loading after `button.css` in
+   `styles.css` settles the tie in this rule's favour. */
+.lat-button.landing-page__theme-toggle {
+  padding: var(--lat-space-2);
+}
+
+/* The source's nav CTA is `py-1.5 px-4` (6px/16px) — between `Button`'s own
+   `sm` (`--lat-space-1`/`--lat-space-3`, 4px/12px) and `md`
+   (`--lat-space-2`/`--lat-space-4`, 8px/16px) rungs, an exact match on
+   neither axis to either size alone. Both halves land on existing spacing
+   rungs regardless (`--lat-space-1-5` is 6px, `--lat-space-4` is 16px), so
+   this restates the pairing directly rather than picking whichever named
+   size is closer. Compounded onto `.lat-button` for the same specificity
+   reason as the theme toggle above.
+
+   117×34 against the source's 115×32 — 1px per side left over on each axis.
+   The source button carries no border at all (`border: 0`); `Button`'s own
+   base rule gives every variant a structural `border: 1px solid transparent`
+   regardless (`button.css`), reserved so `:focus-visible`'s border-colour
+   swap never shifts a button's box size. That reservation is shared by every
+   button on both pages, not a choice this instance could opt out of alone
+   without losing the same focus treatment every other button keeps, so the
+   2px is accepted here rather than special-cased. */
+.lat-button.landing-page__nav-cta {
+  padding: var(--lat-space-1-5) var(--lat-space-4);
 }
 
 /* The source's own nav links are bare `<a>` tags — `font-mono text-[11px]`,
