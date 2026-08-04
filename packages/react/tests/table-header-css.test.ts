@@ -44,7 +44,11 @@ describe("Table's header cell", () => {
   it('stays at normal weight — never bold or semibold on top of the casing and tracking', () => {
     const rule = block('.lat-table__header')
 
-    expect(rule).toContain('font-weight: var(--lat-font-weight-regular);')
+    // The role token, not the primitive it happens to alias to today — reading
+    // the primitive directly is a tier bypass (see M1 of the phase review),
+    // and `--lat-text-eyebrow-font-weight` itself resolves to
+    // `--lat-font-weight-regular` in the emitted tokens.
+    expect(rule).toContain('font-weight: var(--lat-text-eyebrow-font-weight);')
     expect(rule).not.toMatch(/font-weight:\s*var\(--lat-font-weight-(medium|semibold|bold)\)/)
   })
 })

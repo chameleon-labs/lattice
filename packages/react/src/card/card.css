@@ -22,6 +22,7 @@
 .lat-card__label {
   font-family: var(--lat-text-eyebrow-font-family);
   font-size: var(--lat-text-eyebrow-font-size);
+  font-weight: var(--lat-text-eyebrow-font-weight);
   letter-spacing: var(--lat-text-eyebrow-letter-spacing);
   line-height: var(--lat-text-eyebrow-line-height);
   text-transform: var(--lat-text-eyebrow-text-transform);

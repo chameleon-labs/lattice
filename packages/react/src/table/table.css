@@ -25,8 +25,11 @@
   line-height: var(--lat-text-eyebrow-line-height);
   text-transform: var(--lat-text-eyebrow-text-transform);
   /* Normal weight is deliberate: the casing and tracking already carry the
-     emphasis, and bolding on top of both reads as shouting. */
-  font-weight: var(--lat-font-weight-regular);
+     emphasis, and bolding on top of both reads as shouting. The role token,
+     not the primitive it happens to alias to today — reading the primitive
+     directly is a tier bypass that would silently stop tracking the role the
+     moment the two diverge. */
+  font-weight: var(--lat-text-eyebrow-font-weight);
   color: var(--lat-text-subtle);
   /* A border rather than a filled header band: it survives forced-colors, where
      a background is flattened to the system canvas. */

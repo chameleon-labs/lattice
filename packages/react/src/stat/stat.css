@@ -24,7 +24,8 @@
   letter-spacing: var(--lat-text-eyebrow-letter-spacing);
   line-height: var(--lat-text-eyebrow-line-height);
   text-transform: var(--lat-text-eyebrow-text-transform);
-  font-weight: var(--lat-font-weight-regular);
+  /* The role token, not the primitive — see table.css's __header. */
+  font-weight: var(--lat-text-eyebrow-font-weight);
   color: var(--lat-text-subtle);
 }
 

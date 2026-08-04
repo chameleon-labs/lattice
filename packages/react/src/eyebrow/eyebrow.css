@@ -22,7 +22,9 @@
   line-height: var(--lat-text-eyebrow-line-height);
   text-transform: var(--lat-text-eyebrow-text-transform);
   /* Normal weight is deliberate: the casing and tracking already carry the
-     emphasis, and bolding on top of both reads as shouting. */
-  font-weight: var(--lat-font-weight-regular);
+     emphasis, and bolding on top of both reads as shouting. The role token,
+     not the primitive it happens to alias to today — see table.css's
+     __header. */
+  font-weight: var(--lat-text-eyebrow-font-weight);
   color: var(--lat-text-subtle);
 }
