@@ -29,6 +29,12 @@ export function storyFamilies(): string[] {
 
   return readdirSync(src, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
+    // `pages/` ships full-page stories titled `Pages/<Page>`, not
+    // `Components/<Family>` — see the matching exclusion in
+    // tests/exports.test.ts. This sweep is keyed to the Components
+    // namespace, so a page story needs its own coverage rather than being
+    // folded into a walk that assumes every directory is a component family.
+    .filter((entry) => entry.name !== 'pages')
     .filter((entry) =>
       readdirSync(new URL(`${entry.name}/`, src)).some((file) => file.endsWith('.stories.tsx'))
     )

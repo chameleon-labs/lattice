@@ -14,11 +14,22 @@ import * as lattice from '../src/index.js'
 const src = new URL('../src/', import.meta.url)
 const barrel = readFileSync(new URL('index.ts', src), 'utf8')
 
+/**
+ * `pages/` is the one directory under src/ that is not a component family —
+ * Phase 3 added it to hold full-page Storybook stories composed entirely from
+ * the public API, plus the page-local icon set they draw on. Nothing in it is
+ * meant to reach the barrel: a page story imports the library the way a
+ * consumer would, through `../index.js`, so this directory's own exports
+ * (`SystemPage`, the icon components) are deliberately private to it.
+ */
+const NON_COMPONENT_DIRECTORIES = ['pages']
+
 /** Directories under src/ that hold a component, i.e. everything but the barrel. */
 const componentDirectories = (): string[] =>
   readdirSync(src, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
+    .filter((name) => !NON_COMPONENT_DIRECTORIES.includes(name))
     .sort()
 
 /**

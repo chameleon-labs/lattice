@@ -28,6 +28,7 @@
 @import './input/input.css';
 @import './live-region/live-region.css';
 @import './menu/menu.css';
+@import './pages/pages.css';
 @import './segmented-control/segmented-control.css';
 @import './stat/stat.css';
 @import './switch/switch.css';
