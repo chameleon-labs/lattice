@@ -29,7 +29,10 @@
 
 .lat-segmented-control__label {
   display: block;
-  padding: var(--lat-space-1) var(--lat-space-4);
+  /* `py-1.5 px-4` — 6px vertical, not `--lat-space-1` (4px). Paired with the
+     12px/16px `segment` role below, 6px is what actually reaches the
+     source's 28px control height; 4px landed 4px short. */
+  padding: var(--lat-space-1-5) var(--lat-space-4);
 
   /* `segment`, not `code`: this is a single-line mono control (Meridian's
      `font-mono text-xs`, 12px/16px, ratio 1.3333), not a code block, and
