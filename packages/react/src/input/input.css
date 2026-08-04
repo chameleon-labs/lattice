@@ -33,10 +33,15 @@
 
   /* Mono. Meridian sets every field value in the mono face — a token name, a
      URL, an identifier — because the things its fields hold are all of that
-     kind. */
-  font-family: var(--lat-text-code-font-family);
-  font-size: var(--lat-text-code-font-size);
-  line-height: var(--lat-text-code-line-height);
+     kind. This reads the `field` role, not `code`: `code` is prose-leaded
+     (1.625) for multi-line blocks, and a field is a single-line control that
+     needs the same 1.4286 leading every other control in the row gets from
+     `ui`/`ui-strong` — otherwise the field is 1-3px taller than the source
+     design and, since this sits in a flex row with `align-items: stretch`,
+     drags neighbouring controls (e.g. a button beside it) taller with it. */
+  font-family: var(--lat-text-field-font-family);
+  font-size: var(--lat-text-field-font-size);
+  line-height: var(--lat-text-field-line-height);
 
   /* Chromeless: the wrapper carries the background, border and radius now.
      A second border/background here would double the edge the wrapper

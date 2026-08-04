@@ -104,6 +104,7 @@ global.letter-spacing.normal
 global.letter-spacing.tight
 global.letter-spacing.wide
 global.letter-spacing.wider
+global.line-height.control
 global.line-height.none
 global.line-height.normal
 global.line-height.relaxed
@@ -137,6 +138,7 @@ global.text.caption
 global.text.code
 global.text.display
 global.text.eyebrow
+global.text.field
 global.text.h1
 global.text.h2
 global.text.h3

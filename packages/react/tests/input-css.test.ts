@@ -15,10 +15,16 @@
  * of those instead of `--lat-field-bg` would still pass it, the same class
  * of regression `card-css.test.ts` guards against for Card. No unit test in
  * text-field.test.tsx evaluates CSS at all, so it would not catch a
- * `.lat-input` whose font-family still pointed at the `ui` role's tokens
- * instead of `code`'s — an easy slip, since both roles exist side by side in
- * the token package and a `ui`-role reference is exactly as "declared
- * somewhere" as a `code`-role one.
+ * `.lat-input` whose line-height reverted to the `code` role's tokens
+ * instead of `field`'s — an easy slip, since both roles are mono and exist
+ * side by side in the token package, and a `code`-role reference is exactly
+ * as "declared somewhere" as a `field`-role one. `code` is prose-leaded
+ * (1.625) for multi-line blocks; `field` carries the single-line control
+ * leading (1.4286) every other control in a row gets from `ui`/`ui-strong`.
+ * Reverting to `code` is exactly the regression that made every field 1-3px
+ * taller than the source design and, in a flex row with `align-items:
+ * stretch`, dragged neighbouring controls (e.g. a button beside it) taller
+ * with it.
  *
  * The `data-invalid` block guards a real regression: an earlier version of
  * this file dropped invalid-state styling entirely, so a field could carry
@@ -62,11 +68,26 @@ describe("Input's stylesheet", () => {
     expect(rule).not.toMatch(/background:\s*var\(--lat-bg-raised\);/)
   })
 
-  it('sets its value in the mono code role, not the sans ui role', () => {
+  it('sets its value in the mono field role, not the sans ui role', () => {
     const rule = block('.lat-input')
 
-    expect(rule).toContain('font-family: var(--lat-text-code-font-family);')
+    expect(rule).toContain('font-family: var(--lat-text-field-font-family);')
     expect(rule).not.toContain('font-family: var(--lat-text-ui-font-family);')
+  })
+
+  // The exact regression this whole exercise closes: `field` and `code` are
+  // both mono, both "declared somewhere" in the token package, and it is easy
+  // to revert this one line without noticing — `code`'s prose leading (1.625)
+  // makes a single-line field 1-3px taller than the source design, and
+  // because the field sits in a flex row with `align-items: stretch`, that
+  // extra height drags a neighbouring control (e.g. a button) taller with it.
+  // Verified to discriminate: breaking this back to `--lat-text-code-line-height`
+  // by hand fails the assertion, and restoring it passes again.
+  it('reads the field role line-height, not the code role line-height', () => {
+    const rule = block('.lat-input')
+
+    expect(rule).toContain('line-height: var(--lat-text-field-line-height);')
+    expect(rule).not.toContain('line-height: var(--lat-text-code-line-height);')
   })
 
   it('turns an invalid field visibly invalid, in --lat-danger-solid, not the ordinary border', () => {

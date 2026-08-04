@@ -37,8 +37,8 @@ export const TYPOGRAPHY_ROLES = {
   'body-strong': { fontFamily: 'sans', fontSize: 'base', fontWeight: 'semibold', letterSpacing: 'normal', lineHeight: 'normal', classification: 'prose' },
   lead: { fontFamily: 'sans', fontSize: 'lg', fontWeight: 'regular', letterSpacing: 'normal', lineHeight: 'relaxed', classification: 'prose' },
   small: { fontFamily: 'sans', fontSize: 'sm', fontWeight: 'regular', letterSpacing: 'normal', lineHeight: 'relaxed', classification: 'prose' },
-  ui: { fontFamily: 'sans', fontSize: 'sm', fontWeight: 'medium', letterSpacing: 'normal', lineHeight: 'normal', classification: 'ui' },
-  'ui-strong': { fontFamily: 'sans', fontSize: 'sm', fontWeight: 'semibold', letterSpacing: 'normal', lineHeight: 'normal', classification: 'ui' },
+  ui: { fontFamily: 'sans', fontSize: 'sm', fontWeight: 'medium', letterSpacing: 'normal', lineHeight: 'control', classification: 'ui' },
+  'ui-strong': { fontFamily: 'sans', fontSize: 'sm', fontWeight: 'semibold', letterSpacing: 'normal', lineHeight: 'control', classification: 'ui' },
   caption: { fontFamily: 'sans', fontSize: 'xs', fontWeight: 'regular', letterSpacing: 'normal', lineHeight: 'snug', classification: 'supporting' },
 
   // The mono roles. These carry the identity — see the spec's §2.
@@ -46,7 +46,14 @@ export const TYPOGRAPHY_ROLES = {
   tag: { fontFamily: 'mono', fontSize: '3xs', fontWeight: 'regular', letterSpacing: 'wide', lineHeight: 'normal', textTransform: 'uppercase', classification: 'restricted' },
   meta: { fontFamily: 'mono', fontSize: '2xs', fontWeight: 'regular', letterSpacing: 'normal', lineHeight: 'normal', classification: 'supporting' },
   numeric: { fontFamily: 'mono', fontSize: 'base', fontWeight: 'bold', letterSpacing: 'normal', lineHeight: 'none', fontVariantNumeric: 'tabular-nums', classification: 'ui' },
-  code: { fontFamily: 'mono', fontSize: 'sm', fontWeight: 'regular', letterSpacing: 'normal', lineHeight: 'relaxed', classification: 'code' }
+  // `code` is prose-leaded (`relaxed`, 1.625) for multi-line blocks — CodeBlock
+  // depends on that and must keep it. A field is a single-line mono control,
+  // not a block, so it needs the `ui`/`ui-strong` pairing's `control` leading
+  // rather than `code`'s. There was no mono control role before this, so a
+  // field reached for `code` — the nearest mono role — and inherited prose
+  // leading with it, making every field 1-3px taller than the source design.
+  code: { fontFamily: 'mono', fontSize: 'sm', fontWeight: 'regular', letterSpacing: 'normal', lineHeight: 'relaxed', classification: 'code' },
+  field: { fontFamily: 'mono', fontSize: 'sm', fontWeight: 'regular', letterSpacing: 'normal', lineHeight: 'control', classification: 'ui' }
 } as const satisfies Record<string, TypographyRole>
 
 export type TypographyRoleName = keyof typeof TYPOGRAPHY_ROLES

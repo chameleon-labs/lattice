@@ -64,7 +64,15 @@ export const LINE_HEIGHTS = {
   /** Headings. `leading-[1.05]` on the hero. */
   tight: 1.05,
   snug: 1.25,
-  /** Meridian's base-layer default for every heading, label and control. */
+  /** Meridian's base-layer default for every heading and label. */
   normal: 1.5,
-  relaxed: 1.625
+  relaxed: 1.625,
+  /**
+   * Controls. Meridian is Tailwind-based, and Tailwind pairs `text-sm` with an
+   * absolute 20px line-height — a ratio of 1.4286 at 14px, which is what every
+   * control in the bundle actually renders at. Prose leading (1.5, 1.625) makes
+   * a single-line control 1–3px taller than the design and, because control rows
+   * stretch to their tallest item, drags neighbouring controls with it.
+   */
+  control: 1.428571
 } as const
