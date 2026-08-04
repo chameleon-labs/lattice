@@ -1,11 +1,5 @@
 export { Button } from './button/button.js'
-export type {
-  ButtonOptions,
-  ButtonProps,
-  ButtonSize,
-  ButtonTone,
-  ButtonVariant
-} from './button/button.js'
+export type { ButtonOptions, ButtonProps, ButtonSize, ButtonVariant } from './button/button.js'
 
 export { Input } from './input/input.js'
 export type { InputOptions, InputProps } from './input/input.js'
@@ -51,7 +45,7 @@ export type {
 } from './menu/menu.js'
 
 export { Badge } from './badge/badge.js'
-export type { BadgeOptions, BadgeProps, BadgeTone } from './badge/badge.js'
+export type { BadgeOptions, BadgeProps, BadgeVariant } from './badge/badge.js'
 
 export { Callout } from './callout/callout.js'
 export type { CalloutOptions, CalloutProps, CalloutVariant } from './callout/callout.js'

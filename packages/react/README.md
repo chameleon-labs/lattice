@@ -3,6 +3,27 @@
 The component layer of [Lattice](../../README.md), built on design tokens and
 wrapping [Ariakit](https://ariakit.org) where behaviour is hard.
 
+## The identity
+
+Every component renders **Meridian**, the Figma-produced identity
+`@chameleon-labs/lattice-tokens` carries. Meridian is pinned, not generated —
+its colours, the two type families (Instrument Sans for prose and UI,
+JetBrains Mono for the restricted mono roles), the square radius and the
+four-role elevation scale all come from the design and are not adjusted here.
+
+Typography exposes **seventeen semantic roles** — `display`, `h1`–`h4`,
+`body`, `body-strong`, `lead`, `small`, `ui`, `ui-strong`, `caption`, and the
+mono roles that carry the identity itself: `eyebrow`, `tag`, `meta`,
+`numeric`, `code`. A component reaches for a role, never a raw font size or
+family.
+
+**Every value in every stylesheet is a token reference.** No component CSS
+file names a colour, a size or a duration as a literal; each is a `var(--lat-*)`
+custom property resolving into the token package. `tests/css-contract.test.ts`
+enforces this mechanically — no colour literal, no unresolved `--lat-*`
+reference, no universal selector — against the built stylesheet, not just
+against source review.
+
 ## Install
 
 React, `react-dom`, `@ariakit/react` and `@chameleon-labs/lattice-tokens` are
@@ -20,24 +41,28 @@ bundler that is not configured for CSS.
 
 ## Components
 
-Fourteen families. Seven wrap Ariakit; seven are ours on tokens.
+Eighteen families. Seven wrap Ariakit; eleven are ours on tokens.
 
 | Component | Guarantee |
 |---|---|
-| [`Button`](./src/button/README.md) | The focus, variant and motion contracts every other family follows |
+| [`Button`](./src/button/README.md) | The focus, variant and motion contracts every other family follows. Five variants — `primary`, `secondary`, `ghost`, `destructive`, `link` — and no other prop that changes colour |
 | [`Input`](./src/input/README.md) | Invalid state is an attribute, not only a colour |
 | [`TextField`](./src/text-field/README.md) | `aria-describedby` lists exactly what was rendered, and is absent otherwise |
 | [`Switch`](./src/switch/README.md) | State is a position that survives reduced motion |
 | [`Disclosure`](./src/disclosure/README.md) | A real button carrying `aria-expanded` |
 | [`Tabs`](./src/tabs/README.md) | Roving focus, automatic activation, panels associated |
-| [`Menu`](./src/menu/README.md) | Typeahead and focus return, on the overlay elevation |
+| [`Menu`](./src/menu/README.md) | Typeahead and focus return, on the elevation Dialog shares with it |
 | [`Dialog`](./src/dialog/README.md) | Focus trapped and returned, scroll locked, named by its heading |
-| [`Card`](./src/card/README.md) | All three elevation signals; never `role="button"` |
-| [`Badge`](./src/badge/README.md) | Text is required, so colour is never the only signal |
-| [`Callout`](./src/callout/README.md) | No live role by default |
+| [`Card`](./src/card/README.md), `CardHeader`, `CardBody` | All three elevation signals; never `role="button"`. `CardHeader` carries the eyebrow label every panel needs; `CardBody` is the plain content slot |
+| [`Badge`](./src/badge/README.md) | Text is required, so colour is never the only signal. Six variants — `default`, `primary`, `info`, `success`, `danger`, `warning` — plus four severity levels — `critical`, `serious`, `moderate`, `minor` — that are their own variants rather than a mapping onto the six |
+| [`Callout`](./src/callout/README.md) | No live role by default. Four required variants — `info`, `success`, `warning`, `danger` — there is no neutral case to default to |
 | [`Table`](./src/table/README.md) | Caption and scope required by the type |
 | [`LiveRegion`](./src/live-region/README.md) | Never re-announces an unchanged message |
 | [`VisuallyHidden`](./src/visually-hidden/README.md) | Ariakit's, unchanged |
+| [`SegmentedControl`](./src/segmented-control/README.md), `SegmentedControlItem` | Built on Ariakit's radio store, not its tabs — it selects a value, it does not reveal a panel, and that is what a screen reader announces |
+| [`Eyebrow`](./src/eyebrow/README.md) | The uppercase mono label's tracking value has exactly one home |
+| [`Stat`](./src/stat/README.md) | Value, label and an optional sub-line in one shape, on the mono `numeric` role |
+| [`CodeBlock`](./src/code-block/README.md) | The copy result is announced in a live region, not just an icon swap |
 
 Every component makes a guarantee a consumer would otherwise have to remember.
 That is the admission test: `EmptyState` was requested and cut because it makes
@@ -52,7 +77,7 @@ decision the current contract does not permit.
 They are stable and documented on purpose. The token package publishes `--lat-*`
 names it expects consumers to read and override; publishing class names is the
 same bargain one layer up. Variants are `data-*` attributes, so a consumer can
-target `.lat-button[data-variant='solid']` without fighting specificity.
+target `.lat-button[data-variant='primary']` without fighting specificity.
 
 `className` is always **prepended**, never replaced — consumers add, they do not
 take away.
