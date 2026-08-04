@@ -11,8 +11,15 @@
      legible. This is a dim, not a tint: a fixed, mode-independent black at
      60% survives both themes by construction, where a token-based approach
      would have to be re-derived for each and could silently drift back to
-     the same failure. */
+     the same failure.
+
+     Under forced-colors this literal is forced too — verified as
+     rgba(255,255,255,0.6), a white veil over a white Canvas, precisely the
+     near-white-over-near-white failure this rewrite exists to prevent,
+     reintroduced by the one mode nobody checked. forced-color-adjust: none
+     keeps the authored black at 60% instead. */
   background: rgb(0 0 0 / 0.6);
+  forced-color-adjust: none;
 }
 
 .lat-dialog {
