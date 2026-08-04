@@ -12,6 +12,7 @@
  * what it produced is config.
  */
 
+import { GRAY_ANCHORS } from './anchors.js'
 import type { Mode } from './modes.js'
 
 export type Tier = 'hi' | 'lo'
@@ -65,7 +66,13 @@ export const CATEGORICAL: readonly CategoricalSlot[] = [
  */
 export const ALL_PAIRS_CAP = 3
 
-/** The sequential ramp: one hue, the brand's, from pale to deep. */
+/**
+ * The sequential ramp: one hue, from pale to deep.
+ *
+ * 305 is a legacy chart hue, not the brand's — Meridian's accent is chartreuse
+ * (H 120 in dark, H 129 in light). The ramp was never repointed to it, so it
+ * still carries the retired violet-adjacent hue.
+ */
 export const SEQUENTIAL_HUE = 305
 
 export interface SequentialStep {
@@ -95,12 +102,19 @@ export const SEQUENTIAL: readonly SequentialStep[] = [
 export const ORDINAL_CLAMP: Record<Mode, number> = { light: 300, dark: 600 }
 
 /**
- * The surfaces the palettes are validated against: gray-1 in each mode.
+ * The surfaces the palettes are validated against: Meridian's real page
+ * background (`GRAY_ANCHORS[mode].bg`) in each mode.
  *
  * Charts are drawn on the app background, so this is the real comparison rather
- * than a convenient white.
+ * than a convenient white. This used to be `gray-1` from the retired numbered
+ * scale — `#fdfdfd` light, `#111112` dark — which no longer exists and, worse,
+ * was lighter than Meridian's actual light background, so every light-mode
+ * measurement against it was optimistic.
  */
-export const CHART_SURFACES: Record<Mode, string> = { light: '#fdfdfd', dark: '#111112' }
+export const CHART_SURFACES: Record<Mode, string> = {
+  light: GRAY_ANCHORS.light.bg,
+  dark: GRAY_ANCHORS.dark.bg
+}
 
 /**
  * Thresholds for the palette checks.
