@@ -386,14 +386,24 @@ WCAG 2.x on the delivered values:
 | **light `primary-foreground` (#fff) on `primary` (#6a9b00)** | **3.33** | **fails AA for the button label** |
 | **dark `muted-foreground` on `card`** | **3.67** | **fails AA for body text** |
 | **light `primary` as text on `background`** | **2.94** | **fails AA** |
-| **light focus ring `primary/40` vs `card`** | **1.56** | **fails SC 1.4.11 (needs 3:1)** |
-| **`--ring` at 0.35 vs dark `card`** | **2.73** | **fails SC 1.4.11** |
+| **light focus ring `primary/40` vs `card`** | **1.55** | **fails SC 1.4.11 (needs 3:1)** |
 | dark focus ring `primary/40` vs `card` | 3.20 | passes SC 1.4.11 |
-| hairline border vs its surface | 1.19 | decorative; see below |
+| hairline border vs its surface | 1.20 / 1.22 | decorative; see below |
 
-Five failures ship. That is the consequence of the decision in §"The premise",
-taken knowingly, and the ledger exists so it stays visible rather than becoming
-folklore.
+**Four failures ship**, not five. *Corrected 2026-08-04, during implementation.*
+An earlier draft of this table listed a fifth — Meridian's declared `--ring` at
+alpha 0.35, measuring 2.73 against the dark card. Lattice does not emit that
+value. Meridian declares `--ring` at 0.35/0.30 but focuses its components with
+`ring-primary/40`, and the token layer emits **the value the components
+actually use**, because a token nobody reaches for guarantees nothing. At 0.40
+the dark ring reaches 3.20 and passes; only the light one fails.
+
+Four is still four more than a system with a hard gate would ship. That is the
+consequence of the decision in §"The premise", taken knowingly, and the ledger
+exists so it stays visible rather than becoming folklore.
+
+The figures above are the build's own output, not hand arithmetic — reproduce
+them with `pnpm --filter @chameleon-labs/lattice-tokens build`.
 
 Two notes on the last row. The hairline at 1.19 is not itself a violation —
 decorative borders carry no contrast requirement. It matters only for the text

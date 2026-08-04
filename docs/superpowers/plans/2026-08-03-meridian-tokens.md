@@ -14,7 +14,7 @@
 - Every colour value is copied **verbatim** from `Custom Design System/src/styles/theme.css`. If a value is not in that file it is `derived` and must be labelled so in `tokens.json`.
 - Custom property prefix stays `--lat-`.
 - Emitted colours stay `oklch()` in CSS; `tokens.json` carries the source hex.
-- The build **must not fail** on a contrast miss. Five documented failures ship — see the spec's §9 ledger.
+- The build **must not fail** on a contrast miss. Four documented failures ship — see the spec's §9 ledger.
 - Spec: `docs/superpowers/specs/2026-08-03-meridian-identity-design.md`. Read §1 before Task 1.
 - Source bundle: `/Users/george/Downloads/Custom Design System/`.
 - Do not fix existing tests. Tests that assert old values are expected to fail after this plan; only tests this plan explicitly rewrites are updated.
@@ -1024,7 +1024,7 @@ lightness delta that separates declared light and dark serious."
 - Consumes: `contrastRatio`, `apcaLc` from `generate/contrast.js`; `parseHex` from `generate/oklch.js`.
 - Produces: `interface LedgerEntry { name: string; text: string; background: string; ratio: number; apca: number; minimum: number; passes: boolean }`, `buildLedger(): LedgerEntry[]`, `formatLedger(entries: readonly LedgerEntry[]): string` from `generate/report.js`.
 
-**This is the task that changes what the build means.** Five entries fail and the build still writes `dist/`.
+**This is the task that changes what the build means.** Four entries fail and the build still writes `dist/`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1034,15 +1034,24 @@ import { describe, expect, it } from 'vitest'
 import { buildLedger } from '../generate/report.js'
 
 describe('contrast ledger', () => {
-  it('records the five known failures', () => {
+  it('records exactly the four known failures, in emission order', () => {
     const failing = buildLedger().filter((e) => !e.passes).map((e) => e.name)
     expect(failing).toEqual([
       'light on-solid on solid',
       'light solid as text on bg',
-      'dark text-subtle on bg-raised',
       'light focus ring on bg-raised',
-      'dark focus ring on bg-raised'
+      'dark text-subtle on bg-raised'
     ])
+  })
+
+  it('passes the dark focus ring, which the light one fails', () => {
+    // Meridian declares --ring at 0.35 but focuses components at primary/40,
+    // and 0.40 is what this package emits. At 0.40 the dark ring reaches 3.20
+    // and clears SC 1.4.11; the light ring reaches 1.55 and does not. The
+    // asymmetry is the point — do not "fix" it by averaging the two.
+    const dark = buildLedger().find((e) => e.name === 'dark focus ring on bg-raised')!
+    expect(dark.passes).toBe(true)
+    expect(dark.ratio).toBeGreaterThanOrEqual(3)
   })
 
   it('measures the light primary button label at 3.33:1', () => {
@@ -1263,7 +1272,7 @@ Expected: PASS, 4 tests
 git add packages/tokens
 git commit -m "feat(tokens): the contrast contract becomes a report
 
-Five documented pairs miss WCAG and ship anyway, per the approved spec. They
+Four documented pairs miss WCAG and ship anyway, per the approved spec. They
 are measured and printed on every build so they stay visible rather than
 becoming folklore."
 ```
