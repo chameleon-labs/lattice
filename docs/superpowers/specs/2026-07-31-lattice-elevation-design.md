@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-31
 **Status:** superseded by
-[Meridian: replacing Lattice's visual identity](./2026-08-03-meridian-identity-design.md)
+[Replacing Lattice's visual identity with a Figma-generated one](./2026-08-03-lattice-identity-design.md)
 (2026-08-03), which replaces the calibrated multi-level model and its
 theme-dependent roles with four roles taken from the Figma-generated identity.
 Kept for the calibration reasoning, which is why the replacement is a decision

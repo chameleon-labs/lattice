@@ -5,7 +5,7 @@ export type CardProps = ComponentPropsWithRef<'div'>
 /**
  * A `--lat-bg-raised` surface with a hairline border. Flat by default — no
  * shadow — with `data-elevation="floating"` as the escape hatch for the rare
- * instance that needs one, such as Meridian's hero audit card.
+ * instance that needs one, such as the Figma bundle's hero audit card.
  *
  * The hairline, not the shadow, is the edge that survives `forced-colors`,
  * where the user agent strips shadows and flattens surfaces to the system
@@ -22,7 +22,7 @@ export function Card({ className, ...props }: CardProps) {
 }
 
 export interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {
-  /** The eyebrow label. Every panel in Meridian carries one. */
+  /** The eyebrow label. Every panel in Lattice carries one. */
   label: string
   /** An optional leading icon, rendered before the label. */
   icon?: ReactNode

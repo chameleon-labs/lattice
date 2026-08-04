@@ -1,4 +1,4 @@
-# Meridian: replacing Lattice's visual identity
+# Replacing Lattice's visual identity with a Figma-generated one
 
 **Status:** approved
 **Date:** 2026-08-03
@@ -6,8 +6,10 @@
 **Source:** the Figma Make bundle *Custom Design System*
 (`figma.com/design/8pQ17TGPYffdfKoqEPkyEC`), delivered as two exports whose only
 difference is `src/app/App.tsx` — one a design-system documentation site, the
-other a tabstop landing page. The documentation site names the identity
-**Meridian**, and that is the name used here.
+other a tabstop landing page. The documentation site names the identity it
+generated **Meridian**; that name belongs to the bundle's own documentation,
+not to this system. Throughout this document the source is called *the Figma
+bundle*, and the identity it produced is Lattice's — not a second system's.
 
 ## The premise
 
@@ -60,12 +62,12 @@ Every value below is copied verbatim from the bundle's `src/styles/theme.css`.
 These are the anchors; nothing generates them and nothing adjusts them.
 
 \* `--ring` is the one exception, footnoted rather than silently listed as
-verbatim: Meridian *declares* `--ring` at alpha 0.35 (dark) / 0.30 (light) but
+verbatim: the Figma bundle *declares* `--ring` at alpha 0.35 (dark) / 0.30 (light) but
 *focuses its own components* with `ring-primary/40`. The row above is what
 `--lat-focus-ring` actually emits — the value components use — not the unused
 declaration. See §9 for the consequence.
 
-| Meridian role | Lattice role | dark | light |
+| Source role | Lattice role | dark | light |
 | --- | --- | --- | --- |
 | `--background` | `--lat-bg` | `#0c0c14` | `#f0f0f8` |
 | `--card`, `--popover` | `--lat-bg-raised` | `#111120` | `#ffffff` |
@@ -92,7 +94,7 @@ that way while binding them to the chart slots.
 
 ### 1.2 Two structural consequences
 
-**Borders become alpha, not a scale step.** Meridian draws every hairline with
+**Borders become alpha, not a scale step.** The Figma bundle draws every hairline with
 white or black at 7–8%, so an edge composites over whatever surface it lies on
 and a card inside a card produces two visibly different greys from one token.
 Lattice's border roles currently resolve to grey scale steps, which composite
@@ -101,7 +103,7 @@ with nothing. The token package gains an **alpha tier**: a small set of
 `--lat-border-strong` and the tinted component fills are built. This is new
 machinery, not a re-pointing.
 
-**Tinted fills are a first-class pattern.** Meridian's destructive button, every
+**Tinted fills are a first-class pattern.** The Figma bundle's destructive button, every
 badge, and the impact ramp are all *colour at 10–15% over the surface, with a
 20–25% border and full-strength text*. That triple is the single most repeated
 construction in the bundle. It becomes a documented recipe with tokens per
@@ -117,12 +119,12 @@ disproved it.*
 
 **The shared lightness curve does not survive contact with this palette.** It
 holds that step N carries the same lightness in every scale, and that step 9 is
-mode-invariant. Meridian's accent is `#cff23a` at **L 0.905, H 120.3** in dark
+mode-invariant. Lattice's accent is `#cff23a` at **L 0.905, H 120.3** in dark
 and `#6a9b00` at **L 0.630, H 128.6** in light — different lightness *and*
 different hue per mode. Grey runs L 0.159 → 0.916 in dark at a near-constant
 hue of ~284°, and its anchors do not sit on the curve either.
 
-**Meridian has no colour hover states.** Its primary button hovers with
+**Lattice has no colour hover states.** Its primary button hovers with
 `opacity: 0.9`, secondary with `brightness(0.95)`, ghost with a 5% foreground
 wash. There are no `-hover` or `-active` colours to generate, because the design
 does not express hover as a colour.
@@ -138,7 +140,7 @@ the generator still does:
    full strength. Accent runs richer (fill 15%, border 25%) than the five
    status scales (fill 10%, border 20%), because chartreuse at 10% over a
    near-black surface is close to invisible. The single most repeated
-   construction in the bundle, and the only thing Meridian leaves implicit.
+   construction in the bundle, and the only thing the Figma bundle leaves implicit.
 3. **Derives the one missing value**, light-mode `moderate` severity.
 4. **Computes and reports** WCAG and APCA for every documented pair (§9).
 5. **Gamut-checks** every value.
@@ -192,7 +194,7 @@ that silently degrades to system fonts is not an identity.
 | small | 14 | regular (400) |
 | mono | 14 | regular (400) |
 
-Meridian sets headings at `line-height: 1.5` and tracks display and headings
+The Figma bundle sets headings at `line-height: 1.5` and tracks display and headings
 tight (`tracking-tight`); both are folded into the role tokens.
 
 **Five new mono roles.** This is the identity's most recognisable move and it
@@ -235,9 +237,9 @@ looking wrong inside an outer one — that a square system does not have.
 
 ## 4. Spacing
 
-Meridian's declared scale is 4, 8, 12, 16, 24, 32, 48, 64, 96, 128px. Lattice's
+The Figma bundle's declared scale is 4, 8, 12, 16, 24, 32, 48, 64, 96, 128px. Lattice's
 existing 4px-multiplier scale already contains every one of those values, so
-`SPACES` is unchanged. The Meridian subset is documented as the preferred set;
+`SPACES` is unchanged. The Figma bundle's subset is documented as the preferred set;
 the intermediate steps stay available.
 
 Breakpoints and containers are unchanged. The bundle's demos are laid out at
@@ -253,7 +255,7 @@ under forced-colors, so a control whose only edge is a ring has no edge at all
 for a high-contrast user. `tests/browser/a11y.spec.ts` already asserts this.
 
 **Elevation collapses to four roles**, replacing the calibrated multi-level
-model, because four is all Meridian uses:
+model, because four is all the Figma bundle uses:
 
 | role | value (Tailwind v4 equivalents, as the bundle emits them) | used by |
 | --- | --- | --- |
@@ -274,7 +276,7 @@ Surface spec found (80% of near-white over near-white) is not reintroduced.
 
 ## 6. Motion
 
-Meridian's five presets replace the current durations:
+The Figma bundle's five presets replace the current durations:
 
 | preset | duration | easing |
 | --- | --- | --- |
@@ -299,7 +301,7 @@ because colour feedback is never what causes vestibular harm.
 ### 7.1 The fourteen, restyled
 
 Ariakit wiring is retained. Appearance and public variant APIs are rewritten to
-Meridian's own axes, discarding the previous `variant × tone` matrix.
+the Figma bundle's own axes, discarding the previous `variant × tone` matrix.
 
 **Button** — `variant: primary | secondary | ghost | destructive | link`, plus
 `size`. Verbatim from the documentation site's Button panel:
@@ -360,7 +362,7 @@ This is the same admission test that kept `EmptyState` out.
 
 The ~50 remaining stock shadcn components in the bundle's `components/ui/`
 directory are not ported. They are unmodified shadcn defaults that the design
-never touched — they carry no Meridian decisions, and porting them to Ariakit
+never touched — they carry no Lattice decisions, and porting them to Ariakit
 would be inventing a design system rather than applying one.
 
 ## 8. Proof
@@ -369,7 +371,7 @@ Storybook remains the single gallery, with two changes: **dark is the default
 theme**, and a theme toggle is available on every story.
 
 Both bundle pages are rebuilt as page stories composed only of Lattice
-components — the Meridian documentation site and the tabstop landing page. They
+components — the bundle's documentation site and the tabstop landing page. They
 are the acceptance test for this work. Anything either page needs that the
 library cannot express is a gap, and the gap list is the output of building
 them.
@@ -410,7 +412,7 @@ WCAG 2.x on the delivered values:
 | **light info text on its 10% tint** | **3.61** | **fails AA** |
 | **light severity critical text on its tint** | **4.49** | **fails AA (duplicates light danger)** |
 | **light severity serious text on its tint** | **3.15** | **fails AA (duplicates light warning)** |
-| **light severity moderate text on its tint** | **2.26** | **fails AA — the worst pair in the ledger, and Meridian's one derived severity colour** |
+| **light severity moderate text on its tint** | **2.26** | **fails AA — the worst pair in the ledger, and Lattice's one derived severity colour** |
 | **dark severity minor text on its tint** | **3.27** | **fails AA** |
 | **light focus ring `primary/40` vs `card`** | **1.55** | **fails SC 1.4.11 (needs 3:1)** |
 | dark focus ring `primary/40` vs `card` | 3.20 | passes SC 1.4.11 |
@@ -426,16 +428,16 @@ chromatic scale, so these four pairs per mode were new and unmeasured.
 `warning` and so duplicate rows already in this ledger, in both directions.
 `moderate` and `minor` do not: light `moderate` is a new failure and the worst
 pair anywhere in this table, at 2.26 against a minimum of 4.5 — and it is
-Meridian's one *derived* severity colour (see `severity.ts`'s
+Lattice's one *derived* severity colour (see `severity.ts`'s
 `LIGHT_LIGHTNESS_DELTA`), which is exactly where an unmeasured pair is most
 likely to be wrong. Dark `minor` is also a new failure, at 3.27 — it aliases
 to text-subtle on the wash tint rather than to a scale swatch, so it was not
-caught by measuring the coloured severity levels either. Meridian's values did
+caught by measuring the coloured severity levels either. Lattice's values did
 not change; measuring more of them did.
 
 A second, unrelated correction lands in the same pass: the chart palettes were
 being validated against `#fdfdfd` / `#111112` — `gray-1` from the retired
-numbered scale — rather than Meridian's real page background. Against the real
+numbered scale — rather than Lattice's real page background. Against the real
 light background, `#f0f0f8`, the chart sequential ramp's light-end contrast
 check now fails at 1.83:1 (needs 2:1). That failure is reported separately from
 this ledger, in the chart-palette checks the build also prints, because it is a
@@ -468,15 +470,15 @@ Three specs conflict with this direction. Each keeps its file and gains a
 than the tidiness of deleting it:
 
 - **`2026-08-02-quiet-surface-design.md`** — white floating surfaces, neutral
-  default action, accent as opt-in emphasis. Meridian tints its surfaces and
+  default action, accent as opt-in emphasis. Lattice now tints its surfaces and
   makes the accent the primary action, which is the opposite call. **One rule
   survives:** edges are borders, not `box-shadow`, for the forced-colors reason
   recorded in §5.
 - **`2026-07-31-lattice-elevation-design.md`** — the calibrated multi-level
   model and theme-dependent roles, replaced by the four roles in §5.
 - **`2026-08-01-tabstop-design-system-design.md`** — the standalone `--ts-*`
-  system with a blue-violet primary. Meridian occupies the same slot and the
-  reason for a second system disappears with it.
+  system with a blue-violet primary. Lattice's Figma-generated identity
+  occupies the same slot and the reason for a second system disappears with it.
 
 `docs/superpowers/plans/2026-08-02-quiet-surface.md` is marked superseded
 alongside its spec.
@@ -490,8 +492,9 @@ alongside its spec.
   snapshot tests, and the Playwright browser tests — will fail against the new
   appearance and is **left failing**, to be addressed as its own piece of work.
   A red suite at the end of this work is the expected outcome, not a defect.
-- **Renaming the package.** It remains `@chameleon-labs/lattice`. Meridian is
-  the identity the system carries, not the system.
+- **Renaming the package.** It remains `@chameleon-labs/lattice`. The
+  generated identity has no name of its own — it is Lattice's identity, not a
+  second system's.
 - **Tailwind.** The bundle is Tailwind v4; Lattice stays on plain authored CSS
   and takes the *values*, not the toolchain. No Tailwind dependency reaches a
   consumer.

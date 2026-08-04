@@ -15,7 +15,7 @@
 | `align` | `'start'` \| `'center'` | `'start'` |
 
 It exists so that tracking value has exactly one home. It appears on every
-section head, panel header and column in both Meridian demos — the same
+section head, panel header and column in both demo pages — the same
 construction `Card`'s `__label` and `Table`'s `__header` already carry — and a
 value repeated across a dozen stylesheets is a value that drifts.
 

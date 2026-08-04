@@ -110,7 +110,7 @@ describe('public API', () => {
     expect(missing).toEqual([])
   })
 
-  it('never re-exports a *Tone type — the axis Meridian retired', async () => {
+  it('never re-exports a *Tone type — the axis Lattice retired', async () => {
     // Matches the identifier shape rather than naming ButtonTone, BadgeTone
     // and CalloutTone individually, so a *new* tone type reintroduced under
     // any name fails this too, not just the three the axis used to have.

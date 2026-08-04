@@ -1,7 +1,7 @@
 /**
  * The alpha tier.
  *
- * Meridian's edges and washes are not scale steps — they are white or black at a
+ * Lattice's edges and washes are not scale steps — they are white or black at a
  * low alpha, so an edge composites over whatever surface it lies on. Two cards
  * nested inside one another therefore draw two visibly different greys from one
  * token, which an opaque step cannot do.
@@ -40,7 +40,7 @@ export const TINT_FRACTIONS = {
 /**
  * The focus ring.
  *
- * Meridian declares `--ring` at 0.35/0.30 but its components focus with
+ * The Figma bundle declares `--ring` at 0.35/0.30 but its own components focus with
  * `ring-primary/40`. The value components actually use is the one emitted, since
  * a token nobody reaches for guarantees nothing.
  *

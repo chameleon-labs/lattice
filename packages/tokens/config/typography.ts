@@ -5,7 +5,7 @@
  * `assets/fonts/`). The stacks name the family the `@font-face` rules define,
  * then fall back to system faces of the same class.
  *
- * The scale is Meridian's own type specimen, plus the two micro sizes its
+ * The scale is the Figma bundle's own type specimen, plus the two micro sizes its
  * components use that the specimen does not list — 10px and 11px, which carry
  * every eyebrow, badge and table header in both demo pages.
  */
@@ -56,7 +56,7 @@ export const FONT_WEIGHTS = { regular: 400, medium: 500, semibold: 600, bold: 70
  * sub-1rem sizes the mono roles use.
  */
 export const LETTER_SPACINGS = {
-  /** Display and headings. Meridian's `tracking-tight`. */
+  /** Display and headings. The Figma bundle's `tracking-tight`. */
   tight: -0.025,
   normal: 0,
   /** Badges. `tracking-wider`. */
@@ -73,11 +73,11 @@ export const LINE_HEIGHTS = {
   /** Headings. `leading-[1.05]` on the hero. */
   tight: 1.05,
   snug: 1.25,
-  /** Meridian's base-layer default for every heading and label. */
+  /** The Figma bundle's base-layer default for every heading and label. */
   normal: 1.5,
   relaxed: 1.625,
   /**
-   * Controls. Meridian is Tailwind-based, and Tailwind pairs `text-sm` with an
+   * Controls. The Figma bundle is Tailwind-based, and Tailwind pairs `text-sm` with an
    * absolute 20px line-height — a ratio of 1.4286 at 14px, which is what every
    * control in the bundle actually renders at. Prose leading (1.5, 1.625) makes
    * a single-line control 1–3px taller than the design and, because control rows

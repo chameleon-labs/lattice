@@ -1,5 +1,5 @@
 /**
- * The Meridian palette, verbatim.
+ * The palette, verbatim from the Figma bundle.
  *
  * Every value here is copied from the Figma bundle's `src/styles/theme.css`
  * without adjustment. This file is the whole of the colour system's input: there
@@ -7,13 +7,13 @@
  *
  * That is a deliberate reversal. Until 2026-08-03 this package generated its
  * palette from a lightness curve and a chroma envelope, and the generation was
- * the authority. Meridian's values do not lie on any single curve — its accent
+ * the authority. Lattice's values do not lie on any single curve — its accent
  * is L 0.905 H 120 in dark and L 0.630 H 129 in light — so keeping the curve
  * would have meant approximating the identity rather than applying it.
  */
 import type { Mode } from './modes.js'
 
-/** The grey roles Meridian names. Each is anchored in both modes. */
+/** The grey roles Lattice names. Each is anchored in both modes. */
 export const GRAY_ROLES = [
   'bg',
   'bg-raised',
@@ -42,7 +42,7 @@ export type ChromaticScale = (typeof CHROMATIC_SCALES)[number]
 /**
  * Grey.
  *
- * `bg-raised` is lighter than `bg` in both modes — Meridian lifts a surface by
+ * `bg-raised` is lighter than `bg` in both modes — Lattice lifts a surface by
  * raising its lightness regardless of theme, rather than inverting the
  * relationship in dark.
  *
@@ -76,7 +76,7 @@ export const GRAY_ANCHORS: Record<Mode, Record<GrayRole, string>> = {
 /**
  * The solid fill of each chromatic scale.
  *
- * `info`, `success`, `warning` and `decorative` come from Meridian's chart
+ * `info`, `success`, `warning` and `decorative` come from the Figma bundle's chart
  * slots. That is not an interpretation: the bundle's own documentation site
  * labels `chart-2` "Info", `chart-5` "Success" and `chart-3` "Accent" in its
  * token table while binding them to those slots.
@@ -104,7 +104,7 @@ export const ON_SOLID_ANCHORS: Partial<Record<ChromaticScale, Record<Mode, strin
 /**
  * The vivid accent.
  *
- * Meridian keeps `--accent: #cff23a` in *both* modes while `--primary` drops to
+ * Lattice keeps `--accent: #cff23a` in *both* modes while `--primary` drops to
  * olive in light. The chartreuse is the identity; the olive exists only so a
  * white label can sit on it. Emitted separately so a caller can reach the brand
  * colour without going through the primary fill.

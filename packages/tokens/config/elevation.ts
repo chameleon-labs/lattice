@@ -2,7 +2,7 @@
  * Elevation.
  *
  * Four roles, replacing the calibrated multi-level model, because four is all
- * Meridian uses. Values are the Tailwind v4 shadows the bundle emits, stored
+ * the Figma bundle uses. Values are the Tailwind v4 shadows the bundle emits, stored
  * as data rather than as CSS strings.
  *
  * ## Why layers, not strings
@@ -15,7 +15,7 @@
  *
  * ## Recorded, not fixed
  *
- * These shadows are pure black at 10-25% alpha. Over Meridian's `#0c0c14` page
+ * These shadows are pure black at 10-25% alpha. Over Lattice's `#0c0c14` page
  * they are close to invisible, which is why the identity reads as flat in dark
  * mode and leans on the hairline instead; `floating` is the only one that
  * carries. That is the design as delivered and it ships as delivered. The
@@ -53,7 +53,7 @@ export type ShadowName = keyof typeof SHADOWS
 /**
  * What each role is for. `flat` is not an absence of styling — it is the
  * positive statement that a surface is distinguished by its hairline and its
- * fill, which is Meridian's default. It maps to `'none'` rather than a
+ * fill, which is Lattice's default. It maps to `'none'` rather than a
  * `ShadowName` because it has no shadow to point at.
  */
 export const ELEVATION_ROLES = {

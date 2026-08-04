@@ -6,7 +6,7 @@
  * - **WCAG 2.x** relative luminance and ratio decide **pass or fail** in every
  *   printed check — the contrast ledger (generate/report.ts) and the chart
  *   palette checks (generate/charts.ts) both label an entry this way. Neither
- *   stops the build on a miss: Meridian's values are the identity, several of
+ *   stops the build on a miss: Lattice's values are the identity, several of
  *   its pairs miss their WCAG minimum, and the build ships them anyway with
  *   the miss printed rather than hidden. See the design spec's §9.
  * - **APCA** `Lc` is computed and reported alongside and **never** decides

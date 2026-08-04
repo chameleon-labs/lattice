@@ -6,7 +6,7 @@ import { LandingPage } from './landing-page.js'
  *
  * This is an acceptance test rather than a demo. Anything this page needs that
  * the library cannot express is a gap in the library — see the gap list in
- * docs/superpowers/plans/2026-08-03-meridian-proof.md Task 4.
+ * docs/superpowers/plans/2026-08-03-lattice-proof.md Task 4.
  *
  * Two constructions are excluded from the component library — tabstop
  * product surface, not system surface: one consumer each, one arrangement

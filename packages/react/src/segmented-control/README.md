@@ -30,4 +30,4 @@ appearance; the input carries the semantics and the focus target.
 
 **Classes:** `.lat-segmented-control`, `.lat-segmented-control__item`,
 `.lat-segmented-control__input`, `.lat-segmented-control__label`. Labels use
-the `code` text role (mono), matching Meridian's own control.
+the `code` text role (mono), matching the Figma bundle's own control.

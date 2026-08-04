@@ -11,7 +11,7 @@ describe('typography primitives', () => {
     expect(FONT_FAMILIES.mono[0]).toBe('JetBrains Mono')
   })
 
-  it("carries Meridian's scale including the 10px micro size", () => {
+  it("carries the Figma bundle's scale including the 10px micro size", () => {
     expect(FONT_SIZES['3xs']).toBe(0.625)
     expect(FONT_SIZES.base).toBe(1)
     expect(FONT_SIZES['5xl']).toBe(3)
@@ -21,7 +21,7 @@ describe('typography primitives', () => {
     expect(LETTER_SPACINGS.eyebrow).toBe(0.2)
   })
 
-  it('carries the four weights Meridian uses', () => {
+  it('carries the four weights the Figma bundle uses', () => {
     expect(Object.values(FONT_WEIGHTS).sort()).toEqual([400, 500, 600, 700])
   })
 

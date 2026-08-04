@@ -1,4 +1,4 @@
-# Meridian Proof Implementation Plan (Phase 3 of 3)
+# Lattice Proof Implementation Plan (Phase 3 of 3)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -100,7 +100,7 @@ git commit -m "feat(react): Storybook defaults to dark and fills the frame"
 
 ---
 
-### Task 2: The Meridian documentation page
+### Task 2: The documentation page
 
 **Files:**
 - Create: `packages/react/src/pages/icons.tsx`, `packages/react/src/pages/system-page.tsx`, `system-page.stories.tsx`, `packages/react/src/pages/pages.css`
@@ -134,11 +134,11 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { SystemPage } from './system-page.js'
 
 /**
- * The Meridian documentation site, rebuilt from Lattice components alone.
+ * The bundle's documentation site, rebuilt from Lattice components alone.
  *
  * This is an acceptance test rather than a demo. Anything this page needs that
  * the library cannot express is a gap in the library — see the gap list in
- * docs/superpowers/plans/2026-08-03-meridian-proof.md Task 4.
+ * docs/superpowers/plans/2026-08-03-lattice-proof.md Task 4.
  */
 const meta = {
   title: 'Pages/System',
@@ -168,7 +168,7 @@ Check, in order: the eyebrow tracking, the hairline weight, the square corners, 
 
 ```bash
 git add packages/react
-git commit -m "feat(react): rebuild the Meridian documentation page from Lattice
+git commit -m "feat(react): rebuild the documentation page from Lattice
 
 Composed only of the public API. It is the acceptance test for the identity."
 ```
@@ -232,7 +232,7 @@ product surface, the second is a charting concern."
 
 **Files:**
 - Modify: `packages/react/tests/browser/a11y.spec.ts`
-- Create: `docs/superpowers/plans/2026-08-03-meridian-gaps.md`
+- Create: `docs/superpowers/plans/2026-08-03-lattice-gaps.md`
 
 - [ ] **Step 1: Extend the sweep to the page stories**
 
@@ -252,7 +252,7 @@ Run: `cd packages/react && npx playwright test tests/browser/a11y.spec.ts --repo
 
 - [ ] **Step 3: Write the gap list**
 
-Create `docs/superpowers/plans/2026-08-03-meridian-gaps.md` with three sections, each entry naming the page, what it needed, and what was done instead:
+Create `docs/superpowers/plans/2026-08-03-lattice-gaps.md` with three sections, each entry naming the page, what it needed, and what was done instead:
 
 1. **Library gaps** — constructions a page needed that no component provides. Each is a candidate for a future component, with the admission test applied: does it carry a guarantee a caller would otherwise have to remember?
 2. **Known contrast failures** — the axe findings that correspond to the spec's §9 ledger, marked as accepted, with a pointer to the ledger. Anything axe reports that is *not* in the ledger is a real defect and must be listed separately.
@@ -260,7 +260,7 @@ Create `docs/superpowers/plans/2026-08-03-meridian-gaps.md` with three sections,
 
 - [ ] **Step 4: Update the root README**
 
-Replace the "fourteen component families" description with the Meridian identity: eighteen families, the five Button variants, dark by default, and a pointer to the two page stories as the acceptance test. Remove the "one rule that shapes everything" section describing generated colour — it is no longer true — and replace it with the anchored-palette rule and a pointer to the §9 ledger.
+Replace the "fourteen component families" description with the current identity: eighteen families, the five Button variants, dark by default, and a pointer to the two page stories as the acceptance test. Remove the "one rule that shapes everything" section describing generated colour — it is no longer true — and replace it with the anchored-palette rule and a pointer to the §9 ledger.
 
 - [ ] **Step 5: Commit**
 

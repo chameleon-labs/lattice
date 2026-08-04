@@ -11,7 +11,7 @@ import { buildSeverity } from './severity.js'
 /**
  * Build entrypoint. Emits `dist/lattice.css` and `dist/tokens.json`.
  *
- * This build does not gate. Meridian's values are the identity, and a number of
+ * This build does not gate. Lattice's values are the identity, and a number of
  * its documented pairs miss WCAG; refusing to write them would refuse to ship
  * the design. Every pair is still measured and printed — see generate/report.ts.
  */
@@ -21,12 +21,12 @@ await mkdir(dist, { recursive: true })
 const ledger = buildLedger()
 const failed = ledger.filter((e) => !e.passes)
 
-console.log('lattice: Meridian identity, %d modes', MODES.length)
+console.log('lattice: generated identity, %d modes', MODES.length)
 
 console.log('\nContrast ledger (reported, never gates):')
 console.log(formatLedger(ledger))
 console.log(
-  '\n  %d of %d pairs miss their minimum. These ship — see docs/superpowers/specs/2026-08-03-meridian-identity-design.md §9.',
+  '\n  %d of %d pairs miss their minimum. These ship — see docs/superpowers/specs/2026-08-03-lattice-identity-design.md §9.',
   failed.length,
   ledger.length
 )

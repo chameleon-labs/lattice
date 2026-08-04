@@ -1,16 +1,16 @@
-# Meridian Components Implementation Plan (Phase 2 of 3)
+# Lattice Components Implementation Plan (Phase 2 of 3)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Restyle the fourteen existing component families to the Meridian identity and add the four the demos need, keeping Ariakit as the behaviour layer throughout.
+**Goal:** Restyle the fourteen existing component families to the Lattice identity and add the four the demos need, keeping Ariakit as the behaviour layer throughout.
 
-**Architecture:** Each family keeps its Ariakit wiring and its `lat-*` class plus `data-*` attribute pattern. Only the CSS and the public variant props change. Button's `variant × tone` matrix is replaced by Meridian's five named variants — a breaking change, and an intended one.
+**Architecture:** Each family keeps its Ariakit wiring and its `lat-*` class plus `data-*` attribute pattern. Only the CSS and the public variant props change. Button's `variant × tone` matrix is replaced by Lattice's five named variants — a breaking change, and an intended one.
 
 **Tech Stack:** React 19, Ariakit 0.4, plain authored CSS, Storybook 10, vitest, Playwright.
 
 ## Prerequisite
 
-**Phase 1 must be complete and committed.** Every token this plan references is emitted by `docs/superpowers/plans/2026-08-03-meridian-tokens.md`. Verify before starting:
+**Phase 1 must be complete and committed.** Every token this plan references is emitted by `docs/superpowers/plans/2026-08-03-lattice-tokens.md`. Verify before starting:
 
 ```bash
 cd packages/tokens && pnpm build && \
@@ -24,13 +24,13 @@ Expected: a non-zero count. If it is zero, stop — Phase 1 is not done.
 - Package: `packages/react`. `packages/tokens` is not touched.
 - **Every value is a `var(--lat-*)` reference.** No literal colour, size, radius, duration or shadow appears in any component stylesheet. If a value is needed that no token supplies, that is a Phase 1 gap — report it rather than inlining a literal.
 - **An edge is a real `border`, never `box-shadow`.** `box-shadow` is not rendered under forced-colors, so a control whose only edge is a ring has no edge at all for a high-contrast user. `tests/browser/a11y.spec.ts` asserts this. This rule survives from the superseded Quiet Surface spec and is not negotiable.
-- **Radius is `var(--lat-radius-none)` everywhere** except dots and avatars, which use `var(--lat-radius-full)`. Meridian is square.
+- **Radius is `var(--lat-radius-none)` everywhere** except dots and avatars, which use `var(--lat-radius-full)`. Lattice is square.
 - Do not fix pre-existing failing tests. Update only the stories and tests this plan names.
-- Spec: `docs/superpowers/specs/2026-08-03-meridian-identity-design.md` §7. Read it before Task 1.
+- Spec: `docs/superpowers/specs/2026-08-03-lattice-identity-design.md` §7. Read it before Task 1.
 - Source bundle: `/Users/george/Downloads/Custom Design System/src/app/App.tsx` (documentation site) and `/Users/george/Downloads/Custom Design System (1)/src/app/App.tsx` (landing page). These are the authority on appearance.
 - Commit after every task. Never commit to `main`.
 
-## Reference: the Meridian construction vocabulary
+## Reference: the Lattice construction vocabulary
 
 Six constructions account for nearly every surface in both demo pages. Tasks below refer to these by name rather than repeating them.
 
@@ -70,13 +70,13 @@ border: 1px solid var(--lat-danger-tint-border);
 color: var(--lat-danger-solid);
 ```
 
-**The wash hover.** Meridian's hover for anything transparent.
+**The wash hover.** The source's hover for anything transparent.
 
 ```css
 &:hover { background: var(--lat-wash); }
 ```
 
-**The dim hover.** Meridian's hover for anything filled. It dims the whole
+**The dim hover.** The source's hover for anything filled. It dims the whole
 element, label included — that is what the bundle does.
 
 ```css
@@ -108,9 +108,9 @@ still has an edge, and the UA supplies its own focus indicator there.
 - Test: `packages/react/tests/browser/base.spec.ts`
 
 **Interfaces:**
-- Produces: `.lat-surface` — the class a consumer puts on a page root to get Meridian's background, foreground and font.
+- Produces: `.lat-surface` — the class a consumer puts on a page root to get Lattice's background, foreground and font.
 
-**Why this task is first.** The superseded Quiet Surface spec found a real defect: a `<p>` inside `.lat-dialog` computed to **Times**, because Lattice's typography lands only on elements carrying an explicit role class and no component stylesheet sets a family. Meridian's own `@layer base` sets `body { font-family }` and default sizes for `h1`–`h4`, `label`, `button` and `input`. Porting that is what stops the bug recurring in every new component.
+**Why this task is first.** The superseded Quiet Surface spec found a real defect: a `<p>` inside `.lat-dialog` computed to **Times**, because Lattice's typography lands only on elements carrying an explicit role class and no component stylesheet sets a family. The Figma bundle's own `@layer base` sets `body { font-family }` and default sizes for `h1`–`h4`, `label`, `button` and `input`. Porting that is what stops the bug recurring in every new component.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -128,7 +128,7 @@ test('unclassed prose inside a surface inherits the sans stack', async ({ page }
   expect(family).not.toContain('Times')
 })
 
-test('a surface paints the Meridian page colour', async ({ page }) => {
+test('a surface paints the Lattice page colour', async ({ page }) => {
   await page.goto('/iframe.html?id=button--variants&globals=theme:dark')
   const bg = await page
     .locator('.lat-surface')
@@ -150,7 +150,7 @@ Expected: FAIL — no `.lat-surface` class exists
 /*
  * The base layer.
  *
- * Meridian sets defaults on bare elements — body, h1-h4, label, button, input —
+ * The Figma bundle sets defaults on bare elements — body, h1-h4, label, button, input —
  * rather than requiring a class for each. Porting that is not cosmetic: without
  * it, unclassed prose inside a Lattice surface falls through to the browser
  * serif, which shipped as a real defect in the Dialog story for the whole of the
@@ -221,7 +221,7 @@ Add above the alphabetical block, with a comment explaining why the order matter
 
 - [ ] **Step 5: Put the surface class on the story decorator**
 
-In `.storybook/preview.tsx`, change the decorator's `className` from `"lat-story"` to `"lat-story lat-surface"`, and change `initialGlobals.theme` from `'light'` to `'dark'` — Meridian's demos default dark.
+In `.storybook/preview.tsx`, change the decorator's `className` from `"lat-story"` to `"lat-story lat-surface"`, and change `initialGlobals.theme` from `'light'` to `'dark'` — the Figma bundle's demos default dark.
 
 In `.storybook/preview.css`, delete any rule that sets `background` or `color` on `.lat-story`; `.lat-surface` now owns both. Keep the padding rule.
 
@@ -234,11 +234,11 @@ Expected: PASS, 2 tests
 
 ```bash
 git add packages/react
-git commit -m "feat(react): add the Meridian base layer and surface class
+git commit -m "feat(react): add the base layer and surface class
 
-Ports Meridian's bare-element defaults so unclassed prose inside a Lattice
-surface no longer falls through to the browser serif — a defect the Dialog
-story shipped for the whole of the previous library's life."
+Ports the Figma bundle's bare-element defaults so unclassed prose inside a
+Lattice surface no longer falls through to the browser serif — a defect the
+Dialog story shipped for the whole of the previous library's life."
 ```
 
 ---
@@ -269,7 +269,7 @@ describe('Button', () => {
     expect(screen.getByRole('button')).toHaveAttribute('data-variant', 'secondary')
   })
 
-  it('accepts each Meridian variant', () => {
+  it('accepts each Lattice variant', () => {
     for (const variant of ['primary', 'secondary', 'ghost', 'destructive', 'link'] as const) {
       const { unmount } = render(<Button variant={variant}>Go</Button>)
       expect(screen.getByRole('button')).toHaveAttribute('data-variant', variant)
@@ -297,10 +297,10 @@ import { Button as AriakitButton, type ButtonProps as AriakitButtonProps } from 
 import type { ElementType } from 'react'
 
 /**
- * Meridian's five variants.
+ * Lattice's five variants.
  *
  * This replaces the previous `variant × tone` matrix. A neutral button is
- * `secondary`; a dangerous one is `destructive`. Meridian names five buttons and
+ * `secondary`; a dangerous one is `destructive`. Lattice names five buttons and
  * this component offers five, because a system that follows a design strictly
  * cannot also offer combinations the design never drew.
  *
@@ -364,7 +364,7 @@ export function Button<T extends ElementType = 'button'>({
 .lat-button[data-size='md'] { padding: var(--lat-space-2) var(--lat-space-4); }
 .lat-button[data-size='lg'] { padding: var(--lat-space-3) var(--lat-space-5); }
 
-/* Primary: the solid fill. Semibold, because Meridian's is the only button
+/* Primary: the solid fill. Semibold, because Lattice's is the only button
    weighted above medium. */
 .lat-button[data-variant='primary'] {
   background: var(--lat-solid);
@@ -439,7 +439,7 @@ Expected: PASS, 3 tests
 
 ```bash
 git add packages/react
-git commit -m "feat(react)!: Button takes Meridian's five variants
+git commit -m "feat(react)!: Button takes Lattice's five variants
 
 BREAKING CHANGE: the variant x tone matrix is replaced by primary, secondary,
 ghost, destructive and link. ButtonTone is removed. destructive is a tinted
@@ -474,7 +474,7 @@ describe('Badge', () => {
     expect(screen.getByText('beta')).toHaveAttribute('data-variant', 'default')
   })
 
-  it('accepts every Meridian variant', () => {
+  it('accepts every Lattice variant', () => {
     for (const variant of ['default', 'primary', 'info', 'success', 'danger', 'warning'] as const) {
       const { unmount } = render(<Badge variant={variant}>x</Badge>)
       expect(screen.getByText('x')).toHaveAttribute('data-variant', variant)
@@ -621,7 +621,7 @@ Expected: FAIL — `CardHeader` is not exported
 import type { HTMLAttributes, ReactNode } from 'react'
 
 export interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {
-  /** The eyebrow label. Every panel in Meridian carries one. */
+  /** The eyebrow label. Every panel in the Figma bundle carries one. */
   label: string
   /** An optional leading icon, rendered before the label. */
   icon?: ReactNode
@@ -698,7 +698,7 @@ Expected: PASS, 2 tests
 git add packages/react
 git commit -m "feat(react): Card gains a labelled header
 
-Every panel in both Meridian demos is a bordered surface with an eyebrow
+Every panel in both demo pages is a bordered surface with an eyebrow
 header, which makes it a component concern rather than a repeated composition."
 ```
 
@@ -710,7 +710,7 @@ header, which makes it a component concern rather than a repeated composition."
 - Modify: `packages/react/src/input/input.css`, `packages/react/src/text-field/text-field.tsx`, `text-field.css`, both `README.md` and stories
 - Test: `packages/react/tests/browser/field.spec.ts`
 
-Meridian's input carries a **mono** value, an uppercase mono label, the `field-bg` fill, and a focus that sets both a ring and a matching border.
+Lattice's input carries a **mono** value, an uppercase mono label, the `field-bg` fill, and a focus that sets both a ring and a matching border.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -747,7 +747,7 @@ Expected: FAIL — the value is sans and the label is not transformed
   width: 100%;
   padding: var(--lat-space-2) var(--lat-space-3);
 
-  /* Mono. Meridian sets every field value in the mono face — a token name, a
+  /* Mono. Lattice sets every field value in the mono face — a token name, a
      URL, an identifier — because the things its fields hold are all of that
      kind. */
   font-family: var(--lat-text-code-font-family);
@@ -802,7 +802,7 @@ git commit -m "feat(react): fields take the mono value and eyebrow label"
 **Files:**
 - Modify: `packages/react/src/switch/switch.css`, stories, `README.md`
 
-Meridian declares `--switch-background` per mode and nothing else about the control, so the track uses that token and the thumb uses `bg-raised`; checked fills with the solid.
+The Figma bundle declares `--switch-background` per mode and nothing else about the control, so the track uses that token and the thumb uses `bg-raised`; checked fills with the solid.
 
 - [ ] **Step 1: Replace the colour declarations in `switch.css`**
 
@@ -821,7 +821,7 @@ Expected: PASS — the thumb's `transform` transition must be suppressed under `
 
 ```bash
 git add packages/react
-git commit -m "feat(react): restyle Switch onto Meridian's track token"
+git commit -m "feat(react): restyle Switch onto Lattice's track token"
 ```
 
 ---
@@ -836,7 +836,7 @@ git commit -m "feat(react): restyle Switch onto Meridian's track token"
 **Interfaces:**
 - Produces: `SegmentedControl`, `SegmentedControlItem`, `SegmentedControlProps`, `SegmentedControlItemProps`.
 
-Built on Ariakit's radio store so arrow-key semantics and roving focus are not re-implemented. Meridian's segmented control is a `bg-subtle` track with 2px padding and an active thumb at `bg-raised` with the `raised` shadow.
+Built on Ariakit's radio store so arrow-key semantics and roving focus are not re-implemented. The Figma bundle's segmented control is a `bg-subtle` track with 2px padding and an active thumb at `bg-raised` with the `raised` shadow.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -895,7 +895,7 @@ import {
 import type { ReactNode } from 'react'
 
 /**
- * Meridian's segmented control.
+ * Lattice's segmented control.
  *
  * Built on Ariakit's radio store rather than its tabs: the control selects a
  * value, it does not reveal a panel. That distinction is what a screen reader
@@ -1107,7 +1107,7 @@ spec found, kept fixed."
 **Files:**
 - Modify: `packages/react/src/table/table.css`, stories, `README.md`
 
-Meridian's table header cells are 10px uppercase mono at **normal** weight — the casing and tracking carry the emphasis, not the weight. Rows divide with the hairline.
+The Figma bundle's table header cells are 10px uppercase mono at **normal** weight — the casing and tracking carry the emphasis, not the weight. Rows divide with the hairline.
 
 - [ ] **Step 1: Replace `table.css`'s typography and colour**
 
@@ -1261,7 +1261,7 @@ import type { HTMLAttributes } from 'react'
  * The uppercase mono label at 0.2em tracking.
  *
  * It exists so that tracking value has exactly one home. It appears on every
- * section head, panel header and column in both Meridian demos, and a value
+ * section head, panel header and column in both demo pages, and a value
  * repeated in a dozen stylesheets is a value that drifts.
  *
  * `rule` draws the short leading hairline the landing page's section labels
@@ -1375,7 +1375,7 @@ Expected: PASS, 3 tests
 git add packages/react
 git commit -m "feat(react): add Eyebrow, Stat and CodeBlock
 
-Each appears in both Meridian demos and carries a guarantee a caller would
+Each appears in both demo pages and carries a guarantee a caller would
 otherwise have to remember — the 0.2em tracking, tabular figures, and a copy
 that announces rather than only swapping an icon."
 ```
@@ -1429,7 +1429,7 @@ Remove `ButtonTone`, `BadgeTone` and `CalloutTone`. Add `ButtonVariant`, `BadgeV
 
 - [ ] **Step 4: Rewrite `packages/react/README.md`**
 
-State the identity (Meridian), the five Button variants, the six Badge variants, the eighteen typography roles, and the rule that every value is a token reference. Remove every mention of tones.
+State the identity (Lattice), the five Button variants, the six Badge variants, the eighteen typography roles, and the rule that every value is a token reference. Remove every mention of tones.
 
 - [ ] **Step 5: Typecheck and build**
 
@@ -1440,7 +1440,7 @@ Expected: both succeed. Component and browser tests asserting the old appearance
 
 ```bash
 git add packages/react
-git commit -m "feat(react)!: update the public API for Meridian
+git commit -m "feat(react)!: update the public API for Lattice
 
 BREAKING CHANGE: ButtonTone, BadgeTone and CalloutTone are removed. Card gains
 CardHeader and CardBody; Eyebrow, Stat, CodeBlock and SegmentedControl are new."

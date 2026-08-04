@@ -87,7 +87,7 @@ describe('the six categorical checks', () => {
   // Light mode passes ok — a WARN never sets it false — but one check is not a
   // clean pass, and this pins that explicitly rather than lumping it into the
   // dark-mode assertion above. CHART_SURFACES was corrected from a fake,
-  // lighter gray-1 hex to Meridian's real background (#f0f0f8, darker), and
+  // lighter gray-1 hex to Lattice's real background (#f0f0f8, darker), and
   // measured against the real surface aqua drops just below 3:1. Recorded,
   // accepted state: a future colour or threshold change that fixes or hides
   // this must edit this test too, in the open.
@@ -290,7 +290,7 @@ describe('the sequential ramp', () => {
   // background; recorded here as an accepted failure rather than left
   // unasserted, same as the contrast ledger's accepted failures in
   // tests/report.test.ts. It must not be "fixed" by moving ORDINAL_CLAMP or
-  // any chart colour — see docs/superpowers/specs/2026-08-03-meridian-identity-design.md §9.
+  // any chart colour — see docs/superpowers/specs/2026-08-03-lattice-identity-design.md §9.
   it('fails its own light-end clamp floor in light mode, recorded and accepted', () => {
     const report = validateSequential(ordinalRange('light'), 'light')
 
@@ -440,7 +440,7 @@ describe('the ordinal clamp', () => {
   })
 
   // In light mode the clamp's own boundary step no longer clears the floor
-  // once measured against Meridian's real background (#f0f0f8) instead of the
+  // once measured against Lattice's real background (#f0f0f8) instead of the
   // fake, lighter gray-1 hex this used to be checked against — this is the
   // same accepted failure as "fails its own light-end clamp floor in light
   // mode" above and in the chart-check output `build.ts` prints. Recorded
@@ -468,7 +468,7 @@ describe('the ordinal clamp', () => {
     const at = (step: number): string => ramp.find((entry) => entry.step === step)!.hex
 
     // Both figures moved when CHART_SURFACES was corrected from the retired,
-    // fake gray-1 hexes to Meridian's real backgrounds. The spec used to quote
+    // fake gray-1 hexes to Lattice's real backgrounds. The spec used to quote
     // 2.04:1 at step 300 on light and 3.28:1 at 600 on dark; measured against
     // the real surfaces those are now 1.83:1 (light — below the 2:1 floor, an
     // accepted failure, see above) and 3.39:1 (dark — still clears comfortably).

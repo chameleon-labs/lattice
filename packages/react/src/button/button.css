@@ -23,7 +23,7 @@
 .lat-button[data-size='md'] { padding: var(--lat-space-2) var(--lat-space-4); }
 .lat-button[data-size='lg'] { padding: var(--lat-space-3) var(--lat-space-5); }
 
-/* Primary: the solid fill. Semibold, because Meridian's is the only button
+/* Primary: the solid fill. Semibold, because Lattice's is the only button
    weighted above medium. */
 .lat-button[data-variant='primary'] {
   background: var(--lat-solid);
@@ -39,7 +39,7 @@
   color: var(--lat-text);
   font-weight: var(--lat-font-weight-medium);
 }
-/* 0.95 is Meridian's own literal secondary-hover treatment, not a value with
+/* 0.95 is the Figma bundle's own literal secondary-hover treatment, not a value with
    a semantic token name — there is no brightness scale to reach for. */
 .lat-button[data-variant='secondary']:hover:not(:disabled):not([aria-disabled='true']) { filter: brightness(0.95); }
 

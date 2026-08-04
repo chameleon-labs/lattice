@@ -70,7 +70,7 @@ export const TYPOGRAPHY_BREAKPOINT_REM = 40
 /**
  * Heading sizes below {@link TYPOGRAPHY_BREAKPOINT_REM}.
  *
- * Meridian's own hero is `text-5xl md:text-6xl`, so responsive display sizing
+ * The Figma bundle's own hero is `text-5xl md:text-6xl`, so responsive display sizing
  * is part of the identity rather than an addition to it. Each role steps down
  * one rung; `h4` and the mono roles are already small enough to leave alone.
  */

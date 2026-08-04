@@ -46,7 +46,7 @@ test('an unclassed label takes the base size, not its ancestor’s', async ({ pa
   expect(sizes.label).toBe(sizes.root)
 })
 
-test('a surface paints the Meridian page colour', async ({ page }) => {
+test('a surface paints the Lattice page colour', async ({ page }) => {
   await page.goto('/iframe.html?id=components-button--variants&globals=theme:dark')
   const { r, g, b } = await channelsOf(page, '.lat-surface')
   // #0c0c14 -> rgb(12, 12, 20). Tolerance absorbs oklch -> sRGB rounding.

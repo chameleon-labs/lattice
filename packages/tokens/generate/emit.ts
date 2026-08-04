@@ -4,7 +4,7 @@
  * `lattice.css` is what a consumer imports; `tokens.json` is the machine-readable
  * form, in the Design Tokens Community Group format.
  *
- * Emits the **primitive tier** (Meridian's anchored roles), the **chart
+ * Emits the **primitive tier** (the Figma bundle's anchored roles), the **chart
  * palettes**, the **severity ramp** and the **semantic tier** — alpha and role
  * aliases — in both artefacts. The stylesheet expresses aliases as `var()`
  * references and the JSON as DTCG `{group.token}` references, so a consumer
@@ -167,7 +167,7 @@ ${typographyRoleResponsiveCss()}
 }
 
 /**
- * How an emitted colour token knows whether it came from Meridian directly or
+ * How an emitted colour token knows whether it came from the Figma bundle directly or
  * was computed here. Namespaced under the org so a reader parsing `tokens.json`
  * with a generic DTCG tool does not mistake it for a spec-defined field.
  */
@@ -353,7 +353,7 @@ export function emitTokens(): DesignTokens {
       $description: `Primitive colours and semantic roles, ${mode} mode. Generated — never hand-edited.`
     }
 
-    // Primitives: Meridian's anchored roles, grouped by scale. Each carries
+    // Primitives: the Figma bundle's anchored roles, grouped by scale. Each carries
     // whether it was anchored directly or derived here.
     const byScale = new Map<string, Record<string, ColorToken>>()
     for (const swatch of resolveAll(mode)) {

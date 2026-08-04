@@ -8,7 +8,7 @@ describe('Button', () => {
     expect(screen.getByRole('button').dataset['variant']).toBe('secondary')
   })
 
-  it('accepts each Meridian variant', () => {
+  it('accepts each Lattice variant', () => {
     for (const variant of ['primary', 'secondary', 'ghost', 'destructive', 'link'] as const) {
       const { unmount } = render(<Button variant={variant}>Go</Button>)
       expect(screen.getByRole('button').dataset['variant']).toBe(variant)

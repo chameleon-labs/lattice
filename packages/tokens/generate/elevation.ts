@@ -6,7 +6,7 @@ export const ELEVATION_ROLE_COUNT = Object.keys(ELEVATION_ROLES).length
 /**
  * Formats one shadow length for the `box-shadow` shorthand: a literal zero
  * carries no unit, matching how a browser round-trips the value, and every
- * non-zero length is `px` — Meridian's shadows are unitless design values,
+ * non-zero length is `px` — Lattice's shadows are unitless design values,
  * not rem-relative ones.
  */
 function px(value: number): string {
@@ -31,7 +31,7 @@ const SHADOW_CSS = Object.fromEntries(
  * Elevation tokens.
  *
  * Emitted once on `:root` rather than per theme. The prior system varied shadow
- * by mode; Meridian declares one set and uses it in both.
+ * by mode; Lattice declares one set and uses it in both.
  */
 export function elevationCss(): string {
   return [

@@ -34,7 +34,7 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {}
 
 /**
- * Meridian's five variants, side by side, plus the disabled state each one
+ * Lattice's five variants, side by side, plus the disabled state each one
  * loses its identity to. `tests/browser/base.spec.ts` navigates here directly.
  */
 export const Variants: Story = {

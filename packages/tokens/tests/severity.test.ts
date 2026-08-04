@@ -7,7 +7,7 @@ import { buildSeverity, resolveSeverityTints } from '../generate/severity.js'
 import { parseHex, srgbToOklch } from '../generate/oklch.js'
 
 describe('severity ramp', () => {
-  it('takes every dark level from Meridian', () => {
+  it('takes every dark level from the Figma bundle', () => {
     const dark = Object.fromEntries(buildSeverity('dark').map((s) => [s.role, s.hex]))
     expect(dark.critical).toBe('#ff4d6a')
     expect(dark.serious).toBe('#fb923c')

@@ -18,7 +18,7 @@ export type EasingCurve = readonly [number, number, number, number]
 /**
  * Motion.
  *
- * Meridian's five presets, from its documentation site's motion section.
+ * The Figma bundle's five presets, from its documentation site's motion section.
  *
  * `expressive` is a duration and nothing else. Its listed easing is "spring",
  * which no CSS timing function reproduces, and Lattice does not take a
@@ -38,7 +38,7 @@ export const DURATIONS = {
 } as const satisfies Readonly<Record<string, number>>
 
 /**
- * Two curves, because Meridian names two: `ease-out` for entrances and state
+ * Two curves, because Lattice names two: `ease-out` for entrances and state
  * changes, `ease-in-out` for the deliberate tier.
  */
 export const EASINGS = {

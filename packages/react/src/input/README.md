@@ -13,14 +13,14 @@ to the control, use [`TextField`](../text-field/README.md) instead.
 |---|---|---|
 | `invalid` | `boolean` — sets `aria-invalid` | `false` |
 
-There is no `size` prop. Meridian's fields render at one size everywhere in
+There is no `size` prop. Fields render at one size everywhere in
 the source design — no variant of a field is shown larger or smaller than
 another — so this system doesn't offer a knob the design never turns, the
 same call Button made when it dropped the tone axis. The native `size`
 attribute (HTML's "visible character width") passes through untouched, since
 nothing here shadows it any more.
 
-Meridian sets every field value in the mono face — a token name, a URL, an
+Lattice sets every field value in the mono face — a token name, a URL, an
 identifier — because the things its fields hold are all of that kind. Focus
 sets both a matching border and a ring, since the border alone is not enough
 contrast against `--lat-field-bg` for everyone who relies on it.

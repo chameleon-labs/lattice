@@ -27,7 +27,7 @@ export type EyebrowAlign = 'start' | 'center'
  * The uppercase mono label at 0.2em tracking.
  *
  * It exists so that tracking value has exactly one home. It appears on every
- * section head, panel header and column in both Meridian demos, and a value
+ * section head, panel header and column in both demo pages, and a value
  * repeated in a dozen stylesheets is a value that drifts.
  *
  * `rule` draws the short leading hairline the landing page's section labels

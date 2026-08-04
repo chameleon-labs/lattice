@@ -3,7 +3,7 @@ import { Eyebrow } from './eyebrow.js'
 
 /**
  * The uppercase 10px mono label at 0.2em tracking. It appears on every
- * section head, panel header and column in both Meridian demos, and exists so
+ * section head, panel header and column in both demo pages, and exists so
  * that tracking value has exactly one home — a value repeated across a dozen
  * stylesheets is a value that drifts.
  */

@@ -11,7 +11,7 @@ describe('elevation', () => {
     expect(ELEVATION_ROLES.flat).toBe('none')
   })
 
-  it("carries Meridian's 2xl for the floating role", () => {
+  it("carries Lattice's 2xl for the floating role", () => {
     // SHADOWS stores layers as data (Finding 2, Task 11) rather than a CSS
     // string, so the stylesheet and the DTCG token are both derived from the
     // same source rather than one being a hand-maintained copy of the other.

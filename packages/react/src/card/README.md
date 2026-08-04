@@ -1,7 +1,7 @@
 # Card
 
 `Card` — a `--lat-bg-raised` surface with a hairline border. Every panel in
-both Meridian demos is this construction: the surface, a `border-bottom`
+both demo pages is this construction: the surface, a `border-bottom`
 header row carrying an uppercase mono eyebrow label, and a body.
 
 ```tsx
@@ -27,7 +27,7 @@ control on the right of the header row:
 The hairline border is the edge that survives `forced-colors`, where the user
 agent strips shadows and flattens surfaces to the system canvas — a `Card` is
 `flat` by default (no shadow), and `data-elevation="floating"` is the escape
-hatch for the rare instance that needs one, such as Meridian's hero audit card:
+hatch for the rare instance that needs one, such as the Figma bundle's hero audit card:
 
 ```tsx
 <Card data-elevation="floating">…</Card>

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { CodeBlock } from './code-block.js'
 
 /**
- * A mono block with a copy control. Meridian's own bundled version swaps a
+ * A mono block with a copy control. The Figma bundle's own bundled version swaps a
  * clipboard icon for a tick and says nothing — a change invisible to a screen
  * reader. This one announces the result in a live region as well as changing
  * the icon.

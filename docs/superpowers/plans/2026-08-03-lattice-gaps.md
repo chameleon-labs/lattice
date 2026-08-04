@@ -1,6 +1,6 @@
-# Meridian gap list
+# Lattice gap list
 
-**Source:** Phase 3 of `2026-08-03-meridian-proof` — both bundle pages rebuilt
+**Source:** Phase 3 of `2026-08-03-lattice-proof` — both bundle pages rebuilt
 as Storybook stories (`Pages/System`, `Pages/Landing`) from
 `@chameleon-labs/lattice-react`'s public API alone, per the design spec's §8
 ("Both bundle pages are rebuilt as page stories composed only of Lattice
@@ -44,7 +44,7 @@ figures) would remove that burden and is a plausible near-term addition.
 
 ### The `display` role (48px) has no component or bare-element class
 
-Meridian's type scale names `display` alongside `h1`–`h4`, but only the
+Lattice's type scale names `display` alongside `h1`–`h4`, but only the
 headings get bare-element rules in `base.css`. Both pages needed a 48px
 headline (`SystemPage`'s hero, `LandingPage`'s hero `<h1>`) and there was no
 supported way to reach it — not a component, not a class, not a bare
@@ -99,7 +99,7 @@ remember to wire the accessible name themselves, which is the failure mode
 
 The source's `HowItWorks` step index is drawn at 48px, mono, 10% opacity
 (`font-mono text-5xl font-bold text-primary/10`) — a decorative background
-numeral, not a legible label. Nothing in Meridian's type scale expresses
+numeral, not a legible label. Nothing in Lattice's type scale expresses
 "huge and nearly invisible": the `display` role is the right size but is
 sans, not mono, and carries no opacity variant. Rather than inventing a
 *second* appearance exception in `pages.css` (the file sanctions exactly
@@ -130,16 +130,16 @@ defect downstream of the same gap. See §2.
 
 ### 2.1 The thirteen ledger rows, accepted
 
-The design spec's §9 measures every documented Meridian token pair with
+The design spec's §9 measures every documented Lattice token pair with
 WCAG 2.x and reports (does not gate on) the result. **Thirteen fail AA** —
 corrected up from an earlier count of nine during the whole-phase component
 review, once the severity ramp's own tint tokens were measured separately
 from the chromatic scales they resemble. These ship **by explicit approved
-decision**: Meridian's values are the identity, not a defect to fix, and
+decision**: Lattice's values are the identity, not a defect to fix, and
 nothing here changes a colour, an alpha, or a threshold. Full ledger,
 figures, and the reproduction command (`pnpm --filter
 @chameleon-labs/lattice-tokens build`) are in
-[`docs/superpowers/specs/2026-08-03-meridian-identity-design.md`](../specs/2026-08-03-meridian-identity-design.md#9-the-contrast-ledger).
+[`docs/superpowers/specs/2026-08-03-lattice-identity-design.md`](../specs/2026-08-03-lattice-identity-design.md#9-the-contrast-ledger).
 
 Running `cd packages/react && npx playwright test
 tests/browser/a11y.spec.ts` (130 tests) produces **32 failures — 28 against
@@ -323,6 +323,6 @@ every point; a sighted user now also gets the shape.
 The bundle's `components/ui/` directory ships roughly fifty unmodified
 shadcn defaults — Accordion, Command, Popover, Sheet, and the rest of the
 library shadcn generates by default — that neither demo page's design ever
-touched. Design spec §7.3: "They carry no Meridian decisions, and porting
+touched. Design spec §7.3: "They carry no Lattice decisions, and porting
 them to Ariakit would be inventing a design system rather than applying
 one." None were ported; none are planned.

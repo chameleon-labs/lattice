@@ -10,7 +10,7 @@ describe('contrast ledger', () => {
     // pairs were never measured until now. `critical`/`serious` duplicate the
     // already-accepted `danger`/`warning` rows; `moderate` and `minor` are
     // new failures, `moderate` the worst pair in the whole ledger and the
-    // system's one derived severity colour. Meridian's values did not
+    // system's one derived severity colour. Lattice's values did not
     // change; measuring more of them did.
     const failing = buildLedger().filter((e) => !e.passes).map((e) => e.name)
     expect(failing).toEqual([
@@ -31,7 +31,7 @@ describe('contrast ledger', () => {
   })
 
   it('passes the dark focus ring, which the light one fails', () => {
-    // Meridian declares --ring at 0.35 but focuses components at primary/40,
+    // The Figma bundle declares --ring at 0.35 but focuses components at primary/40,
     // and 0.40 is what this package emits. At 0.40 the dark ring reaches 3.20
     // and clears SC 1.4.11; the light ring reaches 1.55 and does not. The
     // asymmetry is the point — do not "fix" it by averaging the two.

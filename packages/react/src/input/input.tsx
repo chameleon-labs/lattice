@@ -15,7 +15,7 @@ export interface InputOptions {
   inputClassName?: string
 }
 
-// Meridian's fields are one size everywhere in the bundle — no variant of
+// Fields are one size everywhere in the bundle — no variant of
 // Input renders at more than one size, unlike Button's sm/md/lg. Offering a
 // size knob the design never turns is worse than not offering it, so there is
 // no custom `size` prop here; the native `size` attribute (visible character

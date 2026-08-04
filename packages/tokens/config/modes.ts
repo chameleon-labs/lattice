@@ -2,7 +2,7 @@
  * The two themes.
  *
  * Previously exported from `config/lightness.ts` alongside the shared lightness
- * curve. The curve is gone — Meridian's anchors do not sit on one — so the mode
+ * curve. The curve is gone — Lattice's anchors do not sit on one — so the mode
  * list lives on its own rather than inside a file named for a thing that no
  * longer exists.
  */

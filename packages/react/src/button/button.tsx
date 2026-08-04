@@ -2,10 +2,10 @@ import { Button as AriakitButton, type ButtonProps as AriakitButtonProps } from 
 import type { ElementType } from 'react'
 
 /**
- * Meridian's five variants.
+ * Lattice's five variants.
  *
  * This replaces the previous `variant × tone` matrix. A neutral button is
- * `secondary`; a dangerous one is `destructive`. Meridian names five buttons and
+ * `secondary`; a dangerous one is `destructive`. Lattice names five buttons and
  * this component offers five, because a system that follows a design strictly
  * cannot also offer combinations the design never drew.
  *

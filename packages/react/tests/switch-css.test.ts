@@ -14,7 +14,7 @@
  * exactly the class of regression `card-css.test.ts` and `input-css.test.ts`
  * guard against for Card and Input. No unit test in switch.test.tsx evaluates
  * CSS at all, so nothing else in the suite would catch the track quietly
- * reading a generic component-fill token instead of the one Meridian declares
+ * reading a generic component-fill token instead of the one the Figma bundle declares
  * specifically for it, or the checked state losing its --lat-solid fill.
  */
 import { fileURLToPath } from 'node:url'
@@ -33,7 +33,7 @@ function block(selector: string): string {
 }
 
 describe("Switch's stylesheet", () => {
-  it('fills its track from the token Meridian declares for it, not a generic component fill', () => {
+  it('fills its track from the token the Figma bundle declares for it, not a generic component fill', () => {
     const rule = block('.lat-switch')
 
     expect(rule).toContain('background-color: var(--lat-switch-track);')

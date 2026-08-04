@@ -56,7 +56,7 @@ describe("SegmentedControl's stylesheet", () => {
     expect(rule).not.toContain('var(--lat-bg-subtle)')
   })
 
-  // The label is a single-line mono control (Meridian's `font-mono text-xs`,
+  // The label is a single-line mono control (the Figma bundle's `font-mono text-xs`,
   // 12px/16px), not a code block, so it must read `segment` — a dedicated
   // control role — not `code`, whose prose leading (1.625) is right for a
   // multi-line block and made this label 1-3px taller than the source. This

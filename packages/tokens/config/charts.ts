@@ -69,7 +69,7 @@ export const ALL_PAIRS_CAP = 3
 /**
  * The sequential ramp: one hue, from pale to deep.
  *
- * 305 is a legacy chart hue, not the brand's — Meridian's accent is chartreuse
+ * 305 is a legacy chart hue, not the brand's — Lattice's accent is chartreuse
  * (H 120 in dark, H 129 in light). The ramp was never repointed to it, so it
  * still carries the retired violet-adjacent hue.
  */
@@ -102,13 +102,13 @@ export const SEQUENTIAL: readonly SequentialStep[] = [
 export const ORDINAL_CLAMP: Record<Mode, number> = { light: 300, dark: 600 }
 
 /**
- * The surfaces the palettes are validated against: Meridian's real page
+ * The surfaces the palettes are validated against: Lattice's real page
  * background (`GRAY_ANCHORS[mode].bg`) in each mode.
  *
  * Charts are drawn on the app background, so this is the real comparison rather
  * than a convenient white. This used to be `gray-1` from the retired numbered
  * scale — `#fdfdfd` light, `#111112` dark — which no longer exists and, worse,
- * was lighter than Meridian's actual light background, so every light-mode
+ * was lighter than Lattice's actual light background, so every light-mode
  * measurement against it was optimistic.
  */
 export const CHART_SURFACES: Record<Mode, string> = {

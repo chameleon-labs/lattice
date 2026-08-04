@@ -99,7 +99,7 @@ describe('motion primitive generation', () => {
   })
 })
 
-describe('Meridian motion presets', () => {
+describe('Lattice motion presets', () => {
   it('carries the five named durations', () => {
     expect(DURATIONS).toEqual({
       instant: 0,

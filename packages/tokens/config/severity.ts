@@ -1,7 +1,7 @@
 /**
  * The severity ramp.
  *
- * Taken from the impact badges on Meridian's tabstop landing page. `minor`
+ * Taken from the impact badges on the Figma bundle's tabstop landing page. `minor`
  * carries no colour of its own — it uses `--lat-text-subtle`, which is what the
  * bundle does — so it is not anchored here.
  *
@@ -20,7 +20,7 @@ export const SEVERITY_LEVELS = ['critical', 'serious', 'moderate', 'minor'] as c
 export type SeverityLevel = (typeof SEVERITY_LEVELS)[number]
 
 /**
- * `undefined` means Meridian did not declare it and the generator must derive
+ * `undefined` means the Figma bundle did not declare it and the generator must derive
  * it. Only light `moderate` is in that position.
  */
 export const SEVERITY_ANCHORS: Record<Mode, Record<SeverityLevel, string | undefined>> = {
@@ -41,7 +41,7 @@ export const SEVERITY_ANCHORS: Record<Mode, Record<SeverityLevel, string | undef
 /**
  * How far light sits below dark for the same level.
  *
- * Meridian declares two levels in both modes, so this is a choice rather than
+ * The Figma bundle declares two levels in both modes, so this is a choice rather than
  * the only available measurement:
  *
  * | level | dark L | light L | delta |

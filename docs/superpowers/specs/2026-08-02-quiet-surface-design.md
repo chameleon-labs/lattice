@@ -1,8 +1,8 @@
 # Quiet Surface: depth from light, colour for meaning
 
 **Status:** superseded by
-[Meridian: replacing Lattice's visual identity](./2026-08-03-meridian-identity-design.md)
-(2026-08-03). Meridian tints its surfaces and makes the accent the primary
+[Replacing Lattice's visual identity with a Figma-generated one](./2026-08-03-lattice-identity-design.md)
+(2026-08-03). Lattice's Figma-generated identity tints its surfaces and makes the accent the primary
 action — the opposite call to this document on both counts.
 
 **One rule survives and is carried forward:** an edge is a real border, never

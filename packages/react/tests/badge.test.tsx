@@ -8,7 +8,7 @@ describe('Badge', () => {
     expect(screen.getByText('beta').dataset['variant']).toBe('default')
   })
 
-  it('accepts every Meridian variant', () => {
+  it('accepts every Lattice variant', () => {
     for (const variant of ['default', 'primary', 'info', 'success', 'danger', 'warning'] as const) {
       const { unmount } = render(<Badge variant={variant}>x</Badge>)
       expect(screen.getByText('x').dataset['variant']).toBe(variant)

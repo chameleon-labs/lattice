@@ -20,7 +20,7 @@ describe('typography roles', () => {
     expect(TYPOGRAPHY_ROLES.numeric!.fontVariantNumeric).toBe('tabular-nums')
   })
 
-  it("matches Meridian's specimen for the sans roles", () => {
+  it("matches the Figma bundle's specimen for the sans roles", () => {
     expect(TYPOGRAPHY_ROLES.display!.fontSize).toBe('5xl')
     expect(TYPOGRAPHY_ROLES.display!.fontWeight).toBe('bold')
     expect(TYPOGRAPHY_ROLES.h1!.fontSize).toBe('3xl')

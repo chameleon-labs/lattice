@@ -1,9 +1,9 @@
 # Tabstop design system
 
 **Status:** superseded by
-[Meridian: replacing Lattice's visual identity](./2026-08-03-meridian-identity-design.md)
+[Replacing Lattice's visual identity with a Figma-generated one](./2026-08-03-lattice-identity-design.md)
 (2026-08-03), never implemented. This document argued for a second, standalone
-`--ts-*` system with a blue-violet primary. Meridian occupies the same slot
+`--ts-*` system with a blue-violet primary. The Figma-generated identity now occupies the same slot
 inside Lattice itself, so the reason to maintain two systems disappears with it.
 Kept for its palette reasoning — particularly why severity must separate by
 lightness as well as hue, which the new system carries forward.

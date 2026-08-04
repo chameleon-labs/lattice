@@ -5,7 +5,7 @@ import { Card, CardBody, CardHeader } from './card.js'
 
 /**
  * A `--lat-bg-raised` surface with a hairline border. Every panel in both
- * Meridian demos is this construction: the surface, a `border-bottom` header
+ * demo pages is this construction: the surface, a `border-bottom` header
  * row carrying an uppercase mono eyebrow label, and a body. The hairline is
  * the edge that survives `forced-colors`, where the user agent strips shadows
  * and flattens surfaces — the shadow `Card` adds under `data-elevation`
@@ -35,7 +35,7 @@ export const Default: Story = {
 
 /**
  * `data-elevation="floating"` is the escape hatch, not a default — the one
- * instance Meridian's landing page uses it for is the hero audit card.
+ * instance the Figma bundle's landing page uses it for is the hero audit card.
  */
 export const Floating: Story = {
   render: (args) => (

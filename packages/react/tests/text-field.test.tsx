@@ -18,7 +18,7 @@ describe('Input', () => {
     expect(screen.getByLabelText('URL').getAttribute('aria-invalid')).toBe('true')
   })
 
-  // There is no size prop: every field in Meridian's source design renders at
+  // There is no size prop: every field in the source design renders at
   // one size, so this system doesn't offer a knob the design never turns.
   it('does not accept a size prop', () => {
     render(<Input aria-label="URL" />)

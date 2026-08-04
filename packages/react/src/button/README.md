@@ -18,7 +18,7 @@ swaps the element and narrows the props to that element's.
 
 **Class:** `.lat-button`, with `data-variant`, `data-size`.
 
-Meridian names five buttons, and this component offers exactly five — the
+Lattice names five buttons, and this component offers exactly five — the
 previous `variant × tone` matrix (`solid|soft|ghost` × `accent|neutral|danger`)
 is gone, and `ButtonTone` is removed entirely. A system that follows a design
 strictly cannot also offer combinations the design never drew: a neutral button

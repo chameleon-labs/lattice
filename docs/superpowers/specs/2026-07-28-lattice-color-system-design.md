@@ -2,10 +2,10 @@
 
 **Date:** 2026-07-28
 **Status:** superseded by
-[Meridian: replacing Lattice's visual identity](./2026-08-03-meridian-identity-design.md)
+[Replacing Lattice's visual identity with a Figma-generated one](./2026-08-03-lattice-identity-design.md)
 (2026-08-03), which replaces this document's generated OKLCH palette — a
 shared lightness curve, a chroma envelope, and a build that fails on a
-contrast miss — with pinned Meridian anchors and a contrast report that ships
+contrast miss — with pinned anchors from the Figma bundle and a contrast report that ships
 regardless of a miss. Kept for the generated-colour reasoning this document
 originated, most of which survives as *architecture* even though every value
 it produced does not.

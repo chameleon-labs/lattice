@@ -1,7 +1,7 @@
 /*
  * The base layer.
  *
- * Meridian sets defaults on bare elements — body, h1-h4, label, button, input —
+ * The Figma bundle sets defaults on bare elements — body, h1-h4, label, button, input —
  * rather than requiring a class for each. Porting that is not cosmetic: without
  * it, unclassed prose inside a Lattice surface falls through to the browser
  * serif, which shipped as a real defect in the Dialog story for the whole of the
@@ -37,7 +37,7 @@
 }
 
 /* h3/h4 intentionally carry no letter-spacing rule, unlike h1/h2 above — this
-   is not an oversight. Meridian tracks only display and the two large
+   is not an oversight. The Figma bundle tracks only display and the two large
    headings tight; h3/h4 use the font's own default spacing. */
 .lat-surface :where(h3) {
   font-family: var(--lat-text-h3-font-family);
@@ -58,7 +58,7 @@
  * same element wins without needing !important and a component stylesheet never
  * has to out-specify the base layer.
  *
- * Meridian sizes the interactive elements too, not just headings — 16px at
+ * The Figma bundle sizes the interactive elements too, not just headings — 16px at
  * line-height 1.5, medium for the two that carry a label and normal for the
  * one that carries user input. Without these an unclassed control falls back
  * to the browser's own font-size, which on most engines is smaller than the

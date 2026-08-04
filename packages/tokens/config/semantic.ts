@@ -1,7 +1,7 @@
 /**
  * The semantic tier: the layer that makes a second theme cheap.
  *
- * Meridian names its colours by job already — `--background`, `--card`,
+ * The Figma bundle names its colours by job already — `--background`, `--card`,
  * `--muted-foreground` — so this tier is a rename rather than an interpretation.
  * The mapping is one-to-one and recorded in the spec's §1.1 table.
  *

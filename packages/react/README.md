@@ -5,8 +5,8 @@ wrapping [Ariakit](https://ariakit.org) where behaviour is hard.
 
 ## The identity
 
-Every component renders **Meridian**, the Figma-produced identity
-`@chameleon-labs/lattice-tokens` carries. Meridian is pinned, not generated —
+Every component renders **Lattice**, the Figma-produced identity
+`@chameleon-labs/lattice-tokens` carries. The identity is pinned, not generated —
 its colours, the two type families (Instrument Sans for prose and UI,
 JetBrains Mono for the restricted mono roles), the square radius and the
 four-role elevation scale all come from the design and are not adjusted here.

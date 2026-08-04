@@ -8,7 +8,7 @@ import {
 import type { ReactNode } from 'react'
 
 /**
- * Meridian's segmented control.
+ * Lattice's segmented control.
  *
  * Built on Ariakit's radio store rather than its tabs: the control selects a
  * value, it does not reveal a panel. That distinction is what a screen reader

@@ -31,7 +31,7 @@ export interface Swatch {
   readonly l: number
   readonly c: number
   readonly h: number
-  /** `anchored` came from Meridian; `derived` was computed here. */
+  /** `anchored` came from the Figma bundle; `derived` was computed here. */
   readonly origin: 'anchored' | 'derived'
 }
 

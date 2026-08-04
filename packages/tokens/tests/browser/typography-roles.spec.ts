@@ -37,8 +37,8 @@ ${extraCss}
 </html>`
 
 // The roles NARROW_HEADING_SIZES steps down — display, h1, h2, h3 as of
-// Task 6's Meridian specimen. `display` is the one worth the closest look: it
-// is the largest step (5xl -> 3xl) and the only role Meridian's own hero
+// Task 6's Figma bundle specimen. `display` is the one worth the closest look: it
+// is the largest step (5xl -> 3xl) and the only role the Figma bundle's own hero
 // renders responsively (`text-5xl md:text-6xl`).
 const RESPONSIVE_ROLES = Object.keys(NARROW_HEADING_SIZES) as (keyof typeof NARROW_HEADING_SIZES)[]
 

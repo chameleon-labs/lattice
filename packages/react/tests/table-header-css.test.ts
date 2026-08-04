@@ -8,7 +8,7 @@
  * document's base instead of import.meta.url.
  *
  * This file exists because nothing else would catch `.lat-table__header`
- * losing its normal font-weight to a later "improvement". Meridian's header
+ * losing its normal font-weight to a later "improvement". The Figma bundle's header
  * cells are 10px uppercase mono at *normal* weight — the casing and tracking
  * already carry the emphasis, and bolding on top of both reads as shouting.
  * `table.test.tsx` only asserts the DOM structure (a real `<th>` with a

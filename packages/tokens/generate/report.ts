@@ -1,7 +1,7 @@
 /**
  * The contrast ledger.
  *
- * Until 2026-08-03 a missed contract stopped the build. Meridian's values are
+ * Until 2026-08-03 a missed contract stopped the build. Lattice's values are
  * the identity and a number of its documented pairs miss WCAG, so the check
  * became a report: measured, printed, and shipped anyway.
  *
@@ -98,7 +98,7 @@ function forMode(mode: Mode): LedgerEntry[] {
   // are not covered by `tints` above and were never measured until now.
   // `critical` and `serious` are anchored the same colours as `danger` and
   // `warning`, so they duplicate rows already in this ledger; `moderate` is
-  // Meridian's one derived severity colour (see severity.ts), which is
+  // Lattice's one derived severity colour (see severity.ts), which is
   // exactly where an unmeasured pair is most likely to be wrong.
   const severityColoured = buildSeverity(mode).map((swatch) => {
     const swatchSolid = parseHex(swatch.hex)

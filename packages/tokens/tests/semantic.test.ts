@@ -38,7 +38,7 @@ describe('semantic tier', () => {
   })
 
   it('raises a surface above the page in both modes', () => {
-    // bg-raised is lighter than bg in dark AND light — Meridian lifts by
+    // bg-raised is lighter than bg in dark AND light — Lattice lifts by
     // lightness regardless of theme. Asserted against the resolved lightness,
     // not against the presence of a property name: a substring check would
     // still pass if the two anchors were swapped, which is the regression this

@@ -21,7 +21,7 @@ import {
 import { Check, ChevronRight, Circle, Copy, Moon, Square, Sun, Triangle, Zap } from './icons.js'
 
 /**
- * The Meridian documentation site, rebuilt from Lattice components alone.
+ * The bundle's documentation site, rebuilt from Lattice components alone.
  *
  * Source: `Custom Design System/src/app/App.tsx`, a six-section reference
  * site — Overview, Tokens, Typography, Components, Patterns, Motion — behind
@@ -87,7 +87,7 @@ const MOTION_PRESETS = [
 
 const CARD_ANATOMY = [
   { icon: Circle, tone: 'primary', title: 'Primitive', tag: 'headless', desc: 'Unstyled base with slot architecture. Compose with your own tokens.' },
-  { icon: Square, tone: 'info', title: 'Styled', tag: 'opinionated', desc: 'Opinionated defaults from the Meridian token set. Ready to ship.' },
+  { icon: Square, tone: 'info', title: 'Styled', tag: 'opinionated', desc: 'Opinionated defaults from the Lattice token set. Ready to ship.' },
   { icon: Triangle, tone: 'accent', title: 'Compound', tag: 'compound', desc: 'Multi-part components with coordinated state. Complex patterns simplified.' }
 ] as const
 
@@ -164,7 +164,7 @@ function OverviewSection() {
               <Badge variant="success">Stable</Badge>
             </div>
             <h1 className="lat-page__display system-page__display">
-              Meridian
+              Lattice
               <br />
               <span className="system-page__display-accent">Design System</span>
             </h1>
@@ -479,7 +479,7 @@ function Sidebar({ active, onNavigate }: { active: string; onNavigate: (id: stri
     <aside className="system-page__sidebar">
       <div className="system-page__logo">
         <span className="system-page__logo-mark" aria-hidden="true" />
-        <span className="system-page__logo-text">Meridian</span>
+        <span className="system-page__logo-text">Lattice</span>
       </div>
 
       <nav className="system-page__nav">
@@ -519,7 +519,7 @@ function Topbar({ active }: { active: string }) {
 
   return (
     <header className="system-page__topbar">
-      <span className="system-page__crumb">meridian</span>
+      <span className="system-page__crumb">lattice</span>
       <ChevronRight size={10} />
       <span className="system-page__crumb">{activeLabel}</span>
       <div className="system-page__topbar-end">

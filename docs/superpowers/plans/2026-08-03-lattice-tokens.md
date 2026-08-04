@@ -1,10 +1,10 @@
-# Meridian Tokens Implementation Plan (Phase 1 of 3)
+# Lattice Tokens Implementation Plan (Phase 1 of 3)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace every value in `@chameleon-labs/lattice-tokens` with the Meridian identity, so `dist/lattice.css` emits the Figma-generated palette, type, shape, elevation and motion.
+**Goal:** Replace every value in `@chameleon-labs/lattice-tokens` with the Lattice identity, so `dist/lattice.css` emits the Figma-generated palette, type, shape, elevation and motion.
 
-**Architecture:** The generated-curve colour pipeline is retired and replaced by **anchors** — verbatim Meridian hex, converted to OKLCH at build time. Grey is anchored at all eight roles it needs; each chromatic scale is anchored at its solid fill, from which a tinted triple (fill/border/text) is derived. The contrast contract becomes a printed report rather than a build gate. Typography, radii, motion and elevation are re-valued in place.
+**Architecture:** The generated-curve colour pipeline is retired and replaced by **anchors** — verbatim hex from the Figma bundle, converted to OKLCH at build time. Grey is anchored at all eight roles it needs; each chromatic scale is anchored at its solid fill, from which a tinted triple (fill/border/text) is derived. The contrast contract becomes a printed report rather than a build gate. Typography, radii, motion and elevation are re-valued in place.
 
 **Tech Stack:** TypeScript 7, tsx, Node 24, vitest, Playwright. No new runtime dependencies.
 
@@ -15,7 +15,7 @@
 - Custom property prefix stays `--lat-`.
 - Emitted colours stay `oklch()` in CSS; `tokens.json` carries the source hex.
 - The build **must not fail** on a contrast miss. Four documented failures ship — see the spec's §9 ledger.
-- Spec: `docs/superpowers/specs/2026-08-03-meridian-identity-design.md`. Read §1 before Task 1.
+- Spec: `docs/superpowers/specs/2026-08-03-lattice-identity-design.md`. Read §1 before Task 1.
 - Source bundle: `/Users/george/Downloads/Custom Design System/`.
 - Do not fix existing tests. Tests that assert old values are expected to fail after this plan; only tests this plan explicitly rewrites are updated.
 - Commit after every task. Never commit to `main`.
@@ -60,7 +60,7 @@ Produced by `srgbToOklch(parseHex(...))` from the existing `generate/oklch.ts`. 
 ## File Structure
 
 **Created**
-- `config/anchors.ts` — the verbatim Meridian hex, per scale, per mode, per role. The single source of colour.
+- `config/anchors.ts` — the verbatim hex from the Figma bundle, per scale, per mode, per role. The single source of colour.
 - `config/alpha.ts` — the alpha hairline/wash tier and the tint recipe fractions.
 - `generate/anchors.ts` — resolves anchors to OKLCH swatches; derives the tinted triple.
 - `generate/report.ts` — the contrast ledger, printed not thrown.
@@ -157,7 +157,7 @@ Expected: FAIL — `Cannot find module '../config/modes.js'`
  * The two themes.
  *
  * Previously exported from `config/lightness.ts` alongside the shared lightness
- * curve. The curve is gone — Meridian's anchors do not sit on one — so the mode
+ * curve. The curve is gone — Lattice's anchors do not sit on one — so the mode
  * list lives on its own rather than inside a file named for a thing that no
  * longer exists.
  */
@@ -170,7 +170,7 @@ export const MODES: readonly Mode[] = ['light', 'dark']
 
 ```ts
 /**
- * The Meridian palette, verbatim.
+ * The Lattice palette, verbatim.
  *
  * Every value here is copied from the Figma bundle's `src/styles/theme.css`
  * without adjustment. This file is the whole of the colour system's input: there
@@ -178,13 +178,13 @@ export const MODES: readonly Mode[] = ['light', 'dark']
  *
  * That is a deliberate reversal. Until 2026-08-03 this package generated its
  * palette from a lightness curve and a chroma envelope, and the generation was
- * the authority. Meridian's values do not lie on any single curve — its accent
+ * the authority. Lattice's values do not lie on any single curve — its accent
  * is L 0.905 H 120 in dark and L 0.630 H 129 in light — so keeping the curve
  * would have meant approximating the identity rather than applying it.
  */
 import type { Mode } from './modes.js'
 
-/** The grey roles Meridian names. Each is anchored in both modes. */
+/** The grey roles the Figma bundle names. Each is anchored in both modes. */
 export const GRAY_ROLES = [
   'bg',
   'bg-raised',
@@ -213,7 +213,7 @@ export type ChromaticScale = (typeof CHROMATIC_SCALES)[number]
 /**
  * Grey.
  *
- * `bg-raised` is lighter than `bg` in both modes — Meridian lifts a surface by
+ * `bg-raised` is lighter than `bg` in both modes — Lattice lifts a surface by
  * raising its lightness regardless of theme, rather than inverting the
  * relationship in dark.
  *
@@ -247,7 +247,7 @@ export const GRAY_ANCHORS: Record<Mode, Record<GrayRole, string>> = {
 /**
  * The solid fill of each chromatic scale.
  *
- * `info`, `success`, `warning` and `decorative` come from Meridian's chart
+ * `info`, `success`, `warning` and `decorative` come from the Figma bundle's chart
  * slots. That is not an interpretation: the bundle's own documentation site
  * labels `chart-2` "Info", `chart-5` "Success" and `chart-3` "Accent" in its
  * token table while binding them to those slots.
@@ -275,7 +275,7 @@ export const ON_SOLID_ANCHORS: Partial<Record<ChromaticScale, Record<Mode, strin
 /**
  * The vivid accent.
  *
- * Meridian keeps `--accent: #cff23a` in *both* modes while `--primary` drops to
+ * The Figma bundle keeps `--accent: #cff23a` in *both* modes while `--primary` drops to
  * olive in light. The chartreuse is the identity; the olive exists only so a
  * white label can sit on it. Emitted separately so a caller can reach the brand
  * colour without going through the primary fill.
@@ -311,7 +311,7 @@ export interface Swatch {
   readonly l: number
   readonly c: number
   readonly h: number
-  /** `anchored` came from Meridian; `derived` was computed here. */
+  /** `anchored` came from the Figma bundle; `derived` was computed here. */
   readonly origin: 'anchored' | 'derived'
 }
 
@@ -386,7 +386,7 @@ Expected: PASS, 4 tests
 git add packages/tokens
 git commit -m "feat(tokens): anchors replace the generated colour scale
 
-Meridian's palette does not lie on a shared lightness curve — its accent is
+Lattice's palette does not lie on a shared lightness curve — its accent is
 L 0.905 H 120 in dark and L 0.630 H 129 in light — so the curve, the chroma
 envelope and the per-step contracts are retired and the declared hex become
 the input."
@@ -405,7 +405,7 @@ the input."
 - Consumes: `Swatch`, `resolveSolids` from `generate/anchors.js`; `Mode` from `config/modes.js`.
 - Produces: `HAIRLINE`, `WASH`, `TINT_FRACTIONS`, `FOCUS_RING_ALPHA` from `config/alpha.js`; `interface AlphaToken { role: string; value: string }`, `resolveAlpha(mode: Mode): AlphaToken[]`, `resolveTints(mode: Mode): AlphaToken[]` from `generate/anchors.js`.
 
-**Why this task exists:** Meridian draws every edge with white or black at 7–8%, and builds every badge and its destructive button from *colour at 10–15% with a border at 20–25% and full-strength text*. Lattice's border roles currently resolve to opaque scale steps, which composite with nothing. Without an alpha tier, a card inside a card cannot produce two different greys from one token, and the tinted triple gets re-typed by hand in a dozen components.
+**Why this task exists:** The Figma bundle draws every edge with white or black at 7–8%, and builds every badge and its destructive button from *colour at 10–15% with a border at 20–25% and full-strength text*. Lattice's border roles currently resolve to opaque scale steps, which composite with nothing. Without an alpha tier, a card inside a card cannot produce two different greys from one token, and the tinted triple gets re-typed by hand in a dozen components.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -450,7 +450,7 @@ Expected: FAIL — `resolveAlpha is not a function`
 /**
  * The alpha tier.
  *
- * Meridian's edges and washes are not scale steps — they are white or black at a
+ * The Figma bundle's edges and washes are not scale steps — they are white or black at a
  * low alpha, so an edge composites over whatever surface it lies on. Two cards
  * nested inside one another therefore draw two visibly different greys from one
  * token, which an opaque step cannot do.
@@ -489,7 +489,7 @@ export const TINT_FRACTIONS = {
 /**
  * The focus ring.
  *
- * Meridian declares `--ring` at 0.35/0.30 but its components focus with
+ * The Figma bundle declares `--ring` at 0.35/0.30 but its own components focus with
  * `ring-primary/40`. The value components actually use is the one emitted, since
  * a token nobody reaches for guarantees nothing.
  *
@@ -564,14 +564,14 @@ Expected: PASS, 4 tests
 git add packages/tokens
 git commit -m "feat(tokens): add the alpha tier and the tinted triple
 
-Meridian's edges are white or black at 7-8% so they composite over their
+The Figma bundle's edges are white or black at 7-8% so they composite over their
 surface, and its badges and destructive button are colour at 10-15% with a
 20-25% border. Both become tokens rather than per-component literals."
 ```
 
 ---
 
-### Task 3: Semantic roles remapped to Meridian
+### Task 3: Semantic roles remapped to the Figma bundle's names
 
 **Files:**
 - Modify: `packages/tokens/config/semantic.ts`, `packages/tokens/generate/semantic.ts`
@@ -646,7 +646,7 @@ describe('semantic tier', () => {
   })
 
   it('raises a surface above the page in both modes', () => {
-    // bg-raised is lighter than bg in dark AND light — Meridian lifts by
+    // bg-raised is lighter than bg in dark AND light — Lattice lifts by
     // lightness regardless of theme. Asserted against the resolved lightness,
     // not against the presence of a property name: a substring check would
     // still pass if the two anchors were swapped, which is the regression this
@@ -686,7 +686,7 @@ Replace the whole file. The step-alias layer (`STEP_SLUGS`, `--lat-gray-9`) is d
 /**
  * The semantic tier: the layer that makes a second theme cheap.
  *
- * Meridian names its colours by job already — `--background`, `--card`,
+ * The Figma bundle names its colours by job already — `--background`, `--card`,
  * `--muted-foreground` — so this tier is a rename rather than an interpretation.
  * The mapping is one-to-one and recorded in the spec's §1.1 table.
  *
@@ -807,9 +807,9 @@ Expected: PASS, 3 tests
 
 ```bash
 git add packages/tokens
-git commit -m "feat(tokens): remap semantic roles onto Meridian's names
+git commit -m "feat(tokens): remap semantic roles onto the Figma bundle's names
 
-Meridian names colours by job already, so the tier becomes a one-to-one
+The Figma bundle names colours by job already, so the tier becomes a one-to-one
 rename. The step-alias sub-layer goes with the numbered scale."
 ```
 
@@ -824,7 +824,7 @@ rename. The step-alias sub-layer goes with the numbered scale."
 **Interfaces:**
 - Produces: `SEVERITY_LEVELS`, `SEVERITY_ANCHORS` from `config/severity.js`; `buildSeverity(mode: Mode): Swatch[]` from `generate/severity.js` — same name and shape as today, so `emit.ts` needs no change here.
 
-**The derivation.** Meridian declares no light-mode `moderate`. Dark `serious` `#fb923c` (L 0.758) corresponds to light `#ea580c` (L 0.646) — a delta of **−0.112**. Applying that to dark `moderate` `#fbbf24` (L 0.837) gives a target L of **0.725** at the same hue (84.4) and chroma (0.1644), fitted to sRGB.
+**The derivation.** The Figma bundle declares no light-mode `moderate`. Dark `serious` `#fb923c` (L 0.758) corresponds to light `#ea580c` (L 0.646) — a delta of **−0.112**. Applying that to dark `moderate` `#fbbf24` (L 0.837) gives a target L of **0.725** at the same hue (84.4) and chroma (0.1644), fitted to sRGB.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -834,7 +834,7 @@ import { describe, expect, it } from 'vitest'
 import { buildSeverity } from '../generate/severity.js'
 
 describe('severity ramp', () => {
-  it('takes every dark level from Meridian', () => {
+  it('takes every dark level from the source', () => {
     const dark = Object.fromEntries(buildSeverity('dark').map((s) => [s.role, s.hex]))
     expect(dark.critical).toBe('#ff4d6a')
     expect(dark.serious).toBe('#fb923c')
@@ -881,7 +881,7 @@ Expected: FAIL — old `buildSeverity` returns swatches keyed by `level`, genera
 /**
  * The severity ramp.
  *
- * Taken from the impact badges on Meridian's tabstop landing page. `minor`
+ * Taken from the impact badges on the Figma bundle's tabstop landing page. `minor`
  * carries no colour of its own — it uses `--lat-text-subtle`, which is what the
  * bundle does — so it is not anchored here.
  *
@@ -900,7 +900,7 @@ export const SEVERITY_LEVELS = ['critical', 'serious', 'moderate', 'minor'] as c
 export type SeverityLevel = (typeof SEVERITY_LEVELS)[number]
 
 /**
- * `undefined` means Meridian did not declare it and the generator must derive
+ * `undefined` means the Figma bundle did not declare it and the generator must derive
  * it. Only light `moderate` is in that position.
  */
 export const SEVERITY_ANCHORS: Record<Mode, Record<SeverityLevel, string | undefined>> = {
@@ -921,7 +921,7 @@ export const SEVERITY_ANCHORS: Record<Mode, Record<SeverityLevel, string | undef
 /**
  * How far light sits below dark for the same level.
  *
- * Meridian declares two levels in both modes, so this is a choice rather than
+ * The Figma bundle declares two levels in both modes, so this is a choice rather than
  * the only available measurement:
  *
  * | level | dark L | light L | delta |
@@ -1004,7 +1004,7 @@ Expected: PASS, 3 tests
 
 ```bash
 git add packages/tokens
-git commit -m "feat(tokens): repoint severity onto Meridian's impact ramp
+git commit -m "feat(tokens): repoint severity onto the Figma bundle's impact ramp
 
 Three of six levels are declared; light moderate is derived by the same
 lightness delta that separates declared light and dark serious."
@@ -1053,7 +1053,7 @@ describe('contrast ledger', () => {
   })
 
   it('passes the dark focus ring, which the light one fails', () => {
-    // Meridian declares --ring at 0.35 but focuses components at primary/40,
+    // The Figma bundle declares --ring at 0.35 but focuses its own components at primary/40,
     // and 0.40 is what this package emits. At 0.40 the dark ring reaches 3.20
     // and clears SC 1.4.11; the light ring reaches 1.55 and does not. The
     // asymmetry is the point — do not "fix" it by averaging the two.
@@ -1091,7 +1091,7 @@ Expected: FAIL — `Cannot find module '../generate/report.js'`
 /**
  * The contrast ledger.
  *
- * Until 2026-08-03 a missed contract stopped the build. Meridian's values are
+ * Until 2026-08-03 a missed contract stopped the build. Lattice's values are
  * the identity and four of its documented pairs miss WCAG, so the check became a
  * report: measured, printed, and shipped anyway.
  *
@@ -1208,7 +1208,7 @@ import { buildSeverity } from './severity.js'
 /**
  * Build entrypoint. Emits `dist/lattice.css` and `dist/tokens.json`.
  *
- * This build does not gate. Meridian's values are the identity, and four of its
+ * This build does not gate. Lattice's values are the identity, and four of its
  * documented pairs miss WCAG; refusing to write them would refuse to ship the
  * design. Every pair is still measured and printed — see generate/report.ts.
  */
@@ -1218,11 +1218,11 @@ await mkdir(dist, { recursive: true })
 const ledger = buildLedger()
 const failed = ledger.filter((e) => !e.passes)
 
-console.log('lattice: Meridian identity, %d modes', MODES.length)
+console.log('lattice: identity, %d modes', MODES.length)
 console.log('\nContrast ledger (reported, never gates):')
 console.log(formatLedger(ledger))
 console.log(
-  '\n  %d of %d pairs miss their minimum. These ship — see docs/superpowers/specs/2026-08-03-meridian-identity-design.md §9.',
+  '\n  %d of %d pairs miss their minimum. These ship — see docs/superpowers/specs/2026-08-03-lattice-identity-design.md §9.',
   failed.length,
   ledger.length
 )
@@ -1298,7 +1298,7 @@ becoming folklore."
 **Interfaces:**
 - Produces: `FONT_FAMILIES`, `FONT_SIZES`, `FONT_WEIGHTS`, `LETTER_SPACINGS`, `LINE_HEIGHTS` from `config/typography.js`; `TYPOGRAPHY_ROLES` from `config/typography-roles.js`. Names and shapes are unchanged, so `generate/typography.ts` and `generate/typography-roles.ts` need no edits.
 
-**Why the mono roles matter.** The uppercase 10px mono label at 0.2em tracking is Meridian's most recognisable move — it appears on every panel header, every eyebrow, every table column and every badge in both demo pages. Without a role it gets re-typed in a dozen component stylesheets and drifts.
+**Why the mono roles matter.** The uppercase 10px mono label at 0.2em tracking is Lattice's most recognisable move — it appears on every panel header, every eyebrow, every table column and every badge in both demo pages. Without a role it gets re-typed in a dozen component stylesheets and drifts.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1317,7 +1317,7 @@ describe('typography primitives', () => {
     expect(FONT_FAMILIES.mono[0]).toBe('JetBrains Mono')
   })
 
-  it("carries Meridian's scale including the 10px micro size", () => {
+  it("carries the Figma bundle's scale including the 10px micro size", () => {
     expect(FONT_SIZES['3xs']).toBe(0.625)
     expect(FONT_SIZES.base).toBe(1)
     expect(FONT_SIZES['5xl']).toBe(3)
@@ -1327,7 +1327,7 @@ describe('typography primitives', () => {
     expect(LETTER_SPACINGS.eyebrow).toBe(0.2)
   })
 
-  it('carries the four weights Meridian uses', () => {
+  it('carries the four weights the Figma bundle uses', () => {
     expect(Object.values(FONT_WEIGHTS).sort()).toEqual([400, 500, 600, 700])
   })
 
@@ -1369,7 +1369,7 @@ to em — see Step 3b.
  * `assets/fonts/`). The stacks name the family the `@font-face` rules define,
  * then fall back to system faces of the same class.
  *
- * The scale is Meridian's own type specimen, plus the two micro sizes its
+ * The scale is the Figma bundle's own type specimen, plus the two micro sizes its
  * components use that the specimen does not list — 10px and 11px, which carry
  * every eyebrow, badge and table header in both demo pages.
  */
@@ -1411,7 +1411,7 @@ export const FONT_WEIGHTS = {
  * sub-1rem sizes the mono roles use.
  */
 export const LETTER_SPACINGS = {
-  /** Display and headings. Meridian's `tracking-tight`. */
+  /** Display and headings. The Figma bundle's `tracking-tight`. */
   tight: -0.025,
   normal: 0,
   /** Badges. `tracking-wider`. */
@@ -1428,7 +1428,7 @@ export const LINE_HEIGHTS = {
   /** Headings. `leading-[1.05]` on the hero. */
   tight: 1.05,
   snug: 1.25,
-  /** Meridian's base-layer default for every heading, label and control. */
+  /** The Figma bundle's base-layer default for every heading, label and control. */
   normal: 1.5,
   relaxed: 1.625
 } as const
@@ -1458,7 +1458,7 @@ the new names, stepping each down one rung of the scale:
 /**
  * Heading sizes below {@link TYPOGRAPHY_BREAKPOINT_REM}.
  *
- * Meridian's own hero is `text-5xl md:text-6xl`, so responsive display sizing
+ * The Figma bundle's own hero is `text-5xl md:text-6xl`, so responsive display sizing
  * is part of the identity rather than an addition to it. Each role steps down
  * one rung; `h4` and the mono roles are already small enough to leave alone.
  */
@@ -1497,7 +1497,7 @@ describe('typography roles', () => {
     expect(TYPOGRAPHY_ROLES.numeric!.fontVariantNumeric).toBe('tabular-nums')
   })
 
-  it("matches Meridian's specimen for the sans roles", () => {
+  it("matches the Figma bundle's specimen for the sans roles", () => {
     expect(TYPOGRAPHY_ROLES.display!.fontSize).toBe('5xl')
     expect(TYPOGRAPHY_ROLES.display!.fontWeight).toBe('bold')
     expect(TYPOGRAPHY_ROLES.h1!.fontSize).toBe('3xl')
@@ -1606,9 +1606,9 @@ Expected: PASS
 
 ```bash
 git add packages/tokens
-git commit -m "feat(tokens): Meridian typography, with five mono roles
+git commit -m "feat(tokens): Lattice typography, with five mono roles
 
-Instrument Sans and JetBrains Mono, Meridian's specimen scale, and the
+Instrument Sans and JetBrains Mono, the Figma bundle's specimen scale, and the
 uppercase 10px/0.2em eyebrow that every panel header in both demos uses."
 ```
 
@@ -1747,7 +1747,7 @@ degrade silently to system fonts when that request fails."
 - Modify: `packages/tokens/config/layout.ts`
 - Test: `packages/tokens/tests/layout.test.ts` (amend)
 
-**The finding this encodes.** `--radius` is `0.1875rem` (3px) and `--radius-sm` is `calc(var(--radius) - 4px)` = **−1px**, which computes to 0. Both demo pages use `rounded-sm` 49 times and `rounded-full` 8 times and nothing else. Rendered, Meridian is square.
+**The finding this encodes.** `--radius` is `0.1875rem` (3px) and `--radius-sm` is `calc(var(--radius) - 4px)` = **−1px**, which computes to 0. Both demo pages use `rounded-sm` 49 times and `rounded-full` 8 times and nothing else. Rendered, Lattice is square.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1782,8 +1782,8 @@ Expected: FAIL — `RADII` still has five keys
 /**
  * Radii.
  *
- * Three values, because Meridian renders as a square system. Its `--radius` is
- * 3px, but the `--radius-sm` its components actually use is
+ * Three values, because Lattice renders as a square system. The Figma bundle's `--radius` is
+ * 3px, but the `--radius-sm` its own components actually use is
  * `calc(var(--radius) - 4px)` — negative, so it computes to zero. Across both
  * demo pages the only radii that appear are that zero and `rounded-full`.
  *
@@ -1807,13 +1807,13 @@ export const RADII = {
 export const NESTED_RADIUS_PAIRINGS = [] as const satisfies readonly NestedRadiusPairing[]
 ```
 
-- [ ] **Step 4: Document the Meridian spacing subset**
+- [ ] **Step 4: Document the Figma bundle's spacing subset**
 
-`SPACES` is unchanged — Meridian's 4/8/12/16/24/32/48/64/96/128 are all already present. Add a comment above `SPACES` recording which subset the identity uses, so a reader does not assume every step is equally blessed:
+`SPACES` is unchanged — the Figma bundle's 4/8/12/16/24/32/48/64/96/128 are all already present. Add a comment above `SPACES` recording which subset the identity uses, so a reader does not assume every step is equally blessed:
 
 ```ts
 /**
- * Meridian uses 4, 8, 12, 16, 24, 32, 48, 64, 96 and 128 — `1`, `2`, `3`, `4`,
+ * The Figma bundle uses 4, 8, 12, 16, 24, 32, 48, 64, 96 and 128 — `1`, `2`, `3`, `4`,
  * `6`, `8`, `12`, `16`, `24` and `32` below. The half-steps and the odd
  * multiples remain available but appear nowhere in the identity.
  */
@@ -1830,7 +1830,7 @@ Expected: PASS
 git add packages/tokens
 git commit -m "feat(tokens): the radius scale goes square
 
-Meridian's rounded-sm computes to -1px and therefore zero, and it is the only
+The Figma bundle's rounded-sm computes to -1px and therefore zero, and it is the only
 radius either demo page uses. Five values become three."
 ```
 
@@ -1848,7 +1848,7 @@ radius either demo page uses. Five values become three."
 // append to packages/tokens/tests/motion.test.ts
 import { DURATIONS, EASINGS } from '../config/motion.js'
 
-describe('Meridian motion presets', () => {
+describe('source motion presets', () => {
   it('carries the five named durations', () => {
     expect(DURATIONS).toEqual({
       instant: 0,
@@ -1876,7 +1876,7 @@ Expected: FAIL — durations are still `fast`/`base`/`slow`/`slower`
 /**
  * Motion.
  *
- * Meridian's five presets, from its documentation site's motion section.
+ * The Figma bundle's five presets, from its documentation site's motion section.
  *
  * `expressive` is a duration and nothing else. Its listed easing is "spring",
  * which no CSS timing function reproduces, and Lattice does not take a
@@ -1893,7 +1893,7 @@ export const DURATIONS = {
 } as const satisfies Readonly<Record<string, number>>
 
 /**
- * Two curves, because Meridian names two: `ease-out` for entrances and state
+ * Two curves, because the Figma bundle names two: `ease-out` for entrances and state
  * changes, `ease-in-out` for the deliberate tier.
  */
 export const EASINGS = {
@@ -1915,7 +1915,7 @@ Expected: PASS
 
 ```bash
 git add packages/tokens
-git commit -m "feat(tokens): Meridian's five motion presets"
+git commit -m "feat(tokens): five motion presets from the Figma bundle"
 ```
 
 ---
@@ -1947,7 +1947,7 @@ describe('elevation', () => {
     expect(ELEVATION_ROLES.flat).toBe('none')
   })
 
-  it("carries Meridian's 2xl for the floating role", () => {
+  it("carries the Figma bundle's 2xl for the floating role", () => {
     expect(SHADOWS['2xl']).toBe('0 25px 50px -12px rgb(0 0 0 / 0.25)')
   })
 
@@ -1972,11 +1972,11 @@ Expected: FAIL — the calibrated model exports different names
  * Elevation.
  *
  * Four roles, replacing the calibrated multi-level model, because four is all
- * Meridian uses. Values are the Tailwind v4 shadows the bundle emits, verbatim.
+ * the Figma bundle uses. Values are the Tailwind v4 shadows the bundle emits, verbatim.
  *
  * ## Recorded, not fixed
  *
- * These shadows are pure black at 10-25% alpha. Over Meridian's `#0c0c14` page
+ * These shadows are pure black at 10-25% alpha. Over the Figma bundle's `#0c0c14` page
  * they are close to invisible, which is why the identity reads as flat in dark
  * mode and leans on the hairline instead; `floating` is the only one that
  * carries. That is the design as delivered and it ships as delivered. The
@@ -1997,7 +1997,7 @@ export type ShadowName = keyof typeof SHADOWS
 /**
  * What each role is for. `flat` is not an absence of styling — it is the
  * positive statement that a surface is distinguished by its hairline and its
- * fill, which is Meridian's default.
+ * fill, which is Lattice's default.
  */
 export const ELEVATION_ROLES = {
   /** Cards, panels, inputs, buttons. Hairline only. */
@@ -2023,7 +2023,7 @@ export const ELEVATION_ROLE_COUNT = Object.keys(ELEVATION_ROLES).length
  * Elevation tokens.
  *
  * Emitted once on `:root` rather than per theme. The prior system varied shadow
- * by mode; Meridian declares one set and uses it in both.
+ * by mode; the Figma bundle declares one set and uses it in both.
  */
 export function elevationCss(): string {
   return [
@@ -2052,10 +2052,10 @@ Expected: PASS, 4 tests
 
 ```bash
 git add packages/tokens
-git commit -m "feat(tokens): elevation collapses to Meridian's four roles
+git commit -m "feat(tokens): elevation collapses to Lattice's four roles
 
 The calibrated multi-level model is replaced by flat/raised/overlay/floating.
-Recorded: these shadows are near-invisible on Meridian's dark page, which is
+Recorded: these shadows are near-invisible on the Figma bundle's dark page, which is
 why the identity leans on the hairline."
 ```
 

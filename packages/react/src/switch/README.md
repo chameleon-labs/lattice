@@ -18,7 +18,7 @@ accessibility tree — all of which a button would have to re-implement.
 transform, so the state signal survives `prefers-reduced-motion: reduce`; only
 the travel between positions is gated.
 
-The track fills from `--lat-switch-track`, the one token Meridian declares
+The track fills from `--lat-switch-track`, the one token the Figma bundle declares
 specifically for this control, and checked fills with `--lat-solid`. The
 thumb sits on `--lat-bg-raised`. Track and thumb are the only two places in
 this system where a pill (`--lat-radius-full`) is correct, because a switch is

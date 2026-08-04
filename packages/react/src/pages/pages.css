@@ -11,7 +11,7 @@
  * Its rules are grid/flex/gap/padding/position shells. Anywhere a rule below
  * reaches past layout into appearance — colour, border, radius, type — the
  * value is a `var(--lat-*)` reference, never a literal: the page exists to
- * prove the token, not to restate the Meridian bundle's own hard-coded hex
+ * prove the token, not to restate the Figma bundle's own hard-coded hex
  * values.
  *
  * The one deliberate exception is the `display` role (48px): it has no
@@ -570,7 +570,7 @@
  * `position: sticky` alone is not enough. A sticky element with `z-index: auto`
  * paints in DOM order against other positioned elements, so anything later in
  * the document that is merely `position: relative` — the hero's audit card, for
- * one — scrolls straight over it. Meridian's own header carries `z-50` for
+ * one — scrolls straight over it. The Figma bundle's own header carries `z-50` for
  * exactly this reason.
  *
  * 50 rather than 1 so page content can still be layered beneath deliberately
@@ -1283,7 +1283,7 @@
 
 /* The source bundle draws each step's index as a giant (48px), near-invisible
    (10% opacity) numeral — a bespoke decorative treatment with no role or
-   token in Meridian's type scale. Rather than inventing a second appearance
+   token in Lattice's type scale. Rather than inventing a second appearance
    exception beyond the sanctioned display role, the index reads as a compact
    meta-style label instead, the same construction `system-page__section-index`
    uses for its "00"/"01" markers. Recorded in the gap list. */

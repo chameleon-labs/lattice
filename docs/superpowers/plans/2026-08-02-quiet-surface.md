@@ -1,7 +1,7 @@
 # Quiet Surface Implementation Plan
 
 > **Status: superseded** by
-> [Meridian: replacing Lattice's visual identity](../specs/2026-08-03-meridian-identity-design.md)
+> [Replacing Lattice's visual identity with a Figma-generated one](../specs/2026-08-03-lattice-identity-design.md)
 > (2026-08-03). Do not execute this plan. Its spec is superseded; see that
 > document's header for the one rule carried forward.
 
