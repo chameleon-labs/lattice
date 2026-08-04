@@ -29,7 +29,11 @@ export const FONT_SIZES = {
   xl: 1.25,
   '2xl': 1.5,
   '3xl': 1.875,
-  '5xl': 3
+  /** 36px — the CTA heading's `text-4xl`. */
+  '4xl': 2.25,
+  '5xl': 3,
+  /** 60px — the hero `h1`'s `md:text-6xl`. */
+  '6xl': 3.75
 } as const
 
 export const FONT_WEIGHTS = { regular: 400, medium: 500, semibold: 600, bold: 700 } as const
