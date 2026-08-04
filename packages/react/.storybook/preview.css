@@ -43,13 +43,24 @@
 
 /* Input and TextField are full-width by design — a form field fills its column.
    The stories lay them out in rows, so they constrain them here rather than the
-   component guessing a width it cannot know. */
-.lat-story .lat-input,
-.lat-story .lat-text-field {
+   component guessing a width it cannot know.
+
+   Both caps below are *gallery presentation*, not design: a lone component on a
+   blank canvas would otherwise stretch the full viewport. They must not reach
+   the page stories, which lay their own components out inside real page
+   containers — a page's Card fills its column by design, and capping it here
+   made the score-history panel render at 480px against the source's 928px.
+   That was a Storybook artifact rather than a page defect: the same markup in a
+   consuming app was always correct.
+
+   `:not(:has(> .lat-page))` rather than a `.lat-page` reset, so the exclusion
+   sits with the rule it qualifies instead of being undone somewhere else. */
+.lat-story:not(:has(> .lat-page)) .lat-input,
+.lat-story:not(:has(> .lat-page)) .lat-text-field {
   max-inline-size: 22rem;
 }
 
-.lat-story .lat-callout,
-.lat-story .lat-card {
+.lat-story:not(:has(> .lat-page)) .lat-callout,
+.lat-story:not(:has(> .lat-page)) .lat-card {
   max-inline-size: 30rem;
 }
