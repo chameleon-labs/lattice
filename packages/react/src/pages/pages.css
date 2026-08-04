@@ -1386,6 +1386,57 @@
   text-align: center;
 }
 
+/* The `tabstop` row — the one entry `COMPETITORS` marks `highlight: true` —
+   is the source's own four-way distinguishing treatment: a tinted fill, a
+   2px accent rule on the leading edge, a brighter name, and Check icons in
+   the accent colour rather than muted. `data-highlight` on the `Tr` (rather
+   than a second, page-owned row class) drives all of it through scoped
+   descendant rules, the same "one attribute, several rules" shape Eyebrow's
+   own `data-tone`/`data-align` use.
+
+   `border-inline-start` here, not `border-inline-start` repeated on every
+   cell in the row: `Table`'s own `border-collapse: collapse` means a border
+   declared on the row is assigned to the row's own leading edge in the
+   collapsed border model (CSS2.1 §17.6.2), the same way a `<tr>` can carry
+   `border-block-*` there — it does not need restating per cell. */
+.landing-page__why-grid .lat-table__row[data-highlight='true'] {
+  background: color-mix(in srgb, var(--lat-solid) 5%, transparent);
+  border-inline-start: 2px solid var(--lat-solid);
+}
+
+/* No hover wash for the highlighted row: the source's own ternary gives it
+   no `hover:` class at all (`c.highlight ? "bg-primary/5 border-l-2
+   border-l-primary" : "hover:bg-foreground/[0.02]"`), unlike every other
+   row, so its background stays the flat 5% tint under the pointer too.
+   Needs the extra `.lat-table__body` qualifier to out-specificity
+   `table.css`'s own `.lat-table__body .lat-table__row:hover` regardless of
+   which stylesheet the cascade happens to load second. */
+.landing-page__why-grid .lat-table__body .lat-table__row[data-highlight='true']:hover {
+  background: color-mix(in srgb, var(--lat-solid) 5%, transparent);
+}
+
+.landing-page__why-grid .lat-table__row[data-highlight='true'] .landing-page__competitor-name {
+  color: var(--lat-text);
+}
+
+/* Present (`Check`) reads muted by default — the same as every other cell
+   in this compact table — and only turns the accent colour on the
+   highlighted row. Absent (`X`) never does: it stays muted at 30% opacity
+   in every row (`text-muted-foreground/30` in the source), so an absent
+   feature never reads as loudly as a present one. */
+.landing-page__why-grid .landing-page__bool-check {
+  color: var(--lat-text-subtle);
+}
+
+.landing-page__why-grid .lat-table__row[data-highlight='true'] .landing-page__bool-check {
+  color: var(--lat-solid);
+}
+
+.landing-page__why-grid .landing-page__bool-x {
+  color: var(--lat-text-subtle);
+  opacity: 0.3;
+}
+
 /* ─── v1 scope ─────────────────────────────────────────────────────────── */
 
 .landing-page__scope-grid {

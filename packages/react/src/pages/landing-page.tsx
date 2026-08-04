@@ -144,11 +144,14 @@ const STEPS = [
   }
 ] as const
 
+// `highlight` — only the `tabstop` row carries it in the source, and it is
+// what the comparison table's four-way distinguishing treatment (row tint,
+// left rule, name weight/colour, Check colour) all key off. See `Why()`.
 const COMPETITORS = [
-  { name: 'Lighthouse CI', cost: 'Free', setup: 'Pipeline integration', trend: false, alert: false, zeroCfg: false },
-  { name: 'pa11y-dashboard', cost: 'Free', setup: 'Self-hosted', trend: true, alert: true, zeroCfg: false },
-  { name: 'axe Monitor', cost: '$$$', setup: 'Sales call', trend: true, alert: true, zeroCfg: false },
-  { name: 'tabstop', cost: 'Free in beta', setup: 'Paste a URL', trend: true, alert: true, zeroCfg: true }
+  { name: 'Lighthouse CI', cost: 'Free', setup: 'Pipeline integration', trend: false, alert: false, zeroCfg: false, highlight: false },
+  { name: 'pa11y-dashboard', cost: 'Free', setup: 'Self-hosted', trend: true, alert: true, zeroCfg: false, highlight: false },
+  { name: 'axe Monitor', cost: '$$$', setup: 'Sales call', trend: true, alert: true, zeroCfg: false, highlight: false },
+  { name: 'tabstop', cost: 'Free in beta', setup: 'Paste a URL', trend: true, alert: true, zeroCfg: true, highlight: true }
 ] as const
 
 const V1_IN = [
@@ -199,10 +202,18 @@ function ImpactBadge({ impact, count }: { impact: Impact; count?: number }) {
   )
 }
 
+// Check reads muted by default and only turns accent-coloured on the
+// highlighted row (`.landing-page__why-grid`'s `[data-highlight='true']`
+// descendant rule); X stays muted at 30% opacity in every row regardless —
+// see the CSS for why an absent feature never competes with a present one.
 function BoolCell({ value }: { value: boolean }) {
   return (
     <Td className="landing-page__bool-cell">
-      {value ? <Check size={13} /> : <X size={13} />}
+      {value ? (
+        <Check size={13} className="landing-page__bool-check" />
+      ) : (
+        <X size={13} className="landing-page__bool-x" />
+      )}
       <VisuallyHidden>{value ? 'Yes' : 'No'}</VisuallyHidden>
     </Td>
   )
@@ -529,7 +540,7 @@ function Why() {
               </THead>
               <TBody>
                 {COMPETITORS.map((c) => (
-                  <Tr key={c.name}>
+                  <Tr key={c.name} data-highlight={c.highlight ? 'true' : undefined}>
                     <Th scope="row">
                       <span className="landing-page__competitor-name">{c.name}</span>
                       <span className="landing-page__competitor-cost">{c.cost}</span>
