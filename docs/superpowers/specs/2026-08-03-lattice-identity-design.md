@@ -418,7 +418,7 @@ WCAG 2.x on the delivered values:
 | dark focus ring `primary/40` vs `card` | 3.20 | passes SC 1.4.11 |
 | hairline border vs its surface | 1.20 / 1.19 | decorative; see below |
 
-**Thirteen failures ship**, not nine. *Corrected 2026-08-04, during the
+**Thirteen failures ship**, not nine. *(Superseded below — the real count is twenty-two.)* *Corrected 2026-08-04, during the
 whole-phase component review.* The count of nine (itself corrected up from an
 original four earlier the same day) covered the six grey and accent pairs plus
 the chromatic tinted triple. It never measured the severity ramp's own tinted
@@ -444,9 +444,52 @@ this ledger, in the chart-palette checks the build also prints, because it is a
 category-4 check (contrast against the app surface) rather than a text-contrast
 pair — see `packages/tokens/config/charts.ts`.
 
-Thirteen is still thirteen more than a system with a hard gate would ship.
+### A fourth correction: twenty-two, not thirteen
+
+*Corrected 2026-08-04, while making the accessibility sweep's assertion
+honest.* The count above is superseded. **Twenty-two of fifty pairs fail.**
+
+The sweep had asserted zero axe violations, which made it permanently red
+against a system that ships failures deliberately. Rewriting it to assert *the
+accepted pairs* — matching each violation's rendered colours against this
+ledger rather than against a list of selectors — required the ledger to
+describe what actually renders. It did not.
+
+Every tinted-triple row here was measured against `--lat-bg-raised` only. But a
+tint is translucent: it composites over whatever sits beneath it, and in every
+story root and in real page chrome that is `--lat-bg`, not the raised surface.
+Those are different pairs, and nine of them fail:
+
+| pair | ratio | verdict |
+| --- | --- | --- |
+| light accent text on its tint over bg | 2.54 | fails AA |
+| light danger text on its tint over bg | 3.98 | fails AA |
+| light warning text on its tint over bg | 2.80 | fails AA |
+| light success text on its tint over bg | 2.97 | fails AA |
+| light info text on its tint over bg | 3.21 | fails AA |
+| **light decorative text on its tint over bg** | **4.36** | **fails AA — a genuinely new failure; `decorative` passes at 4.91 over `bg-raised` and only fails over the page** |
+| light severity critical text on its tint over bg | 3.98 | fails AA (duplicates danger) |
+| light severity serious text on its tint over bg | 2.80 | fails AA (duplicates warning) |
+| **light severity moderate text on its tint over bg** | **2.01** | **fails AA — the worst pair in the system, replacing 2.26** |
+
+`decorative` is the one that matters most: it is the only scale that *passes*
+on a raised surface and fails on the page, so no amount of re-reading the old
+ledger would have surfaced it. It took measuring the composite.
+
+Lattice's values did not change. What changed, for the fourth time, is how
+much of them is measured — four, then nine, then thirteen, now twenty-two.
+Each rise came from measuring a pairing that had been invisible rather than
+from anything getting worse, and each was found by building something that had
+to be right about the numbers: a report, a page, a test.
+
+Twenty-two is still twenty-two more than a system with a hard gate would ship.
 That is the consequence of the decision in §"The premise", taken knowingly,
 and the ledger exists so it stays visible rather than becoming folklore.
+
+`tests/browser/a11y.spec.ts` now enforces it: a contrast violation passes only
+if its foreground is a documented deficiency and its ratio is no worse than the
+floor this ledger records for it. Any other contrast pair, and any violation of
+any other rule, fails the suite.
 
 The figures above are the build's own output, not hand arithmetic — reproduce
 them with `pnpm --filter @chameleon-labs/lattice-tokens build`.
