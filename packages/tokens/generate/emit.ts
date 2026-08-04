@@ -34,6 +34,7 @@ import {
   motionCss,
   motionTokens
 } from './motion.js'
+import { formatOklch } from './format.js'
 import type { Scale, Swatch } from './scale.js'
 import { accentOnSolid, semanticBlock } from './semantic.js'
 import { buildSeverity } from './severity.js'
@@ -56,7 +57,7 @@ import {
  */
 export const DTCG_SCHEMA = 'https://www.designtokens.org/schemas/2025.10/format.json'
 
-export { formatOklch } from './format.js'
+export { formatOklch }
 
 const customProperty = (scale: Scale, swatch: Swatch): string =>
   `  --lat-${scale.name}-${swatch.step}: ${formatOklch(swatch)};`
