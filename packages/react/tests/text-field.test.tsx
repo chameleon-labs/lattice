@@ -1,3 +1,4 @@
+import { createRef } from 'react'
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { Input } from '../src/input/input.js'
@@ -26,12 +27,85 @@ describe('Input', () => {
     expect(input.dataset['size']).toBeUndefined()
   })
 
-  it('adds className rather than replacing it', () => {
+  // className moved from the <input> to the wrapper it always renders inside
+  // — the wrapper is the box a caller positions or sizes, since it is now
+  // the element carrying the border and background.
+  it('adds className to the wrapper, not the control', () => {
     render(<Input aria-label="URL" className="mine" />)
     const input = screen.getByLabelText('URL')
+    const wrapper = input.parentElement as HTMLElement
 
-    expect(input.classList.contains('lat-input')).toBe(true)
-    expect(input.classList.contains('mine')).toBe(true)
+    expect(wrapper.classList.contains('lat-input-field')).toBe(true)
+    expect(wrapper.classList.contains('mine')).toBe(true)
+    expect(input.classList.contains('mine')).toBe(false)
+  })
+
+  it('always renders the field wrapper, addons or not', () => {
+    render(<Input aria-label="URL" />)
+    const input = screen.getByLabelText('URL')
+
+    expect(input.parentElement?.classList.contains('lat-input-field')).toBe(true)
+  })
+
+  it('renders addonStart before the control and addonEnd after it', () => {
+    render(
+      <Input
+        aria-label="URL"
+        addonStart={<span data-testid="start">start</span>}
+        addonEnd={<span data-testid="end">end</span>}
+      />
+    )
+    const input = screen.getByLabelText('URL')
+    const wrapper = input.parentElement as HTMLElement
+    const children = Array.from(wrapper.children)
+
+    expect(children.indexOf(screen.getByTestId('start'))).toBe(0)
+    expect(children.indexOf(input)).toBe(1)
+    expect(children.indexOf(screen.getByTestId('end'))).toBe(2)
+  })
+
+  it('reflects invalid onto the wrapper as data-invalid, while aria-invalid stays on the control', () => {
+    render(<Input aria-label="URL" invalid />)
+    const input = screen.getByLabelText('URL')
+    const wrapper = input.parentElement as HTMLElement
+
+    expect(wrapper.dataset['invalid']).toBe('true')
+    expect(input.getAttribute('aria-invalid')).toBe('true')
+  })
+
+  it('omits data-invalid from the wrapper when not invalid', () => {
+    render(<Input aria-label="URL" />)
+    const wrapper = screen.getByLabelText('URL').parentElement as HTMLElement
+
+    expect(wrapper.dataset['invalid']).toBeUndefined()
+  })
+
+  it('reflects disabled onto the wrapper as data-disabled', () => {
+    render(<Input aria-label="URL" disabled />)
+    const input = screen.getByLabelText('URL')
+    const wrapper = input.parentElement as HTMLElement
+
+    expect(wrapper.dataset['disabled']).toBe('true')
+    expect((input as HTMLInputElement).disabled).toBe(true)
+  })
+
+  it('omits data-disabled from the wrapper when enabled', () => {
+    render(<Input aria-label="URL" />)
+    const wrapper = screen.getByLabelText('URL').parentElement as HTMLElement
+
+    expect(wrapper.dataset['disabled']).toBeUndefined()
+  })
+
+  // The ref stays pinned to the <input>, not the wrapper the field chrome
+  // moved onto — InputProps is ComponentPropsWithRef<'input'> and callers
+  // (focus management, form libraries) rely on that.
+  it('resolves a ref to the <input>, not the wrapper', () => {
+    const ref = createRef<HTMLInputElement>()
+    render(<Input aria-label="URL" ref={ref} />)
+
+    expect(ref.current).not.toBeNull()
+    expect(ref.current?.tagName).toBe('INPUT')
+    expect(ref.current?.classList.contains('lat-input')).toBe(true)
   })
 })
 

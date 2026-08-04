@@ -132,6 +132,16 @@ describe('findBareFocusOutlines', () => {
     ).toEqual([])
   })
 
+  // A wrapper reacting to focus landing on a descendant control — Input's
+  // field wrapper is exactly this — isn't the bare-:focus problem this check
+  // exists to catch. A naive `:focus\b` match would misfire here, since
+  // ":focus-within" contains ":focus" at a word boundary.
+  it('permits an outline on :focus-within', () => {
+    expect(
+      findBareFocusOutlines(`.a:focus-within { outline: 2px solid var(--lat-focus-ring); }`)
+    ).toEqual([])
+  })
+
   it('ignores a :focus rule that sets no outline', () => {
     expect(findBareFocusOutlines(`.a:focus { background-color: var(--lat-bg); }`)).toEqual([])
   })

@@ -33,3 +33,34 @@ export const Invalid: Story = {
 export const Disabled: Story = {
   args: { disabled: true, 'aria-label': 'Page URL, unavailable' }
 }
+
+/**
+ * `addonStart` renders inside the same wrapper that carries the border and
+ * the focus ring, so the icon sits inside the field rather than glued
+ * beside it — focus the control and the highlight encloses the icon too.
+ *
+ * The icon carries `aria-hidden`: it is decorative, and the accessible name
+ * still comes from `aria-label` alone.
+ */
+export const WithLeadingIcon: Story = {
+  args: {
+    'aria-label': 'Page URL',
+    addonStart: (
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <line x1="2" x2="22" y1="12" y2="12" />
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+      </svg>
+    )
+  }
+}
