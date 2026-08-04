@@ -33,3 +33,17 @@ export const WithRule: Story = {
     children: 'Section'
   }
 }
+
+/**
+ * The landing page CTA's kicker — centred inside a `text-align: center`
+ * section. `.lat-eyebrow` is a flex container, so it needs `align="center"`
+ * rather than relying on the inherited text alignment a flex container does
+ * not pick up for its own layout.
+ */
+export const Centered: Story = {
+  args: {
+    align: 'center',
+    tone: 'accent',
+    children: 'Early access — free'
+  }
+}

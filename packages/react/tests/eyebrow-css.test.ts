@@ -69,4 +69,22 @@ describe("Eyebrow's stylesheet", () => {
     expect(rule).toContain('color: var(--lat-solid);')
     expect(rule).not.toContain('--lat-text-subtle')
   })
+
+  // `.lat-eyebrow` is `display: flex`, so an ancestor's `text-align: center`
+  // never reaches it — the landing page CTA's kicker needs `align="center"`
+  // to actually centre, and this pins the one declaration that does it.
+  // Verified to discriminate: deleting the rule (or its `[data-align=
+  // 'center']` qualifier) leaves `.lat-eyebrow` at its unqualified
+  // `justify-content: normal` default and fails this.
+  it("align='center' centres the flex container's own justify-content", () => {
+    const rule = selectorBlock(css, ".lat-eyebrow[data-align='center']")
+
+    expect(rule).toContain('justify-content: center;')
+  })
+
+  it('the base .lat-eyebrow rule sets no justify-content of its own', () => {
+    const rule = selectorBlock(css, '.lat-eyebrow')
+
+    expect(rule).not.toContain('justify-content')
+  })
 })

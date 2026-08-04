@@ -1429,8 +1429,15 @@
 
 /* ─── CTA ──────────────────────────────────────────────────────────────── */
 
+/* `bg-card/30` — the card surface at 30% alpha over the page, not
+   `--lat-bg-subtle` opaque: the source composites to a barely-there lift
+   (~rgb(13 13 24) on this package's dark page background), while the subtle
+   surface painted flat reads as a distinctly lighter band. `color-mix`
+   derives the alpha blend from the same token `Card` itself reads
+   (card.css's `background: var(--lat-bg-raised)`), so the value still has a
+   token for a source rather than restating the source bundle's literal. */
 .landing-page__cta {
-  background: var(--lat-bg-subtle);
+  background: color-mix(in srgb, var(--lat-bg-raised) 30%, transparent);
   border-block-start: 1px solid var(--lat-border);
 }
 
@@ -1439,14 +1446,28 @@
   text-align: center;
 }
 
-.landing-page__cta-inner .landing-page__url-row {
-  max-inline-size: 26rem;
+/* `max-w-xl mx-auto` (576px) wraps *all* of the CTA's content in the
+   source — eyebrow, heading, paragraph and field row alike — not just the
+   paragraph. `Eyebrow` never exposes a width hook of its own, so this reaches
+   it (and everything beside it) via the page-owned wrapper `CTA()` renders,
+   the same shape as `.landing-page__section`'s own `max-inline-size` +
+   `margin-inline: auto` pairing one level up. No token on the container
+   scale sits at 576px (`--lat-container-prose` is 672px, `--lat-container-
+   content` is 1024px), so this is a literal rem, the same class of layout
+   value `.landing-page__lede`'s 26rem and `.landing-page__muted`'s 32rem
+   already are in this file — a dimension, not an appearance value the
+   no-literal-colours rule is about. */
+.landing-page__cta-content {
+  max-inline-size: 36rem;
   margin-inline: auto;
 }
 
 /* The CTA's own paragraph carries `mb-8` (32px) — the other `.landing-page__muted`
    instances all want `mb-4` (the shared rule's default), this is the one
-   that does not. */
+   that does not. `margin-inline: auto` re-centres it within the 576px
+   column above: `.landing-page__muted`'s own `max-inline-size` (32rem/512px)
+   is narrower than the column, exactly as the source's unconstrained `<p>`
+   would be if it happened to be shorter than 576px of text. */
 .landing-page__cta-inner .landing-page__muted {
   margin-inline: auto;
   margin-block-end: var(--lat-space-8);

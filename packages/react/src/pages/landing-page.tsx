@@ -594,17 +594,19 @@ function CTA() {
   return (
     <div className="landing-page__cta">
       <Section className="landing-page__cta-inner">
-        <Eyebrow tone="accent" className="landing-page__cta-eyebrow">
-          Early access — free
-        </Eyebrow>
-        <h2 className="landing-page__heading landing-page__heading--cta">
-          Know the moment you break accessibility.
-        </h2>
-        <p className="landing-page__muted">No account needed to run your first audit.</p>
+        <div className="landing-page__cta-content">
+          <Eyebrow tone="accent" align="center" className="landing-page__cta-eyebrow">
+            Early access — free
+          </Eyebrow>
+          <h2 className="landing-page__heading landing-page__heading--cta">
+            Know the moment you break accessibility.
+          </h2>
+          <p className="landing-page__muted">No account needed to run your first audit.</p>
 
-        <UrlField inputLabel="Website URL (early access)" />
+          <UrlField inputLabel="Website URL (early access)" />
 
-        <p className="landing-page__meta">MIT licensed · Built in public · Follow DECISIONS.md</p>
+          <p className="landing-page__meta">MIT licensed · Built in public · Follow DECISIONS.md</p>
+        </div>
       </Section>
     </div>
   )
