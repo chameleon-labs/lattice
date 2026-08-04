@@ -677,20 +677,106 @@
 
 /* Hero mock audit card */
 
-.landing-page__audit-meta {
-  margin-inline-start: auto;
+/* The glow and the card share a stacking context: the glow is a sibling,
+   not a Card child, so Card's own `overflow: hidden` (the hairline's square
+   corners) never clips it. */
+.landing-page__audit-wrap {
+  position: relative;
+}
+
+.landing-page__audit-glow {
+  position: absolute;
+  inset: calc(var(--lat-space-8) * -1);
+  background: color-mix(in oklch, var(--lat-solid) 5%, transparent);
+  border-radius: var(--lat-radius-full);
+  filter: blur(64px);
+  pointer-events: none;
+}
+
+.landing-page__audit-card {
+  position: relative;
+}
+
+/* Browser chrome, not `CardHeader` — see the comment at the call site. */
+.landing-page__audit-header {
+  display: flex;
+  align-items: center;
+  gap: var(--lat-space-3);
+  padding: 0.875rem var(--lat-space-5);
+  border-block-end: 1px solid var(--lat-border);
+}
+
+.landing-page__audit-dots {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--lat-space-1-5);
+}
+
+.landing-page__audit-dot {
+  display: block;
+  inline-size: 0.625rem;
+  block-size: 0.625rem;
+  border-radius: var(--lat-radius-full);
+}
+
+.landing-page__audit-dot--critical { background: color-mix(in oklch, var(--lat-severity-critical) 60%, transparent); }
+.landing-page__audit-dot--serious { background: color-mix(in oklch, var(--lat-severity-serious) 60%, transparent); }
+.landing-page__audit-dot--primary { background: color-mix(in oklch, var(--lat-solid) 60%, transparent); }
+
+/* The URL: normal-case mono, not the eyebrow `CardHeader` would have given it. */
+.landing-page__audit-url {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--lat-text-subtle);
-  font-family: var(--lat-text-meta-font-family);
-  font-size: var(--lat-text-meta-font-size);
+  font-family: var(--lat-font-mono);
+  font-size: var(--lat-font-size-2xs);
+}
+
+.landing-page__audit-meta {
+  flex: 0 0 auto;
+  color: var(--lat-text-subtle);
+  font-family: var(--lat-font-mono);
+  /* No text role sits at 9px — the nearest is the eyebrow/meta primitive at
+     10px (`--lat-font-size-3xs`). One px short of the source's literal 9px,
+     accepted rather than adding a one-off size token for a single label. */
+  font-size: var(--lat-font-size-3xs);
+  opacity: 0.4;
 }
 
 .landing-page__audit-summary {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--lat-space-6);
   border-block-end: 1px solid var(--lat-border);
 }
+
+.landing-page__score-arc {
+  flex: 0 0 auto;
+}
+
+.landing-page__score-arc-track {
+  color: var(--lat-border);
+  opacity: 0.4;
+}
+
+.landing-page__score-arc-value {
+  font-family: var(--lat-font-mono);
+  font-weight: var(--lat-font-weight-bold);
+}
+
+.landing-page__score-arc-suffix {
+  color: var(--lat-text);
+  opacity: 0.5;
+  font-family: var(--lat-font-sans);
+}
+
+.landing-page__score-arc--good { color: var(--lat-accent-vivid); }
+.landing-page__score-arc--warn { color: var(--lat-severity-serious); }
+.landing-page__score-arc--bad { color: var(--lat-severity-critical); }
 
 .landing-page__audit-signals {
   display: flex;
@@ -698,11 +784,42 @@
   gap: var(--lat-space-2);
 }
 
-.landing-page__audit-badges {
+.landing-page__audit-violations-label {
+  margin-block-end: var(--lat-space-1);
+  color: var(--lat-text-subtle);
+  font-family: var(--lat-font-mono);
+  font-size: var(--lat-font-size-3xs);
+  letter-spacing: var(--lat-letter-spacing-wider);
+  text-transform: uppercase;
+}
+
+.landing-page__audit-counts {
   display: flex;
   flex-wrap: wrap;
   gap: var(--lat-space-2);
 }
+
+.landing-page__audit-count {
+  font-family: var(--lat-font-mono);
+  font-size: var(--lat-font-size-xs);
+}
+
+.landing-page__audit-count--critical { color: var(--lat-severity-critical); }
+.landing-page__audit-count--serious { color: var(--lat-severity-serious); }
+.landing-page__audit-count--moderate { color: var(--lat-severity-moderate); }
+.landing-page__audit-count--minor { color: var(--lat-severity-minor); }
+
+.landing-page__audit-trend,
+.landing-page__audit-alert {
+  display: flex;
+  align-items: center;
+  gap: var(--lat-space-1-5);
+  font-family: var(--lat-font-mono);
+  font-size: var(--lat-font-size-3xs);
+}
+
+.landing-page__audit-trend { color: var(--lat-severity-serious); }
+.landing-page__audit-alert { color: var(--lat-text-subtle); }
 
 .landing-page__audit-violations {
   display: flex;
@@ -717,7 +834,17 @@
   align-items: flex-start;
   gap: var(--lat-space-3);
   padding: var(--lat-space-3) var(--lat-space-5);
-  border-block-end: 1px solid var(--lat-border);
+}
+
+/* `divide-y divide-border/50`: a hairline between rows, at half the
+   border's usual strength, and none above the first row or below the last
+   — the full-strength border sits at the footer's top edge instead. */
+.landing-page__audit-violation:not(:first-child) {
+  border-block-start: 1px solid color-mix(in oklch, var(--lat-border) 50%, transparent);
+}
+
+.landing-page__audit-violation:hover {
+  background: color-mix(in oklch, var(--lat-text) 2%, transparent);
 }
 
 .landing-page__audit-violation-copy {
@@ -747,6 +874,21 @@
 
 .landing-page__audit-footer {
   padding: var(--lat-space-3) var(--lat-space-5);
+  border-block-start: 1px solid var(--lat-border);
+}
+
+/* `Button variant="link"` is muted-foreground by design (its README: a link
+   inline in body copy, not a call to action) — right for the nav and footer
+   links elsewhere on this page, but the source's "View full report" is
+   `text-primary`, not muted. Recoloured here rather than in `button.css`,
+   since every other `link` button on both pages wants the muted default.
+   Qualified with `[data-variant='link']` rather than bare `.lat-button`
+   so the selector never reads as a second declaration of that base rule. */
+.landing-page__audit-footer .lat-button[data-variant='link'] {
+  color: var(--lat-solid);
+}
+.landing-page__audit-footer .lat-button[data-variant='link']:hover:not(:disabled):not([aria-disabled='true']) {
+  color: color-mix(in oklch, var(--lat-solid) 80%, transparent);
 }
 
 /* ─── Trust bar ────────────────────────────────────────────────────────── */

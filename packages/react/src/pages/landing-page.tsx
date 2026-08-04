@@ -35,6 +35,7 @@ import {
   Zap
 } from './icons.js'
 import type { IconProps } from './icons.js'
+import { ScoreArc } from './score-arc.js'
 
 /**
  * The tabstop landing page, rebuilt from Lattice components alone.
@@ -42,9 +43,13 @@ import type { IconProps } from './icons.js'
  * Source: `Custom Design System/src/app/App.tsx` — a marketing page for a
  * fictional accessibility-monitoring product, nine sections behind a sticky
  * nav. This is a faithful port of that structure, not a reinterpretation,
- * with two deliberate omissions (see the module docs in
- * `landing-page.stories.tsx`): `ScoreArc` is rendered as a `Stat`, and the
- * Recharts score-history line chart is rendered as a `Table`.
+ * with one deliberate omission (see the module docs in
+ * `landing-page.stories.tsx`): the Recharts score-history line chart is
+ * rendered as a `Table`. The hero's `ScoreArc` gauge stays out of the
+ * component library — same reasoning, one consumer, no reusable guarantee —
+ * but is built here as a page-local component (`./score-arc.js`) rather than
+ * substituted, since nothing in the library reproduces a colour-coded arc
+ * gauge.
  *
  * Every impact badge (`critical`/`serious`/`moderate`/`minor`) carries both
  * an icon and its text label — colour never carries severity alone, per the
@@ -291,51 +296,73 @@ function Hero() {
           <p className="landing-page__meta">No account needed · Results in ~30 seconds</p>
         </div>
 
-        <Card data-elevation="floating" className="landing-page__audit-card">
-          <CardHeader label="https://ariakit.org">
-            <span className="landing-page__audit-meta">audited 4 min ago</span>
-          </CardHeader>
+        <div className="landing-page__audit-wrap">
+          <div className="landing-page__audit-glow" aria-hidden="true" />
 
-          <CardBody className="landing-page__audit-summary">
-            <Stat value="71" label="Score" sub="out of 100" />
-
-            <div className="landing-page__audit-signals">
-              <div className="landing-page__audit-badges">
-                {VIOLATIONS.map((v) => (
-                  <ImpactBadge key={v.impact} impact={v.impact} count={v.count} />
-                ))}
+          <Card data-elevation="floating" className="landing-page__audit-card">
+            {/* Browser chrome, not a panel header — deliberately not `CardHeader`,
+                whose eyebrow convention (uppercase, letter-spaced) is wrong for a
+                URL bar. Built as page markup instead of a `CardHeader` variant,
+                per the resolution recorded in the design spec. */}
+            <div className="landing-page__audit-header">
+              <div className="landing-page__audit-dots" aria-hidden="true">
+                <span className="landing-page__audit-dot landing-page__audit-dot--critical" />
+                <span className="landing-page__audit-dot landing-page__audit-dot--serious" />
+                <span className="landing-page__audit-dot landing-page__audit-dot--primary" />
               </div>
-              <Badge variant="warning">
-                <TrendingDown size={12} />
-                −20 pts since Jul 21 deploy
-              </Badge>
-              <Badge variant="default">
-                <Mail size={11} />
-                Alert sent
-              </Badge>
+              <span className="landing-page__audit-url">https://ariakit.org</span>
+              <span className="landing-page__audit-meta">audited 4 min ago</span>
             </div>
-          </CardBody>
 
-          <ul className="landing-page__audit-violations">
-            {VIOLATIONS.slice(0, 3).map((v) => (
-              <li key={v.rule} className="landing-page__audit-violation">
-                <ImpactBadge impact={v.impact} />
-                <div className="landing-page__audit-violation-copy">
-                  <p className="landing-page__audit-violation-rule">{v.rule}</p>
-                  <p className="landing-page__audit-violation-desc">{v.desc}</p>
+            <CardBody className="landing-page__audit-summary">
+              <ScoreArc score={71} size={100} />
+
+              <div className="landing-page__audit-signals">
+                <div>
+                  <div className="landing-page__audit-violations-label">Violations</div>
+                  <div className="landing-page__audit-counts">
+                    {VIOLATIONS.map((v) => (
+                      <span
+                        key={v.impact}
+                        className={`landing-page__audit-count landing-page__audit-count--${v.impact}`}
+                      >
+                        {v.count} {v.impact}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <span className="landing-page__audit-violation-count">{v.count}×</span>
-              </li>
-            ))}
-          </ul>
+                <div className="landing-page__audit-trend">
+                  <TrendingDown size={12} />
+                  <span>−20 pts since Jul 21 deploy</span>
+                </div>
+                <div className="landing-page__audit-alert">
+                  <Mail size={11} />
+                  <span>Alert sent</span>
+                </div>
+              </div>
+            </CardBody>
 
-          <div className="landing-page__audit-footer">
-            <Button variant="link" size="sm">
-              View full report
-              <ExternalLink size={10} />
-            </Button>
-          </div>
-        </Card>
+            <ul className="landing-page__audit-violations">
+              {VIOLATIONS.slice(0, 3).map((v) => (
+                <li key={v.rule} className="landing-page__audit-violation">
+                  <ImpactBadge impact={v.impact} />
+                  <div className="landing-page__audit-violation-copy">
+                    <p className="landing-page__audit-violation-rule">{v.rule}</p>
+                    <p className="landing-page__audit-violation-desc">{v.desc}</p>
+                  </div>
+                  <span className="landing-page__audit-violation-count">{v.count}×</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="landing-page__audit-footer">
+              <Button variant="link" size="sm">
+                View full report
+                <ExternalLink size={10} />
+              </Button>
+            </div>
+          </Card>
+        </div>
       </div>
     </Section>
   )

@@ -22,17 +22,23 @@ would otherwise have to remember, or is it a one-off arrangement?
 ### `Stat` has no size axis
 
 `stat.css` reads `--lat-text-numeric-*`, which resolves to 16px
-(`--lat-font-size-base`) at every call site. Both pages needed a large,
-attention-anchoring figure — the documentation site's overview tiles and,
-much more visibly, the landing page's hero audit score (source: a
-colour-coded `ScoreArc` gauge with the number set large inside it). `Stat`
-has no `size` prop, so both pages render every statistic — trust-bar numbers
-and hero score alike — at the same visual weight. The hero card reads
-correctly ("71 / SCORE / out of 100") but does not read as the card's most
-important fact the way the source's oversized, colour-coded gauge did.
+(`--lat-font-size-base`) at every call site. `Stat` has no `size` prop, so
+every statistic that uses it — the documentation site's overview tiles, the
+landing page's trust bar and score-history summary — renders at the same
+visual weight, regardless of how much prominence the surrounding layout
+gives it.
 
-**Admission test:** passes. A caller reaching for a hero statistic has to
-remember to compensate with ad hoc CSS today; a `size` axis (e.g.
+The landing page's hero audit score is no longer one of these call sites:
+its source is a large, colour-coded `ScoreArc` gauge, and rather than
+accept the visual-weight loss of a plain `Stat`, it is built as a
+page-local component (§3 below, "Deliberate omissions" → `ScoreArc`) that
+reproduces the gauge's own sizing rather than reaching for this token. The
+`Stat`-has-no-size-axis gap is unaffected by that choice — it is still real
+for every other statistic on both pages — but the hero score is no longer
+its motivating example.
+
+**Admission test:** passes. A caller reaching for a prominent statistic has
+to remember to compensate with ad hoc CSS today; a `size` axis (e.g.
 `sm | md | lg`, `lg` mapping to the display role's numerals with tabular
 figures) would remove that burden and is a plausible near-term addition.
 
@@ -260,9 +266,17 @@ The landing page's hero audit card centres on a colour-coded circular
 gauge. Design spec §7.3: "It is tabstop product surface, not system
 surface: one consumer, one arrangement, and no guarantee a caller would
 otherwise have to remember. This is the same admission test that kept
-`EmptyState` out." Substituted with `Stat` (§1 above records the resulting
-loss of visual prominence — the direct, expected cost of this exclusion,
-not a surprise).
+`EmptyState` out." It stays out of the component library on that basis —
+but, unlike the Recharts line chart below, it is not down-rendered to a
+lesser library component. Nothing in the library reproduces a colour-coded
+arc gauge, so it is built as `src/pages/score-arc.tsx`: a page-local
+component, imported only by `landing-page.tsx`, that keeps the source's
+exact geometry (the −210°→30° sweep, the `size`-proportional radius and
+stroke) while reading every colour through a token — `currentColor` set by
+a `landing-page__score-arc--{good,warn,bad}` modifier class in
+`pages.css`, never the source's literal hex. This is the pattern the
+architecture note in §7.3 anticipates: excluded from the library, not
+excluded from the page.
 
 ### The Recharts score-history line chart
 
