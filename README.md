@@ -82,6 +82,15 @@ Inside `packages/tokens/`, `config/` declares reviewed token values and contract
 
 Never hand-edit a primitive token, and never hand-edit `dist/`. Change the config and rebuild — a value that is not declared or computed does not ship.
 
+## Fonts
+
+The Meridian identity's two families, Instrument Sans and JetBrains Mono, are
+self-hosted rather than loaded from Google Fonts — see
+[`packages/tokens/assets/fonts/`](./packages/tokens/assets/fonts/), exported
+from `@chameleon-labs/lattice-tokens` at `./fonts/*`. Both are licensed under
+the SIL Open Font License 1.1; the full text and provenance are in
+[`OFL.txt`](./packages/tokens/assets/fonts/OFL.txt).
+
 ## Licence
 
 [MIT](./LICENSE)

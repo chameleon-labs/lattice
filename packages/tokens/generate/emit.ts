@@ -35,6 +35,7 @@ import {
   motionTokens
 } from './motion.js'
 import { formatOklch } from './format.js'
+import { fontFaceCss } from './fonts.js'
 import type { Scale, Swatch } from './scale.js'
 import { accentOnSolid, semanticBlock } from './semantic.js'
 import { buildSeverity } from './severity.js'
@@ -130,6 +131,8 @@ export function emitCss(scales: readonly Scale[]): string {
 /* Layout primitives: ${LAYOUT_PRIMITIVE_COUNTS.space} spacing; ${LAYOUT_PRIMITIVE_COUNTS.breakpoint} breakpoints; ${LAYOUT_PRIMITIVE_COUNTS.container} containers; ${LAYOUT_PRIMITIVE_COUNTS.radius} radii. */
 /* Motion primitives: ${MOTION_PRIMITIVE_COUNTS.duration} durations; ${MOTION_PRIMITIVE_COUNTS.easing} easings. */
 /* Elevation: ${SHADOW_PRIMITIVE_COUNT} shadows; ${ELEVATION_ROLE_COUNT} role tokens per theme. */
+
+${fontFaceCss()}
 
 :root {
 ${typographyCss()}

@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { cp, mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -59,6 +59,9 @@ const tokens = `${JSON.stringify(emitTokens(), null, 2)}\n`
 // a `file:` URL would treat `#` and `?` in any parent directory name as a fragment
 // or query and silently truncate the path — writing lattice.css somewhere else
 // entirely, with no error.
+const fontsSource = fileURLToPath(new URL('../assets/fonts/', import.meta.url))
+await cp(fontsSource, join(dist, 'fonts'), { recursive: true })
+
 await writeFile(join(dist, 'lattice.css'), css, 'utf8')
 await writeFile(join(dist, 'tokens.json'), tokens, 'utf8')
 
