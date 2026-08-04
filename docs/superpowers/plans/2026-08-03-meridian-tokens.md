@@ -1316,7 +1316,7 @@ describe('typography primitives', () => {
     expect(FONT_FAMILIES.mono).toContain("'JetBrains Mono'")
   })
 
-  it('carries Meridian's scale including the 10px micro size', () => {
+  it("carries Meridian's scale including the 10px micro size", () => {
     expect(FONT_SIZES['3xs'].rem).toBe(0.625)
     expect(FONT_SIZES.base.rem).toBe(1)
     expect(FONT_SIZES['5xl'].rem).toBe(3)
@@ -1429,7 +1429,7 @@ describe('typography roles', () => {
     expect(TYPOGRAPHY_ROLES.numeric!.fontVariantNumeric).toBe('tabular-nums')
   })
 
-  it('matches Meridian's specimen for the sans roles', () => {
+  it("matches Meridian's specimen for the sans roles", () => {
     expect(TYPOGRAPHY_ROLES.display!.fontSize).toBe('5xl')
     expect(TYPOGRAPHY_ROLES.display!.fontWeight).toBe('bold')
     expect(TYPOGRAPHY_ROLES.h1!.fontSize).toBe('3xl')
@@ -1832,7 +1832,7 @@ describe('elevation', () => {
     expect(ELEVATION_ROLES.flat).toBe('none')
   })
 
-  it('carries Meridian's 2xl for the floating role', () => {
+  it("carries Meridian's 2xl for the floating role", () => {
     expect(SHADOWS['2xl']).toBe('0 25px 50px -12px rgb(0 0 0 / 0.25)')
   })
 
