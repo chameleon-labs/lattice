@@ -67,3 +67,13 @@
   border-color: var(--lat-focus-ring);
   box-shadow: 0 0 0 1px var(--lat-focus-ring);
 }
+
+/* The sighted half of the copy feedback. The label text stays the same string
+   throughout — swapping it would change the button's accessible name mid-
+   interaction — so the cue is colour alone here, with the live region (kept
+   out of the visual layout by VisuallyHidden) carrying the same fact to
+   assistive technology. */
+.lat-code-block__copy[data-copied] {
+  opacity: 1;
+  color: var(--lat-solid);
+}

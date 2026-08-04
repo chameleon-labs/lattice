@@ -33,6 +33,43 @@ describe('CodeBlock', () => {
     expect(status.textContent ?? '').toMatch(/copied/i)
   })
 
+  it('keeps the live region out of the visual layout', async () => {
+    const user = userEvent.setup()
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    stubClipboard(writeText)
+
+    render(<CodeBlock code="--lat-solid" />)
+    await user.click(screen.getByRole('button', { name: /copy/i }))
+
+    const status = await screen.findByRole('status')
+
+    // VisuallyHidden clips its child to a 1px rect rather than removing it, so
+    // the announcement stays in the accessibility tree without the block of
+    // text it used to render pushing the panel's content down.
+    expect(status.parentElement?.style.getPropertyValue('clip-path')).toBe('inset(50%)')
+    expect(status.parentElement?.style.position).toBe('absolute')
+  })
+
+  it('gives the button a copied state that clears itself, alongside the announcement', async () => {
+    const user = userEvent.setup()
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    stubClipboard(writeText)
+
+    render(<CodeBlock code="--lat-solid" />)
+    const button = screen.getByRole('button', { name: /copy/i })
+
+    expect('copied' in button.dataset).toBe(false)
+
+    await user.click(button)
+
+    await waitFor(() => expect('copied' in button.dataset).toBe(true))
+    // The accessible name is the sighted label held stable — only the data
+    // attribute (and the colour code-block.css keys off it) changes.
+    expect(button.textContent).toBe('Copy code')
+
+    await waitFor(() => expect('copied' in button.dataset).toBe(false), { timeout: 3000 })
+  })
+
   it(
     're-announces a second copy of the same text rather than deduplicating it',
     async () => {
