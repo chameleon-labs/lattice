@@ -20,3 +20,12 @@ test('the light global re-themes the surface', async ({ page }) => {
   expect(Math.abs(g - 240)).toBeLessThanOrEqual(2)
   expect(Math.abs(b - 248)).toBeLessThanOrEqual(2)
 })
+
+test('stat values use tabular figures', async ({ page }) => {
+  await page.goto('/iframe.html?id=pages-landing--dark')
+  const variant = await page
+    .locator('.lat-stat__value')
+    .first()
+    .evaluate((el) => getComputedStyle(el).fontVariantNumeric)
+  expect(variant).toContain('tabular-nums')
+})

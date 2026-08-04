@@ -108,3 +108,89 @@ export function Zap(props: IconProps) {
     </svg>
   )
 }
+
+export function ArrowRight(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </svg>
+  )
+}
+
+export function Globe(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+      <path d="M2 12h20" />
+    </svg>
+  )
+}
+
+export function Mail(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <rect width="20" height="16" x="2" y="4" rx="2" />
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+    </svg>
+  )
+}
+
+export function TrendingDown(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path d="M16 17h6v-6" />
+      <path d="m22 17-8.5-8.5-5 5L2 7" />
+    </svg>
+  )
+}
+
+export function ExternalLink(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path d="M15 3h6v6" />
+      <path d="M10 14 21 3" />
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    </svg>
+  )
+}
+
+export function AlertCircle(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" x2="12" y1="8" y2="12" />
+      <line x1="12" x2="12.01" y1="16" y2="16" />
+    </svg>
+  )
+}
+
+export function AlertTriangle(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+      <path d="M12 9v4" />
+      <path d="M12 17h.01" />
+    </svg>
+  )
+}
+
+export function Info(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 16v-4" />
+      <path d="M12 8h.01" />
+    </svg>
+  )
+}
+
+export function X(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
+  )
+}
