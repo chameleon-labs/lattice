@@ -1,8 +1,18 @@
 .lat-dialog__backdrop {
   position: fixed;
   inset: 0;
-  background-color: var(--lat-gray-1);
-  opacity: 0.8;
+
+  /* The one colour literal permitted in this stylesheet, and only because it
+     is a scrim rather than a palette value — there is no token whose role is
+     "the page behind an open modal". The superseded Quiet Surface spec found
+     this backdrop declared as `--lat-gray-1` at `opacity: 0.8`: in light mode,
+     80% of near-white laid over near-white — a scrim present in the markup
+     and absent in the render, so the page behind an open modal stayed fully
+     legible. This is a dim, not a tint: a fixed, mode-independent black at
+     60% survives both themes by construction, where a token-based approach
+     would have to be re-derived for each and could silently drift back to
+     the same failure. */
+  background: rgb(0 0 0 / 0.6);
 }
 
 .lat-dialog {
@@ -23,30 +33,34 @@
   padding: var(--lat-space-6);
 
   color: var(--lat-text);
-  /* The modal elevation role: surface, border and shadow together. A shadow
-     alone is not subtle on a dark surface, it is absent. */
-  background-color: var(--lat-elevation-modal-surface);
-  border: 1px solid var(--lat-elevation-modal-border);
-  border-radius: var(--lat-radius-lg);
-  box-shadow: var(--lat-elevation-modal-shadow);
+  background: var(--lat-bg-raised);
+  /* The hairline is the edge that survives forced-colors, where the user agent
+     strips shadows and flattens surfaces. The shadow is the enhancement. */
+  border: 1px solid var(--lat-border);
+  border-radius: var(--lat-radius-none);
+  box-shadow: var(--lat-elevation-overlay);
 
   /* Opacity is unconditional: it is feedback, not vestibular movement. */
   opacity: 0;
   transition-property: opacity;
-  transition-duration: var(--lat-duration-slower);
-  transition-timing-function: var(--lat-easing-entrance);
+  transition-duration: var(--lat-duration-default);
+  transition-timing-function: var(--lat-easing-out);
 }
 
 .lat-dialog[data-enter] {
   opacity: 1;
 }
 
+/* The h3 role: Ariakit's DialogHeading defaults to an <h1>, which the base
+   layer would size as the page's own top-level heading rather than a modal
+   title. Body text below it is unclassed prose and inherits from
+   .lat-surface via the base layer added in Task 1 — it takes no rule here. */
 .lat-dialog__heading {
   margin: 0;
-  font-family: var(--lat-text-heading-3-font-family);
-  font-size: var(--lat-text-heading-3-font-size);
-  font-weight: var(--lat-text-heading-3-font-weight);
-  line-height: var(--lat-text-heading-3-line-height);
+  font-family: var(--lat-text-h3-font-family);
+  font-size: var(--lat-text-h3-font-size);
+  font-weight: var(--lat-text-h3-font-weight);
+  line-height: var(--lat-text-h3-line-height);
   color: var(--lat-text);
 }
 

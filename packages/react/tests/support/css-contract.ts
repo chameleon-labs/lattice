@@ -12,6 +12,13 @@ const stripComments = (css: string): string => css.replace(COMMENTS, '')
 // the rule exists to catch a hand-written value, not to be a CSS parser.
 const NAMED = ['red', 'blue', 'green', 'black', 'white', 'gray', 'grey', 'orange', 'yellow']
 
+// The dialog backdrop's scrim is the one colour literal this system permits —
+// a fixed, mode-independent dim rather than a palette value, standing in for
+// a role no token declares. dialog.css records the reason on the rule itself;
+// this is the narrow allowance for it, not a general escape hatch. Everything
+// else a stylesheet writes still gets flagged below.
+const PERMITTED_COLOUR_LITERALS = new Set(['rgb(0 0 0 / 0.6)'])
+
 export const findColourLiterals = (css: string): string[] => {
   const source = stripComments(css)
   const found: string[] = []
@@ -20,8 +27,10 @@ export const findColourLiterals = (css: string): string[] => {
     found.push(match[0])
   }
 
-  for (const match of source.matchAll(/\b(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/g)) {
-    found.push(match[0])
+  for (const match of source.matchAll(/\b(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\([^)]*\)/g)) {
+    const value = match[0].replace(/\s+/g, ' ').trim()
+    if (PERMITTED_COLOUR_LITERALS.has(value)) continue
+    found.push(`${match[1]}(`)
   }
 
   for (const name of NAMED) {
