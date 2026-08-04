@@ -117,6 +117,76 @@ for (const family of families) {
 }
 
 /**
+ * Page-story sweep, separate from the per-family loop above.
+ *
+ * `storyFamilies()` walks directories under `src/` and excludes `pages/` —
+ * a page ships one full document, not a family of component variants, so it
+ * has no place in a sweep keyed to `Components/<Family>` titles (see the
+ * exclusion and its comment in support/stories.ts). That exclusion is
+ * correct, but its consequence was that nothing swept the pages at all: the
+ * acceptance test for the whole identity went unaudited by the very tool
+ * built to audit it.
+ *
+ * So this block is keyed to the index, not the filesystem: it asks
+ * Storybook's own `/index.json` for every entry titled `Pages/*`, the same
+ * way `fetchStories` is already used above, rather than hardcoding story
+ * IDs. The next page to land needs no edit here to be picked up.
+ *
+ * Unlike the family loop, `PAGE_SCOPED_RULES` is **not** disabled. Landmark,
+ * region and heading-order rules are meaningless against a lone component
+ * dropped into an empty iframe — that's exactly why the family sweep turns
+ * them off — but a page is the one place those rules ask a real question:
+ * does it have a `<main>`, a single `<h1>`, a way to bypass repeated
+ * content, and no content stranded outside a landmark? Disabling them here
+ * would leave the acceptance test unable to fail for the reasons a page
+ * actually fails.
+ */
+test.describe('page stories', () => {
+  const pageStories = async (request: import('@playwright/test').APIRequestContext) =>
+    (await fetchStories(request)).filter((story) => story.title.startsWith('Pages/'))
+
+  test('the page-story index is populated', async ({ request }) => {
+    const pages = await pageStories(request)
+
+    // Mirrors "the story index is populated" above: if the index stops
+    // matching `Pages/` — a rename, a moved directory, a title typo — this
+    // fails loudly instead of the loop below silently sweeping zero pages
+    // and reporting green.
+    expect(pages.length).toBeGreaterThan(0)
+  })
+
+  for (const theme of THEMES) {
+    test(`page stories have no axe violations in ${theme}`, async ({ page, request }) => {
+      const pages = await pageStories(request)
+
+      expect(pages.length).toBeGreaterThan(0)
+
+      for (const story of pages) {
+        await test.step(`${story.title} ${story.name}`, async () => {
+          await page.goto(storyUrl(story.id, theme))
+
+          await page.locator('.lat-story').waitFor()
+          await settle(page)
+
+          // No disableRules() call: the full default rule set runs, page
+          // rules included — see the block comment above.
+          const results = await new AxeBuilder({ page }).analyze()
+
+          const summary = results.violations.map((violation) => ({
+            rule: violation.id,
+            impact: violation.impact,
+            help: violation.help,
+            targets: violation.nodes.map((node) => node.target.join(' '))
+          }))
+
+          expect.soft(summary, `${story.id} in ${theme}`).toEqual([])
+        })
+      }
+    })
+  }
+})
+
+/**
  * The shared focus recipe (`outline: none` + a `border-color`/`box-shadow`
  * pair) means "visible ring" is not the same assertion in both modes. Under
  * `forced-colors: none` the box-shadow carries it, since the author's own
