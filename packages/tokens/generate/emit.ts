@@ -16,7 +16,9 @@ import { CHROMATIC_SCALES, GRAY_ROLES } from '../config/anchors.js'
 import { MODES, type Mode } from '../config/modes.js'
 import { ROLE_ALIASES } from '../config/semantic.js'
 import { buildCategorical, buildSequential } from './charts.js'
-import { ORDINAL_CLAMP } from '../config/charts.js'
+import { CHECKS, ORDINAL_CLAMP } from '../config/charts.js'
+import { deltaE } from './cvd.js'
+import { parseHex, srgbToOklch } from './oklch.js'
 import {
   ELEVATION_ROLE_COUNT,
   SHADOW_PRIMITIVE_COUNT,
@@ -33,8 +35,8 @@ import {
   motionCss,
   motionTokens
 } from './motion.js'
-import { resolveAll } from './anchors.js'
-import type { Swatch } from './anchors.js'
+import { resolveAlpha, resolveAll, resolveTints } from './anchors.js'
+import type { AlphaToken, Swatch } from './anchors.js'
 import { formatOklch } from './format.js'
 import { fontFaceCss } from './fonts.js'
 import { semanticBlock } from './semantic.js'
@@ -212,7 +214,13 @@ export interface DesignTokens {
  */
 const PLACES = 6
 
-function colorValue(l: number, c: number, h: number, hex: string): ColorToken['$value'] {
+function colorValue(
+  l: number,
+  c: number,
+  h: number,
+  hex: string,
+  alpha: number = 1
+): ColorToken['$value'] {
   return {
     colorSpace: 'oklch',
     components: [
@@ -220,7 +228,7 @@ function colorValue(l: number, c: number, h: number, hex: string): ColorToken['$
       Number(c.toFixed(PLACES)),
       Number(h.toFixed(PLACES))
     ],
-    alpha: 1,
+    alpha,
     hex
   }
 }
@@ -238,12 +246,65 @@ function token(swatch: Swatch): ColorToken {
 }
 
 /**
+ * Human-readable text for one alpha-tier token, by role name.
+ *
+ * `resolveAlpha`/`resolveTints` name a token by its full CSS suffix
+ * (`border`, `accent-tint`, `danger-tint-border`, …), so the scale — if any —
+ * is recovered from the name rather than passed separately.
+ */
+function alphaDescription(role: string): string {
+  switch (role) {
+    case 'border':
+      return 'Resting hairline edge. Decorative — composites over whatever surface it sits on.'
+    case 'border-strong':
+      return 'Hover hairline edge.'
+    case 'wash':
+      return 'Hover fill wash.'
+    case 'focus-ring':
+      return 'The focus ring, composited from the accent solid at its declared alpha.'
+    default: {
+      const scale = role.replace(/-tint(-border)?$/, '')
+      return role.endsWith('-border')
+        ? `Tint border for the ${scale} scale — the wider fraction of the tinted triple.`
+        : `Tint fill for the ${scale} scale — the first layer of the tinted triple.`
+    }
+  }
+}
+
+/**
+ * A DTCG colour token for one alpha-tier primitive: a hairline, wash, the
+ * focus ring, or a scale's tinted-triple fill/border.
+ *
+ * These are not opaque swatches — the alpha channel carries the fraction, and
+ * `hex` is the *base* colour (white, black, or a scale's solid) before it is
+ * applied. The CSS pairs with these one-to-one: `--lat-${role}` is
+ * `rgb(<channels of hex> / <alpha>)`, exactly what {@link resolveAlpha} and
+ * {@link resolveTints} already compute for the stylesheet.
+ */
+function alphaColorToken(t: AlphaToken): ColorToken {
+  const { l, c, h } = srgbToOklch(parseHex(t.hex))
+  return {
+    $type: 'color',
+    $description: alphaDescription(t.role),
+    // The fraction is copied verbatim from the Figma bundle, same as every
+    // other alpha value in config/alpha.ts — see its module comment.
+    $extensions: extensionsFor('anchored'),
+    $value: colorValue(l, c, c === 0 ? 0 : h, t.hex, t.alpha)
+  }
+}
+
+/**
  * Human-readable group labels. Purely descriptive — nothing downstream parses
  * these — so a scale with no entry here just falls back to its own name.
  */
 const SCALE_DESCRIPTIONS: Partial<Record<string, string>> = {
   gray: 'Grey. Background, surface and text roles.',
-  accent: 'The accent scale: solid fill, the text that sits on it, and the brand vivid.'
+  accent: 'The accent scale: solid fill, the text that sits on it, and the brand vivid.',
+  danger: 'The danger scale: solid fill, plus the tinted triple built from it — the destructive button and error states.',
+  warning: 'The warning scale: solid fill, plus the tinted triple built from it — caution states.',
+  success: 'The success scale: solid fill, plus the tinted triple built from it — confirmation states.',
+  info: 'The info scale: solid fill, plus the tinted triple built from it — informational states.',
+  decorative: 'The decorative scale: solid fill, plus the tinted triple built from it — colour with no semantic meaning.'
 }
 
 /**
@@ -254,6 +315,20 @@ const SCALE_DESCRIPTIONS: Partial<Record<string, string>> = {
 function splitSource(source: string): { readonly scale: string; readonly role: string } {
   const [scale, ...rest] = source.split('-')
   return { scale: scale!, role: rest.join('-') }
+}
+
+/**
+ * Worst adjacent deuteranopia separation in a severity ramp, so the emitted
+ * description states a measured number rather than an assertion. `minor`
+ * carries no colour of its own and is excluded by {@link buildSeverity}
+ * already returning only the coloured levels.
+ */
+function worstAdjacentDeutan(ramp: readonly Swatch[]): number {
+  let worst = Number.POSITIVE_INFINITY
+  for (let i = 1; i < ramp.length; i++) {
+    worst = Math.min(worst, deltaE(parseHex(ramp[i - 1]!.hex), parseHex(ramp[i]!.hex), 'deutan'))
+  }
+  return worst
 }
 
 /**
@@ -303,6 +378,22 @@ export function emitTokens(): DesignTokens {
       ...roles
     }
 
+    // The alpha tier: hairlines, wash, the focus ring, and the tinted triple
+    // per chromatic scale. Emitted here so it reaches tokens.json as well as
+    // the stylesheet — previously it only reached the CSS, which the module
+    // docstring claimed was not the case.
+    const alphaGroup: Record<string, ColorToken> = {}
+    for (const t of [...resolveAlpha(mode), ...resolveTints(mode)]) {
+      alphaGroup[t.role] = alphaColorToken(t)
+    }
+
+    group['alpha'] = {
+      $description:
+        "Alpha-tier primitives. `hex` is the base colour before its alpha is applied; " +
+        'the composited result is what a viewer sees, and is what generate/report.ts measures.',
+      ...alphaGroup
+    }
+
     const categorical: Record<string, ColorToken> = {}
     for (const swatch of buildCategorical(mode)) {
       categorical[String(swatch.slot)] = {
@@ -338,11 +429,14 @@ export function emitTokens(): DesignTokens {
       }
     })
 
+    const worstDeutan = worstAdjacentDeutan(ramp)
     group['severity'] = {
       $description:
         'Ordered impact levels, least to most severe. Colour never carries severity ' +
-        'alone — every mark needs an icon and a label. In dark mode adjacent levels ' +
-        'are indistinguishable under deuteranopia, so this is a rule, not advice.',
+        'alone — every mark needs an icon and a label. Worst adjacent ' +
+        `${mode}-mode deuteranopia separation is ${worstDeutan.toFixed(1)}, ` +
+        `${worstDeutan >= CHECKS.cvdFloor ? 'above' : 'below'} the package's floor of ` +
+        `${CHECKS.cvdFloor} — the icon-and-label rule is mandatory regardless.`,
       ...severity
     }
 
@@ -365,8 +459,9 @@ export function emitTokens(): DesignTokens {
   return {
     $schema: DTCG_SCHEMA,
     $description:
-      'Lattice design tokens. Generated from reviewed config and guarded by ' +
-      'build-time contracts. Do not edit by hand.',
+      'Lattice design tokens. Generated from reviewed config. Colour contrast is ' +
+      'measured and reported at build time, not gated — see the contrast ledger ' +
+      'in generate/report.ts and the design spec, section 9. Do not edit by hand.',
     global: {
       $description:
         'Theme-independent typography, layout, motion and shadow primitives, plus ' +

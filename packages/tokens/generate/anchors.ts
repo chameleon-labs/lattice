@@ -75,6 +75,10 @@ export function resolveAll(mode: Mode): Swatch[] {
 export interface AlphaToken {
   readonly role: string
   readonly value: string
+  /** The base colour before its alpha is applied — white, black, or a scale's solid. */
+  readonly hex: string
+  /** The fraction composited over `hex`, 0..1. */
+  readonly alpha: number
 }
 
 const rgbChannels = (hex: string): string => {
@@ -85,27 +89,41 @@ const rgbChannels = (hex: string): string => {
 const alpha = (channels: string, fraction: number): string =>
   `rgb(${channels} / ${String(fraction)})`
 
+/** `ALPHA_CHANNEL` holds "255 255 255" / "0 0 0" — the only two values it ever takes. */
+const hexFromChannels = (channels: string): string =>
+  channels === ALPHA_CHANNEL.dark ? '#ffffff' : '#000000'
+
 export function resolveAlpha(mode: Mode): AlphaToken[] {
   const channels = ALPHA_CHANNEL[mode]
+  const base = hexFromChannels(channels)
+  const accentSolid = SOLID_ANCHORS.accent[mode]
   return [
-    { role: 'border', value: alpha(channels, HAIRLINE[mode]) },
-    { role: 'border-strong', value: alpha(channels, HAIRLINE_STRONG) },
-    { role: 'wash', value: alpha(channels, WASH) },
+    { role: 'border', value: alpha(channels, HAIRLINE[mode]), hex: base, alpha: HAIRLINE[mode] },
+    {
+      role: 'border-strong',
+      value: alpha(channels, HAIRLINE_STRONG),
+      hex: base,
+      alpha: HAIRLINE_STRONG
+    },
+    { role: 'wash', value: alpha(channels, WASH), hex: base, alpha: WASH },
     {
       role: 'focus-ring',
-      value: alpha(rgbChannels(SOLID_ANCHORS.accent[mode]), FOCUS_RING_ALPHA)
+      value: alpha(rgbChannels(accentSolid), FOCUS_RING_ALPHA),
+      hex: accentSolid,
+      alpha: FOCUS_RING_ALPHA
     }
   ]
 }
 
 export function resolveTints(mode: Mode): AlphaToken[] {
   return CHROMATIC_SCALES.flatMap((scale) => {
-    const channels = rgbChannels(SOLID_ANCHORS[scale][mode])
+    const hex = SOLID_ANCHORS[scale][mode]
+    const channels = rgbChannels(hex)
     const { fill, border } =
       scale === 'accent' ? TINT_FRACTIONS.accent : TINT_FRACTIONS.default
     return [
-      { role: `${scale}-tint`, value: alpha(channels, fill) },
-      { role: `${scale}-tint-border`, value: alpha(channels, border) }
+      { role: `${scale}-tint`, value: alpha(channels, fill), hex, alpha: fill },
+      { role: `${scale}-tint-border`, value: alpha(channels, border), hex, alpha: border }
     ]
   })
 }

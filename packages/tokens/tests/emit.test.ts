@@ -427,7 +427,16 @@ describe('tokens.json', () => {
       expect(token.$type, path).toBe('color')
       expect(token.$value.colorSpace, path).toBe('oklch')
       expect(token.$value.components, path).toHaveLength(3)
-      expect(token.$value.alpha, path).toBe(1)
+      // Every primitive, chart, and severity swatch is opaque. Only the alpha
+      // tier — hairlines, wash, the focus ring, the tinted triple — carries a
+      // fraction less than 1, because that fraction is the whole point of the
+      // token; see the dedicated alpha-tier test below for the exact values.
+      if (path.includes('.alpha.')) {
+        expect(token.$value.alpha, path).toBeGreaterThan(0)
+        expect(token.$value.alpha, path).toBeLessThan(1)
+      } else {
+        expect(token.$value.alpha, path).toBe(1)
+      }
     }
   })
 
@@ -479,11 +488,94 @@ describe('tokens.json', () => {
   })
 
   it('agrees with the CSS on every colour value', () => {
-    for (const { token } of colorLeaves()) {
+    for (const { path, token } of colorLeaves()) {
+      // The alpha tier ships as rgb() with a fractional alpha, never oklch() —
+      // see the dedicated alpha-tier parity test below.
+      if (path.includes('.alpha.')) {
+        continue
+      }
       const [l, c, h] = token.$value.components
 
       expect(css).toContain(`oklch(${trim(l)} ${trim(c)} ${trim(h)})`)
     }
+  })
+
+  // JSON -> CSS for the alpha tier specifically: `resolveAlpha`/`resolveTints`
+  // already compute the exact `rgb(... / fraction)` string the stylesheet
+  // emits, so re-deriving it here (rather than re-parsing the JSON's oklch
+  // components) is what proves the two artefacts agree on the same fraction.
+  it('agrees with the CSS on every alpha-tier colour value', () => {
+    const byPath = new Map(colorLeaves().map((leaf) => [leaf.path, leaf.token]))
+
+    for (const mode of MODES) {
+      for (const t of [...resolveAlpha(mode), ...resolveTints(mode)]) {
+        const path = `${mode}.alpha.${t.role}`
+        const token = byPath.get(path)
+
+        expect(token, path).toBeDefined()
+        expect(token?.$value.alpha, path).toBeCloseTo(t.alpha, 6)
+        expect(token?.$value.hex, path).toBe(t.hex)
+        expect(css, path).toContain(`--lat-${t.role}: ${t.value};`)
+      }
+    }
+  })
+
+  // The reverse direction: walk the emitted CSS and confirm every literal
+  // (non-var()) `--lat-*` colour declaration has a tokens.json counterpart.
+  // The forward-direction tests above (and `carries the verified hex`) only
+  // ever start from the JSON and check the CSS contains a match, which is why
+  // a primitive emitted to CSS but never wired into `emitTokens()` — as the
+  // alpha tier was — could survive unnoticed. This starts from the CSS text
+  // instead.
+  it('walks the CSS and finds a tokens.json counterpart for every literal colour property', () => {
+    const byPath = new Map(leaves().map((leaf) => [leaf.path, leaf.token]))
+
+    // cssName -> jsonPath, built from the same generators the emitter calls,
+    // for every group whose CSS custom property carries a literal value
+    // (oklch() or rgb()) rather than a var() alias.
+    const expected = new Map<string, string>()
+    for (const mode of MODES) {
+      for (const swatch of resolveAll(mode)) {
+        expected.set(`${mode}:${swatch.scale}-${swatch.role}`, `${mode}.${swatch.scale}.${swatch.role}`)
+      }
+      for (const t of [...resolveAlpha(mode), ...resolveTints(mode)]) {
+        expected.set(`${mode}:${t.role}`, `${mode}.alpha.${t.role}`)
+      }
+      for (const swatch of buildCategorical(mode)) {
+        expected.set(`${mode}:chart-${swatch.slot}`, `${mode}.chart.categorical.${swatch.slot}`)
+      }
+      for (const swatch of buildSequential()) {
+        expected.set(`${mode}:chart-sequential-${swatch.step}`, `${mode}.chart.sequential.${swatch.step}`)
+      }
+      for (const swatch of buildSeverity(mode)) {
+        expected.set(`${mode}:severity-${swatch.role}`, `${mode}.severity.${swatch.role}`)
+      }
+    }
+
+    const [, lightBlock, darkBlock] = splitBlocks(css)
+    const blocksByMode: readonly [string, string][] = [
+      ['light', lightBlock],
+      ['dark', darkBlock]
+    ]
+
+    let checked = 0
+    for (const [mode, block] of blocksByMode) {
+      for (const match of block.matchAll(/^\s*--lat-([a-z0-9-]+): ([^;]+);/gm)) {
+        const [, name, value] = match
+        if (value!.startsWith('var(')) {
+          // An alias, not a literal — already covered by `resolves every
+          // alias reference to a token that exists`.
+          continue
+        }
+
+        const jsonPath = expected.get(`${mode}:${name}`)
+        expect(jsonPath, `${mode} --lat-${name} has no tokens.json counterpart`).toBeDefined()
+        expect(byPath.has(jsonPath!), `${jsonPath} missing from tokens.json`).toBe(true)
+        checked++
+      }
+    }
+
+    expect(checked).toBeGreaterThan(0)
   })
 
   // Names must not begin with $, which is reserved for format properties, and
