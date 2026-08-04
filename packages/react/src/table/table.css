@@ -18,21 +18,35 @@
 
 .lat-table__header {
   text-align: start;
-  padding: var(--lat-space-2) var(--lat-space-3);
-  font-family: var(--lat-text-ui-font-family);
-  font-size: var(--lat-text-ui-font-size);
-  font-weight: var(--lat-font-weight-semibold);
-  color: var(--lat-text);
+  padding: var(--lat-space-2) var(--lat-space-4);
+  font-family: var(--lat-text-eyebrow-font-family);
+  font-size: var(--lat-text-eyebrow-font-size);
+  letter-spacing: var(--lat-text-eyebrow-letter-spacing);
+  line-height: var(--lat-text-eyebrow-line-height);
+  text-transform: var(--lat-text-eyebrow-text-transform);
+  /* Normal weight is deliberate: the casing and tracking already carry the
+     emphasis, and bolding on top of both reads as shouting. */
+  font-weight: var(--lat-font-weight-regular);
+  color: var(--lat-text-subtle);
   /* A border rather than a filled header band: it survives forced-colors, where
      a background is flattened to the system canvas. */
   border-block-end: 1px solid var(--lat-border);
 }
 
 .lat-table__cell {
-  padding: var(--lat-space-2) var(--lat-space-3);
-  border-block-end: 1px solid var(--lat-border-subtle);
+  padding: var(--lat-space-3) var(--lat-space-4);
+  font-size: var(--lat-text-small-font-size);
+  color: var(--lat-text);
+  border-block-end: 1px solid var(--lat-border);
 }
 
 .lat-table__row:last-child .lat-table__cell {
   border-block-end: none;
+}
+
+/* Purely a pointer affordance, not a state that carries information — the
+   row's content is fully identifiable without it, so no forced-colors
+   fallback is needed: losing the wash there loses convenience, not meaning. */
+.lat-table__body .lat-table__row:hover {
+  background: var(--lat-wash);
 }
