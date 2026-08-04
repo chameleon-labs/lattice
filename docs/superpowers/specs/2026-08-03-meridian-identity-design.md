@@ -59,6 +59,12 @@ anchors as input instead of a curve alone.
 Every value below is copied verbatim from the bundle's `src/styles/theme.css`.
 These are the anchors; nothing generates them and nothing adjusts them.
 
+\* `--ring` is the one exception, footnoted rather than silently listed as
+verbatim: Meridian *declares* `--ring` at alpha 0.35 (dark) / 0.30 (light) but
+*focuses its own components* with `ring-primary/40`. The row above is what
+`--lat-focus-ring` actually emits — the value components use — not the unused
+declaration. See §9 for the consequence.
+
 | Meridian role | Lattice role | dark | light |
 | --- | --- | --- | --- |
 | `--background` | `--lat-bg` | `#0c0c14` | `#f0f0f8` |
@@ -74,7 +80,7 @@ These are the anchors; nothing generates them and nothing adjusts them.
 | `--input-background` | `--lat-field-bg` | `#1a1a2e` | `#e8e8f2` |
 | `--switch-background` | `--lat-switch-track` | `#2a2a48` | `#c8c8dc` |
 | `--border` | `--lat-border` | `rgb(255 255 255 / 0.07)` | `rgb(0 0 0 / 0.08)` |
-| `--ring` | `--lat-focus-ring` | `rgb(207 242 58 / 0.35)` | `rgb(106 155 0 / 0.3)` |
+| `--ring`* | `--lat-focus-ring` | `rgb(207 242 58 / 0.40)` | `rgb(106 155 0 / 0.40)` |
 | `--chart-2` | `--lat-info-solid` | `#38bdf8` | `#0284c7` |
 | `--chart-5` | `--lat-success-solid` | `#34d399` | `#059669` |
 | `--chart-3` | `--lat-decorative-solid` | `#a78bfa` | `#7c3aed` |
@@ -99,8 +105,8 @@ machinery, not a re-pointing.
 badge, and the impact ramp are all *colour at 10–15% over the surface, with a
 20–25% border and full-strength text*. That triple is the single most repeated
 construction in the bundle. It becomes a documented recipe with tokens per
-scale (`--lat-danger-tint`, `--lat-danger-tint-border`, `--lat-danger-text`)
-rather than a set of one-off alpha values re-typed per component.
+scale (`--lat-danger-tint`, `--lat-danger-tint-border`, `--lat-danger-solid`
+as the text) rather than a set of one-off alpha values re-typed per component.
 
 ### 1.3 What the generator still does
 
@@ -128,9 +134,11 @@ the generator still does:
 
 1. **Converts every anchor to OKLCH** and emits `oklch()`, keeping the bit-depth
    benefit and leaving the wide-gamut path open.
-2. **Derives the tinted triple** per chromatic scale — fill at 10%, border at
-   20%, text at full strength — which is the single most repeated construction
-   in the bundle and the only thing Meridian leaves implicit.
+2. **Derives the tinted triple** per chromatic scale — fill and border, text at
+   full strength. Accent runs richer (fill 15%, border 25%) than the five
+   status scales (fill 10%, border 20%), because chartreuse at 10% over a
+   near-black surface is close to invisible. The single most repeated
+   construction in the bundle, and the only thing Meridian leaves implicit.
 3. **Derives the one missing value**, light-mode `moderate` severity.
 4. **Computes and reports** WCAG and APCA for every documented pair (§9).
 5. **Gamut-checks** every value.
@@ -378,38 +386,59 @@ WCAG 2.x on the delivered values:
 | --- | --- | --- |
 | dark `foreground` on `background` | 15.16 | passes |
 | dark `primary-foreground` on `primary` | 15.22 | passes |
+| dark `primary` as text on `background` | 15.22 | passes |
 | light `foreground` on `background` | 17.18 | passes |
 | light `muted-foreground` on `card` | 6.61 | passes |
+| dark accent text on its 15% tint | 10.21 | passes |
+| dark decorative text on its 10% tint | 5.97 | passes |
 | dark danger text on its 10% tint | 5.23 | passes |
-| dark info text on its 10% tint | 7.46 | passes |
-| dark success text on its 10% tint | 8.27 | passes |
+| dark info text on its 10% tint | 7.45 | passes |
+| dark success text on its 10% tint | 8.25 | passes |
+| dark warning text on its 10% tint | 7.13 | passes |
+| light decorative text on its 10% tint | 4.91 | passes |
 | **light `primary-foreground` (#fff) on `primary` (#6a9b00)** | **3.33** | **fails AA for the button label** |
 | **dark `muted-foreground` on `card`** | **3.67** | **fails AA for body text** |
 | **light `primary` as text on `background`** | **2.94** | **fails AA** |
+| **light accent text on its 15% tint** | **2.84** | **fails AA** |
+| **light danger text on its 10% tint** | **4.49** | **fails AA, by 0.01** |
+| **light warning text on its 10% tint** | **3.15** | **fails AA** |
+| **light success text on its 10% tint** | **3.34** | **fails AA** |
+| **light info text on its 10% tint** | **3.61** | **fails AA** |
 | **light focus ring `primary/40` vs `card`** | **1.55** | **fails SC 1.4.11 (needs 3:1)** |
 | dark focus ring `primary/40` vs `card` | 3.20 | passes SC 1.4.11 |
-| hairline border vs its surface | 1.20 / 1.22 | decorative; see below |
+| hairline border vs its surface | 1.20 / 1.19 | decorative; see below |
 
-**Four failures ship**, not five. *Corrected 2026-08-04, during implementation.*
-An earlier draft of this table listed a fifth — Meridian's declared `--ring` at
-alpha 0.35, measuring 2.73 against the dark card. Lattice does not emit that
-value. Meridian declares `--ring` at 0.35/0.30 but focuses its components with
-`ring-primary/40`, and the token layer emits **the value the components
-actually use**, because a token nobody reaches for guarantees nothing. At 0.40
-the dark ring reaches 3.20 and passes; only the light one fails.
+**Nine failures ship**, not four. *Corrected 2026-08-04, during a second
+implementation pass.* The original count of four covered only the six grey and
+accent pairs `forMode()` measured. It never measured the tinted triple — a
+scale's solid as text on its own tint, composited over `bg-raised` — which is
+what every Badge, the destructive Button and every Callout are built from.
+Measuring it added five more failures: in light mode, every chromatic scale
+except `decorative` misses 4.5:1 on its own tint, `danger` by the narrowest
+possible margin, 4.49 against a minimum of 4.5. Meridian's values did not
+change; what changed is that the ledger now counts what it always should have.
 
-Four is still four more than a system with a hard gate would ship. That is the
+A second, unrelated correction lands in the same pass: the chart palettes were
+being validated against `#fdfdfd` / `#111112` — `gray-1` from the retired
+numbered scale — rather than Meridian's real page background. Against the real
+light background, `#f0f0f8`, the chart sequential ramp's light-end contrast
+check now fails at 1.83:1 (needs 2:1). That failure is reported separately from
+this ledger, in the chart-palette checks the build also prints, because it is a
+category-4 check (contrast against the app surface) rather than a text-contrast
+pair — see `packages/tokens/config/charts.ts`.
+
+Nine is still nine more than a system with a hard gate would ship. That is the
 consequence of the decision in §"The premise", taken knowingly, and the ledger
 exists so it stays visible rather than becoming folklore.
 
 The figures above are the build's own output, not hand arithmetic — reproduce
 them with `pnpm --filter @chameleon-labs/lattice-tokens build`.
 
-Two notes on the last row. The hairline at 1.19 is not itself a violation —
-decorative borders carry no contrast requirement. It matters only for the text
-input, where the border would otherwise be the sole means of identifying the
-control; there the filled `--lat-field-bg` provides identification, so the
-control is distinguishable without relying on its edge.
+Two notes on the last row. The hairline at 1.19 (dark) / 1.20 (light) is not
+itself a violation — decorative borders carry no contrast requirement. It
+matters only for the text input, where the border would otherwise be the sole
+means of identifying the control; there the filled `--lat-field-bg` provides
+identification, so the control is distinguishable without relying on its edge.
 
 The light-mode focus ring is the most serious entry in the table, because a
 focus indicator that cannot be seen is a keyboard user's only means of
