@@ -54,7 +54,7 @@ export { Badge } from './badge/badge.js'
 export type { BadgeOptions, BadgeProps, BadgeTone } from './badge/badge.js'
 
 export { Callout } from './callout/callout.js'
-export type { CalloutOptions, CalloutProps, CalloutTone } from './callout/callout.js'
+export type { CalloutOptions, CalloutProps, CalloutVariant } from './callout/callout.js'
 
 export { Card, CardBody, CardHeader } from './card/card.js'
 export type { CardBodyProps, CardHeaderProps, CardProps } from './card/card.js'
