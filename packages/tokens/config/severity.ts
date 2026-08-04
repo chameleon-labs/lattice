@@ -41,9 +41,23 @@ export const SEVERITY_ANCHORS: Record<Mode, Record<SeverityLevel, string | undef
 /**
  * How far light sits below dark for the same level.
  *
- * Measured from the one pair Meridian declares in both modes: `serious` runs
- * L 0.758 dark and L 0.646 light. Applied to dark `moderate` to place its light
- * counterpart, so the derived value sits where the palette's own arithmetic puts
- * it rather than where it looked right.
+ * Meridian declares two levels in both modes, so this is a choice rather than
+ * the only available measurement:
+ *
+ * | level | dark L | light L | delta |
+ * | --- | --- | --- | --- |
+ * | critical | 0.678 | 0.556 | −0.122 |
+ * | serious | 0.758 | 0.646 | **−0.112** |
+ *
+ * `serious` is the basis because it is `moderate`'s neighbour in both the ramp
+ * and the colour wheel — serious sits at hue 56 and moderate at 84, both warm,
+ * while critical is red at 16. How far a colour can drop in lightness between
+ * modes depends on how much gamut headroom its hue has, so extrapolating from
+ * the nearest hue is the smaller leap. Using critical's −0.122 instead would
+ * put the derived value at L ≈ 0.715.
+ *
+ * Applied to dark `moderate` to place its light counterpart, so the derived
+ * value sits where the palette's own arithmetic puts it rather than where it
+ * looked right.
  */
 export const LIGHT_LIGHTNESS_DELTA = -0.112
