@@ -104,6 +104,7 @@ global.letter-spacing.normal
 global.letter-spacing.tight
 global.letter-spacing.wide
 global.letter-spacing.wider
+global.line-height.compact
 global.line-height.control
 global.line-height.none
 global.line-height.normal
@@ -146,6 +147,7 @@ global.text.h4
 global.text.lead
 global.text.meta
 global.text.numeric
+global.text.segment
 global.text.small
 global.text.tag
 global.text.ui

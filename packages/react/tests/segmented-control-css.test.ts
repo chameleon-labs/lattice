@@ -55,4 +55,22 @@ describe("SegmentedControl's stylesheet", () => {
     // the track, not merely repaint it.
     expect(rule).not.toContain('var(--lat-bg-subtle)')
   })
+
+  // The label is a single-line mono control (Meridian's `font-mono text-xs`,
+  // 12px/16px), not a code block, so it must read `segment` — a dedicated
+  // control role — not `code`, whose prose leading (1.625) is right for a
+  // multi-line block and made this label 1-3px taller than the source. This
+  // is the same category error input-css.test.ts guards for Input's `field`
+  // role, in the control that fix didn't reach. Verified to discriminate:
+  // reverting to `--lat-text-code-*` by hand fails this, restoring it passes.
+  it('sets its label in the mono segment role, not the code role', () => {
+    const rule = block('.lat-segmented-control__label')
+
+    expect(rule).toContain('font-family: var(--lat-text-segment-font-family);')
+    expect(rule).toContain('font-size: var(--lat-text-segment-font-size);')
+    expect(rule).toContain('line-height: var(--lat-text-segment-line-height);')
+    expect(rule).not.toContain('var(--lat-text-code-font-family)')
+    expect(rule).not.toContain('var(--lat-text-code-font-size)')
+    expect(rule).not.toContain('var(--lat-text-code-line-height)')
+  })
 })

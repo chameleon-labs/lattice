@@ -53,7 +53,14 @@ export const TYPOGRAPHY_ROLES = {
   // field reached for `code` — the nearest mono role — and inherited prose
   // leading with it, making every field 1-3px taller than the source design.
   code: { fontFamily: 'mono', fontSize: 'sm', fontWeight: 'regular', letterSpacing: 'normal', lineHeight: 'relaxed', classification: 'code' },
-  field: { fontFamily: 'mono', fontSize: 'sm', fontWeight: 'regular', letterSpacing: 'normal', lineHeight: 'control', classification: 'ui' }
+  field: { fontFamily: 'mono', fontSize: 'sm', fontWeight: 'regular', letterSpacing: 'normal', lineHeight: 'control', classification: 'ui' },
+  // The same category error as `field`, in a control `field`'s fix didn't
+  // reach: SegmentedControl's label is a single-line mono control that also
+  // borrowed `code` wholesale, but at `text-xs` (12px) rather than `field`'s
+  // `text-sm` (14px) — Tailwind pairs every size with its own leading, so
+  // `control`'s 1.4286 is the wrong ratio here too. `compact` is that size's
+  // own pairing.
+  segment: { fontFamily: 'mono', fontSize: 'xs', fontWeight: 'regular', letterSpacing: 'normal', lineHeight: 'compact', classification: 'ui' }
 } as const satisfies Record<string, TypographyRole>
 
 export type TypographyRoleName = keyof typeof TYPOGRAPHY_ROLES

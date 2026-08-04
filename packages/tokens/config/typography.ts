@@ -73,6 +73,29 @@ export const LINE_HEIGHTS = {
    * control in the bundle actually renders at. Prose leading (1.5, 1.625) makes
    * a single-line control 1–3px taller than the design and, because control rows
    * stretch to their tallest item, drags neighbouring controls with it.
+   *
+   * Written as the division, not a decimal literal: the pairing being
+   * reproduced is "20px at 14px", and `20 / 14` says that directly, evaluates
+   * to the closest double (1.4285714285714286), and multiplies back to
+   * exactly 20 at 14px. A hand-truncated `1.428571` does not — it multiplies
+   * back to 19.999994, which is precisely the kind of sub-pixel miss this
+   * token exists to close. Do not "tidy" this into a decimal.
    */
-  control: 1.428571
+  control: 20 / 14,
+  /**
+   * Compact mono controls. Tailwind pairs `text-xs` with its own absolute
+   * 16px line-height — a *different* ratio from `text-sm`'s, 1.3333 at 12px,
+   * because Tailwind pairs every size with its own leading rather than
+   * sharing one across sizes. `caption` (`xs`/`snug`) is the nearest existing
+   * step at 1.25 (15px) and is 1px short of this — close enough to read as a
+   * plausible substitute, which is exactly how the `code`-for-`field`
+   * mistake happened the first time. `SegmentedControl`'s label is the
+   * bundle's one `text-xs` mono control; this is its dedicated pairing.
+   *
+   * Written as the division, not a decimal literal, for the same reason as
+   * `control` above: `16 / 12` reproduces "16px at 12px" exactly; a
+   * hand-truncated `1.333333` multiplies back to 15.999996. Do not "tidy"
+   * this into a decimal.
+   */
+  compact: 16 / 12
 } as const
