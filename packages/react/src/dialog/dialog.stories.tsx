@@ -34,8 +34,8 @@ function Confirmation() {
       <DialogHeading>Remove this page?</DialogHeading>
       <p>This cannot be undone. Its audit history is removed with it.</p>
       <div className="lat-story__row">
-        <DialogDismiss render={<Button tone="neutral" />}>Cancel</DialogDismiss>
-        <DialogDismiss render={<Button variant="solid" tone="danger" />}>Remove</DialogDismiss>
+        <DialogDismiss render={<Button variant="secondary" />}>Cancel</DialogDismiss>
+        <DialogDismiss render={<Button variant="destructive" />}>Remove</DialogDismiss>
       </div>
     </>
   )

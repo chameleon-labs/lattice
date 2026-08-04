@@ -15,7 +15,7 @@ async function channelsOf(page: import('@playwright/test').Page, selector: strin
     const ctx = canvas.getContext('2d')!
     ctx.fillStyle = colour
     ctx.fillRect(0, 0, 1, 1)
-    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data
+    const [r = 0, g = 0, b = 0] = ctx.getImageData(0, 0, 1, 1).data
     return { r, g, b }
   })
 }
