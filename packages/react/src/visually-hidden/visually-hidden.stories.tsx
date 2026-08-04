@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Button } from '../button/button.js'
 import { VisuallyHidden } from './visually-hidden.js'
 
 /**
@@ -37,9 +38,9 @@ export const Default: Story = {
  */
 export const AsAnAccessibleName: Story = {
   render: () => (
-    <button className="lat-button" data-variant="soft" data-size="md" data-tone="accent">
+    <Button variant="ghost" size="md">
       <span aria-hidden="true">×</span>
       <VisuallyHidden>Dismiss this notification</VisuallyHidden>
-    </button>
+    </Button>
   )
 }
