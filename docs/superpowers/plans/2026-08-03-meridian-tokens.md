@@ -2070,6 +2070,56 @@ why the identity leans on the hairline."
 **Interfaces:**
 - Produces: `emitCss(): string`, `emitTokens(): DesignTokens` — both lose their `scales` parameter, matching the call sites Task 5 wrote.
 
+- [ ] **Step 0: Close the four loose ends earlier tasks left**
+
+*Added 2026-08-04. Each was found during an earlier task and deferred here.*
+
+**a. `generate/charts.ts` imports a deleted module.** Task 1 removed
+`generate/solve.ts`, but `charts.ts` still imports `ship` from it, so the build
+cannot run at all. `ship` is four lines and depends only on gamut helpers —
+`fitToGamut`, `oklchToSrgb`, `formatHex` — none of which were retired. Move it
+into `generate/oklch.ts` beside them:
+
+```ts
+/** A requested colour, resolved to what sRGB can actually show. */
+export interface Shipped {
+  readonly oklch: Oklch
+  readonly hex: string
+}
+
+/**
+ * Fits a requested colour into sRGB and reports it alongside the hex it emits.
+ *
+ * Chart palettes are the last thing still generated rather than anchored, so
+ * this is where a requested colour becomes a shippable one. It lived in
+ * `generate/solve.ts` until the contrast solver that surrounded it was retired.
+ */
+export function ship(request: Oklch): Shipped {
+  const fitted = fitToGamut(request)
+
+  return { oklch: fitted, hex: formatHex(oklchToSrgb(fitted)) }
+}
+```
+
+Then repoint `charts.ts`'s import to `./oklch.js`. Do **not** resurrect
+`solveLightness` — that one solved a lightness against a contrast target, and
+there are no contracts left to solve against.
+
+**b. Three test files still import deleted modules** — `tests/schema.test.ts`,
+`tests/emit.test.ts` and `tests/browser/typography-roles.spec.ts`. Repoint or
+retire each assertion as Step 3 describes for `emit.test.ts`; the same rule
+applies to the other two.
+
+**c. A stale comment in `generate/emit.ts`.** The header comment describing
+elevation as "role tokens per theme" is no longer true — Task 10 moved
+elevation to `:root`, emitted once for both modes. Correct it.
+
+**d. A rationale lost from `config/motion.ts`.** Task 9 trimmed a false claim
+about a 400ms ceiling from the file header and took an unrelated, still-true
+sentence with it: that `instant` exists so a state change which must not
+animate can say so with a token rather than by omitting one. Restore that
+sentence.
+
 - [ ] **Step 1: Update `emitCss` and `emitTokens` signatures**
 
 In `generate/emit.ts`:
