@@ -47,3 +47,27 @@
   --_tint-border: var(--lat-warning-tint-border);
   --_text: var(--lat-warning-solid);
 }
+
+/* The severity ramp. Its own tint tokens, not a chromatic scale's — there is
+   no chromatic scale at moderate's hue to borrow. `minor` carries no colour
+   of its own, so it repeats the base rule's neutral triple exactly. */
+.lat-badge[data-variant='critical'] {
+  --_tint: var(--lat-severity-critical-tint);
+  --_tint-border: var(--lat-severity-critical-tint-border);
+  --_text: var(--lat-severity-critical);
+}
+.lat-badge[data-variant='serious'] {
+  --_tint: var(--lat-severity-serious-tint);
+  --_tint-border: var(--lat-severity-serious-tint-border);
+  --_text: var(--lat-severity-serious);
+}
+.lat-badge[data-variant='moderate'] {
+  --_tint: var(--lat-severity-moderate-tint);
+  --_tint-border: var(--lat-severity-moderate-tint-border);
+  --_text: var(--lat-severity-moderate);
+}
+.lat-badge[data-variant='minor'] {
+  --_tint: var(--lat-wash);
+  --_tint-border: var(--lat-border);
+  --_text: var(--lat-text-subtle);
+}

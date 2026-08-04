@@ -16,6 +16,18 @@ describe('Badge', () => {
     }
   })
 
+  // The severity ramp gets its own variants rather than borrowing a
+  // chromatic scale — moderate is amber (hue 84), and the nearest available
+  // scale, info, is blue (hue 232), which would break both the ramp's hue
+  // ordering and the lightness safety net the severity tokens are built on.
+  it('accepts every severity level as its own variant', () => {
+    for (const variant of ['critical', 'serious', 'moderate', 'minor'] as const) {
+      const { unmount } = render(<Badge variant={variant}>x</Badge>)
+      expect(screen.getByText('x').dataset['variant']).toBe(variant)
+      unmount()
+    }
+  })
+
   it('no longer accepts a tone', () => {
     // @ts-expect-error tone was removed with BadgeTone; variant replaces it
     render(<Badge tone="critical">critical</Badge>)

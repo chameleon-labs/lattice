@@ -42,19 +42,21 @@ export const Variants: Story = {
 /**
  * Impact severity, as used by the landing page's `ImpactBadge` (an axe impact
  * string threaded straight into `variant`, plus an icon and a label — not a
- * separate component). Each level maps onto one of the six Meridian variants,
- * from most to least severe: critical -> danger, serious -> warning,
- * moderate -> info, minor -> default.
+ * separate component). `critical` / `serious` / `moderate` / `minor` are
+ * their own variants, not a mapping onto the six chromatic ones above: the
+ * severity ramp has its own tint tokens because there is no chromatic scale
+ * at `moderate`'s hue (84, amber) to borrow — the nearest candidate, `info`,
+ * is blue (hue 232), which would break both the ramp's hue ordering and the
+ * lightness ordering the severity tokens are built on as the safety net for
+ * when hue fails.
  *
  * Colour never carries severity alone: every entry below pairs its tint with
  * both an icon *and* a text label, so the ramp stays legible under
- * protanopia and deuteranopia, where the danger/warning/info hues are the
- * hardest to tell apart by colour.
+ * protanopia and deuteranopia, where these hues are hardest to tell apart.
  */
-const SEVERITY: ReadonlyArray<{ level: string; variant: BadgeVariant; icon: ReactElement }> = [
+const SEVERITY: ReadonlyArray<{ level: BadgeVariant; icon: ReactElement }> = [
   {
     level: 'critical',
-    variant: 'danger',
     icon: (
       <svg
         width="12"
@@ -75,7 +77,6 @@ const SEVERITY: ReadonlyArray<{ level: string; variant: BadgeVariant; icon: Reac
   },
   {
     level: 'serious',
-    variant: 'warning',
     icon: (
       <svg
         width="12"
@@ -96,7 +97,6 @@ const SEVERITY: ReadonlyArray<{ level: string; variant: BadgeVariant; icon: Reac
   },
   {
     level: 'moderate',
-    variant: 'info',
     icon: (
       <svg
         width="12"
@@ -117,7 +117,6 @@ const SEVERITY: ReadonlyArray<{ level: string; variant: BadgeVariant; icon: Reac
   },
   {
     level: 'minor',
-    variant: 'default',
     icon: (
       <svg
         width="12"
@@ -141,8 +140,8 @@ const SEVERITY: ReadonlyArray<{ level: string; variant: BadgeVariant; icon: Reac
 export const Impact: Story = {
   render: (args) => (
     <div className="lat-story__row">
-      {SEVERITY.map(({ level, variant, icon }) => (
-        <Badge {...args} key={level} variant={variant}>
+      {SEVERITY.map(({ level, icon }) => (
+        <Badge {...args} key={level} variant={level}>
           {icon}
           {level}
         </Badge>
