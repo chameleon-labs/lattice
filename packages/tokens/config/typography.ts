@@ -10,7 +10,7 @@
  * every eyebrow, badge and table header in both demo pages.
  */
 
-const SYSTEM_SANS = ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif']
+const SYSTEM_SANS = ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'] as const
 
 export const FONT_FAMILIES = {
   sans: ['Instrument Sans', ...SYSTEM_SANS],
