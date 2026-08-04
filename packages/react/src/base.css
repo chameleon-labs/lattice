@@ -36,6 +36,9 @@
   line-height: var(--lat-text-h2-line-height);
 }
 
+/* h3/h4 intentionally carry no letter-spacing rule, unlike h1/h2 above — this
+   is not an oversight. Meridian tracks only display and the two large
+   headings tight; h3/h4 use the font's own default spacing. */
 .lat-surface :where(h3) {
   font-family: var(--lat-text-h3-font-family);
   font-size: var(--lat-text-h3-font-size);
@@ -54,7 +57,23 @@
  * `:where()` keeps every rule above at zero specificity, so a role class on the
  * same element wins without needing !important and a component stylesheet never
  * has to out-specify the base layer.
+ *
+ * Meridian sizes the interactive elements too, not just headings — 16px at
+ * line-height 1.5, medium for the two that carry a label and normal for the
+ * one that carries user input. Without these an unclassed control falls back
+ * to the browser's own font-size, which on most engines is smaller than the
+ * surrounding prose and reads as a rendering bug rather than a default.
  */
-.lat-surface :where(button, input, select, textarea) {
+.lat-surface :where(label, button) {
   font-family: inherit;
+  font-size: var(--lat-font-size-base);
+  font-weight: var(--lat-font-weight-medium);
+  line-height: var(--lat-line-height-normal);
+}
+
+.lat-surface :where(input, select, textarea) {
+  font-family: inherit;
+  font-size: var(--lat-font-size-base);
+  font-weight: var(--lat-font-weight-regular);
+  line-height: var(--lat-line-height-normal);
 }

@@ -27,6 +27,12 @@ const withTheme: Decorator = (Story, context) => {
   // base.css's own rule — "a consumer who does own the page puts the class on
   // <body>" — and Storybook owns this iframe page outright, so the class and
   // attribute go on <body> as well, not instead of the wrapper.
+  //
+  // Deliberately no cleanup function: this decorator wraps every story, so
+  // the stamp on <body> is meant to be always-on for the lifetime of the
+  // preview iframe, not toggled per mount/unmount. Do not "fix" this into a
+  // mount/unmount pair — the next story's effect just overwrites the
+  // attribute value, which is what we want.
   useLayoutEffect(() => {
     document.body.classList.add('lat-surface')
     document.body.dataset['latTheme'] = theme
