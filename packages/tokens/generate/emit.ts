@@ -56,27 +56,7 @@ import {
  */
 export const DTCG_SCHEMA = 'https://www.designtokens.org/schemas/2025.10/format.json'
 
-/**
- * Decimal places kept in an emitted colour.
- *
- * Not cosmetic. At three places — the precision the spec's own tables print — 21
- * of the 120 generated colours re-emit as a different byte, and at five places two
- * still do: the solved success steps, whose lightness comes off a binary search
- * rather than the curve. Six round-trips all 120 exactly, so the colour a browser
- * computes is the colour whose contrast was verified.
- */
-const PLACES = 6
-
-function trim(value: number): string {
-  // toFixed then back through Number drops trailing zeros, so a hue stays `305`
-  // rather than becoming `305.000000`.
-  return String(Number(value.toFixed(PLACES)))
-}
-
-/** A swatch as a CSS `oklch()` value. */
-export function formatOklch(swatch: Pick<Swatch, 'l' | 'c' | 'h'>): string {
-  return `oklch(${trim(swatch.l)} ${trim(swatch.c)} ${trim(swatch.h)})`
-}
+export { formatOklch } from './format.js'
 
 const customProperty = (scale: Scale, swatch: Swatch): string =>
   `  --lat-${scale.name}-${swatch.step}: ${formatOklch(swatch)};`
