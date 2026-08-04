@@ -12,6 +12,12 @@ dark.alpha.decorative-tint-border
 dark.alpha.focus-ring
 dark.alpha.info-tint
 dark.alpha.info-tint-border
+dark.alpha.severity-critical-tint
+dark.alpha.severity-critical-tint-border
+dark.alpha.severity-moderate-tint
+dark.alpha.severity-moderate-tint-border
+dark.alpha.severity-serious-tint
+dark.alpha.severity-serious-tint-border
 dark.alpha.success-tint
 dark.alpha.success-tint-border
 dark.alpha.warning-tint
@@ -154,6 +160,12 @@ light.alpha.decorative-tint-border
 light.alpha.focus-ring
 light.alpha.info-tint
 light.alpha.info-tint-border
+light.alpha.severity-critical-tint
+light.alpha.severity-critical-tint-border
+light.alpha.severity-moderate-tint
+light.alpha.severity-moderate-tint-border
+light.alpha.severity-serious-tint
+light.alpha.severity-serious-tint-border
 light.alpha.success-tint
 light.alpha.success-tint-border
 light.alpha.warning-tint

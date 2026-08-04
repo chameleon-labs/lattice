@@ -40,7 +40,7 @@ import type { AlphaToken, Swatch } from './anchors.js'
 import { formatOklch } from './format.js'
 import { fontFaceCss } from './fonts.js'
 import { semanticBlock } from './semantic.js'
-import { buildSeverity } from './severity.js'
+import { buildSeverity, resolveSeverityTints } from './severity.js'
 import {
   TYPOGRAPHY_PRIMITIVE_COUNT,
   typographyCss,
@@ -83,7 +83,12 @@ function themedBlock(mode: Mode): string {
   const severity = [
     ...buildSeverity(mode).map((swatch) => `  --lat-severity-${swatch.role}: ${formatOklch(swatch)};`),
     // `minor` has no colour of its own — it borrows the subdued text role.
-    '  --lat-severity-minor: var(--lat-text-subtle);'
+    '  --lat-severity-minor: var(--lat-text-subtle);',
+    ...resolveSeverityTints(mode).map((t) => `  --lat-${t.role}: ${t.value};`),
+    // `minor`'s tint pair borrows the neutral pair rather than computing one,
+    // the same way its solid borrows --lat-text-subtle above.
+    '  --lat-severity-minor-tint: var(--lat-wash);',
+    '  --lat-severity-minor-tint-border: var(--lat-border);'
   ].join('\n')
 
   // The semantic tier goes in every block rather than once on :root. An alias
@@ -378,12 +383,13 @@ export function emitTokens(): DesignTokens {
       ...roles
     }
 
-    // The alpha tier: hairlines, wash, the focus ring, and the tinted triple
-    // per chromatic scale. Emitted here so it reaches tokens.json as well as
-    // the stylesheet — previously it only reached the CSS, which the module
-    // docstring claimed was not the case.
+    // The alpha tier: hairlines, wash, the focus ring, the tinted triple per
+    // chromatic scale, and the severity ramp's own tint/tint-border pair.
+    // Emitted here so it reaches tokens.json as well as the stylesheet —
+    // previously it only reached the CSS, which the module docstring claimed
+    // was not the case.
     const alphaGroup: Record<string, ColorToken> = {}
-    for (const t of [...resolveAlpha(mode), ...resolveTints(mode)]) {
+    for (const t of [...resolveAlpha(mode), ...resolveTints(mode), ...resolveSeverityTints(mode)]) {
       alphaGroup[t.role] = alphaColorToken(t)
     }
 

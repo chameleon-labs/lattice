@@ -81,12 +81,15 @@ export interface AlphaToken {
   readonly alpha: number
 }
 
-const rgbChannels = (hex: string): string => {
+// Exported so generate/severity.ts can build the severity ramp's tint pair
+// with the exact same rgb(R G B / A) mechanics, rather than a second
+// implementation of the same formatting.
+export const rgbChannels = (hex: string): string => {
   const { r, g, b } = parseHex(hex)
   return `${Math.round(r * 255)} ${Math.round(g * 255)} ${Math.round(b * 255)}`
 }
 
-const alpha = (channels: string, fraction: number): string =>
+export const alpha = (channels: string, fraction: number): string =>
   `rgb(${channels} / ${String(fraction)})`
 
 /** `ALPHA_CHANNEL` holds "255 255 255" / "0 0 0" — the only two values it ever takes. */

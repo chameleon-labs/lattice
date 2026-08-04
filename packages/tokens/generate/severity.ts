@@ -1,11 +1,12 @@
 import type { Mode } from '../config/modes.js'
+import { TINT_FRACTIONS } from '../config/alpha.js'
 import {
   LIGHT_LIGHTNESS_DELTA,
   SEVERITY_ANCHORS,
   SEVERITY_LEVELS,
   type SeverityLevel
 } from '../config/severity.js'
-import type { Swatch } from './anchors.js'
+import { alpha, rgbChannels, type AlphaToken, type Swatch } from './anchors.js'
 import { fitToGamut, formatHex, oklchToSrgb, parseHex, srgbToOklch } from './oklch.js'
 
 /**
@@ -43,5 +44,37 @@ export function buildSeverity(mode: Mode): Swatch[] {
 
     const { l, c, h } = srgbToOklch(parseHex(hex))
     return { scale: 'severity', role: level, mode, hex, l, c, h, origin: 'anchored' as const }
+  })
+}
+
+/**
+ * The severity ramp's tinted triple, third leg: `--lat-severity-{level}-tint`
+ * and `-tint-border`, at the same fractions the status scales use
+ * (`TINT_FRACTIONS.default` — fill 0.1, border 0.2), built from each level's
+ * own resolved swatch exactly the way {@link resolveTints} in anchors.ts
+ * builds a chromatic scale's tint pair.
+ *
+ * `minor` has no swatch of its own (see {@link COLOURED}) and is not covered
+ * here — the emitter aliases its tint pair straight to `--lat-wash` /
+ * `--lat-border`, the neutral pair, rather than computing one.
+ */
+export function resolveSeverityTints(mode: Mode): AlphaToken[] {
+  return buildSeverity(mode).flatMap((swatch) => {
+    const channels = rgbChannels(swatch.hex)
+    const { fill, border } = TINT_FRACTIONS.default
+    return [
+      {
+        role: `severity-${swatch.role}-tint`,
+        value: alpha(channels, fill),
+        hex: swatch.hex,
+        alpha: fill
+      },
+      {
+        role: `severity-${swatch.role}-tint-border`,
+        value: alpha(channels, border),
+        hex: swatch.hex,
+        alpha: border
+      }
+    ]
   })
 }

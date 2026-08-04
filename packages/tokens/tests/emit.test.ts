@@ -23,7 +23,7 @@ import {
 } from '../generate/layout.js'
 import { formatHex, oklchToSrgb } from '../generate/oklch.js'
 import { MOTION_PRIMITIVE_COUNT, MOTION_PRIMITIVE_COUNTS, motionCss } from '../generate/motion.js'
-import { buildSeverity } from '../generate/severity.js'
+import { buildSeverity, resolveSeverityTints } from '../generate/severity.js'
 import { TYPOGRAPHY_PRIMITIVE_COUNT, typographyCss } from '../generate/typography.js'
 import {
   TYPOGRAPHY_RESPONSIVE_OVERRIDE_COUNT,
@@ -38,9 +38,11 @@ const tokens = emitTokens()
 
 // Declarations inside one themed block: the resolved primitives, the alpha
 // tier and the tints, the role aliases, both chart palettes, the severity
-// ramp and the `minor` alias that borrows text-subtle. Derived from the same
-// generators the emitter calls, so this moves correctly when config moves
-// rather than hardcoding a count that would silently go stale.
+// ramp, the `minor` alias that borrows text-subtle, the severity ramp's own
+// tint/tint-border pair, and `minor`'s tint pair that borrows the neutral
+// wash/border aliases. Derived from the same generators the emitter calls, so
+// this moves correctly when config moves rather than hardcoding a count that
+// would silently go stale.
 const PER_BLOCK =
   resolveAll('light').length +
   resolveAlpha('light').length +
@@ -49,7 +51,9 @@ const PER_BLOCK =
   buildCategorical('light').length +
   buildSequential().length +
   buildSeverity('light').length +
-  1
+  1 +
+  resolveSeverityTints('light').length +
+  2
 // Light once, dark twice — see the block test below.
 const BLOCKS = 3
 // Counted from the actual generated CSS rather than
@@ -538,7 +542,7 @@ describe('tokens.json', () => {
       for (const swatch of resolveAll(mode)) {
         expected.set(`${mode}:${swatch.scale}-${swatch.role}`, `${mode}.${swatch.scale}.${swatch.role}`)
       }
-      for (const t of [...resolveAlpha(mode), ...resolveTints(mode)]) {
+      for (const t of [...resolveAlpha(mode), ...resolveTints(mode), ...resolveSeverityTints(mode)]) {
         expected.set(`${mode}:${t.role}`, `${mode}.alpha.${t.role}`)
       }
       for (const swatch of buildCategorical(mode)) {

@@ -202,6 +202,14 @@
   --lat-severity-serious: oklch(0.646072 0.194327 41.115779);
   --lat-severity-moderate: oklch(0.724861 0.148676 84.428628);
   --lat-severity-minor: var(--lat-text-subtle);
+  --lat-severity-critical-tint: rgb(212 18 64 / 0.1);
+  --lat-severity-critical-tint-border: rgb(212 18 64 / 0.2);
+  --lat-severity-serious-tint: rgb(234 88 12 / 0.1);
+  --lat-severity-serious-tint-border: rgb(234 88 12 / 0.2);
+  --lat-severity-moderate-tint: rgb(209 157 0 / 0.1);
+  --lat-severity-moderate-tint-border: rgb(209 157 0 / 0.2);
+  --lat-severity-minor-tint: var(--lat-wash);
+  --lat-severity-minor-tint-border: var(--lat-border);
 
   --lat-gray-bg: oklch(0.957435 0.010661 286.196641);
   --lat-gray-bg-raised: oklch(1 0 89.875563);
@@ -271,6 +279,14 @@
   --lat-severity-serious: oklch(0.75764 0.159037 55.934415);
   --lat-severity-moderate: oklch(0.836861 0.164422 84.428628);
   --lat-severity-minor: var(--lat-text-subtle);
+  --lat-severity-critical-tint: rgb(255 77 106 / 0.1);
+  --lat-severity-critical-tint-border: rgb(255 77 106 / 0.2);
+  --lat-severity-serious-tint: rgb(251 146 60 / 0.1);
+  --lat-severity-serious-tint-border: rgb(251 146 60 / 0.2);
+  --lat-severity-moderate-tint: rgb(251 191 36 / 0.1);
+  --lat-severity-moderate-tint-border: rgb(251 191 36 / 0.2);
+  --lat-severity-minor-tint: var(--lat-wash);
+  --lat-severity-minor-tint-border: var(--lat-border);
 
   --lat-gray-bg: oklch(0.15857 0.016889 284.309748);
   --lat-gray-bg-raised: oklch(0.185982 0.030356 283.049124);
@@ -344,6 +360,14 @@
     --lat-severity-serious: oklch(0.75764 0.159037 55.934415);
     --lat-severity-moderate: oklch(0.836861 0.164422 84.428628);
     --lat-severity-minor: var(--lat-text-subtle);
+    --lat-severity-critical-tint: rgb(255 77 106 / 0.1);
+    --lat-severity-critical-tint-border: rgb(255 77 106 / 0.2);
+    --lat-severity-serious-tint: rgb(251 146 60 / 0.1);
+    --lat-severity-serious-tint-border: rgb(251 146 60 / 0.2);
+    --lat-severity-moderate-tint: rgb(251 191 36 / 0.1);
+    --lat-severity-moderate-tint-border: rgb(251 191 36 / 0.2);
+    --lat-severity-minor-tint: var(--lat-wash);
+    --lat-severity-minor-tint-border: var(--lat-border);
 
     --lat-gray-bg: oklch(0.15857 0.016889 284.309748);
     --lat-gray-bg-raised: oklch(0.185982 0.030356 283.049124);
