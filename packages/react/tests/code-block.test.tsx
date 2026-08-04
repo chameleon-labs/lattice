@@ -70,6 +70,27 @@ describe('CodeBlock', () => {
     await waitFor(() => expect('copied' in button.dataset).toBe(false), { timeout: 3000 })
   })
 
+  it('makes the scrollable code region reachable and nameable by keyboard', () => {
+    render(<CodeBlock code="--lat-solid" />)
+
+    // `region` + the label is what a screen-reader user hears on landing here;
+    // `tabIndex` is what gets a keyboard-only user here in the first place —
+    // `overflow-x: auto` (code-block.css) is otherwise reachable only by mouse
+    // drag or by a screen reader's virtual cursor, not by Tab.
+    const region = screen.getByRole('region', { name: 'Code sample' })
+    expect(region.tagName).toBe('PRE')
+    expect(region.tabIndex).toBe(0)
+  })
+
+  it('forwards a className onto the root element', () => {
+    render(<CodeBlock code="--lat-solid" className="custom" />)
+
+    // Same contract as Card/Stat: a consumer's class joins the component's
+    // own, it does not replace it.
+    const root = screen.getByRole('region', { name: 'Code sample' }).parentElement
+    expect(root?.className.split(' ')).toEqual(expect.arrayContaining(['lat-code-block', 'custom']))
+  })
+
   it(
     're-announces a second copy of the same text rather than deduplicating it',
     async () => {

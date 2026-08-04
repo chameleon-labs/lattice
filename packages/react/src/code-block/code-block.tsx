@@ -1,11 +1,21 @@
+import type { HTMLAttributes } from 'react'
 import { useState } from 'react'
 import { LiveRegion } from '../live-region/live-region.js'
 import { VisuallyHidden } from '../visually-hidden/visually-hidden.js'
 
-export interface CodeBlockProps {
+export interface CodeBlockProps extends HTMLAttributes<HTMLDivElement> {
   code: string
   /** Accessible name for the copy control. */
   copyLabel?: string
+  /**
+   * Accessible name for the scrollable code region itself (the `<pre>`,
+   * exposed as `role="region"` — see below). Defaults to a generic label
+   * that is fine for a page with one `CodeBlock`; a page with more than one
+   * must give each a distinct value, since `landmark-unique` (part of the
+   * default axe rule set) fails a document where two regions share both a
+   * role and a name.
+   */
+  regionLabel?: string
 }
 
 /**
@@ -23,7 +33,13 @@ export interface CodeBlockProps {
  * accessible name mid-interaction — the sighted cue instead colours the
  * existing label via `data-copied`, which `code-block.css` keys on.
  */
-export function CodeBlock({ code, copyLabel = 'Copy code' }: CodeBlockProps) {
+export function CodeBlock({
+  code,
+  copyLabel = 'Copy code',
+  regionLabel = 'Code sample',
+  className,
+  ...props
+}: CodeBlockProps) {
   const [message, setMessage] = useState('')
 
   const copy = async () => {
@@ -36,8 +52,17 @@ export function CodeBlock({ code, copyLabel = 'Copy code' }: CodeBlockProps) {
   }
 
   return (
-    <div className="lat-code-block">
-      <pre className="lat-code-block__pre">{code}</pre>
+    <div
+      {...props}
+      className={className === undefined ? 'lat-code-block' : `lat-code-block ${className}`}
+    >
+      {/* `overflow-x: auto` (code-block.css) makes this scrollable whenever a
+          line overruns the block — reachable by mouse drag and, since the
+          content is real text, by a screen reader, but with nothing to give
+          it a tab stop a keyboard-only user could reach. `tabIndex={0}` puts
+          it in the tab order; `role="region"` + `aria-label` gives it a name
+          once focused, since a bare `<pre>` announces none. */}
+      <pre className="lat-code-block__pre" tabIndex={0} role="region" aria-label={regionLabel}>{code}</pre>
       <button
         type="button"
         className="lat-code-block__copy"
