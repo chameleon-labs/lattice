@@ -1528,7 +1528,13 @@ describe('typography roles', () => {
   })
 
   it('carries the eyebrow tracking through to the emitted role', () => {
-    expect(typographyRoleCss()).toContain('--lat-text-eyebrow-letter-spacing: 0.2em;')
+    // A role alias points at the primitive; it does not inline its value. The
+    // literal `0.2em` belongs to typographyCss()'s primitive tier and is
+    // asserted there. Checking for it here would assert against the two-tier
+    // structure rather than for it.
+    expect(typographyRoleCss()).toContain(
+      '--lat-text-eyebrow-letter-spacing: var(--lat-letter-spacing-eyebrow);'
+    )
   })
 })
 ```
