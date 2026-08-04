@@ -14,7 +14,10 @@ export type SwitchProps = CheckboxProps
  * The visible state signal is the thumb's **position**, set with a static
  * transform so it survives `prefers-reduced-motion: reduce`. Only the movement
  * between positions is gated. A switch whose state read as a colour change
- * alone would fail this system's own premise.
+ * alone would fail this system's own premise — and conversely, a position that
+ * moves but cannot be seen is no signal either: under forced-colors the thumb
+ * and both track states rendered identically until switch.css added an
+ * explicit repaint, because a moving-but-invisible thumb is not a visible cue.
  */
 export function Switch({ className, ...props }: SwitchProps) {
   return (

@@ -94,3 +94,15 @@
   border-color: var(--lat-focus-ring);
   box-shadow: 0 0 0 1px var(--lat-focus-ring);
 }
+
+/* The shared focus recipe above relies on two properties forced-colors
+   removes: box-shadow is forced to `none`, and border-color resolves to the
+   same system value the resting border already uses, so neither carries any
+   signal. `outline: none` is honoured rather than overridden, so nothing
+   falls back on its own — the ring must be restated explicitly here. */
+@media (forced-colors: active) {
+  .lat-button:focus-visible {
+    outline: 2px solid CanvasText;
+    outline-offset: 2px;
+  }
+}

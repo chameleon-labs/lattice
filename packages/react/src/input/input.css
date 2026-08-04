@@ -27,6 +27,18 @@
   box-shadow: 0 0 0 1px var(--lat-focus-ring);
 }
 
+/* The shared focus recipe above relies on two properties forced-colors
+   removes: box-shadow is forced to `none`, and border-color resolves to the
+   same system value the resting border already uses, so neither carries any
+   signal. `outline: none` is honoured rather than overridden, so nothing
+   falls back on its own — the ring must be restated explicitly here. */
+@media (forced-colors: active) {
+  .lat-input:focus-visible {
+    outline: 2px solid CanvasText;
+    outline-offset: 2px;
+  }
+}
+
 .lat-input:disabled {
   color: var(--lat-text-subtle);
   cursor: not-allowed;
@@ -39,8 +51,12 @@
  * that only added a shadow would vanish under forced-colors, where the UA
  * strips shadows.
  *
- * Colour is not the only cue: TextField renders its error message in the meta
- * role beneath the control, and the two work together. This is the visual half.
+ * That border colour is itself forced under forced-colors, though, exactly as
+ * the background is — verified identical for valid and invalid fields there.
+ * So the visual cue does not actually survive on its own; the block below
+ * restates it explicitly. Colour is not the only cue in either mode: TextField
+ * renders its error message in the meta role beneath the control, and the two
+ * work together.
  */
 .lat-input[aria-invalid='true'] {
   border-color: var(--lat-danger-solid);
@@ -49,4 +65,11 @@
 .lat-input[aria-invalid='true']:focus-visible {
   border-color: var(--lat-danger-solid);
   box-shadow: 0 0 0 1px var(--lat-danger-solid);
+}
+
+@media (forced-colors: active) {
+  .lat-input[aria-invalid='true'] {
+    border-color: Highlight;
+    forced-color-adjust: none;
+  }
 }

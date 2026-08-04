@@ -116,8 +116,23 @@ for (const family of families) {
   })
 }
 
-test('keyboard focus produces a visible ring', async ({ page }) => {
-  await page.goto(storyUrl('components-button--default', 'light'))
+/**
+ * The shared focus recipe (`outline: none` + a `border-color`/`box-shadow`
+ * pair) means "visible ring" is not the same assertion in both modes. Under
+ * `forced-colors: none` the box-shadow carries it, since the author's own
+ * `outline: none` is honoured. Under `forced-colors: active` box-shadow is
+ * forced to `none` and border-color is forced to the same system value the
+ * resting border already uses, so the ring has to be restated as an explicit
+ * `outline` inside a `@media (forced-colors: active)` block — see button.css
+ * — and that outline is what must be checked there instead.
+ *
+ * This assertion used to check only `outlineStyle !== 'none'`,
+ * unconditionally — a contract Phase 2 inverted (the ring became a
+ * box-shadow with `outline: none`) without updating the test, which is why
+ * `pnpm test` was red. It never ran under forced-colors at all, so it also
+ * caught nothing of C1.
+ */
+async function focusRing(page: import('@playwright/test').Page) {
   await page.locator('.lat-button').waitFor()
 
   // Drive focus purely by keyboard. A programmatic .focus() does not set the
@@ -125,7 +140,7 @@ test('keyboard focus produces a visible ring', async ({ page }) => {
   // measuring the wrong thing — and would keep passing if the ring were removed.
   await page.keyboard.press('Tab')
 
-  const focused = await page.evaluate(() => {
+  return page.evaluate(() => {
     const el = document.activeElement
     if (el === null) return null
     const style = getComputedStyle(el)
@@ -133,9 +148,28 @@ test('keyboard focus produces a visible ring', async ({ page }) => {
       className: el.className,
       matchesFocusVisible: el.matches(':focus-visible'),
       outlineStyle: style.outlineStyle,
-      outlineWidth: style.outlineWidth
+      outlineWidth: style.outlineWidth,
+      boxShadow: style.boxShadow
     }
   })
+}
+
+test('keyboard focus produces a visible ring', async ({ page }) => {
+  await page.goto(storyUrl('components-button--default', 'light'))
+
+  const focused = await focusRing(page)
+
+  expect(focused).not.toBeNull()
+  expect(focused?.className).toContain('lat-button')
+  expect(focused?.matchesFocusVisible).toBe(true)
+  expect(focused?.boxShadow).not.toBe('none')
+})
+
+test('keyboard focus produces a visible ring under forced-colors', async ({ page }) => {
+  await page.emulateMedia({ forcedColors: 'active' })
+  await page.goto(storyUrl('components-button--default', 'light'))
+
+  const focused = await focusRing(page)
 
   expect(focused).not.toBeNull()
   expect(focused?.className).toContain('lat-button')
@@ -229,4 +263,36 @@ test('borders survive forced-colors', async ({ page }) => {
     .evaluate((el) => getComputedStyle(el).borderTopWidth)
 
   expect(parseFloat(width)).toBeGreaterThan(0)
+})
+
+// The counterpart to "the switch thumb still moves between states" above: the
+// position surviving is not enough if the thing that moves is invisible.
+// Before switch.css's forced-colors block, the track computed the same
+// rgba(0,0,0,0) in both states and the thumb computed white-on-white Canvas
+// with its box-shadow stripped — on and off were pixel-identical.
+test('the switch off and on states are visually distinct under forced-colors', async ({
+  page
+}) => {
+  await page.emulateMedia({ forcedColors: 'active' })
+
+  const state = async (id: string) => {
+    await page.goto(storyUrl(id, 'light'))
+    await page.locator('.lat-switch').waitFor()
+    return page.locator('.lat-switch').evaluate((el) => ({
+      trackBackground: getComputedStyle(el).backgroundColor,
+      thumbBackground: getComputedStyle(el, '::before').backgroundColor
+    }))
+  }
+
+  const off = await state('components-switch--off')
+  const on = await state('components-switch--on')
+
+  // The thumb itself must be visible against the track in both states —
+  // Canvas is the only colour it could otherwise collapse into.
+  expect(off.thumbBackground).not.toBe('rgba(0, 0, 0, 0)')
+  expect(on.thumbBackground).not.toBe('rgba(0, 0, 0, 0)')
+
+  // And the two states must be distinguishable from each other, not merely
+  // each individually visible.
+  expect(off.trackBackground).not.toBe(on.trackBackground)
 })

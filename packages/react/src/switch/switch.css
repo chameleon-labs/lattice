@@ -52,7 +52,7 @@
 }
 
 .lat-switch:disabled {
-  background-color: var(--lat-gray-component);
+  background-color: var(--lat-component);
   border-color: var(--lat-border);
   cursor: not-allowed;
 }
@@ -62,5 +62,32 @@
     transition-property: transform;
     transition-duration: var(--lat-duration-swift);
     transition-timing-function: var(--lat-easing-out);
+  }
+}
+
+/*
+ * Two failures stack here under forced-colors. First, the focus recipe shared
+ * with Button/Input/CodeBlock relies on box-shadow and border-color, both
+ * neutralised the same way — see button.css. Second, and specific to Switch:
+ * the checked/unchecked signal is the track's background (forced to
+ * `transparent` in both states, so on and off render identically) plus the
+ * thumb's background-and-shadow (no border), which computes to white-on-white
+ * Canvas with the shadow stripped. The positional cue survives, but the thing
+ * that moves is invisible, so both track and thumb need an explicit repaint.
+ */
+@media (forced-colors: active) {
+  .lat-switch:focus-visible {
+    outline: 2px solid CanvasText;
+    outline-offset: 2px;
+  }
+
+  .lat-switch::before {
+    background-color: CanvasText;
+    forced-color-adjust: none;
+  }
+
+  .lat-switch[aria-checked='true'] {
+    background-color: Highlight;
+    forced-color-adjust: none;
   }
 }
