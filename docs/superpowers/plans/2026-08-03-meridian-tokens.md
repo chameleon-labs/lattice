@@ -1629,24 +1629,40 @@ uppercase 10px/0.2em eyebrow that every panel header in both demos uses."
 
 Both are SIL Open Font License 1.1.
 
+Both URLs serve **TrueType**, so download to `.ttf` and convert. Downloading
+straight to a `.woff2` filename would leave TTF bytes behind a woff2 extension
+and every browser would reject the face.
+
 ```bash
 cd packages/tokens && mkdir -p assets/fonts && cd assets/fonts
-curl -fsSL -o InstrumentSans-Variable.woff2 \
+
+curl -fsSL --max-time 90 -o InstrumentSans-Variable.ttf \
   "https://github.com/google/fonts/raw/main/ofl/instrumentsans/InstrumentSans%5Bwdth%2Cwght%5D.ttf"
-curl -fsSL -o JetBrainsMono-Variable.woff2 \
+curl -fsSL --max-time 90 -o JetBrainsMono-Variable.ttf \
   "https://github.com/JetBrains/JetBrainsMono/raw/master/fonts/variable/JetBrainsMono%5Bwght%5D.ttf"
+
+npx --yes ttf2woff2 < InstrumentSans-Variable.ttf > InstrumentSans-Variable.woff2
+npx --yes ttf2woff2 < JetBrainsMono-Variable.ttf > JetBrainsMono-Variable.woff2
+rm -f ./*.ttf
 ls -la
 ```
 
-These URLs serve `.ttf`. Convert both to woff2 before use:
+Verified working: the sources are 194,336 and 300,144 bytes of TrueType, and
+Instrument Sans converts to roughly 90KB of woff2. `file` reports a `wdth`
+axis on Instrument Sans and a `wght` axis on both, which is what the
+`font-stretch` and `font-weight` ranges in Step 3 describe.
+
+Sanity-check the result before continuing — a zero-byte or TTF-sized `.woff2`
+means the conversion silently failed:
 
 ```bash
-npx --yes ttf2woff2 < InstrumentSans-Variable.ttf > InstrumentSans-Variable.woff2
-npx --yes ttf2woff2 < JetBrainsMono-Variable.ttf > JetBrainsMono-Variable.woff2
-rm -f *.ttf
+ls -l ./*.woff2 && file ./*.woff2
 ```
 
-If the network is unavailable, stop and report — do not substitute a different family or fall back to the CDN.
+Each should report "Web Open Font Format (Version 2)".
+
+If the network is unavailable, stop and report — do not substitute a different
+family, do not fall back to the CDN, and do not commit a placeholder file.
 
 - [ ] **Step 2: Record the licence**
 
