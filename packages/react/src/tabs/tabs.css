@@ -48,6 +48,18 @@
   box-shadow: 0 0 0 1px var(--lat-focus-ring);
 }
 
+/* Both spellings, deliberately — see button.css. A disabled tab stays in the
+   roving-focus order (Ariakit keeps it reachable so assistive technology can
+   land on it and hear why it is unavailable), which is why it carries
+   aria-disabled rather than the native attribute; :disabled is kept too in
+   case a consumer renders a native control through `render`. */
+.lat-tab:disabled,
+.lat-tab[aria-disabled='true'] {
+  color: var(--lat-text-subtle);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .lat-tab-panel {
   padding: var(--lat-space-3);
   color: var(--lat-text);

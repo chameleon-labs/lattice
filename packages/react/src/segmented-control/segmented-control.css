@@ -56,11 +56,21 @@
   outline-offset: 1px;
 }
 
+/* Both spellings, deliberately — see button.css. The input carries the
+   disabled state; the label carries the appearance, exactly as it carries
+   the checked appearance above. */
+.lat-segmented-control__input:disabled + .lat-segmented-control__label,
+.lat-segmented-control__input[aria-disabled='true'] + .lat-segmented-control__label {
+  color: var(--lat-text-subtle);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 /*
  * Forced-colors strips box-shadow and overrides background, which between them
- * are the entire selected state above. Nothing here moves, so unlike Switch
- * there is no positional cue to fall back on — without this block every
- * segment renders identically and the control has no visible selection.
+ * are the entire selected state above. Nothing here moves, so there is no
+ * positional cue to fall back on — without this block every segment renders
+ * identically and the control has no visible selection.
  *
  * Highlight/HighlightText are the system pair for exactly this: a selected
  * item within a set. They are the colours the user's own high-contrast theme

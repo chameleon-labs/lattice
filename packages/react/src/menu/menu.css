@@ -52,6 +52,15 @@
   background: var(--lat-wash);
 }
 
+/* Both spellings, deliberately — see button.css. A disabled item stays in the
+   roving-focus order for the same reason a disabled Tab does. */
+.lat-menu__item:disabled,
+.lat-menu__item[aria-disabled='true'] {
+  color: var(--lat-text-subtle);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .lat-menu__separator {
   margin: var(--lat-space-1) 0;
   border: none;
