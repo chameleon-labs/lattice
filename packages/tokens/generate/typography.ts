@@ -90,10 +90,15 @@ export function typographyTokens(): TypographyTokenGroups {
       { $type: 'number', $value: value } satisfies NumberToken
     ])
   )
+  // The published DTCG dimension schema's `unit` enum is `px` | `rem` only —
+  // `em` is not a legal value, even though it is exactly right for CSS
+  // letter-spacing and is what `typographyCss()` emits below. `rem` carries the
+  // same number under the unit DTCG actually accepts; a consumer reading the
+  // JSON directly needs to know it means em, same as the CSS does.
   const letterSpacing = Object.fromEntries(
     Object.entries(LETTER_SPACINGS).map(([name, value]) => [
       name,
-      { $type: 'dimension', $value: { value, unit: 'em' } } satisfies DimensionToken
+      { $type: 'dimension', $value: { value, unit: 'rem' } } satisfies DimensionToken
     ])
   )
   const fontWeight = Object.fromEntries(

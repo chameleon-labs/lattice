@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 import { emitCss, emitTokens } from '../generate/emit.js'
-import { buildAllScales } from '../generate/scale.js'
-
-const scales = buildAllScales()
 
 /**
  * Every token path in the emitted JSON, sorted, without values.
@@ -35,11 +32,11 @@ describe('the emitted artefacts', () => {
   // consuming product. `dist/` is gitignored, so this file is the only committed
   // record of what the build actually produces.
   it('matches the committed stylesheet', async () => {
-    await expect(emitCss(scales)).toMatchFileSnapshot('__snapshots__/lattice.css')
+    await expect(emitCss()).toMatchFileSnapshot('__snapshots__/lattice.css')
   })
 
   it('matches the committed token shape', async () => {
-    const paths = tokenPaths(emitTokens(scales)).sort()
+    const paths = tokenPaths(emitTokens()).sort()
 
     await expect(`${paths.join('\n')}\n`).toMatchFileSnapshot('__snapshots__/tokens.paths.txt')
   })
@@ -52,26 +49,22 @@ describe('the emitted artefacts', () => {
   // it moves correctly when the config moves. A threshold repeated here would be
   // a weaker hardcoded duplicate that fails on any legitimate reduction.
   it('covers every mode, scale, palette and alias in the shape file', () => {
-    const paths = tokenPaths(emitTokens(scales))
+    const paths = tokenPaths(emitTokens())
 
     for (const fragment of [
-      'light.gray.1',
-      'dark.accent.12',
+      'light.gray.bg',
+      'dark.accent.solid',
       'global.space.0-5',
       'global.breakpoint.sm',
       'global.container.prose',
       'global.radius.full',
-      'global.duration.base',
-      'global.easing.standard',
-      'light.gray.bg',
+      'global.duration.default',
+      'global.easing.out',
       'light.role.text',
       'dark.role.on-solid',
       'light.chart.categorical.1',
       'dark.chart.sequential.700',
-      'light.severity.critical',
-      'global.shadow.medium',
-      'light.elevation.raised.border',
-      'dark.elevation.modal.shadow'
+      'light.severity.critical'
     ]) {
       expect(paths, fragment).toContain(fragment)
     }

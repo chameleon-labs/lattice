@@ -25,6 +25,9 @@ export type EasingCurve = readonly [number, number, number, number]
  * JavaScript animation dependency to provide one. The token records the 500ms
  * intent; a caller wanting true spring behaviour brings its own library. No
  * component in this system uses it.
+ *
+ * `instant` exists so a state change that must not animate can say so with a
+ * token, rather than by omitting one.
  */
 export const DURATIONS = {
   instant: 0,

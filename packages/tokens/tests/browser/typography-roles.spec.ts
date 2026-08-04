@@ -4,9 +4,8 @@ import { expect, test } from '@playwright/test'
 
 import { TYPOGRAPHY_ROLES } from '../../config/typography-roles.js'
 import { emitCss } from '../../generate/emit.js'
-import { buildAllScales } from '../../generate/scale.js'
 
-const emittedCss = emitCss(buildAllScales())
+const emittedCss = emitCss()
 const applicationCss = Object.keys(TYPOGRAPHY_ROLES)
   .map(
     (role) => `[data-role="${role}"] {

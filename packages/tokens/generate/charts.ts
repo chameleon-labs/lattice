@@ -21,8 +21,7 @@ import {
 import type { Mode } from '../config/modes.js'
 import { apcaLc, contrastRatio } from './contrast.js'
 import { deltaE } from './cvd.js'
-import { parseHex } from './oklch.js'
-import { ship } from './solve.js'
+import { parseHex, ship } from './oklch.js'
 
 export interface ChartSwatch {
   readonly slot: number
