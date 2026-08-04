@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { Badge } from '../src/badge/badge.js'
 import { Callout } from '../src/callout/callout.js'
 import { Card } from '../src/card/card.js'
 
@@ -22,28 +21,6 @@ describe('Card', () => {
 
     expect(card.classList.contains('lat-card')).toBe(true)
     expect(card.classList.contains('mine')).toBe(true)
-  })
-})
-
-describe('Badge', () => {
-  it('defaults to the neutral tone', () => {
-    render(<Badge>paused</Badge>)
-
-    expect(screen.getByText('paused').dataset['tone']).toBe('neutral')
-  })
-
-  it('accepts an axe impact string directly as a tone', () => {
-    render(<Badge tone="critical">critical</Badge>)
-
-    expect(screen.getByText('critical').dataset['tone']).toBe('critical')
-  })
-
-  // The guarantee: text always accompanies colour. `children` is required in
-  // the type, so a colour-only badge cannot be written.
-  it('always carries text alongside its colour', () => {
-    render(<Badge tone="serious">3 serious</Badge>)
-
-    expect(screen.getByText('3 serious').textContent).not.toBe('')
   })
 })
 

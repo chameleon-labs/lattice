@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Badge, type BadgeTone } from './badge.js'
+import type { ReactElement } from 'react'
+import { Badge, type BadgeVariant } from './badge.js'
 
-const SEMANTIC: readonly BadgeTone[] = ['neutral', 'accent', 'success', 'warning', 'danger']
-const SEVERITY: readonly BadgeTone[] = ['critical', 'serious', 'moderate', 'minor']
+const VARIANTS: readonly BadgeVariant[] = ['default', 'primary', 'info', 'success', 'danger', 'warning']
 
 /**
  * `children` is required rather than optional, which is the whole guarantee: a
@@ -17,7 +17,7 @@ const meta = {
     children: 'Passing'
   },
   argTypes: {
-    tone: { control: 'select', options: [...SEMANTIC, ...SEVERITY] }
+    variant: { control: 'select', options: VARIANTS }
   }
 } satisfies Meta<typeof Badge>
 
@@ -27,12 +27,12 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
-export const SemanticTones: Story = {
+export const Variants: Story = {
   render: (args) => (
     <div className="lat-story__row">
-      {SEMANTIC.map((tone) => (
-        <Badge {...args} key={tone} tone={tone}>
-          {tone}
+      {VARIANTS.map((variant) => (
+        <Badge {...args} key={variant} variant={variant}>
+          {variant}
         </Badge>
       ))}
     </div>
@@ -40,19 +40,111 @@ export const SemanticTones: Story = {
 }
 
 /**
- * The severity names exist so an axe impact string can be passed straight
- * through — `<Badge tone={violation.impact}>` — rather than maintaining a
- * mapping that could drift from the ramp the token system already publishes.
+ * Impact severity, as used by the landing page's `ImpactBadge` (an axe impact
+ * string threaded straight into `variant`, plus an icon and a label — not a
+ * separate component). Each level maps onto one of the six Meridian variants,
+ * from most to least severe: critical -> danger, serious -> warning,
+ * moderate -> info, minor -> default.
  *
- * Severity is a 3:1 *mark* contract rather than a text contract, which is why it
- * reads as a border rather than as a fill.
+ * Colour never carries severity alone: every entry below pairs its tint with
+ * both an icon *and* a text label, so the ramp stays legible under
+ * protanopia and deuteranopia, where the danger/warning/info hues are the
+ * hardest to tell apart by colour.
  */
-export const SeverityTones: Story = {
+const SEVERITY: ReadonlyArray<{ level: string; variant: BadgeVariant; icon: ReactElement }> = [
+  {
+    level: 'critical',
+    variant: 'danger',
+    icon: (
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2" />
+        <line x1="12" x2="12" y1="8" y2="12" />
+        <line x1="12" x2="12.01" y1="16" y2="16" />
+      </svg>
+    )
+  },
+  {
+    level: 'serious',
+    variant: 'warning',
+    icon: (
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+        <path d="M12 9v4" />
+        <path d="M12 17h.01" />
+      </svg>
+    )
+  },
+  {
+    level: 'moderate',
+    variant: 'info',
+    icon: (
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" x2="12" y1="8" y2="12" />
+        <line x1="12" x2="12.01" y1="16" y2="16" />
+      </svg>
+    )
+  },
+  {
+    level: 'minor',
+    variant: 'default',
+    icon: (
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <path d="M12 16v-4" />
+        <path d="M12 8h.01" />
+      </svg>
+    )
+  }
+]
+
+export const Impact: Story = {
   render: (args) => (
     <div className="lat-story__row">
-      {SEVERITY.map((tone) => (
-        <Badge {...args} key={tone} tone={tone}>
-          {tone}
+      {SEVERITY.map(({ level, variant, icon }) => (
+        <Badge {...args} key={level} variant={variant}>
+          {icon}
+          {level}
         </Badge>
       ))}
     </div>

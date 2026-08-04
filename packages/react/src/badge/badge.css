@@ -1,79 +1,49 @@
 .lat-badge {
+  /* Every variant is the tinted triple; only the three custom properties
+     below change. A new variant is three declarations. */
+  --_tint: var(--lat-wash);
+  --_tint-border: var(--lat-border);
+  --_text: var(--lat-text-subtle);
+
   display: inline-flex;
   align-items: center;
   gap: var(--lat-space-1);
 
-  font-family: var(--lat-text-ui-font-family);
-  font-size: var(--lat-text-micro-font-size);
-  font-weight: var(--lat-font-weight-semibold);
-  line-height: var(--lat-text-micro-line-height);
-  letter-spacing: var(--lat-text-micro-letter-spacing);
+  font-family: var(--lat-text-tag-font-family);
+  font-size: var(--lat-text-tag-font-size);
+  letter-spacing: var(--lat-text-tag-letter-spacing);
+  line-height: var(--lat-text-tag-line-height);
+  text-transform: var(--lat-text-tag-text-transform);
 
-  padding: var(--lat-space-0-5) var(--lat-space-2);
-  border: 1px solid transparent;
-  border-radius: var(--lat-radius-full);
-
-  /* Neutral default. */
-  color: var(--lat-gray-text);
-  background-color: var(--lat-gray-bg-subtle);
-  border-color: var(--lat-gray-border);
+  padding: 0 var(--lat-space-2);
+  background: var(--_tint);
+  border: 1px solid var(--_tint-border);
+  border-radius: var(--lat-radius-none);
+  color: var(--_text);
 }
 
-.lat-badge[data-tone='accent'] {
-  color: var(--lat-accent-text);
-  background-color: var(--lat-accent-bg-subtle);
-  border-color: var(--lat-accent-border);
+.lat-badge[data-variant='primary'] {
+  --_tint: var(--lat-accent-tint);
+  --_tint-border: var(--lat-accent-tint-border);
+  --_text: var(--lat-solid);
 }
-
-.lat-badge[data-tone='success'] {
-  color: var(--lat-success-text);
-  background-color: var(--lat-success-bg-subtle);
-  border-color: var(--lat-success-border);
+.lat-badge[data-variant='info'] {
+  --_tint: var(--lat-info-tint);
+  --_tint-border: var(--lat-info-tint-border);
+  --_text: var(--lat-info-solid);
 }
-
-.lat-badge[data-tone='warning'] {
-  color: var(--lat-warning-text);
-  background-color: var(--lat-warning-bg-subtle);
-  border-color: var(--lat-warning-border);
+.lat-badge[data-variant='success'] {
+  --_tint: var(--lat-success-tint);
+  --_tint-border: var(--lat-success-tint-border);
+  --_text: var(--lat-success-solid);
 }
-
-.lat-badge[data-tone='danger'] {
-  color: var(--lat-danger-text);
-  background-color: var(--lat-danger-bg-subtle);
-  border-color: var(--lat-danger-border);
+.lat-badge[data-variant='danger'] {
+  --_tint: var(--lat-danger-tint);
+  --_tint-border: var(--lat-danger-tint-border);
+  --_text: var(--lat-danger-solid);
 }
-
-/*
- * The severity ramp is a *mark* contract, not a text one: the token system
- * guarantees each level clears 3:1 against its surface, which is WCAG's
- * non-text threshold. Using one as a text colour or as a fill behind text would
- * be reading a guarantee the tokens never made.
- *
- * So severity shows as the border, while the label keeps --lat-text, which is
- * contract-checked against the surface. The label always names the level, so
- * the badge never signals by colour alone.
- */
-.lat-badge[data-tone='critical'],
-.lat-badge[data-tone='serious'],
-.lat-badge[data-tone='moderate'],
-.lat-badge[data-tone='minor'] {
-  color: var(--lat-text);
-  background-color: var(--lat-bg-subtle);
-  border-width: 2px;
-}
-
-.lat-badge[data-tone='critical'] {
-  border-color: var(--lat-severity-critical);
-}
-
-.lat-badge[data-tone='serious'] {
-  border-color: var(--lat-severity-serious);
-}
-
-.lat-badge[data-tone='moderate'] {
-  border-color: var(--lat-severity-moderate);
-}
-
-.lat-badge[data-tone='minor'] {
-  border-color: var(--lat-severity-minor);
+.lat-badge[data-variant='warning'] {
+  --_tint: var(--lat-warning-tint);
+  --_tint-border: var(--lat-warning-tint-border);
+  --_text: var(--lat-warning-solid);
 }

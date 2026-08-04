@@ -1,25 +1,15 @@
 import type { ComponentPropsWithRef, ReactNode } from 'react'
 
 /**
- * Four semantic tones plus the four severity levels.
- *
- * The severity names are here so tabstop can pass an axe impact string straight
- * through — `<Badge tone={violation.impact}>` — rather than maintaining a
- * mapping that could drift from the ramp the token system already publishes.
+ * The six chromatic scales plus a neutral default. Every variant is the same
+ * tinted triple — a 10-15% fill, a 20-25% border, full-strength text — so a
+ * new variant is three custom-property declarations in badge.css, never a new
+ * shape.
  */
-export type BadgeTone =
-  | 'neutral'
-  | 'accent'
-  | 'success'
-  | 'warning'
-  | 'danger'
-  | 'critical'
-  | 'serious'
-  | 'moderate'
-  | 'minor'
+export type BadgeVariant = 'default' | 'primary' | 'info' | 'success' | 'danger' | 'warning'
 
 export interface BadgeOptions {
-  tone?: BadgeTone
+  variant?: BadgeVariant
 }
 
 // `children` is required rather than optional, which is the whole guarantee:
@@ -27,12 +17,12 @@ export interface BadgeOptions {
 export type BadgeProps = Omit<ComponentPropsWithRef<'span'>, 'children'> &
   BadgeOptions & { children: ReactNode }
 
-export function Badge({ tone = 'neutral', className, ...props }: BadgeProps) {
+export function Badge({ variant = 'default', className, ...props }: BadgeProps) {
   return (
     <span
       {...props}
       className={className === undefined ? 'lat-badge' : `lat-badge ${className}`}
-      data-tone={tone}
+      data-variant={variant}
     />
   )
 }
