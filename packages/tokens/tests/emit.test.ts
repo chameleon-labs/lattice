@@ -532,10 +532,45 @@ describe('tokens.json', () => {
     expect(JSON.parse(JSON.stringify(tokens))).toEqual(tokens)
   })
 
-  it('confirms every typography role has a matching token', () => {
+  // CSS/DTCG parity for layout dimensions is covered by tests/layout.test.ts
+  // rather than duplicated here — that file asserts each layout primitive's
+  // DTCG `$value.value`/`$value.unit` against the matching `--lat-` custom
+  // property directly off `layoutTokens()`/`layoutCss()`, which is a tighter
+  // check than repeating it against the full emitted artefact would be.
+  it('keeps CSS and DTCG aliases in parity for every typography role', () => {
     const global = tokens['global'] as Record<string, unknown>
-    const text = global['text'] as Record<string, unknown>
+    expect(global['text']).toBeDefined()
+    const text = (global['text'] ?? {}) as Record<
+      string,
+      {
+        $type: string
+        $value: Record<string, string>
+      }
+    >
+    const properties = {
+      fontFamily: 'font-family',
+      fontSize: 'font-size',
+      fontWeight: 'font-weight',
+      letterSpacing: 'letter-spacing',
+      lineHeight: 'line-height'
+    } as const
+
     expect(Object.keys(text)).toEqual(Object.keys(TYPOGRAPHY_ROLES))
+    expect(global['text-narrow']).toBeUndefined()
+
+    for (const [roleName, token] of Object.entries(text)) {
+      expect(token.$type, roleName).toBe('typography')
+      expect(Object.keys(token.$value), roleName).toEqual(Object.keys(properties))
+      for (const [property, cssProperty] of Object.entries(properties)) {
+        const reference = token.$value[property]!
+        const primitive = reference.slice('{global.'.length, -1).replaceAll('.', '-')
+
+        expect(reference, `${roleName}.${property}`).toMatch(/^\{global\.[a-z0-9.-]+\}$/)
+        expect(css).toContain(
+          `--lat-text-${roleName}-${cssProperty}: var(--lat-${primitive});`
+        )
+      }
+    }
   })
 })
 
