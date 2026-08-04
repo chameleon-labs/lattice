@@ -81,3 +81,6 @@ export type {
   SegmentedControlItemProps,
   SegmentedControlProps
 } from './segmented-control/segmented-control.js'
+
+export { Eyebrow } from './eyebrow/eyebrow.js'
+export type { EyebrowProps } from './eyebrow/eyebrow.js'
