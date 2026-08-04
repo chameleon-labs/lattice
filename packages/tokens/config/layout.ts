@@ -63,17 +63,3 @@ export type SpaceName = keyof typeof SPACES
 export type BreakpointName = keyof typeof BREAKPOINTS
 export type ContainerName = keyof typeof CONTAINERS
 export type RadiusName = keyof typeof RADII
-
-export interface NestedRadiusPairing {
-  readonly outer: RadiusName
-  readonly gap: SpaceName
-  readonly inner: RadiusName
-}
-
-/**
- * Empty.
- *
- * The pairing rule existed to stop an inner corner looking wrong inside an outer
- * one. A square system does not have that problem.
- */
-export const NESTED_RADIUS_PAIRINGS = [] as const satisfies readonly NestedRadiusPairing[]

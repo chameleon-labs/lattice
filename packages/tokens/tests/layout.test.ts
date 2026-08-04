@@ -4,7 +4,6 @@ import type { DimensionToken } from '../generate/layout.js'
 import {
   BREAKPOINTS,
   CONTAINERS,
-  NESTED_RADIUS_PAIRINGS,
   RADII,
   SPACES
 } from '../config/layout.js'
@@ -62,8 +61,7 @@ describe('layout primitive contracts', () => {
     expect(CONTAINERS).not.toHaveProperty('full')
   })
 
-  it('carries no nested-radius pairings in the square system', () => {
-    expect(NESTED_RADIUS_PAIRINGS).toEqual([])
+  it('keeps radius.full at the declared value', () => {
     expect(RADII.full).toBe(9999)
   })
 
@@ -136,9 +134,5 @@ describe('radii', () => {
 
   it('keeps the declared 3px for large surfaces', () => {
     expect(RADII.sm).toBe(0.1875)
-  })
-
-  it('drops the nested-radius pairing', () => {
-    expect(NESTED_RADIUS_PAIRINGS).toHaveLength(0)
   })
 })
