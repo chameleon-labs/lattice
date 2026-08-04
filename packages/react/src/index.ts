@@ -84,3 +84,6 @@ export type {
 
 export { Eyebrow } from './eyebrow/eyebrow.js'
 export type { EyebrowProps } from './eyebrow/eyebrow.js'
+
+export { Stat } from './stat/stat.js'
+export type { StatProps } from './stat/stat.js'
