@@ -94,8 +94,7 @@ function themedBlock(scales: readonly Scale[], mode: Mode): string {
     categorical,
     sequential,
     severity,
-    semanticBlock(scales, mode),
-    elevationCss()
+    semanticBlock(scales, mode)
   ].join('\n\n')
 }
 
@@ -140,6 +139,7 @@ ${layoutCss()}
 ${motionCss()}
 ${shadowCss()}
 ${typographyRoleCss()}
+${elevationCss()}
 }
 
 :root,

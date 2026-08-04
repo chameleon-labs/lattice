@@ -1,70 +1,41 @@
 /**
- * Theme-independent shadow recipes and the elevation signal table.
+ * Elevation.
  *
- * The values are the outcome of a calibration recorded on issue #30, not taste.
- * Composited over each mode's page surface and measured with this system's own
- * contrast module, a shadow is worth 1.315:1 on light and 1.016:1 on dark at the
- * same alpha — and at 50% black the dark figure still only reaches 1.058:1.
- * There is no alpha at which a shadow becomes load-bearing on a dark surface,
- * which is why every level above `flat` also carries a surface step and a
- * border.
+ * Four roles, replacing the calibrated multi-level model, because four is all
+ * Meridian uses. Values are the Tailwind v4 shadows the bundle emits, verbatim.
  *
- * The colour is neutral rather than tinted to the scale's hue 305. Measured, the
- * two differ by a contrast ratio of at most 1.019 — under 2%, on an edge that is
- * blurred by design.
+ * ## Recorded, not fixed
+ *
+ * These shadows are pure black at 10-25% alpha. Over Meridian's `#0c0c14` page
+ * they are close to invisible, which is why the identity reads as flat in dark
+ * mode and leans on the hairline instead; `floating` is the only one that
+ * carries. That is the design as delivered and it ships as delivered. The
+ * observation is written down so a future change is a decision rather than a
+ * discovery.
+ *
+ * Depth is not conveyed by shadow alone anywhere in this system: every raised
+ * surface also carries a hairline border, which is what survives forced-colors.
  */
-
-import type { ScaleName } from './scales.js'
-
-export interface ShadowRecipe {
-  /** Offsets, blur and spread in px. */
-  readonly offsetX: number
-  readonly offsetY: number
-  readonly blur: number
-  readonly spread: number
-  /** Opacity of the neutral shadow colour, 0 to 1. */
-  readonly alpha: number
-}
-
 export const SHADOWS = {
-  small: { offsetX: 0, offsetY: 1, blur: 2, spread: 0, alpha: 0.1 },
-  medium: { offsetX: 0, offsetY: 4, blur: 8, spread: -1, alpha: 0.12 },
-  large: { offsetX: 0, offsetY: 12, blur: 24, spread: -4, alpha: 0.16 }
-} as const satisfies Readonly<Record<string, ShadowRecipe>>
+  sm: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+  lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+  '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)'
+} as const
 
 export type ShadowName = keyof typeof SHADOWS
 
 /**
- * One elevation level.
- *
- * `surface` and `border` are step slugs from the semantic tier, so a role reads
- * as a sentence — `--lat-elevation-modal-border` is the grey scale's border
- * step — and resolves through the same per-scope indirection every other role
- * uses.
- *
- * `border` and `shadow` are optional because `flat` is the absence of both. A
- * `none`-valued token would invite a consumer to treat the absence as a value it
- * could interpolate or override, and there is nothing for it to name.
+ * What each role is for. `flat` is not an absence of styling — it is the
+ * positive statement that a surface is distinguished by its hairline and its
+ * fill, which is Meridian's default.
  */
-export interface ElevationLevel {
-  readonly level: string
-  readonly surface: string
-  readonly border?: string
-  readonly shadow?: ShadowName
-}
-
-/**
- * Annotated rather than `as const`, matching `ROLE_ALIASES`. A const assertion
- * would give the array a union element type whose `flat` member has no `border`
- * or `shadow` property at all, and every `level.shadow` read in the generator
- * would then fail to compile.
- */
-export const ELEVATION_LEVELS: readonly ElevationLevel[] = [
-  { level: 'flat', surface: 'bg' },
-  { level: 'raised', surface: 'bg-subtle', border: 'border-subtle', shadow: 'small' },
-  { level: 'overlay', surface: 'bg-subtle', border: 'border', shadow: 'medium' },
-  { level: 'modal', surface: 'component', border: 'border', shadow: 'large' }
-]
-
-/** Elevation surfaces and borders are grey; nothing here is accented. */
-export const ELEVATION_SCALE: ScaleName = 'gray'
+export const ELEVATION_ROLES = {
+  /** Cards, panels, inputs, buttons. Hairline only. */
+  flat: 'none',
+  /** The segmented-control thumb. */
+  raised: SHADOWS.sm,
+  /** Tooltip, popover, menu. */
+  overlay: SHADOWS.lg,
+  /** The hero audit card. The only shadow that reads in dark mode. */
+  floating: SHADOWS['2xl']
+} as const satisfies Record<string, string>
