@@ -1226,6 +1226,59 @@
   font-size: var(--lat-font-size-2xl);
 }
 
+/* `<figure>` carries a UA default margin; the chart sits flush inside
+   `CardBody`'s own padding like every other child of
+   `.landing-page__score-history-body`. */
+.landing-page__chart-figure {
+  margin: 0;
+}
+
+.landing-page__chart {
+  width: 100%;
+}
+
+.landing-page__chart-svg {
+  display: block;
+  width: 100%;
+  /* Matches the source's `ResponsiveContainer height={180}` — the one
+     dimension that does not track the container. */
+  height: 180px;
+}
+
+.landing-page__chart-line {
+  fill: none;
+  stroke: var(--lat-solid);
+  stroke-width: 2;
+}
+
+/* The stroke is shared across all three thresholds — a 2px ring in the
+   card's own surface colour, so each dot reads as punched out of the card
+   rather than merely drawn on it. Only `fill` varies, by threshold. */
+.landing-page__chart-dot {
+  stroke: var(--lat-bg-raised);
+  stroke-width: 2;
+}
+
+.landing-page__chart-dot--good { fill: var(--lat-solid); }
+.landing-page__chart-dot--warn { fill: var(--lat-severity-serious); }
+.landing-page__chart-dot--bad { fill: var(--lat-severity-critical); }
+
+.landing-page__chart-refline {
+  stroke: var(--lat-severity-critical);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.6;
+}
+
+/* Both axes: 10px mono in the subtle text colour, no axis line, no tick
+   line — the source's `axisLine={false}` `tickLine={false}`, which is why
+   there is no corresponding stroke rule here at all. */
+.landing-page__chart-tick {
+  font-family: var(--lat-font-mono);
+  font-size: var(--lat-font-size-3xs);
+  fill: var(--lat-text-subtle);
+}
+
 /* ─── Why ──────────────────────────────────────────────────────────────── */
 
 .landing-page__why-grid {

@@ -36,20 +36,21 @@ import {
 } from './icons.js'
 import type { IconProps } from './icons.js'
 import { ScoreArc } from './score-arc.js'
+import { ScoreChart } from './score-chart.js'
 
 /**
  * The tabstop landing page, rebuilt from Lattice components alone.
  *
  * Source: `Custom Design System/src/app/App.tsx` — a marketing page for a
  * fictional accessibility-monitoring product, nine sections behind a sticky
- * nav. This is a faithful port of that structure, not a reinterpretation,
- * with one deliberate omission (see the module docs in
- * `landing-page.stories.tsx`): the Recharts score-history line chart is
- * rendered as a `Table`. The hero's `ScoreArc` gauge stays out of the
- * component library — same reasoning, one consumer, no reusable guarantee —
- * but is built here as a page-local component (`./score-arc.js`) rather than
- * substituted, since nothing in the library reproduces a colour-coded arc
- * gauge.
+ * nav. This is a faithful port of that structure, not a reinterpretation.
+ * Two constructions the library cannot express are built as page-local
+ * components rather than substituted with a lesser one — see the module
+ * docs in `landing-page.stories.tsx` for the "one consumer, no reusable
+ * guarantee" reasoning both share: the hero's `ScoreArc` gauge
+ * (`./score-arc.js`) and the score-history section's line chart
+ * (`./score-chart.js`), reproduced as inline SVG rather than by taking a
+ * charting dependency.
  *
  * Every impact badge (`critical`/`serious`/`moderate`/`minor`) carries both
  * an icon and its text label — colour never carries severity alone, per the
@@ -412,11 +413,19 @@ function HowItWorks() {
 }
 
 /**
- * Replaces the source bundle's Recharts `<LineChart>` — see the story docs
- * for why. The same nine points render as rows in a `Table` instead of as a
- * plotted line: the trend is still readable (91 → 61 → 71) but the shape of
- * the regression, and the day it happened, is no longer visible at a glance.
- * That loss is the gap list entry.
+ * Ported from the source bundle's Recharts `<LineChart>` as inline SVG —
+ * see `./score-chart.tsx` for the geometry and interpolation, and the gap
+ * list's "Deliberate omissions" for why a chart at all: a `Table` alone
+ * reads these nine points as data, not as the shape of a regression, and
+ * the section's own copy ("−20 pts since Jul 21") is pointing at that
+ * shape.
+ *
+ * The chart is `aria-hidden`, so the `Table` stays — as the accessible
+ * equivalent rather than the primary rendering, wrapped in `VisuallyHidden`
+ * inside the same `<figure>`. The `figure`'s `aria-label` carries the
+ * chart's headline fact for anyone who never sees the SVG at all; the
+ * hidden `Table` carries every point for anyone who wants more than the
+ * headline.
  */
 function ScoreHistory() {
   return (
@@ -436,25 +445,33 @@ function ScoreHistory() {
             className="landing-page__score-history-stat"
           />
 
-          <Table
-            caption="Score history for ariakit.org, nine audits from Jul 1 to Aug 2"
-            visuallyHiddenCaption
+          <figure
+            className="landing-page__chart-figure"
+            aria-label="Score history for ariakit.org: a line chart of nine audits from Jul 1 to Aug 2, trending down 20 points since Jul 21"
           >
-            <THead>
-              <Tr>
-                <Th scope="col">Date</Th>
-                <Th scope="col">Score</Th>
-              </Tr>
-            </THead>
-            <TBody>
-              {SCORE_HISTORY.map((point) => (
-                <Tr key={point.date}>
-                  <Th scope="row">{point.date}</Th>
-                  <Td>{point.score}</Td>
-                </Tr>
-              ))}
-            </TBody>
-          </Table>
+            <ScoreChart data={SCORE_HISTORY} referenceDate="Jul 21" />
+            <VisuallyHidden>
+              <Table
+                caption="Score history for ariakit.org, nine audits from Jul 1 to Aug 2"
+                visuallyHiddenCaption
+              >
+                <THead>
+                  <Tr>
+                    <Th scope="col">Date</Th>
+                    <Th scope="col">Score</Th>
+                  </Tr>
+                </THead>
+                <TBody>
+                  {SCORE_HISTORY.map((point) => (
+                    <Tr key={point.date}>
+                      <Th scope="row">{point.date}</Th>
+                      <Td>{point.score}</Td>
+                    </Tr>
+                  ))}
+                </TBody>
+              </Table>
+            </VisuallyHidden>
+          </figure>
         </CardBody>
       </Card>
     </Section>

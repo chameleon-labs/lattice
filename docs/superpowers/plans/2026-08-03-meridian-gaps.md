@@ -267,7 +267,7 @@ gauge. Design spec §7.3: "It is tabstop product surface, not system
 surface: one consumer, one arrangement, and no guarantee a caller would
 otherwise have to remember. This is the same admission test that kept
 `EmptyState` out." It stays out of the component library on that basis —
-but, unlike the Recharts line chart below, it is not down-rendered to a
+but, like the score-history line chart below, it is not down-rendered to a
 lesser library component. Nothing in the library reproduces a colour-coded
 arc gauge, so it is built as `src/pages/score-arc.tsx`: a page-local
 component, imported only by `landing-page.tsx`, that keeps the source's
@@ -278,17 +278,45 @@ a `landing-page__score-arc--{good,warn,bad}` modifier class in
 architecture note in §7.3 anticipates: excluded from the library, not
 excluded from the page.
 
-### The Recharts score-history line chart
+### `ScoreChart`
 
-`ScoreHistory`'s nine-point trend, drawn in the source with a Recharts
-`<LineChart>`, is rendered instead as a `Table` of all nine `(date,
-score)` points. Charting is not a design-system concern here — Lattice
-ships tokens and accessible primitives, not a charting library — so no
-chart component was built or is planned. Cost: the *shape* of the
-regression (a sharp week-over-week cliff) is legible at a glance in a line
-chart and is not in a table without reading every row; the `CardHeader`'s
-`danger` `Badge` ("−20 pts since Jul 21") restores the headline number as
-a single glance-able fact, partially compensating.
+**No longer a `Table` substitution — the `Table` downgrade recorded below
+in earlier drafts of this document was overridden.** `ScoreHistory`'s
+nine-point trend, drawn in the source with a Recharts `<LineChart>`, is now
+built as `src/pages/score-chart.tsx`: the same page-local pattern as
+`ScoreArc` above, one consumer, reproduced as inline SVG rather than by
+taking Recharts (or any charting library) as a dependency. The call that
+excluded it originally — "charting is not a design-system concern" — still
+holds and is exactly why this ships from `src/pages/` rather than
+`src/<family>/`: **charting stays out of the component library.** What
+changed is only where the line between "system" and "page" work was drawn
+for *this specific chart*, once it became clear that a `Table` cannot show
+the *shape* of a regression, which is what the section's own copy
+("−20 pts since Jul 21") is pointing at — a cost no `Badge` restoring the
+headline number could fully compensate for.
+
+The port matches the source's geometry rather than approximating it:
+`ResponsiveContainer`'s `width="100%" height={180}` (tracked live via
+`ResizeObserver`, redrawing at the real pixel width the way
+`ResponsiveContainer` does, rather than stretching a fixed-aspect
+`viewBox`), the same margins, the same 50–100 Y domain and the same four Y
+ticks Recharts' own `getNiceTickValues` produces for it (`50, 65, 80,
+100`, not an evenly-stepped `50‑60‑70‑80‑90‑100` a generic "nice ticks"
+implementation would have produced), and — the part most likely to be
+faked — `type="monotone"`'s actual curve: `src/pages/monotone-path.ts` is
+a direct port of d3-shape's `curveMonotoneX` (Fritsch–Carlson tangents),
+not a straight polyline and not a generic smooth spline, either of which
+would misrepresent this exact data's sharp elbow at Jul 21 (see that
+file's header and `tests/monotone-path.test.ts`, which asserts the curve
+never overshoots a segment's own endpoints). Every colour is a `--lat-*`
+token read from a `landing-page__chart-*` class in `pages.css`, never a
+literal hex.
+
+Accessibility is preserved, not merely not-regressed: the SVG is
+`aria-hidden`, and the same nine-row `Table` this component replaces stays
+in the page inside a `VisuallyHidden` wrapper, alongside a `<figure
+aria-label>` naming what the chart shows — a screen-reader user still gets
+every point; a sighted user now also gets the shape.
 
 ### The ~50 stock shadcn components
 
