@@ -50,7 +50,10 @@
 
 /* The severity ramp. Its own tint tokens, not a chromatic scale's — there is
    no chromatic scale at moderate's hue to borrow. `minor` carries no colour
-   of its own, so it repeats the base rule's neutral triple exactly. */
+   of its own, but still reads its own three severity tokens rather than
+   reaching past them for the neutral pair directly: --lat-severity-minor(-tint(-border))
+   already alias to --lat-text-subtle / --lat-wash / --lat-border, so all four
+   levels resolve through one mechanism instead of three-plus-an-exception. */
 .lat-badge[data-variant='critical'] {
   --_tint: var(--lat-severity-critical-tint);
   --_tint-border: var(--lat-severity-critical-tint-border);
@@ -67,7 +70,7 @@
   --_text: var(--lat-severity-moderate);
 }
 .lat-badge[data-variant='minor'] {
-  --_tint: var(--lat-wash);
-  --_tint-border: var(--lat-border);
-  --_text: var(--lat-text-subtle);
+  --_tint: var(--lat-severity-minor-tint);
+  --_tint-border: var(--lat-severity-minor-tint-border);
+  --_text: var(--lat-severity-minor);
 }
