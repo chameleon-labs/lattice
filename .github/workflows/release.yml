@@ -1,0 +1,211 @@
+name: Release
+
+# Releases are cut by pushing a tag:
+#
+#   git tag v0.1.0-rc.1 && git push origin v0.1.0-rc.1
+#
+# The tag triggers the release rather than a push to main, because a release
+# that fires on every merge cannot be reasoned about afterwards and cannot be
+# re-run against a known commit. The tag is the record of what shipped.
+#
+# The whole contract suite runs again here even though CI already ran it on the
+# same commit. A tag can be moved; a release is the one job where "it passed on
+# some earlier run" is not good enough.
+#
+# Who can start one: both triggers are restricted to accounts with write access
+# to this repository, by GitHub rather than by anything written here — pushing a
+# tag requires it, and `workflow_dispatch` is documented as requiring it too. An
+# outside contributor, a fork, or a pull request from either cannot reach this
+# workflow. The `npm-publish` environment on the job below is where that can be
+# tightened further (required reviewers, or a smaller list of who may approve).
+on:
+  push:
+    tags: ['v*']
+  # Dispatched by cut-release.yml, which is the normal path. A tag it pushes
+  # with the default GITHUB_TOKEN does not fire the `push` trigger above —
+  # GitHub suppresses that so a workflow cannot trigger itself into a loop — so
+  # the release is started explicitly instead.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to release, e.g. v0.1.0-rc.1'
+        required: true
+        type: string
+
+# Two publishes of the same version cannot converge — the first wins and the
+# second is a 403. Serialise rather than race.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    # The one place a token that can publish under @chameleon-labs is used, so
+    # NPM_TOKEN belongs to this environment rather than to the repository at
+    # large: a secret scoped here cannot be read by any other workflow. Add
+    # required reviewers to it in Settings → Environments to make every release
+    # need a second pair of eyes; the workflow needs no change for that.
+    # Referencing an environment that does not exist yet creates it, unprotected.
+    environment: npm-publish
+
+    permissions:
+      # `npm publish --provenance` mints a signed attestation from a Sigstore
+      # OIDC token. Without this the publish fails outright rather than quietly
+      # shipping an unattested package.
+      id-token: write
+      # Creating the GitHub Release at the end.
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # On a dispatch the workflow may be running from a branch, so check
+          # out the tag being released explicitly rather than whatever ref
+          # triggered it. On a tag push the two are the same thing.
+          ref: ${{ inputs.tag || github.ref }}
+          # `gh release --notes-start-tag` needs the previous tag, which a
+          # shallow clone does not have.
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: pnpm
+          # Writes the .npmrc that resolves NODE_AUTH_TOKEN at publish time.
+          # npm does the publishing here, not pnpm: pnpm 10.7 has no
+          # --provenance flag, and provenance is a requirement of this release.
+          registry-url: 'https://registry.npmjs.org'
+
+      # A prerelease must not become `latest`, or `npm i @chameleon-labs/…`
+      # hands every consumer an RC. npm tags whatever it publishes `latest`
+      # unless told otherwise, so the dist-tag is derived from the version
+      # rather than remembered: 0.1.0-rc.1 -> `rc`, 0.1.0 -> `latest`.
+      - name: Derive the version and dist-tag
+        env:
+          # Through the environment, not `${{ }}` interpolation: `${{ }}` is
+          # substituted into the script text before the shell sees it, so an
+          # input carrying shell metacharacters would be executed rather than read.
+          TAG_INPUT: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          tag="${TAG_INPUT:-$GITHUB_REF_NAME}"
+          case "${tag}" in
+            v*) ;;
+            *) echo "not a release tag: ${tag}"; exit 1 ;;
+          esac
+          version="${tag#v}"
+          case "${version}" in
+            *-*)
+              prerelease="${version#*-}"
+              dist_tag="${prerelease%%.*}"
+              is_prerelease=true
+              ;;
+            *)
+              dist_tag=latest
+              is_prerelease=false
+              ;;
+          esac
+          echo "TAG=${tag}" >> "$GITHUB_ENV"
+          echo "VERSION=${version}" >> "$GITHUB_ENV"
+          echo "DIST_TAG=${dist_tag}" >> "$GITHUB_ENV"
+          echo "IS_PRERELEASE=${is_prerelease}" >> "$GITHUB_ENV"
+          echo "releasing ${tag}: publishing ${version} under dist-tag '${dist_tag}' (prerelease: ${is_prerelease})"
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Install Firefox
+        run: pnpm --filter @chameleon-labs/lattice-tokens exec playwright install --with-deps firefox
+
+      # Fails on a package still marked private, a version that disagrees with
+      # the tag, or an `exports` entry that would 404 for consumers — before
+      # anything is built, and long before anything is published.
+      - name: Check release preconditions
+        run: node scripts/check-release.mjs "${TAG}"
+
+      - name: Build tokens
+        run: pnpm --filter @chameleon-labs/lattice-tokens build
+
+      - name: Typecheck
+        run: pnpm -r typecheck
+
+      - name: Test
+        run: pnpm -r test
+
+      - name: Build
+        run: pnpm -r build
+
+      # Packs both packages into .release/ and proves each tarball is
+      # consumable. The publish step below ships these exact files rather than
+      # rebuilding, so nothing can change between the check and the release.
+      - name: Pack and verify tarballs
+        run: node scripts/verify-tarballs.mjs
+
+      # Tokens first: the React package's peer range names a token version, and
+      # a consumer installing react in the window between the two publishes
+      # should find a resolvable peer rather than a 404.
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          for name in lattice-tokens lattice-react; do
+            tarball=".release/chameleon-labs-${name}-${VERSION}.tgz"
+            test -s "${tarball}" || { echo "missing tarball: ${tarball}"; exit 1; }
+            echo "publishing ${tarball} under dist-tag '${DIST_TAG}'"
+            npm publish "${tarball}" --provenance --access public --tag "${DIST_TAG}"
+          done
+
+      # The exit code is not the evidence. A publish that skips a private
+      # package exits 0 having done nothing — precisely the failure this release
+      # is written to avoid — so the registry is asked directly. Retried because
+      # it is read-through-cached and a fresh version is not always visible on
+      # the first read.
+      - name: Verify the packages are on npm
+        run: |
+          set -euo pipefail
+          for name in lattice-tokens lattice-react; do
+            package="@chameleon-labs/${name}"
+            for attempt in 1 2 3 4 5 6; do
+              found="$(npm view "${package}@${VERSION}" version 2>/dev/null || true)"
+              if [ "${found}" = "${VERSION}" ]; then
+                echo "ok: ${package}@${VERSION} is on npm"
+                break
+              fi
+              if [ "${attempt}" = "6" ]; then
+                echo "${package}@${VERSION} is not on npm after ${attempt} attempts"
+                exit 1
+              fi
+              echo "waiting for ${package}@${VERSION} to appear (attempt ${attempt})…"
+              sleep 10
+            done
+
+            # A forgotten `--tag` is silent: the publish succeeds and `latest`
+            # quietly moves to the RC. Assert it did not.
+            if [ "${IS_PRERELEASE}" = "true" ]; then
+              latest="$(npm view "${package}" dist-tags.latest 2>/dev/null || true)"
+              if [ "${latest}" = "${VERSION}" ]; then
+                echo "${package}: prerelease ${VERSION} became dist-tag 'latest'"
+                exit 1
+              fi
+              echo "ok: ${package} 'latest' is '${latest:-unset}', not the prerelease"
+            fi
+          done
+
+      - name: Create the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          previous="$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)"
+          args=(--title "${TAG}" --generate-notes)
+          if [ -n "${previous}" ]; then args+=(--notes-start-tag "${previous}"); fi
+          if [ "${IS_PRERELEASE}" = "true" ]; then args+=(--prerelease); fi
+          gh release create "${TAG}" "${args[@]}" \
+            --notes "Published \`@chameleon-labs/lattice-tokens@${VERSION}\` and \`@chameleon-labs/lattice-react@${VERSION}\` to npm with provenance, under the \`${DIST_TAG}\` dist-tag."

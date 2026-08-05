@@ -1,6 +1,10 @@
 node_modules/
 dist/
 coverage/
+
+# Packed tarballs, written by scripts/verify-tarballs.mjs and published as-is
+# by the release workflow. Build output, never committed.
+.release/
 test-results/
 playwright-report/
 storybook-static/
