@@ -33,11 +33,21 @@
  */
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, readdirSync, rmSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { dirname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..')
-const outputDir = join(repoRoot, process.argv[2] ?? '.release')
+
+// The output directory is deleted before it is written, so where it points is a
+// destructive decision taken from argv. `join` does not contain a `..` — it
+// resolves it — so `verify-tarballs.mjs ../../..` would have recursively
+// removed a directory well outside this repo. Refuse anything that is not
+// strictly beneath the repo root, and refuse the root itself.
+const outputDir = resolve(repoRoot, process.argv[2] ?? '.release')
+if (outputDir === repoRoot || !outputDir.startsWith(`${repoRoot}${sep}`)) {
+  console.error(`refusing to use ${outputDir} as the output directory — it must be inside ${repoRoot}`)
+  process.exit(1)
+}
 
 const problems = []
 const fail = (where, message) => problems.push(`${where}: ${message}`)

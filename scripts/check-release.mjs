@@ -104,6 +104,28 @@ for (const dir of packageDirs) {
   }
 }
 
+// A peer on another package in this workspace must be `workspace:*`, which pnpm
+// publishes as the exact version.
+//
+// `workspace:^` was here first and was wrong. It publishes as a caret range, so
+// `@chameleon-labs/lattice-react@0.1.0-rc.1` would have accepted
+// `lattice-tokens@0.1.0` — a combination this project does not support and
+// cannot detect at runtime, because a component stylesheet whose `var(--lat-*)`
+// references have moved renders unstyled rather than throwing. The lockstep
+// claim in the README is only true if the published range says so.
+const workspaceNames = new Set(releases.map((release) => release.manifest.name))
+for (const { dir, manifest } of releases) {
+  for (const [name, range] of Object.entries(manifest.peerDependencies ?? {})) {
+    if (!workspaceNames.has(name)) continue
+    if (range !== 'workspace:*') {
+      fail(
+        `packages/${dir}/package.json`,
+        `peer on ${name} is ${JSON.stringify(range)} — must be "workspace:*", which publishes as an exact version`
+      )
+    }
+  }
+}
+
 // One version across the workspace, deliberately. The React package's
 // stylesheets are `var(--lat-*)` references that resolve into the token
 // package; a component release whose references outrun the tokens it is paired

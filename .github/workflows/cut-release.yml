@@ -116,11 +116,27 @@ jobs:
             fi
           done
 
-          # Release from main. Tagging a commit no branch contains would publish
-          # code that cannot be found afterwards.
+          # Release from the tip of main, and only from main.
+          #
+          # `workflow_dispatch` can be run against any branch, and the version
+          # bump below is pushed to whichever ref that is. An ancestry check
+          # alone was not enough: any commit already merged into main passes it,
+          # so dispatching from a stale branch would have committed the bump to
+          # that branch and left the published tag on a commit main does not
+          # contain — a release nobody can find from the default branch.
+          #
+          # Requiring the exact tip rather than mere reachability also means a
+          # main that moved between dispatch and run is a re-run rather than a
+          # silent release of something older than intended.
+          if [ "${GITHUB_REF_NAME}" != "main" ]; then
+            echo "releases are cut from main — this run is on '${GITHUB_REF_NAME}'"
+            exit 1
+          fi
+
           git fetch --quiet origin main
-          if ! git merge-base --is-ancestor HEAD origin/main; then
-            echo "HEAD ($(git rev-parse --short HEAD)) is not contained in origin/main — merge first"
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+            echo "HEAD ($(git rev-parse --short HEAD)) is not the tip of origin/main ($(git rev-parse --short origin/main))"
+            echo "main moved since this run started — dispatch it again"
             exit 1
           fi
 
@@ -146,10 +162,15 @@ jobs:
             echo "version unchanged at ${VERSION} — tagging the existing commit"
           else
             git commit -m "Release ${VERSION}" -m "${PREVIOUS} -> ${VERSION}, cut by ${GITHUB_ACTOR}."
+            # Explicitly to main, not to the ref this was dispatched on. The
+            # guard above already proved they are the same thing; naming main
+            # here means a future change to that guard cannot quietly turn this
+            # into a push to somewhere else.
+            #
             # The commit first, then the tag. If this push is rejected — a
             # protected branch, or main having moved under us — the tag does not
             # exist remotely yet and there is nothing to unpick.
-            git push origin "HEAD:${GITHUB_REF_NAME}"
+            git push origin HEAD:main
           fi
 
           # Annotated, not lightweight: the tag carries who cut it and when,
