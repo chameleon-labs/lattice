@@ -203,6 +203,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          # `--notes` alongside `--generate-notes` is deliberate and supported:
+          # `gh release create --help` states that "additional release notes can
+          # be prepended to automatically generated notes by using the --notes
+          # flag". So the line below sits above the generated changelog rather
+          # than replacing it. Raised in review as a conflict; it is not one.
           previous="$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)"
           args=(--title "${TAG}" --generate-notes)
           if [ -n "${previous}" ]; then args+=(--notes-start-tag "${previous}"); fi
