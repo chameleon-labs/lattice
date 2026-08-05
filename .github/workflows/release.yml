@@ -156,45 +156,86 @@ jobs:
         run: |
           set -euo pipefail
           for name in lattice-tokens lattice-react; do
+            package="@chameleon-labs/${name}"
             tarball=".release/chameleon-labs-${name}-${VERSION}.tgz"
             test -s "${tarball}" || { echo "missing tarball: ${tarball}"; exit 1; }
+
+            # Skip anything already on the registry, so this step is resumable.
+            # An npm version is immutable, so a re-run after a later step failed
+            # would otherwise die here on a version conflict — which is exactly
+            # what happened on 0.1.0-rc.1: both packages published fine, the
+            # verification below timed out, and the job could not be re-run to
+            # finish the release because the publish would no longer succeed.
+            published="$(npm view "${package}@${VERSION}" version --prefer-online 2>/dev/null || true)"
+            if [ "${published}" = "${VERSION}" ]; then
+              echo "${package}@${VERSION} is already on npm — skipping"
+              continue
+            fi
+
             echo "publishing ${tarball} under dist-tag '${DIST_TAG}'"
             npm publish "${tarball}" --provenance --access public --tag "${DIST_TAG}"
           done
 
       # The exit code is not the evidence. A publish that skips a private
       # package exits 0 having done nothing — precisely the failure this release
-      # is written to avoid — so the registry is asked directly. Retried because
-      # it is read-through-cached and a fresh version is not always visible on
-      # the first read.
+      # is written to avoid — so the registry is asked directly.
+      #
+      # Ten minutes, not one. The first release measured this: both packages
+      # published successfully at 20:58:38 and the packument did not answer
+      # until 21:03:59 — five minutes and twenty seconds. The original window
+      # was fifty seconds, so it failed a release that had in fact worked, and
+      # left the GitHub Release uncreated. A package's *first* appearance is the
+      # slow case; later versions show up in seconds, and this loop exits as
+      # soon as it sees one, so the ceiling costs nothing in the normal case.
+      #
+      # `--prefer-online` because npm caches registry responses, negative ones
+      # included: without it the poll can keep re-reading its own cached 404
+      # and never notice the package arriving.
       - name: Verify the packages are on npm
         run: |
           set -euo pipefail
+          attempts=40
           for name in lattice-tokens lattice-react; do
             package="@chameleon-labs/${name}"
-            for attempt in 1 2 3 4 5 6; do
-              found="$(npm view "${package}@${VERSION}" version 2>/dev/null || true)"
+            for attempt in $(seq 1 "${attempts}"); do
+              found="$(npm view "${package}@${VERSION}" version --prefer-online 2>/dev/null || true)"
               if [ "${found}" = "${VERSION}" ]; then
                 echo "ok: ${package}@${VERSION} is on npm"
                 break
               fi
-              if [ "${attempt}" = "6" ]; then
-                echo "${package}@${VERSION} is not on npm after ${attempt} attempts"
+              if [ "${attempt}" = "${attempts}" ]; then
+                echo "${package}@${VERSION} did not appear within 10 minutes"
                 exit 1
               fi
-              echo "waiting for ${package}@${VERSION} to appear (attempt ${attempt})…"
-              sleep 10
+              echo "waiting for ${package}@${VERSION} to appear (attempt ${attempt}/${attempts})…"
+              sleep 15
             done
 
             # A forgotten `--tag` is silent: the publish succeeds and `latest`
-            # quietly moves to the RC. Assert it did not.
+            # quietly moves to the RC. Assert it did not — except on a first
+            # publish, where it is not a mistake and cannot be avoided.
+            #
+            # npm requires every package to carry a `latest`, and the first
+            # version published becomes it whatever `--tag` says, because there
+            # is nothing else to point at. 0.1.0-rc.1 is `latest` on both
+            # packages for exactly that reason, and it corrects itself the
+            # moment a stable version ships. Failing the release over it would
+            # be failing over a rule of the registry, so this reports instead.
             if [ "${IS_PRERELEASE}" = "true" ]; then
-              latest="$(npm view "${package}" dist-tags.latest 2>/dev/null || true)"
+              latest="$(npm view "${package}" dist-tags.latest --prefer-online 2>/dev/null || true)"
               if [ "${latest}" = "${VERSION}" ]; then
-                echo "${package}: prerelease ${VERSION} became dist-tag 'latest'"
-                exit 1
+                count="$(npm view "${package}" versions --json --prefer-online 2>/dev/null \
+                  | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const v=JSON.parse(s);console.log(Array.isArray(v)?v.length:1)}catch{console.log(0)}})")"
+                if [ "${count}" = "1" ]; then
+                  echo "note: ${package} has only this version, so npm made the prerelease 'latest'."
+                  echo "      Unavoidable on a first publish; it moves when a stable version ships."
+                else
+                  echo "${package}: prerelease ${VERSION} became dist-tag 'latest' alongside ${count} other versions"
+                  exit 1
+                fi
+              else
+                echo "ok: ${package} 'latest' is '${latest:-unset}', not the prerelease"
               fi
-              echo "ok: ${package} 'latest' is '${latest:-unset}', not the prerelease"
             fi
           done
 
