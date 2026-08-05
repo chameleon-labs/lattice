@@ -16,7 +16,7 @@ import type { Mode } from '../config/modes.js'
 import { parseHex, srgbToOklch } from './oklch.js'
 import {
   ALPHA_CHANNEL,
-  FOCUS_RING_ALPHA,
+  FOCUS_RING,
   HAIRLINE,
   HAIRLINE_STRONG,
   TINT_FRACTIONS,
@@ -99,7 +99,6 @@ const hexFromChannels = (channels: string): string =>
 export function resolveAlpha(mode: Mode): AlphaToken[] {
   const channels = ALPHA_CHANNEL[mode]
   const base = hexFromChannels(channels)
-  const accentSolid = SOLID_ANCHORS.accent[mode]
   return [
     { role: 'border', value: alpha(channels, HAIRLINE[mode]), hex: base, alpha: HAIRLINE[mode] },
     {
@@ -110,10 +109,12 @@ export function resolveAlpha(mode: Mode): AlphaToken[] {
     },
     { role: 'wash', value: alpha(channels, WASH), hex: base, alpha: WASH },
     {
+      // Anchored per mode, not derived from the accent solid — see
+      // config/alpha.ts for why light is opaque and dark is not.
       role: 'focus-ring',
-      value: alpha(rgbChannels(accentSolid), FOCUS_RING_ALPHA),
-      hex: accentSolid,
-      alpha: FOCUS_RING_ALPHA
+      value: alpha(rgbChannels(FOCUS_RING[mode].hex), FOCUS_RING[mode].alpha),
+      hex: FOCUS_RING[mode].hex,
+      alpha: FOCUS_RING[mode].alpha
     }
   ]
 }
