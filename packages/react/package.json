@@ -38,7 +38,7 @@
     "**/*.css"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.build.json && tsx scripts/build-css.ts",
+    "build": "node ../../scripts/clean.mjs dist && tsc -p tsconfig.build.json && tsx scripts/build-css.ts",
     "prepack": "pnpm build",
     "build-storybook": "pnpm --filter @chameleon-labs/lattice-tokens build && storybook build",
     "dev": "pnpm --filter @chameleon-labs/lattice-tokens build && storybook dev -p 6006",

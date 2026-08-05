@@ -38,7 +38,7 @@
     "**/*.css"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc --noEmit && tsx generate/build.ts",
+    "build": "node ../../scripts/clean.mjs dist && tsc --noEmit && tsx generate/build.ts",
     "prepack": "pnpm build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run && playwright test",
