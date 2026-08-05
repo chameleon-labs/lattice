@@ -38,14 +38,42 @@ export const TINT_FRACTIONS = {
 } as const
 
 /**
- * The focus ring.
+ * The focus ring, anchored per mode rather than derived from the accent solid.
  *
- * The Figma bundle declares `--ring` at 0.35/0.30 but its own components focus with
- * `ring-primary/40`. The value components actually use is the one emitted, since
- * a token nobody reaches for guarantees nothing.
+ * It used to be `--lat-solid` at 40%, which is what the reference design does
+ * (`ring-primary/40`). In light mode that measured **1.55:1** against a card
+ * and 1.50 against the page, against the 3:1 SC 1.4.11 requires — and unlike
+ * the other accepted contrast failures, a focus ring is a keyboard user's only
+ * means of orientation, with no second cue carrying it. See issue #47.
  *
- * Recorded consequence: in light mode this lands at 1.55:1 against the card,
- * below the 3:1 that SC 1.4.11 requires of a focus indicator. It ships as
- * delivered — see the spec's §9 ledger.
+ * ## Why the modes are shaped differently
+ *
+ * **Light is opaque**, because at 40% over a near-white surface, 60% of what
+ * gets measured *is* the surface. No green reaches 3:1 at that alpha — `#4f7300`
+ * only lifts it to 1.80 — so the alpha, not the hue, is the binding constraint.
+ * Opaque `#4f7300` measures 4.89 against the page, 5.55 against a card and 4.56
+ * against a field.
+ *
+ * **Dark keeps its alpha**, and this is not an inconsistency left unfixed. A
+ * translucent ring composites with whatever it is drawn on, so it tracks the
+ * surface — on dark that holds it at 3.17–3.20 across all three surfaces.
+ * Anchoring dark opaque at the same rendered colour *loses* that adaptation and
+ * drops the field case to 2.93, introducing a failure while fixing nothing.
+ *
+ * ## Why it is anchored rather than derived
+ *
+ * `--lat-solid` was being asked to be a legible fill, legible text, a tint base
+ * *and* a 3:1 focus indicator at once. Those constraints have no common
+ * solution, which is why this defect resisted every attempt to fix it by
+ * changing the accent. Anchoring the ring separates them: focus contrast can be
+ * corrected without moving the brand colour, and the brand colour can move
+ * without silently breaking focus.
+ *
+ * Dark's hex equals the dark accent solid today. That is a coincidence of value,
+ * not a dependency — it is written here so a future change to the accent does
+ * not drag the focus ring with it.
  */
-export const FOCUS_RING_ALPHA = 0.4
+export const FOCUS_RING = {
+  light: { hex: '#4f7300', alpha: 1 },
+  dark: { hex: '#cff23a', alpha: 0.4 }
+} as const satisfies Readonly<Record<'light' | 'dark', { hex: string; alpha: number }>>

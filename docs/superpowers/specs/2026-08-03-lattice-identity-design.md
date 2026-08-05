@@ -414,7 +414,7 @@ WCAG 2.x on the delivered values:
 | **light severity serious text on its tint** | **3.15** | **fails AA (duplicates light warning)** |
 | **light severity moderate text on its tint** | **2.26** | **fails AA — the worst pair in the ledger, and Lattice's one derived severity colour** |
 | **dark severity minor text on its tint** | **3.27** | **fails AA** |
-| **light focus ring `primary/40` vs `card`** | **1.55** | **fails SC 1.4.11 (needs 3:1)** |
+| ~~**light focus ring `primary/40` vs `card`**~~ | ~~**1.55**~~ | **fixed — see below** |
 | dark focus ring `primary/40` vs `card` | 3.20 | passes SC 1.4.11 |
 | hairline border vs its surface | 1.20 / 1.19 | decorative; see below |
 
@@ -482,7 +482,7 @@ Each rise came from measuring a pairing that had been invisible rather than
 from anything getting worse, and each was found by building something that had
 to be right about the numbers: a report, a page, a test.
 
-Twenty-two is still twenty-two more than a system with a hard gate would ship.
+Twenty-two is still twenty-two more than a system with a hard gate would ship. (Twenty-one as of issue #47 — see below.)
 That is the consequence of the decision in §"The premise", taken knowingly,
 and the ledger exists so it stays visible rather than becoming folklore.
 
@@ -500,9 +500,48 @@ matters only for the text input, where the border would otherwise be the sole
 means of identifying the control; there the filled `--lat-field-bg` provides
 identification, so the control is distinguishable without relying on its edge.
 
-The light-mode focus ring is the most serious entry in the table, because a
+### The light focus ring has since been fixed
+
+The light-mode focus ring was the most serious entry in this table, because a
 focus indicator that cannot be seen is a keyboard user's only means of
-orientation. It is recorded here and left as delivered.
+orientation, with no second cue carrying it. Unlike every other row here, it was
+not a legibility trade-off on content available some other way.
+
+[Issue #47](https://github.com/chameleon-labs/lattice/issues/47) fixed it, so
+**the accepted count is twenty-one, not twenty-two**, and this is the first row
+to leave the ledger by being repaired rather than re-measured.
+
+The fix is not the one that was proposed repeatedly, including in this document's
+own review: darkening `--lat-solid` does not work. The ring was that colour at
+40% over a near-white surface, so 60% of what got measured *was* the surface, and
+no green in the family reaches 3:1 at that alpha — `#4f7300` only lifts 1.55 to
+1.80. **The alpha was the binding constraint, not the hue.**
+
+`--lat-focus-ring` is now anchored per mode rather than derived from
+`--lat-solid`:
+
+| | colour | alpha | vs `bg` | vs `bg-raised` | vs `field-bg` |
+|---|---|---|---|---|---|
+| light | `#4f7300` | 1.0 | 4.89 | 5.55 | 4.56 |
+| dark | `#cff23a` | 0.4 | 3.19 | 3.20 | 3.17 |
+
+Three things worth recording:
+
+- **Dark keeps its alpha, and that is deliberate.** A translucent ring
+  composites with whatever it is drawn on, so it tracks the surface — which is
+  what holds dark above 3:1 on all three. Anchoring dark opaque at the same
+  rendered colour *loses* that adaptation and drops `field-bg` to 2.93,
+  introducing a failure while fixing nothing.
+- **The ledger now measures three surfaces per mode, not one.** It previously
+  measured only `bg-raised`. `field-bg` is the weakest of the three in dark, so
+  the old single row would have reported a pass while a real pairing sat closest
+  to the line.
+- **Anchoring is the point, not just the value.** `--lat-solid` was being asked
+  to be a legible fill, legible text, a tint base *and* a 3:1 focus indicator at
+  once. Those constraints have no common solution, which is why this defect
+  resisted every attempt to fix it by moving the accent. Separating them means
+  focus contrast can be corrected without touching the brand colour — every
+  primary button, all accent text and every tint render exactly as before.
 
 APCA `Lc` is computed and emitted alongside every WCAG figure, as before.
 

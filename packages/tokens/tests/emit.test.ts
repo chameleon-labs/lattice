@@ -449,13 +449,23 @@ describe('tokens.json', () => {
       expect(token.$type, path).toBe('color')
       expect(token.$value.colorSpace, path).toBe('oklch')
       expect(token.$value.components, path).toHaveLength(3)
-      // Every primitive, chart, and severity swatch is opaque. Only the alpha
-      // tier — hairlines, wash, the focus ring, the tinted triple — carries a
-      // fraction less than 1, because that fraction is the whole point of the
-      // token; see the dedicated alpha-tier test below for the exact values.
+      // Every primitive, chart, and severity swatch is opaque. The alpha tier —
+      // hairlines, wash, the focus ring, the tinted triple — carries a fraction,
+      // because that fraction is the whole point of the token; see the dedicated
+      // alpha-tier test below for the exact values.
+      //
+      // The light focus ring is the one alpha-tier token at a full 1. Issue #47
+      // anchored it opaque: at 40% over a near-white surface the ring measured
+      // 1.55:1 against the 3:1 SC 1.4.11 requires, and no hue fixes that because
+      // 60% of the measurement is the surface. It stays in this tier because it
+      // is still declared as a colour *and* a fraction — dark still uses 0.4 —
+      // rather than because the fraction is always less than one.
       if (path.includes('.alpha.')) {
         expect(token.$value.alpha, path).toBeGreaterThan(0)
-        expect(token.$value.alpha, path).toBeLessThan(1)
+        expect(token.$value.alpha, path).toBeLessThanOrEqual(1)
+        if (!path.endsWith('.focus-ring')) {
+          expect(token.$value.alpha, path).toBeLessThan(1)
+        }
       } else {
         expect(token.$value.alpha, path).toBe(1)
       }

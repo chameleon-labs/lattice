@@ -38,7 +38,7 @@
  * Alpha values are composited over their surface before measuring, because that
  * is what a viewer sees.
  */
-import { ALPHA_CHANNEL, FOCUS_RING_ALPHA, HAIRLINE, TINT_FRACTIONS, WASH } from '../config/alpha.js'
+import { ALPHA_CHANNEL, FOCUS_RING, HAIRLINE, TINT_FRACTIONS, WASH } from '../config/alpha.js'
 import { CHROMATIC_SCALES, GRAY_ANCHORS, ON_SOLID_ANCHORS, SOLID_ANCHORS } from '../config/anchors.js'
 import { MODES, type Mode } from '../config/modes.js'
 import { apcaLc, contrastRatio } from './contrast.js'
@@ -93,7 +93,12 @@ function forMode(mode: Mode): LedgerEntry[] {
   const raised = parseHex(gray['bg-raised'])
   const solid = parseHex(SOLID_ANCHORS.accent[mode])
   const onSolid = parseHex(ON_SOLID_ANCHORS.accent![mode])
-  const ring = over(solid, FOCUS_RING_ALPHA, raised)
+  const field = parseHex(gray['field-bg'])
+  // The ring is anchored, not derived from `solid`. It is still composited over
+  // each surface: light ships opaque, so the composite is the anchor itself,
+  // while dark ships translucent and genuinely differs per surface — which is
+  // why all three are measured rather than one standing in for the others.
+  const ringOn = (surface: Rgb) => over(parseHex(FOCUS_RING[mode].hex), FOCUS_RING[mode].alpha, surface)
   // ALPHA_CHANNEL holds 0..255 strings for CSS output; normalise to the 0..1
   // the colour maths uses.
   const channel = ALPHA_CHANNEL[mode].split(' ').map((v) => Number(v) / 255)
@@ -172,8 +177,13 @@ function forMode(mode: Mode): LedgerEntry[] {
     entry(`${mode} text-subtle on bg-raised`, parseHex(gray['text-subtle']), raised, 4.5),
     entry(`${mode} on-solid on solid`, onSolid, solid, 4.5),
     entry(`${mode} solid as text on bg`, solid, bg, 4.5),
-    // SC 1.4.11: a focus indicator needs 3:1 against what surrounds it.
-    entry(`${mode} focus ring on bg-raised`, ring, raised, 3),
+    // SC 1.4.11: a focus indicator needs 3:1 against what surrounds it. Every
+    // surface a component draws the ring on is measured — `field-bg` is the
+    // weakest of the three in dark mode, so measuring only `bg-raised` would
+    // have reported a pass while a real pairing sat below the line.
+    entry(`${mode} focus ring on bg`, ringOn(bg), bg, 3),
+    entry(`${mode} focus ring on bg-raised`, ringOn(raised), raised, 3),
+    entry(`${mode} focus ring on field-bg`, ringOn(field), field, 3),
     entry(`${mode} hairline on bg-raised`, over(hairline, HAIRLINE[mode], raised), raised, 1),
     ...tints,
     ...tintsOnBg,

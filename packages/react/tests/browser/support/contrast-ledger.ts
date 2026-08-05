@@ -8,7 +8,7 @@ import { readFileSync } from 'node:fs'
  * ## Why a generated set, not a hand-copied one
  *
  * `docs/superpowers/specs/2026-08-03-lattice-identity-design.md` §9 documents
- * thirteen contrast pairs that fail WCAG and ship anyway — a knowing,
+ * twenty-one contrast pairs that fail WCAG and ship anyway — a knowing,
  * approved decision, not an oversight. `packages/tokens/generate/report.ts`
  * already computes that ledger and prints it on every build; hand-copying it
  * into a second list here would let the two drift the first time a token
