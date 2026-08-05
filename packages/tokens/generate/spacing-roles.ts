@@ -8,7 +8,7 @@
  *
  * ## Why the two representations do not have matching names
  *
- * A control's inset is one idea with two measures — `2` down the block axis and
+ * A label's inset is one idea with two measures — `2` down the block axis and
  * `4` across the inline one — and the two artefacts disagree about whether that
  * can be a single value.
  *
@@ -16,7 +16,7 @@
  * role emits as one custom property a call site can use directly:
  *
  * ```css
- * padding: var(--lat-inset-control-md);
+ * padding: var(--lat-inset-label-md);
  * ```
  *
  * DTCG cannot. Its `dimension` type is a single `{value, unit}` pair and the
@@ -24,7 +24,7 @@
  * two dimensions**, `block` and `inline`:
  *
  * ```json
- * "control-md": {
+ * "label-md": {
  *   "block":  { "$type": "dimension", "$value": "{global.space.2}" },
  *   "inline": { "$type": "dimension", "$value": "{global.space.4}" }
  * }
@@ -82,7 +82,7 @@ const reference = (name: SpaceName): string => `var(--lat-space-${name})`
 /**
  * The shorthand, block axis first. That is the order `padding` and `margin`
  * already define for two values; reversing it still parses, so nothing would
- * report the mistake except every control in the library coming out the wrong
+ * report the mistake except every padded element in the library coming out
  * shape.
  */
 const insetValue = (value: InsetValue): string =>

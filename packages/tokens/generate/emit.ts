@@ -486,7 +486,7 @@ export function emitTokens(): DesignTokens {
       inset: {
         $description:
           'What a component puts between its own edge and its content. Three families: ' +
-          '`control` (a control and its label), `row` (an item in a list), `surface` (a ' +
+          '`label` (an element and its short label), `row` (an item in a list), `surface` (a ' +
           'container and its children). A pair is a group of two dimensions — block and ' +
           'inline — because the format has no two-dimension type; see generate/spacing-roles.ts.',
         ...spacingRoles.inset

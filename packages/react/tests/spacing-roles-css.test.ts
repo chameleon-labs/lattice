@@ -151,7 +151,7 @@ describe('component spacing names its purpose', () => {
     )
     expect(emitted.size).toBeGreaterThan(0)
     for (const name of emitted) {
-      expect(name).toMatch(/^--lat-(inset-(control|row|surface)-(sm|md|lg|xl)|gap-(xs|sm|md|lg))$/)
+      expect(name).toMatch(/^--lat-(inset-(label|row|surface)-(sm|md|lg|xl)|gap-(xs|sm|md|lg))$/)
     }
   })
 })

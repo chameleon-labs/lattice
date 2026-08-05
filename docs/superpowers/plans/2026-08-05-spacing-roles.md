@@ -21,6 +21,13 @@
 
 ## The approved vocabulary
 
+> **Superseded naming.** The `control` family shipped as `--lat-inset-label-*`.
+> Two of its seven consumers turned out to be headers rather than controls, so
+> the name was wrong while the grouping was right. This file is left as the plan
+> that was executed; the
+> [spacing spec](../specs/2026-07-30-lattice-spacing-and-motion-design.md#the-shipped-inset-and-gap-vocabulary)
+> is the current record.
+
 | role | value | consumers |
 | --- | --- | --- |
 | `--lat-inset-control-sm` | `space-1 / space-3` | `.lat-button[data-size='sm']`, `.lat-code-block__copy` |
@@ -304,7 +311,17 @@ Replace each declaration with its role. Add the two exception comments:
 .lat-menu { padding: var(--lat-space-1); }
 ```
 
-`.lat-input`'s split `padding-block` / `padding-inline` collapses to `padding: var(--lat-inset-row-sm)`. Confirm the computed result is identical.
+~~`.lat-input`'s split `padding-block` / `padding-inline` collapses to `padding: var(--lat-inset-row-sm)`. Confirm the computed result is identical.~~
+
+> **This instruction was wrong and was not followed.** The two declarations are
+> on different elements, not two axes of one: `.lat-input-field` (the wrapper)
+> owns `padding-inline`, `.lat-input` (the `<input>`) owns `padding-block`.
+> Collapsing them onto the wrapper keeps the field's outer height identical —
+> which is exactly why "confirm the computed result is identical" would have
+> passed — but shrinks the `<input>`'s own box from 36px to 20px. The wrapper is
+> a `<div>`, not a `<label>`, so a click in the vertical padding would then land
+> on nothing and stop focusing the field. `.lat-input` stays on primitives, with
+> the reasoning in `input.css`.
 
 - [ ] **Step 3: Diff the baseline**
 

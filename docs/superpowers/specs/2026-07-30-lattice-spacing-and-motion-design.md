@@ -220,15 +220,15 @@ This slice does not add semantic inset or gap roles. Those mappings remain defer
 
 Deferring the mapping until components existed was the right call, and the reason is that **the vocabulary this document assumed turned out to be wrong**.
 
-The assumption above — one `--lat-inset-*` family sized `sm|md|lg` — was drafted before any component was written. It fails on contact with the first one. Two axes climbing a single three-step scale collide at the top: the largest control inset and the smallest surface inset want the same rung for different reasons, and one of them has to be wrong.
+The assumption above — one `--lat-inset-*` family sized `sm|md|lg` — was drafted before any component was written. It fails on contact with the first one. Two axes climbing a single three-step scale collide at the top: the largest label inset and the smallest surface inset want the same rung for different reasons, and one of them has to be wrong.
 
 What fourteen component stylesheets actually showed is **three families, distinguished by what they inset rather than by how much**:
 
 | Role | Block / inline | Where it came from |
 |---|---|---|
-| `--lat-inset-control-sm` | `space-1` / `space-3` | `.lat-button[data-size='sm']`, `.lat-code-block__copy` |
-| `--lat-inset-control-md` | `space-2` / `space-4` | `.lat-button[data-size='md']`, `.lat-tab`, `.lat-table__header` |
-| `--lat-inset-control-lg` | `space-3` / `space-5` | `.lat-button[data-size='lg']`, `.lat-card__header` |
+| `--lat-inset-label-sm` | `space-1` / `space-3` | `.lat-button[data-size='sm']`, `.lat-code-block__copy` |
+| `--lat-inset-label-md` | `space-2` / `space-4` | `.lat-button[data-size='md']`, `.lat-tab`, `.lat-table__header` |
+| `--lat-inset-label-lg` | `space-3` / `space-5` | `.lat-button[data-size='lg']`, `.lat-card__header` |
 | `--lat-inset-row-sm` | `space-2` / `space-3` | `.lat-menu__item`, `.lat-disclosure` |
 | `--lat-inset-row-md` | `space-3` / `space-4` | `.lat-table__cell` |
 | `--lat-inset-surface-sm` | `space-3` | `.lat-tab-panel`, `.lat-disclosure__content` |
@@ -237,7 +237,9 @@ What fourteen component stylesheets actually showed is **three families, disting
 | `--lat-inset-surface-xl` | `space-6` | `.lat-dialog` |
 | `--lat-gap-xs` \| `sm` \| `md` \| `lg` | `space-1` … `space-4` | 13 component declarations; 36 more in the proof pages, which keep primitives |
 
-The finding worth keeping is the **shape of the pairs**, not the sizes. Inline leads block by *two* steps for a control and by *one* for a row, at every rung. That is a difference in kind rather than degree — a control needs horizontal room for its label, a row is already bounded by its siblings — and it is exactly what stops a menu item reaching for a button's inset. A single `sm|md|lg` scale cannot express it.
+The finding worth keeping is the **shape of the pairs**, not the sizes. Inline leads block by *two* steps for a label and by *one* for a row, at every rung. That is a difference in kind rather than degree — a short label reads as cramped long before a paragraph does, and a row is already bounded by its siblings — and it is exactly what stops a menu item reaching for a button's inset. A single `sm|md|lg` scale cannot express it.
+
+**The `label` family was called `control` until the migration was already written**, and the rename is worth recording because the mistake is easy to repeat. Five of its seven consumers are controls, so the name looked right; the other two are headers — `.lat-table__header` is a `<th>`, `.lat-card__header` a `<div>` wrapping `.lat-card__label`. A role named for interactivity that two non-interactive elements have to borrow is doing exactly what the vocabulary exists to prevent, and the fix was the name rather than the grouping: what all seven share is a short label needing horizontal room. Renaming cost one commit before release and would have been a breaking change after.
 
 Gaps went the other way: named by size, because the measurement showed no purpose split to encode, and inventing one for symmetry would be a distinction the system does not have. They stop at `space-4`; larger gaps appear only in page layout, and a role covering them would invite a component to reach for a page-sized gap.
 

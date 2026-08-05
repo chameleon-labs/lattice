@@ -30,7 +30,7 @@
   inset-block-start: var(--lat-space-2);
   inset-inline-end: var(--lat-space-2);
 
-  padding: var(--lat-inset-control-sm);
+  padding: var(--lat-inset-label-sm);
 
   font-family: var(--lat-text-ui-font-family);
   font-size: var(--lat-text-ui-font-size);

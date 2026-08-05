@@ -81,9 +81,9 @@
   --lat-radius-none: 0rem;
   --lat-radius-sm: 0.1875rem;
   --lat-radius-full: 9999rem;
-  --lat-inset-control-sm: var(--lat-space-1) var(--lat-space-3);
-  --lat-inset-control-md: var(--lat-space-2) var(--lat-space-4);
-  --lat-inset-control-lg: var(--lat-space-3) var(--lat-space-5);
+  --lat-inset-label-sm: var(--lat-space-1) var(--lat-space-3);
+  --lat-inset-label-md: var(--lat-space-2) var(--lat-space-4);
+  --lat-inset-label-lg: var(--lat-space-3) var(--lat-space-5);
   --lat-inset-row-sm: var(--lat-space-2) var(--lat-space-3);
   --lat-inset-row-md: var(--lat-space-3) var(--lat-space-4);
   --lat-inset-surface-sm: var(--lat-space-3);

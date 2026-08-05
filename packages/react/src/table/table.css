@@ -18,7 +18,7 @@
 
 .lat-table__header {
   text-align: start;
-  padding: var(--lat-inset-control-md);
+  padding: var(--lat-inset-label-md);
   font-family: var(--lat-text-eyebrow-font-family);
   font-size: var(--lat-text-eyebrow-font-size);
   letter-spacing: var(--lat-text-eyebrow-letter-spacing);

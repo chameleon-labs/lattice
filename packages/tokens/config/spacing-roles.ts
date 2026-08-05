@@ -9,15 +9,23 @@
  * What the measurement showed instead is three families, each answering a
  * different question:
  *
- * - **control** — how much room a control gives its label. Inline leads block
- *   by two steps at every rung.
+ * - **label** — how much room an element gives a short label. Inline leads
+ *   block by two steps at every rung, because a short string reads as cramped
+ *   long before a paragraph does.
  * - **row** — how much room a row in a list gives its content. Inline leads by
  *   one, because a row is already bounded by its siblings.
  * - **surface** — how much room a container gives its children. Symmetric.
  *
- * The control/row split is the useful part: they are not neighbours on one
+ * The label/row split is the useful part: they are not neighbours on one
  * scale, they encode a difference in kind, and naming them by purpose is what
  * stops a menu item reaching for a button's inset.
+ *
+ * `label` was called `control` until the migration was already written, which
+ * is when it became clear the name did not fit its own consumers: two of the
+ * seven are headers rather than controls — `.lat-table__header` is a `<th>`
+ * and `.lat-card__header` a `<div>` wrapping `.lat-card__label`. What every
+ * consumer shares is a short label needing horizontal room, not interactivity.
+ * The grouping was right and the name was wrong.
  *
  * Values are primitive *names*, not numbers, so a change to `SPACES` flows
  * through every role rather than being restated here.
@@ -30,9 +38,9 @@ export type { SpaceName }
 export type InsetValue = readonly [SpaceName, SpaceName] | SpaceName
 
 export const INSET_ROLES = {
-  'control-sm': ['1', '3'],
-  'control-md': ['2', '4'],
-  'control-lg': ['3', '5'],
+  'label-sm': ['1', '3'],
+  'label-md': ['2', '4'],
+  'label-lg': ['3', '5'],
 
   'row-sm': ['2', '3'],
   'row-md': ['3', '4'],

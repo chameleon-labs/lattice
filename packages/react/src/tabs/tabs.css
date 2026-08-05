@@ -10,7 +10,7 @@
   font-weight: var(--lat-font-weight-semibold);
   line-height: var(--lat-text-ui-line-height);
 
-  padding: var(--lat-inset-control-md);
+  padding: var(--lat-inset-label-md);
   color: var(--lat-text-subtle);
   background-color: transparent;
   border: none;

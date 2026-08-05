@@ -16,12 +16,12 @@ import {
 describe('spacing roles', () => {
   it('names every inset by purpose, not by size alone', () => {
     for (const name of Object.keys(INSET_ROLES)) {
-      expect(name).toMatch(/^(control|row|surface)-/)
+      expect(name).toMatch(/^(label|row|surface)-/)
     }
   })
 
-  it('gives controls more inline inset than block, and rows less', () => {
-    // The two series are the finding this vocabulary encodes: a control needs
+  it('gives labels more inline inset than block, and rows less', () => {
+    // The two series are the finding this vocabulary encodes: a short label needs
     // horizontal room for its label, a row is already bounded by its siblings.
     const lead = (role: InsetRole) => {
       const v: InsetValue = INSET_ROLES[role]
@@ -29,7 +29,7 @@ describe('spacing roles', () => {
       const [block, inline] = v as readonly [SpaceName, SpaceName]
       return SPACES[inline].multiplier - SPACES[block].multiplier
     }
-    for (const role of ['control-sm', 'control-md', 'control-lg'] as const) {
+    for (const role of ['label-sm', 'label-md', 'label-lg'] as const) {
       expect(lead(role)).toBe(2)
     }
     for (const role of ['row-sm', 'row-md'] as const) expect(lead(role)).toBe(1)
@@ -68,7 +68,7 @@ describe('the emitted spacing roles', () => {
     // extracted from — the tier stops being a tier, and a change to SPACES
     // stops reaching it.
     expect(css).not.toMatch(/--lat-(inset|gap)-[a-z-]+:[^;]*[\d.]+rem/)
-    expect(css).toContain('--lat-inset-control-md: var(--lat-space-2) var(--lat-space-4);')
+    expect(css).toContain('--lat-inset-label-md: var(--lat-space-2) var(--lat-space-4);')
     expect(css).toContain('--lat-inset-surface-xl: var(--lat-space-6);')
     expect(css).toContain('--lat-gap-md: var(--lat-space-3);')
   })
@@ -81,7 +81,7 @@ describe('the emitted spacing roles', () => {
 
   it('writes a pair as block-then-inline, matching the CSS shorthand order', () => {
     // `padding: <block> <inline>` is the two-value shorthand's own order. Emitting
-    // inline first would be silently wrong: it still parses, and every control in
+    // inline first would be silently wrong: it still parses, and every padded
     // the library would come out the wrong shape.
     for (const [role, value] of Object.entries(INSET_ROLES)) {
       if (!Array.isArray(value)) continue

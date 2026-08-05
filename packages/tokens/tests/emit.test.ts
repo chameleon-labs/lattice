@@ -143,7 +143,7 @@ describe('lattice.css', () => {
 
     expect(globalBlock).toContain(spacingRoleCss())
     expect(count(spacingRoleCss())).toBe(SPACING_ROLE_COUNT)
-    expect(css.match(/--lat-inset-control-md:/g)).toHaveLength(1)
+    expect(css.match(/--lat-inset-label-md:/g)).toHaveLength(1)
     expect(css.match(/--lat-gap-lg:/g)).toHaveLength(1)
     for (const block of [lightBlock, darkBlock, mediaBlock]) {
       expect(block).not.toMatch(/--lat-(inset|gap)-/)
