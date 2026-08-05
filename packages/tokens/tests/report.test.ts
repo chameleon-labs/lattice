@@ -3,7 +3,7 @@ import { FOCUS_RING } from '../config/alpha.js'
 import { GRAY_ANCHORS } from '../config/anchors.js'
 import { contrastRatio } from '../generate/contrast.js'
 import { parseHex } from '../generate/oklch.js'
-import { buildLedger } from '../generate/report.js'
+import { buildLedger, over } from '../generate/report.js'
 
 describe('contrast ledger', () => {
   it('records exactly the twenty-one known failures, in emission order', () => {
@@ -83,8 +83,9 @@ describe('contrast ledger', () => {
     // This test used to assert the opposite — that light measured *below* 3:1 —
     // because the ring was `--lat-solid` at 40% and could not reach it at any
     // hue. Issue #47 anchored the ring instead. All six rows are asserted here
-    // rather than the one that used to fail: measuring only `bg-raised` is what
-    // let the weakest pairing (dark on `field-bg`, 3.17) go unexamined.
+    // rather than only the one that used to fail: `bg-raised` alone left the
+    // narrowest pairing (dark on `field-bg`, 3.17 — passing, but the row with
+    // least room) unmeasured.
     const ledger = buildLedger()
     const rings = ledger.filter((e) => e.name.includes('focus ring'))
 
@@ -112,12 +113,24 @@ describe('contrast ledger', () => {
     expect(FOCUS_RING.light.alpha).toBe(1)
     expect(FOCUS_RING.dark.alpha).toBeLessThan(1)
 
-    // And anchoring dark opaque would introduce a failure rather than fix one.
+    // And the alternative — anchoring dark opaque the way light is — introduces
+    // a failure rather than fixing one. The candidate colour for that is not the
+    // raw anchor `#cff23a` (nobody ever sees that; it is never drawn at alpha 1)
+    // but the colour the translucent ring *renders as* today. Freezing that one
+    // rendered value is exactly what loses the per-surface adaptation.
     const field = parseHex(GRAY_ANCHORS.dark['field-bg'])
-    const darkOpaque = contrastRatio(parseHex(FOCUS_RING.dark.hex), field)
-    expect(darkOpaque).toBeGreaterThan(3)
+    const asRenderedOnRaised = over(
+      parseHex(FOCUS_RING.dark.hex),
+      FOCUS_RING.dark.alpha,
+      parseHex(GRAY_ANCHORS.dark['bg-raised'])
+    )
+    expect(contrastRatio(asRenderedOnRaised, field)).toBeLessThan(3)
+
+    // Translucent, the same ring clears the same surface, because it composites
+    // with it instead of sitting on top of it.
     const darkComposited = buildLedger().find((e) => e.name === 'dark focus ring on field-bg')!
     expect(darkComposited.ratio).toBeGreaterThanOrEqual(3)
+    expect(darkComposited.passes).toBe(true)
   })
 
   it('reports APCA alongside every WCAG figure', () => {

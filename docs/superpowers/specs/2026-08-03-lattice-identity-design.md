@@ -418,7 +418,7 @@ WCAG 2.x on the delivered values:
 | dark focus ring `primary/40` vs `card` | 3.20 | passes SC 1.4.11 |
 | hairline border vs its surface | 1.20 / 1.19 | decorative; see below |
 
-**Thirteen failures ship**, not nine. *(Superseded below — the real count is twenty-two.)* *Corrected 2026-08-04, during the
+**Thirteen failures ship**, not nine. *(Superseded twice below — the current count is twenty-one of fifty-four pairs.)* *Corrected 2026-08-04, during the
 whole-phase component review.* The count of nine (itself corrected up from an
 original four earlier the same day) covered the six grey and accent pairs plus
 the chromatic tinted triple. It never measured the severity ramp's own tinted
@@ -448,6 +448,9 @@ pair — see `packages/tokens/config/charts.ts`.
 
 *Corrected 2026-08-04, while making the accessibility sweep's assertion
 honest.* The count above is superseded. **Twenty-two of fifty pairs fail.**
+*(Twenty-one of fifty-four as of issue #47, which fixed the light focus ring
+and added two ledger rows per mode — see the section after next. The figures in
+this section are the ones that were true when it was written.)*
 
 The sweep had asserted zero axe violations, which made it permanently red
 against a system that ships failures deliberately. Rewriting it to assert *the
@@ -477,12 +480,17 @@ on a raised surface and fails on the page, so no amount of re-reading the old
 ledger would have surfaced it. It took measuring the composite.
 
 Lattice's values did not change. What changed, for the fourth time, is how
-much of them is measured — four, then nine, then thirteen, now twenty-two.
+much of them is measured — four, then nine, then thirteen, then twenty-two.
 Each rise came from measuring a pairing that had been invisible rather than
 from anything getting worse, and each was found by building something that had
 to be right about the numbers: a report, a page, a test.
 
-Twenty-two is still twenty-two more than a system with a hard gate would ship. (Twenty-one as of issue #47 — see below.)
+**The count is now twenty-one**, and that fifth movement is the first of a
+different kind: the light focus ring was *fixed* rather than newly measured.
+See "The light focus ring has since been fixed" below. Every other row in this
+table still ships as delivered.
+
+Twenty-one is still twenty-one more than a system with a hard gate would ship.
 That is the consequence of the decision in §"The premise", taken knowingly,
 and the ledger exists so it stays visible rather than becoming folklore.
 

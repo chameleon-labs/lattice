@@ -62,7 +62,12 @@ export interface LedgerEntry {
  * expects the same. Do not round here — rounding a 0..1 channel collapses it to
  * 0 or 1 and every ratio below becomes fiction.
  */
-function over(fg: Rgb, alpha: number, bg: Rgb): Rgb {
+/**
+ * Source-over compositing. Exported so tests measure with the same function the
+ * ledger does — a second implementation is how the 0..1-vs-0..255 channel bug
+ * got in last time.
+ */
+export function over(fg: Rgb, alpha: number, bg: Rgb): Rgb {
   return {
     r: alpha * fg.r + (1 - alpha) * bg.r,
     g: alpha * fg.g + (1 - alpha) * bg.g,
@@ -178,9 +183,11 @@ function forMode(mode: Mode): LedgerEntry[] {
     entry(`${mode} on-solid on solid`, onSolid, solid, 4.5),
     entry(`${mode} solid as text on bg`, solid, bg, 4.5),
     // SC 1.4.11: a focus indicator needs 3:1 against what surrounds it. Every
-    // surface a component draws the ring on is measured — `field-bg` is the
-    // weakest of the three in dark mode, so measuring only `bg-raised` would
-    // have reported a pass while a real pairing sat below the line.
+    // surface a component draws the ring on is measured, rather than one
+    // standing in for the others. All six currently pass; `field-bg` is the
+    // narrowest at 3.17 in dark, so it is the row that would move first if a
+    // surface or the ring changed — which is the reason to measure it, not a
+    // claim that it fails today.
     entry(`${mode} focus ring on bg`, ringOn(bg), bg, 3),
     entry(`${mode} focus ring on bg-raised`, ringOn(raised), raised, 3),
     entry(`${mode} focus ring on field-bg`, ringOn(field), field, 3),
