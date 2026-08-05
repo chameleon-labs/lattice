@@ -35,6 +35,11 @@ import {
   motionCss,
   motionTokens
 } from './motion.js'
+import {
+  SPACING_ROLE_COUNT,
+  spacingRoleCss,
+  spacingRoleTokens
+} from './spacing-roles.js'
 import { resolveAlpha, resolveAll, resolveTints } from './anchors.js'
 import type { AlphaToken, Swatch } from './anchors.js'
 import { formatOklch } from './format.js'
@@ -128,6 +133,7 @@ export function emitCss(): string {
 /* Colour: ${GRAY_ROLES.length} grey roles + ${CHROMATIC_SCALES.length} chromatic solids, both modes. */
 /* Typography: ${TYPOGRAPHY_PRIMITIVE_COUNT} primitives; ${TYPOGRAPHY_ROLE_COUNT} semantic roles x ${TYPOGRAPHY_ROLE_PROPERTY_COUNT} properties. */
 /* Layout primitives: ${LAYOUT_PRIMITIVE_COUNTS.space} spacing; ${LAYOUT_PRIMITIVE_COUNTS.breakpoint} breakpoints; ${LAYOUT_PRIMITIVE_COUNTS.container} containers; ${LAYOUT_PRIMITIVE_COUNTS.radius} radii. */
+/* Spacing roles: ${SPACING_ROLE_COUNT} inset and gap roles, theme-independent, emitted once. */
 /* Motion primitives: ${MOTION_PRIMITIVE_COUNTS.duration} durations; ${MOTION_PRIMITIVE_COUNTS.easing} easings. */
 /* Elevation: ${SHADOW_PRIMITIVE_COUNT} shadows; ${ELEVATION_ROLE_COUNT} role tokens, emitted once for both modes. */
 
@@ -136,6 +142,7 @@ ${fontFaceCss()}
 :root {
 ${typographyCss()}
 ${layoutCss()}
+${spacingRoleCss()}
 ${motionCss()}
 ${typographyRoleCss()}
 ${elevationCss()}
@@ -461,6 +468,7 @@ export function emitTokens(): DesignTokens {
   }
 
   const elevation = elevationTokens()
+  const spacingRoles = spacingRoleTokens()
 
   return {
     $schema: DTCG_SCHEMA,
@@ -475,6 +483,20 @@ export function emitTokens(): DesignTokens {
       ...typographyTokens(),
       ...layoutTokens(),
       ...motionTokens(),
+      inset: {
+        $description:
+          'What a component puts between its own edge and its content. Three families: ' +
+          '`control` (a control and its label), `row` (an item in a list), `surface` (a ' +
+          'container and its children). A pair is a group of two dimensions — block and ' +
+          'inline — because the format has no two-dimension type; see generate/spacing-roles.ts.',
+        ...spacingRoles.inset
+      },
+      gap: {
+        $description:
+          'What a component puts between adjacent children. Named by size rather than ' +
+          'purpose: the component stylesheets showed no purpose split to encode.',
+        ...spacingRoles.gap
+      },
       text: typographyRoleTokens(),
       shadow: elevation.shadow,
       elevation: {
