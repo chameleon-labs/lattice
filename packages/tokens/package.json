@@ -1,7 +1,6 @@
 {
   "name": "@chameleon-labs/lattice-tokens",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0-rc.1",
   "description": "The token layer of Lattice, an accessibility-first design system. Colour, typography, and layout values are generated from reviewed config; contrast is measured and reported at build time, not gated.",
   "license": "MIT",
   "author": "George Karan",
@@ -22,6 +21,9 @@
     "wcag"
   ],
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist"
   ],
@@ -36,7 +38,8 @@
     "**/*.css"
   ],
   "scripts": {
-    "build": "tsc --noEmit && tsx generate/build.ts",
+    "build": "node ../../scripts/clean.mjs dist && tsc --noEmit && tsx generate/build.ts",
+    "prepack": "pnpm build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run && playwright test",
     "test:unit": "vitest run",

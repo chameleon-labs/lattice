@@ -2,7 +2,7 @@
 
 > The design system behind [tabstop](https://github.com/chameleon-labs/tabstop) and whatever comes next. Accessibility is the constraint, not the feature.
 
-**Status: early development.** Colour, typography, spacing/motion and elevation are specified and built, and eighteen component families ship on top of them; nothing is published yet.
+**Status: early development.** Colour, typography, spacing/motion and elevation are specified and built, and eighteen component families ship on top of them. Both packages publish from CI with provenance — see [Releasing](#releasing) — and the first cut is a **release candidate**, `0.1.0-rc.1`, published under the `rc` dist-tag rather than `latest`. At 0.x **no API stability is promised**: the token indirection layer exists and is used internally, but is not documented as a public theming API.
 
 ## The name
 
@@ -65,6 +65,35 @@ The severity ramp's `critical` and `serious` levels are anchored to the same col
 
 **Anything outside these thirteen is a real defect, not an accepted one.** The `Pages/System` and `Pages/Landing` Storybook stories — see [Development](#development) — are the acceptance test that checks for exactly that distinction: both bundle pages rebuilt from this package's public components alone, swept by the same axe-core suite. See [`docs/superpowers/plans/2026-08-03-lattice-gaps.md`](./docs/superpowers/plans/2026-08-03-lattice-gaps.md) for the full triage of every axe finding against this ledger, the resulting library gap list, and the deliberate omissions (`ScoreArc`, the score-history chart, the untouched shadcn components).
 
+## Install
+
+While the current release is a candidate it carries the `rc` dist-tag, so an unqualified `npm i` will not find it — ask for `@rc` explicitly. Drop the suffix once `0.1.0` proper is out.
+
+Tokens alone, for a consumer that never touches React:
+
+```sh
+npm i @chameleon-labs/lattice-tokens@rc
+```
+
+```ts
+import '@chameleon-labs/lattice-tokens/lattice.css'
+```
+
+With the components — `react`, `react-dom` and `@ariakit/react` are peers, and both stylesheets are imported by the application, in this order:
+
+```sh
+npm i @chameleon-labs/lattice-react@rc @chameleon-labs/lattice-tokens@rc @ariakit/react
+```
+
+```ts
+import '@chameleon-labs/lattice-tokens/lattice.css'
+import '@chameleon-labs/lattice-react/styles.css'
+```
+
+Dark is the default; light mode is opt-in per subtree with `data-lat-theme="light"`.
+
+The two packages release **in lockstep** at one version, and the React package's peer range says so. A component stylesheet is nothing but `var(--lat-*)` references resolving into the token package, so a mismatched pair renders unstyled rather than failing loudly — the shared version number is what makes the supported pair obvious.
+
 ## Scope
 
 **In:** colour scales, semantic colour tokens, light and dark modes (dark is the default), a per-scale computed on-solid, an ordered severity ramp, validated categorical and sequential chart palettes, primitive and semantic typography tokens, primitive spacing, breakpoints, containers and radii tokens, primitive motion tokens, four elevation roles (theme-independent), and eighteen component families on Ariakit.
@@ -116,6 +145,51 @@ packages/
 Inside `packages/tokens/`, `config/` declares reviewed token values and contracts and `generate/` turns them into artefacts. `dist/` is generated output and is not committed.
 
 Never hand-edit a primitive token, and never hand-edit `dist/`. Change the config and rebuild — a value that is not declared or computed does not ship.
+
+## Releasing
+
+Both packages ship at one version, and releasing is one button: **Actions → Cut release → Run workflow**. Pick how far to move the version and it does the rest — bump both manifests, commit, tag, and start the release.
+
+| bump | from `0.1.0-rc.1` | when |
+|---|---|---|
+| `current` | `0.1.0-rc.1` | the first release, or re-cutting one that failed before publishing |
+| `prerelease` | `0.1.0-rc.2` | another candidate |
+| `release` | `0.1.0` | graduate the candidate |
+| `minor` | `0.1.0` | — the candidate *is* 0.1.0, so this graduates too |
+| `major` | `1.0.0` | |
+
+`dry_run` runs every check and works out the version without tagging anything.
+
+**Only repository members can start one.** Both triggers — `workflow_dispatch` and pushing a `v*` tag — require write access, enforced by GitHub rather than by anything in the workflow; a fork or an outside contributor cannot reach either. The `npm-publish` environment on the release job is where that tightens further: add required reviewers in *Settings → Environments* and every release waits for an approval, with no change to the workflow. `NPM_TOKEN` belongs to that environment rather than to the repository at large, so no other workflow can read it.
+
+Two things about the automation are worth knowing, because both are surprising:
+
+- **A tag pushed by Actions does not trigger the release.** GitHub suppresses workflow events raised by the default `GITHUB_TOKEN` so a workflow cannot trigger itself in a loop, so `on: push: tags` never fires for it. `workflow_dispatch` is a documented exception, so `cut-release.yml` tags *and then dispatches* `release.yml` explicitly. A tag pushed from a laptop still triggers it the ordinary way — both paths work, for different reasons.
+- **A bot commits the version bump straight to `main`**, so if `main` is protected the push needs an exemption.
+
+The manual path still works if you would rather do it yourself — bump both manifests, commit, then `git tag v0.1.0-rc.1 && git push origin v0.1.0-rc.1`.
+
+**The dist-tag is derived from the version, never remembered.** npm tags whatever it publishes `latest` unless told otherwise, so a forgotten `--tag` on a prerelease silently hands every consumer an RC. The workflow reads the version instead — `0.1.0-rc.1` publishes under `rc`, `0.1.0-beta.3` under `beta`, `0.1.0` under `latest` — marks the GitHub Release as a prerelease to match, and afterwards asserts that `latest` did *not* move to the prerelease.
+
+[`.github/workflows/release.yml`](./.github/workflows/release.yml) re-runs the whole contract suite on the tagged commit, packs both packages, verifies the tarballs, publishes them to npm with provenance, and opens a GitHub Release. It needs an `NPM_TOKEN` secret — an npm automation token with publish rights on the `@chameleon-labs` scope.
+
+**Two tools, deliberately.** `pnpm pack` builds the tarball, because only pnpm rewrites the `workspace:` protocol into a real semver range; `npm publish` ships that tarball, because only npm generates provenance — pnpm 10.7 has no such flag. The publish step uploads the exact bytes the verification step checked, so nothing can change in between.
+
+**The exit code is not the evidence.** pnpm and npm both *skip* a package marked `private` rather than erroring: `pnpm publish -r` prints "There are no new packages that should be published" and exits 0. A release that did nothing looks exactly like one that worked. So the workflow asks the registry directly afterwards, and two scripts run on every PR — long before anyone tries to publish:
+
+```sh
+node scripts/bump-version.mjs --self-test   # the version arithmetic
+node scripts/check-release.mjs              # manifests: private, versions, exports vs files
+node scripts/verify-tarballs.mjs            # packs into .release/ and proves each is consumable
+```
+
+`bump-version.mjs` computes the next version and rewrites both manifests, in lockstep, with no semver dependency — the workspace root installs nothing and this runs before `pnpm install`. It follows npm's own rules, including the counterintuitive one: `patch` on `0.1.0-rc.1` gives **`0.1.0`**, not `0.1.1`, because the candidate was a rehearsal of that release. Its `--self-test` checks nineteen cases on every PR, since version arithmetic is a poor thing to debug mid-release.
+
+`check-release.mjs` fails on a package still marked `private`, a version the two packages disagree on, a missing `publishConfig.access`, or an `exports` entry pointing outside `files` — which resolves locally, where the whole working tree is present, and 404s for the consumer. Given the tag it also asserts both manifests match it.
+
+`verify-tarballs.mjs` packs each package and checks that every path its `exports` map promises is present and non-empty, that `README.md` and `LICENSE` are there, that no `workspace:` range survived into the packed manifest, and that no story or test file leaked into the consumer's module graph. The required set is derived from the manifest rather than hand-listed, so a new export cannot be added without the check following it.
+
+Both are cheap to run locally; `.release/` is gitignored.
 
 ## Fonts
 

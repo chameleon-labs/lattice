@@ -62,6 +62,25 @@ jobs:
       - name: Build Storybook
         run: pnpm build-storybook
 
+      # Release preconditions are checked on every PR, not only at release. A
+      # package still marked `private`, an `exports` entry pointing outside
+      # `files`, or a version the two packages disagree on are all invisible
+      # until someone tries to publish — the worst moment to discover them.
+      # The version arithmetic is checked here rather than discovered during a
+      # release: `bump-version.mjs` decides what a tag will be called, and
+      # `patch` on a prerelease graduating rather than incrementing is exactly
+      # the sort of rule that is easy to get subtly wrong.
+      - name: Check release preconditions
+        run: |
+          node scripts/bump-version.mjs --self-test
+          node scripts/check-release.mjs
+
+      # Packs both packages and proves each tarball is consumable. The release
+      # workflow runs the same script and publishes the files it produces, so
+      # this is a rehearsal of the real thing rather than an approximation.
+      - name: Pack and verify tarballs
+        run: node scripts/verify-tarballs.mjs
+
       # dist/ is gitignored, so a broken emit would otherwise be invisible until
       # release. This proves every published file exists and is non-empty.
       - name: Verify emitted artefacts

@@ -1,0 +1,214 @@
+name: Cut release
+
+# The button that ships a release. Run it from the Actions tab, pick how far to
+# move the version, and it bumps both manifests, commits, tags, and starts the
+# release. Nothing to edit by hand and nothing to remember.
+#
+# Every step before the push is a guard, and each covers something that cannot
+# be undone: an npm version is immutable, and a tag that fails to release has to
+# be deleted by hand before it can be retried. The cheap checks run first so a
+# mistake costs seconds rather than a half-finished release.
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'How far to move the version'
+        required: true
+        # `current` is the default because it is what a first release needs: the
+        # manifests already carry the version, and bumping would skip it. After
+        # that it is also the right answer for re-cutting a release that failed
+        # before it published anything. Choosing it when the version *has* been
+        # released is caught — the tag already exists.
+        default: current
+        type: choice
+        options:
+          - current      # release the version the manifests already carry
+          - prerelease   # 0.1.0-rc.1 -> 0.1.0-rc.2
+          - release      # 0.1.0-rc.1 -> 0.1.0   (graduate the candidate)
+          - patch        # 0.1.0      -> 0.1.1
+          - minor        # 0.1.0      -> 0.2.0
+          - major        # 0.1.0      -> 1.0.0
+          - prepatch     # 0.1.0      -> 0.1.1-rc.0
+          - preminor     # 0.1.0      -> 0.2.0-rc.0
+          - premajor     # 0.1.0      -> 1.0.0-rc.0
+      preid:
+        description: 'Prerelease identifier, for the pre* bumps'
+        required: false
+        default: rc
+        type: string
+      dry_run:
+        description: 'Work out the version and run every check, but tag nothing'
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: cut-release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  cut:
+    runs-on: ubuntu-latest
+
+    permissions:
+      # Committing the version bump and pushing the tag.
+      contents: write
+      # Dispatching the release workflow. A tag pushed with the default
+      # GITHUB_TOKEN does *not* fire `on: push: tags` — GitHub suppresses it so
+      # a workflow cannot trigger itself into a loop. `workflow_dispatch` is one
+      # of the two documented exceptions, so the release is started explicitly
+      # at the end of this job rather than left to the tag event. A tag pushed
+      # by a human from a laptop still triggers it the ordinary way.
+      actions: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Tags, so the "does this already exist" check can see them, and full
+          # history for the ancestry check below.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+
+      # Inputs travel through `env:` rather than `${{ }}` interpolation. `${{ }}`
+      # is substituted into the script text before the shell ever sees it, so an
+      # input containing shell metacharacters would be executed rather than read.
+      - name: Work out the next version
+        id: version
+        env:
+          BUMP: ${{ inputs.bump }}
+          PREID: ${{ inputs.preid }}
+        run: |
+          set -euo pipefail
+          node scripts/bump-version.mjs --self-test
+          node scripts/bump-version.mjs "${BUMP}" --preid "${PREID}"
+
+      - name: Check the tag, the registry and the branch
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          tag="v${VERSION}"
+
+          # The manifests were just rewritten — this proves the result is
+          # publishable and internally consistent before anything is committed.
+          # Same script CI runs on every PR.
+          node scripts/check-release.mjs "${tag}"
+
+          if git rev-parse --verify --quiet "refs/tags/${tag}" >/dev/null; then
+            echo "tag ${tag} already exists — delete it first, or pick a different bump"
+            exit 1
+          fi
+
+          # An npm version is immutable. Finding it already published means this
+          # release is finished or half-done, and tagging again will not help.
+          for name in lattice-tokens lattice-react; do
+            package="@chameleon-labs/${name}"
+            published="$(npm view "${package}@${VERSION}" version 2>/dev/null || true)"
+            if [ "${published}" = "${VERSION}" ]; then
+              echo "${package}@${VERSION} is already on npm — versions cannot be republished"
+              exit 1
+            fi
+          done
+
+          # Release from the tip of main, and only from main.
+          #
+          # `workflow_dispatch` can be run against any branch, and the version
+          # bump below is pushed to whichever ref that is. An ancestry check
+          # alone was not enough: any commit already merged into main passes it,
+          # so dispatching from a stale branch would have committed the bump to
+          # that branch and left the published tag on a commit main does not
+          # contain — a release nobody can find from the default branch.
+          #
+          # Requiring the exact tip rather than mere reachability also means a
+          # main that moved between dispatch and run is a re-run rather than a
+          # silent release of something older than intended.
+          if [ "${GITHUB_REF_NAME}" != "main" ]; then
+            echo "releases are cut from main — this run is on '${GITHUB_REF_NAME}'"
+            exit 1
+          fi
+
+          git fetch --quiet origin main
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+            echo "HEAD ($(git rev-parse --short HEAD)) is not the tip of origin/main ($(git rev-parse --short origin/main))"
+            echo "main moved since this run started — dispatch it again"
+            exit 1
+          fi
+
+          echo "TAG=${tag}" >> "$GITHUB_ENV"
+          echo "ok: ${tag} is ready to cut from $(git rev-parse --short HEAD)"
+
+      - name: Commit, tag and push
+        if: ${{ !inputs.dry_run }}
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          PREVIOUS: ${{ steps.version.outputs.previous }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          git add packages/*/package.json
+
+          # A `current` release changes no file, so there is nothing to commit
+          # and the tag simply lands on the commit that is already there.
+          # `git commit` would fail on an empty index rather than no-op.
+          if git diff --cached --quiet; then
+            echo "version unchanged at ${VERSION} — tagging the existing commit"
+          else
+            git commit -m "Release ${VERSION}" -m "${PREVIOUS} -> ${VERSION}, cut by ${GITHUB_ACTOR}."
+            # Explicitly to main, not to the ref this was dispatched on. The
+            # guard above already proved they are the same thing; naming main
+            # here means a future change to that guard cannot quietly turn this
+            # into a push to somewhere else.
+            #
+            # The commit first, then the tag. If this push is rejected — a
+            # protected branch, or main having moved under us — the tag does not
+            # exist remotely yet and there is nothing to unpick.
+            git push origin HEAD:main
+          fi
+
+          # Annotated, not lightweight: the tag carries who cut it and when,
+          # which is what the generated release notes are anchored against.
+          git tag -a "${TAG}" -m "Lattice ${VERSION}"
+          git push origin "${TAG}"
+          echo "pushed ${TAG}"
+
+      # `--ref "${TAG}"` runs the release workflow *as defined at the tag*, so a
+      # release is always performed by the pipeline that shipped alongside the
+      # code being released, not by whatever main has drifted to since.
+      - name: Start the release
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run release.yml --ref "${TAG}" -f tag="${TAG}"
+          echo "dispatched release.yml for ${TAG}"
+
+      - name: Summary
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          PREVIOUS: ${{ steps.version.outputs.previous }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          {
+            if [ "${DRY_RUN}" = "true" ]; then
+              echo "### Dry run — nothing was tagged"
+              echo
+              echo "\`${PREVIOUS}\` → \`${VERSION}\`, and every check passed."
+            else
+              echo "### Cut \`${TAG}\`"
+              echo
+              echo "- \`${PREVIOUS}\` → \`${VERSION}\` on commit \`$(git rev-parse --short HEAD)\`"
+              echo "- released by [release.yml](../../actions/workflows/release.yml), dispatched from this run"
+              echo "- publishing \`@chameleon-labs/lattice-tokens@${VERSION}\` and \`@chameleon-labs/lattice-react@${VERSION}\`"
+              echo
+              echo "Nothing is on npm yet — the release workflow runs the full contract suite first."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

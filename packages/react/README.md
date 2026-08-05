@@ -26,8 +26,24 @@ against source review.
 
 ## Install
 
+```sh
+npm i @chameleon-labs/lattice-react@rc @chameleon-labs/lattice-tokens@rc @ariakit/react
+```
+
+The current release is a candidate, published under the `rc` dist-tag rather
+than `latest`, so an unqualified `npm i` will not find it. Drop the suffix once
+`0.1.0` proper is out.
+
 React, `react-dom`, `@ariakit/react` and `@chameleon-labs/lattice-tokens` are
 peer dependencies. This package ships no runtime dependencies of its own.
+
+The token peer is pinned to the **exact** matching version, not to `*` and not
+to a caret range. The two packages release in lockstep, and every rule in the
+stylesheet below is a `var(--lat-*)` reference resolving into the token
+package — a pair that does not match renders unstyled rather than failing
+loudly. A range that permitted any other token version would quietly allow
+exactly the combination lockstep exists to prevent, so the published peer names
+one version and your installer refuses the rest.
 
 Both stylesheets are imported by the application, in this order:
 

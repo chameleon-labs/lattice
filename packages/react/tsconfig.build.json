@@ -6,15 +6,40 @@
   "compilerOptions": {
     "noEmit": false,
     "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    // No maps, deliberately. A map is a pointer to a source file, and `files`
+    // ships `dist` only — so every emitted `.d.ts.map` and `.js.map` resolved
+    // to a `../src/` that is not in the tarball. A map whose sources are
+    // missing is worse than no map: editors and debuggers try to load it and
+    // fail, where absence is simply handled. The declarations carry the types
+    // and their doc comments regardless.
+    //
+    // The alternative — shipping `src` so the maps resolve — was rejected: it
+    // roughly doubles the tarball to publish the CSS that dist/styles.css has
+    // already inlined, and the `exports` map has no wildcard, so nothing in
+    // `src` would be importable anyway. scripts/verify-tarballs.mjs enforces
+    // this rather than leaving it to be re-litigated.
+    "declarationMap": false,
+    "sourceMap": false,
     "outDir": "dist",
     "rootDir": "src"
   },
   "include": ["src"],
-  // Stories are co-located with the component they document, which puts them
-  // inside `rootDir`. Without this they would compile into dist/ and ship to
-  // consumers, dragging @storybook/react-vite along as a runtime import.
-  // tsconfig.json still includes them, so they remain typechecked.
-  "exclude": ["src/**/*.stories.tsx"]
+  "exclude": [
+    // Stories are co-located with the component they document, which puts them
+    // inside `rootDir`. Without this they would compile into dist/ and ship to
+    // consumers, dragging @storybook/react-vite along as a runtime import.
+    // tsconfig.json still includes them, so they remain typechecked.
+    "src/**/*.stories.tsx",
+    // The two acceptance-fixture pages, and the chart and icon components that
+    // exist only to build them. `index.ts` exports none of it and the `exports`
+    // map has no wildcard, so a consumer could not import it if they tried —
+    // it was 88K of unreachable JavaScript in every install. Found by packing
+    // the tarball and reading what was actually in it.
+    //
+    // Only the JavaScript. `src/pages/pages.css` is still `@import`ed by
+    // `src/styles.css` and so is still inlined into the published stylesheet;
+    // untangling that is a separate question from this one, because those rules
+    // deliberately sit after `button.css` and `table.css` in the cascade.
+    "src/pages"
+  ]
 }
