@@ -13,8 +13,8 @@
 .lat-card__header {
   display: flex;
   align-items: center;
-  gap: var(--lat-space-2);
-  padding: var(--lat-space-3) var(--lat-space-5);
+  gap: var(--lat-gap-sm);
+  padding: var(--lat-inset-label-lg);
   border-bottom: 1px solid var(--lat-border);
   color: var(--lat-text-subtle);
 }
@@ -28,4 +28,4 @@
   text-transform: var(--lat-text-eyebrow-text-transform);
 }
 
-.lat-card__body { padding: var(--lat-space-5); }
+.lat-card__body { padding: var(--lat-inset-surface-lg); }

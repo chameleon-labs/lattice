@@ -1,6 +1,6 @@
 .lat-tab-list {
   display: flex;
-  gap: var(--lat-space-1);
+  gap: var(--lat-gap-xs);
   border-bottom: 1px solid var(--lat-border);
 }
 
@@ -10,7 +10,7 @@
   font-weight: var(--lat-font-weight-semibold);
   line-height: var(--lat-text-ui-line-height);
 
-  padding: var(--lat-space-2) var(--lat-space-4);
+  padding: var(--lat-inset-label-md);
   color: var(--lat-text-subtle);
   background-color: transparent;
   border: none;
@@ -61,7 +61,7 @@
 }
 
 .lat-tab-panel {
-  padding: var(--lat-space-3);
+  padding: var(--lat-inset-surface-sm);
   color: var(--lat-text);
 }
 

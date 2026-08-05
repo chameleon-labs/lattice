@@ -189,7 +189,7 @@ Three tiers, matching colour and typography.
 
 **Tier 1 — primitive, generated.** `--lat-space-*`, `--lat-radius-*`, `--lat-shadow-*`, `--lat-duration-*`, `--lat-easing-*`, `--lat-breakpoint-*`, `--lat-container-*`.
 
-**Tier 2 — semantic role, hand-authored.** `--lat-inset-*` for component padding, `--lat-gap-*` for layout rhythm, `--lat-elevation-*` bundling the three signals of a level.
+**Tier 2 — semantic role, hand-authored.** `--lat-inset-*` for component padding, `--lat-gap-*` for layout rhythm, `--lat-elevation-*` bundling the three signals of a level. Shipped for spacing in [#38](https://github.com/chameleon-labs/lattice/issues/38) — see [the vocabulary below](#the-shipped-inset-and-gap-vocabulary), which is not the one this section predicted.
 
 **Tier 3 — component tokens.** Permitted with a written justification in review, as in colour.
 
@@ -215,6 +215,45 @@ It contains exactly 28 tokens: sixteen spacing steps, four breakpoints, three co
 DTCG names cannot contain `.`, so the two fractional spacing steps use the multiplier-preserving slugs `0-5` and `1-5` in both artefacts: `--lat-space-0-5` matches `global.space.0-5`, and `--lat-space-1-5` matches `global.space.1-5`.
 
 This slice does not add semantic inset or gap roles. Those mappings remain deferred until the component inventory demonstrates the vocabulary it needs. It also does not add a `full` container: edge-to-edge remains the absence of a container.
+
+### The shipped inset and gap vocabulary
+
+Deferring the mapping until components existed was the right call, and the reason is that **the vocabulary this document assumed turned out to be wrong**.
+
+The assumption above — one `--lat-inset-*` family sized `sm|md|lg` — was drafted before any component was written. It fails on contact with the first one. Two axes climbing a single three-step scale collide at the top: the largest label inset and the smallest surface inset want the same rung for different reasons, and one of them has to be wrong.
+
+What fourteen component stylesheets actually showed is **three families, distinguished by what they inset rather than by how much**:
+
+| Role | Block / inline | Where it came from |
+|---|---|---|
+| `--lat-inset-label-sm` | `space-1` / `space-3` | `.lat-button[data-size='sm']`, `.lat-code-block__copy` |
+| `--lat-inset-label-md` | `space-2` / `space-4` | `.lat-button[data-size='md']`, `.lat-tab`, `.lat-table__header` |
+| `--lat-inset-label-lg` | `space-3` / `space-5` | `.lat-button[data-size='lg']`, `.lat-card__header` |
+| `--lat-inset-row-sm` | `space-2` / `space-3` | `.lat-menu__item`, `.lat-disclosure` |
+| `--lat-inset-row-md` | `space-3` / `space-4` | `.lat-table__cell` |
+| `--lat-inset-surface-sm` | `space-3` | `.lat-tab-panel`, `.lat-disclosure__content` |
+| `--lat-inset-surface-md` | `space-4` | `.lat-callout`, `.lat-code-block__pre` |
+| `--lat-inset-surface-lg` | `space-5` | `.lat-card__body` |
+| `--lat-inset-surface-xl` | `space-6` | `.lat-dialog` |
+| `--lat-gap-xs` \| `sm` \| `md` \| `lg` | `space-1` … `space-4` | 13 component declarations; 36 more in the proof pages, which keep primitives |
+
+The finding worth keeping is the **shape of the pairs**, not the sizes. Inline leads block by *two* steps for a label and by *one* for a row, at every rung. That is a difference in kind rather than degree — a short label reads as cramped long before a paragraph does, and a row is already bounded by its siblings — and it is exactly what stops a menu item reaching for a button's inset. A single `sm|md|lg` scale cannot express it.
+
+**The `label` family was called `control` until the migration was already written**, and the rename is worth recording because the mistake is easy to repeat. Five of its seven consumers are controls, so the name looked right; the other two are headers — `.lat-table__header` is a `<th>`, `.lat-card__header` a `<div>` wrapping `.lat-card__label`. A role named for interactivity that two non-interactive elements have to borrow is doing exactly what the vocabulary exists to prevent, and the fix was the name rather than the grouping: what all seven share is a short label needing horizontal room. Renaming cost one commit before release and would have been a breaking change after.
+
+Gaps went the other way: named by size, because the measurement showed no purpose split to encode, and inventing one for symmetry would be a distinction the system does not have. They stop at `space-4`; larger gaps appear only in page layout, and a role covering them would invite a component to reach for a page-sized gap.
+
+**Both artefacts point at the primitive** — `var(--lat-space-2)` in CSS, `{global.space.2}` in DTCG — rather than restating a resolved number, so the tier stays a tier. Parity between them is structural rather than name-for-name: DTCG defines no two-dimension type, so a pair emits as a group of two dimensions, `block` and `inline`.
+
+Three placements stay on primitives, each with the reason in the stylesheet beside it:
+
+- `.lat-segmented-control__label` reproduces `py-1.5 px-4`, and no rung sits at 1.5/4 — the nearest already measured 4px short. Snapping it to a rung would change rendering to tidy a token table.
+- `.lat-menu` is a track hugging its items, not a container giving its children room. The surface rungs start at 12px, which would make the active-item highlight read as a floating chip rather than a full-width row.
+- `.lat-input` splits one inset across two elements: the wrapper owns the inline gutter, the `<input>` owns the block padding that makes its own box clickable. A role describes one element's inset; this one spans two.
+
+The proof pages keep primitives. They are application layout demonstrating the system, not library components, and their rules routinely mix a covered rung with an uncovered one in a single declaration.
+
+`packages/react/tests/spacing-roles-css.test.ts` holds the line. Its allow-list carries two of those three: `.lat-input` needs no entry, because its declarations are axis longhands and the test only asserts the shapes a role actually covers. The list is asserted to stay at two, and each entry is asserted to still be needed — a fourth entry means the vocabulary is wrong and should be revisited rather than extended.
 
 ## Accessibility constraints
 

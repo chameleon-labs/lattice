@@ -7,7 +7,7 @@
 
   display: inline-flex;
   align-items: center;
-  gap: var(--lat-space-1);
+  gap: var(--lat-gap-xs);
 
   font-family: var(--lat-text-tag-font-family);
   font-size: var(--lat-text-tag-font-size);

@@ -23,6 +23,7 @@ import {
 } from '../generate/layout.js'
 import { formatHex, oklchToSrgb } from '../generate/oklch.js'
 import { MOTION_PRIMITIVE_COUNT, MOTION_PRIMITIVE_COUNTS, motionCss } from '../generate/motion.js'
+import { SPACING_ROLE_COUNT, spacingRoleCss } from '../generate/spacing-roles.js'
 import { buildSeverity, resolveSeverityTints } from '../generate/severity.js'
 import { TYPOGRAPHY_PRIMITIVE_COUNT, typographyCss } from '../generate/typography.js'
 import {
@@ -66,6 +67,7 @@ const GLOBAL_DECLARATIONS =
   count(typographyCss()) +
   count(typographyRoleCss()) +
   count(layoutCss()) +
+  count(spacingRoleCss()) +
   count(motionCss()) +
   count(elevationCss())
 
@@ -130,6 +132,22 @@ describe('lattice.css', () => {
     expect(css.match(/--lat-space-0-5:/g)).toHaveLength(1)
     expect(css.match(/--lat-breakpoint-sm:/g)).toHaveLength(1)
     expect(css.match(/--lat-container-prose:/g)).toHaveLength(1)
+  })
+
+  // Spacing roles reference primitives that are identical in both modes, so a
+  // single global declaration is correct — unlike the colour and elevation
+  // roles, which must repeat per scope because their primitives change with the
+  // theme. Emitting these per theme would triple them for no behavioural gain.
+  it('emits every spacing role once in the global rule, never per theme', () => {
+    const [globalBlock, lightBlock, darkBlock, mediaBlock] = splitBlocks(css)
+
+    expect(globalBlock).toContain(spacingRoleCss())
+    expect(count(spacingRoleCss())).toBe(SPACING_ROLE_COUNT)
+    expect(css.match(/--lat-inset-label-md:/g)).toHaveLength(1)
+    expect(css.match(/--lat-gap-lg:/g)).toHaveLength(1)
+    for (const block of [lightBlock, darkBlock, mediaBlock]) {
+      expect(block).not.toMatch(/--lat-(inset|gap)-/)
+    }
   })
 
   it('emits every motion primitive once in the global rule', () => {

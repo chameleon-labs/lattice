@@ -2,6 +2,7 @@
 /* Colour: 8 grey roles + 6 chromatic solids, both modes. */
 /* Typography: 31 primitives; 19 semantic roles x 5 properties. */
 /* Layout primitives: 16 spacing; 4 breakpoints; 3 containers; 3 radii. */
+/* Spacing roles: 13 inset and gap roles, theme-independent, emitted once. */
 /* Motion primitives: 5 durations; 2 easings. */
 /* Elevation: 3 shadows; 4 role tokens, emitted once for both modes. */
 
@@ -80,6 +81,19 @@
   --lat-radius-none: 0rem;
   --lat-radius-sm: 0.1875rem;
   --lat-radius-full: 9999rem;
+  --lat-inset-label-sm: var(--lat-space-1) var(--lat-space-3);
+  --lat-inset-label-md: var(--lat-space-2) var(--lat-space-4);
+  --lat-inset-label-lg: var(--lat-space-3) var(--lat-space-5);
+  --lat-inset-row-sm: var(--lat-space-2) var(--lat-space-3);
+  --lat-inset-row-md: var(--lat-space-3) var(--lat-space-4);
+  --lat-inset-surface-sm: var(--lat-space-3);
+  --lat-inset-surface-md: var(--lat-space-4);
+  --lat-inset-surface-lg: var(--lat-space-5);
+  --lat-inset-surface-xl: var(--lat-space-6);
+  --lat-gap-xs: var(--lat-space-1);
+  --lat-gap-sm: var(--lat-space-2);
+  --lat-gap-md: var(--lat-space-3);
+  --lat-gap-lg: var(--lat-space-4);
   --lat-duration-instant: 0ms;
   --lat-duration-swift: 100ms;
   --lat-duration-default: 200ms;

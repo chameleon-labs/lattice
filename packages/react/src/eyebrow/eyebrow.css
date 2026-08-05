@@ -1,7 +1,7 @@
 .lat-eyebrow {
   display: flex;
   align-items: center;
-  gap: var(--lat-space-3);
+  gap: var(--lat-gap-md);
 }
 
 /* `align="center"` — for an eyebrow inside a `text-align: center` ancestor
