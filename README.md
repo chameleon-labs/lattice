@@ -67,7 +67,7 @@ The severity ramp's `critical` and `serious` levels are anchored to the same col
 
 ## Install
 
-While the current release is a candidate it carries the `rc` dist-tag, so an unqualified `npm i` will not find it — ask for `@rc` explicitly. Drop the suffix once `0.1.0` proper is out.
+The current release is a candidate, `0.1.0-rc.1`. It carries the `rc` dist-tag — and, for now, `latest` as well: npm requires every package to have a `latest`, and with only one version published there is nothing else for it to point at. So a bare `npm i` currently gets the candidate. Ask for `@rc` explicitly anyway, so that the day `0.1.0` ships you keep getting candidates rather than silently changing channel.
 
 Tokens alone, for a consumer that never touches React:
 
@@ -169,7 +169,7 @@ Two things about the automation are worth knowing, because both are surprising:
 
 The manual path still works if you would rather do it yourself — bump both manifests, commit, then `git tag v0.1.0-rc.1 && git push origin v0.1.0-rc.1`.
 
-**The dist-tag is derived from the version, never remembered.** npm tags whatever it publishes `latest` unless told otherwise, so a forgotten `--tag` on a prerelease silently hands every consumer an RC. The workflow reads the version instead — `0.1.0-rc.1` publishes under `rc`, `0.1.0-beta.3` under `beta`, `0.1.0` under `latest` — marks the GitHub Release as a prerelease to match, and afterwards asserts that `latest` did *not* move to the prerelease.
+**The dist-tag is derived from the version, never remembered.** npm tags whatever it publishes `latest` unless told otherwise, so a forgotten `--tag` on a prerelease silently hands every consumer an RC. The workflow reads the version instead — `0.1.0-rc.1` publishes under `rc`, `0.1.0-beta.3` under `beta`, `0.1.0` under `latest` — marks the GitHub Release as a prerelease to match, and afterwards asserts that `latest` did *not* move to the prerelease — except on a package's very first publish, where npm assigns `latest` regardless because a package must have one and there is no other version to carry it.
 
 [`.github/workflows/release.yml`](./.github/workflows/release.yml) re-runs the whole contract suite on the tagged commit, packs both packages, verifies the tarballs, publishes them to npm with provenance, and opens a GitHub Release. It needs an `NPM_TOKEN` secret — an npm automation token with publish rights on the `@chameleon-labs` scope.
 
