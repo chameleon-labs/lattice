@@ -2,7 +2,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--lat-space-2);
+  gap: var(--lat-gap-sm);
 
   font-family: var(--lat-text-ui-font-family);
   font-size: var(--lat-text-ui-font-size);
@@ -19,9 +19,9 @@
   transition-timing-function: var(--lat-easing-out);
 }
 
-.lat-button[data-size='sm'] { padding: var(--lat-space-1) var(--lat-space-3); }
-.lat-button[data-size='md'] { padding: var(--lat-space-2) var(--lat-space-4); }
-.lat-button[data-size='lg'] { padding: var(--lat-space-3) var(--lat-space-5); }
+.lat-button[data-size='sm'] { padding: var(--lat-inset-control-sm); }
+.lat-button[data-size='md'] { padding: var(--lat-inset-control-md); }
+.lat-button[data-size='lg'] { padding: var(--lat-inset-control-lg); }
 
 /* Primary: the solid fill. Semibold, because Lattice's is the only button
    weighted above medium. */
