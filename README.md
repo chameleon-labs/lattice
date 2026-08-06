@@ -2,7 +2,7 @@
 
 > The design system behind [tabstop](https://github.com/chameleon-labs/tabstop) and whatever comes next. Accessibility is the constraint, not the feature.
 
-**Status: early development.** Colour, typography, spacing/motion and elevation are specified and built, and eighteen component families ship on top of them. Both packages publish from CI with provenance — see [Releasing](#releasing) — and the first cut is a **release candidate**, `0.1.0-rc.1`, published under the `rc` dist-tag rather than `latest`. At 0.x **no API stability is promised**: the token indirection layer exists and is used internally, but is not documented as a public theming API.
+**Status: early development.** Colour, typography, spacing/motion and elevation are specified and built, and twenty component families ship on top of them. Both packages publish from CI with provenance — see [Releasing](#releasing) — and the first cut is a **release candidate**, `0.1.0-rc.1`, published under the `rc` dist-tag rather than `latest`. At 0.x **no API stability is promised**: the token indirection layer exists and is used internally, but is not documented as a public theming API.
 
 ## The name
 
@@ -17,7 +17,7 @@ Two packages.
 | Package | What it is |
 |---|---|
 | `@chameleon-labs/lattice-tokens` | foundational design tokens — colour, typography, spacing, sizing, elevation, and motion |
-| `@chameleon-labs/lattice-react` | the component layer on [Ariakit](https://github.com/ariakit/ariakit) — eighteen component families |
+| `@chameleon-labs/lattice-react` | the component layer on [Ariakit](https://github.com/ariakit/ariakit) — twenty component families |
 
 They are separate because tokens carry no framework dependency and should stay installable by a consumer that never touches React.
 
@@ -96,7 +96,7 @@ The two packages release **in lockstep** at one version, and the React package's
 
 ## Scope
 
-**In:** colour scales, semantic colour tokens, light and dark modes (dark is the default), a per-scale computed on-solid, an ordered severity ramp, validated categorical and sequential chart palettes, primitive and semantic typography tokens, primitive spacing, breakpoints, containers and radii tokens, primitive motion tokens, four elevation roles (theme-independent), and eighteen component families on Ariakit.
+**In:** colour scales, semantic colour tokens, light and dark modes (dark is the default), a per-scale computed on-solid, an ordered severity ramp, validated categorical and sequential chart palettes, primitive and semantic typography tokens, primitive spacing, breakpoints, containers and radii tokens, primitive motion tokens, four elevation roles (theme-independent), and twenty component families on Ariakit.
 
 **Not yet:** semantic spacing roles, wide-gamut output, forced-colors handling. Each is tracked separately.
 

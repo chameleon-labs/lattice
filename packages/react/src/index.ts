@@ -84,3 +84,9 @@ export type { StatProps } from './stat/stat.js'
 
 export { CodeBlock } from './code-block/code-block.js'
 export type { CodeBlockProps } from './code-block/code-block.js'
+
+export { Code } from './code/code.js'
+export type { CodeProps } from './code/code.js'
+
+export { Progress } from './progress/progress.js'
+export type { ProgressProps } from './progress/progress.js'
