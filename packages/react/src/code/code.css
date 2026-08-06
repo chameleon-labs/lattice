@@ -1,0 +1,29 @@
+.lat-code {
+  /* The same mono role CodeBlock uses. An inline fragment and the block it is
+     quoted from should not disagree about what code looks like. */
+  font-family: var(--lat-text-code-font-family);
+  font-size: var(--lat-text-code-font-size);
+  font-weight: var(--lat-text-code-font-weight);
+  letter-spacing: var(--lat-text-code-letter-spacing);
+  line-height: var(--lat-text-code-line-height);
+  color: var(--lat-text);
+
+  background: var(--lat-bg-subtle);
+  border: 1px solid var(--lat-border);
+  /* Square, matching CodeBlock. */
+  border-radius: var(--lat-radius-none);
+
+  /* Inline padding only. Block padding on an inline element does not grow the
+     line box, so a vertical value would overlap the lines above and below
+     instead of spacing them. */
+  padding-inline: var(--lat-gap-xs);
+
+  /* The guarantee. A selector, a URL or an attribute is one unbroken token, so
+     without this the fragment cannot wrap and instead pushes its container
+     past the viewport — a horizontal scrollbar on the whole page, appearing
+     only at the widths and font sizes where the string happens not to fit.
+     `anywhere` rather than `break-word`: it also lets the browser count this
+     word when choosing where to break the *rest* of the line, which is what
+     keeps a long selector from stranding the text before it. */
+  overflow-wrap: anywhere;
+}

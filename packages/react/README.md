@@ -59,7 +59,7 @@ bundler that is not configured for CSS.
 
 ## Components
 
-Eighteen families. Seven wrap Ariakit; eleven are ours on tokens.
+Twenty families. Seven wrap Ariakit; thirteen are ours on tokens.
 
 | Component | Guarantee |
 |---|---|
@@ -81,6 +81,8 @@ Eighteen families. Seven wrap Ariakit; eleven are ours on tokens.
 | [`Eyebrow`](./src/eyebrow/README.md) | The uppercase mono label's tracking value has exactly one home |
 | [`Stat`](./src/stat/README.md) | Value, label and an optional sub-line in one shape, on the mono `numeric` role |
 | [`CodeBlock`](./src/code-block/README.md) | The copy result is announced in a live region, not just an icon swap |
+| [`Code`](./src/code/README.md) | An unbreakable selector wraps instead of widening the page |
+| [`Progress`](./src/progress/README.md) | Cannot render unlabelled; the fill and `aria-valuenow` come from one clamped number |
 
 Every component makes a guarantee a consumer would otherwise have to remember.
 That is the admission test: `EmptyState` was requested and cut because it makes

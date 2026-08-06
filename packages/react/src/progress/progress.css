@@ -1,0 +1,53 @@
+.lat-progress {
+  /* A hairline by default. The bar is a secondary signal beside the text that
+     says what is happening; it should not read as the primary content. */
+  block-size: 2px;
+  inline-size: 100%;
+  overflow: hidden;
+
+  background: var(--lat-border);
+  border-radius: var(--lat-radius-none);
+}
+
+.lat-progress__fill {
+  block-size: 100%;
+  /* `scaleX` rather than `inline-size`, so the browser can composite the
+     change instead of laying the element out again on every tick. The
+     transform is static per render — it is a position, like Switch's thumb,
+     not motion — so it needs no reduced-motion guard. The *transition* below
+     is guarded, which is the part that moves. */
+  transform: scaleX(var(--_lat-progress));
+  transform-origin: left center;
+
+  background: var(--lat-solid);
+}
+
+/* Reversed writing modes fill from the other edge. Without this the bar would
+   grow away from the side the text starts on. */
+[dir='rtl'] .lat-progress__fill {
+  transform-origin: right center;
+}
+
+/* The one animated property, and it is gated. A bar that jumps between values
+   is legible; a bar that eases between them is nicer, and nobody needs the
+   niceness badly enough to override a stated motion preference. */
+@media (prefers-reduced-motion: no-preference) {
+  .lat-progress__fill {
+    transition-property: transform;
+    transition-duration: var(--lat-duration-default);
+    transition-timing-function: var(--lat-easing-out);
+  }
+}
+
+/* forced-colors removes background colours, which would leave the track and
+   the fill identically invisible. Redrawn from system colours so the bar still
+   reads as a bar. */
+@media (forced-colors: active) {
+  .lat-progress {
+    border: 1px solid CanvasText;
+  }
+
+  .lat-progress__fill {
+    background: Highlight;
+  }
+}

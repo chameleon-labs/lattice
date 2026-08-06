@@ -21,6 +21,7 @@
 @import './button/button.css';
 @import './callout/callout.css';
 @import './card/card.css';
+@import './code/code.css';
 @import './code-block/code-block.css';
 @import './dialog/dialog.css';
 @import './disclosure/disclosure.css';
@@ -29,6 +30,7 @@
 @import './live-region/live-region.css';
 @import './menu/menu.css';
 @import './pages/pages.css';
+@import './progress/progress.css';
 @import './segmented-control/segmented-control.css';
 @import './stat/stat.css';
 @import './switch/switch.css';
