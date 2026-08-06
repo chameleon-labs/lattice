@@ -59,6 +59,48 @@ describe('Progress', () => {
     expect(fillRatio(bar)).toBe('0.5')
   })
 
+  /**
+   * `aria-labelledby` outranks `aria-label` in the accessible name calculation,
+   * so one pointing at a missing id would leave the bar unnamed while `label`
+   * sat there looking required.
+   *
+   * This test is the only thing standing in the way, and that is not a figure
+   * of speech: `ProgressProps` omits `aria-labelledby`, but **TypeScript does
+   * not check hyphenated JSX attributes at all** — they cannot be JS
+   * identifiers, so it lets any of them through regardless of the props type.
+   * A `@ts-expect-error` on the line below fails as *unused*. The omission in
+   * the type is documentation; the `aria-labelledby={undefined}` after the
+   * prop spread is the enforcement.
+   */
+  it('refuses an aria-labelledby that would outrank its own name', () => {
+    render(<Progress label="Audit progress" value={10} aria-labelledby="nonexistent" />)
+    const bar = screen.getByRole('progressbar', { name: 'Audit progress' })
+
+    expect(bar.hasAttribute('aria-labelledby')).toBe(false)
+  })
+
+  // Every guard downstream passes non-finite input through silently: clamping
+  // NaN yields NaN, so the bar would announce `aria-valuenow="NaN"` and set a
+  // custom property no browser can parse.
+  it('coerces a non-finite value rather than announcing NaN', () => {
+    render(<Progress label="Audit progress" value={Number.NaN} />)
+    const bar = screen.getByRole('progressbar')
+
+    expect(bar.getAttribute('aria-valuenow')).toBe('0')
+    expect(fillRatio(bar)).toBe('0')
+  })
+
+  // Infinity survives a `> 0` test, which would make aria-valuemax="Infinity"
+  // while the ratio collapsed to zero — a bar that reads empty at every value.
+  it('rejects a non-finite max instead of letting it through the > 0 test', () => {
+    render(<Progress label="Audit progress" value={50} max={Number.POSITIVE_INFINITY} />)
+    const bar = screen.getByRole('progressbar')
+
+    expect(bar.getAttribute('aria-valuemax')).toBe('100')
+    expect(bar.getAttribute('aria-valuenow')).toBe('50')
+    expect(fillRatio(bar)).toBe('0.5')
+  })
+
   it('keeps a caller-supplied class and style alongside its own', () => {
     render(<Progress label="Audit progress" value={10} className="mine" style={{ opacity: 0.5 }} />)
     const bar = screen.getByRole('progressbar')
