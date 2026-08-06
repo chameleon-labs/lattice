@@ -59,19 +59,6 @@ describe('Progress', () => {
     expect(fillRatio(bar)).toBe('0.5')
   })
 
-  /**
-   * `aria-labelledby` outranks `aria-label` in the accessible name calculation,
-   * so one pointing at a missing id would leave the bar unnamed while `label`
-   * sat there looking required.
-   *
-   * This test is the only thing standing in the way, and that is not a figure
-   * of speech: `ProgressProps` omits `aria-labelledby`, but **TypeScript does
-   * not check hyphenated JSX attributes at all** — they cannot be JS
-   * identifiers, so it lets any of them through regardless of the props type.
-   * A `@ts-expect-error` on the line below fails as *unused*. The omission in
-   * the type is documentation; the `aria-labelledby={undefined}` after the
-   * prop spread is the enforcement.
-   */
   it('refuses an aria-labelledby that would outrank its own name', () => {
     render(<Progress label="Audit progress" value={10} aria-labelledby="nonexistent" />)
     const bar = screen.getByRole('progressbar', { name: 'Audit progress' })
