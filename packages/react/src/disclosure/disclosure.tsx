@@ -21,7 +21,10 @@ export type DisclosureContentProps<T extends ElementType = 'div'> = AriakitDiscl
  * clickable divs. Ariakit supplies the expanded state and the association; this
  * adds the appearance.
  */
-export function Disclosure<T extends ElementType = 'button'>({className, ...props}: DisclosureProps<T>) {
+export function Disclosure<T extends ElementType = 'button'>({
+  className,
+  ...props
+}: DisclosureProps<T>): React.JSX.Element {
   return (
     <AriakitDisclosure
       {...props}
@@ -30,7 +33,10 @@ export function Disclosure<T extends ElementType = 'button'>({className, ...prop
   );
 }
 
-export function DisclosureContent<T extends ElementType = 'div'>({className, ...props}: DisclosureContentProps<T>) {
+export function DisclosureContent<T extends ElementType = 'div'>({
+  className,
+  ...props
+}: DisclosureContentProps<T>): React.JSX.Element {
   return (
     <AriakitDisclosureContent
       {...props}

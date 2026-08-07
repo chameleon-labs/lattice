@@ -35,7 +35,7 @@ export interface BadgeOptions {
 // a badge that signalled by colour alone cannot be written.
 export type BadgeProps = Omit<ComponentPropsWithRef<'span'>, 'children'> & BadgeOptions & {children: ReactNode};
 
-export function Badge({variant = 'default', className, ...props}: BadgeProps) {
+export function Badge({variant = 'default', className, ...props}: BadgeProps): React.JSX.Element {
   return (
     <span
       {...props}

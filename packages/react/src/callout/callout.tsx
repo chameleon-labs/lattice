@@ -29,7 +29,7 @@ export interface CalloutOptions {
 export type CalloutProps = Omit<ComponentPropsWithRef<'div'>, 'children' | 'title'> &
   CalloutOptions & {children: ReactNode};
 
-export function Callout({variant, icon, title, live, className, children, ...props}: CalloutProps) {
+export function Callout({variant, icon, title, live, className, children, ...props}: CalloutProps): React.JSX.Element {
   return (
     <div
       {...props}

@@ -33,13 +33,16 @@ export type MenuSeparatorProps<T extends ElementType = 'hr'> = AriakitMenuSepara
  * one. No count is given, because that number belongs to Ariakit and moves with
  * it.
  */
-export function Menu<T extends ElementType = 'div'>({className, ...props}: MenuProps<T>) {
+export function Menu<T extends ElementType = 'div'>({className, ...props}: MenuProps<T>): React.JSX.Element {
   return (
     <AriakitMenu gutter={4} {...props} className={className === undefined ? 'lat-menu' : `lat-menu ${className}`} />
   );
 }
 
-export function MenuButton<T extends ElementType = 'button'>({className, ...props}: MenuButtonProps<T>) {
+export function MenuButton<T extends ElementType = 'button'>({
+  className,
+  ...props
+}: MenuButtonProps<T>): React.JSX.Element {
   return (
     <AriakitMenuButton
       {...props}
@@ -50,7 +53,7 @@ export function MenuButton<T extends ElementType = 'button'>({className, ...prop
   );
 }
 
-export function MenuItem<T extends ElementType = 'div'>({className, ...props}: MenuItemProps<T>) {
+export function MenuItem<T extends ElementType = 'div'>({className, ...props}: MenuItemProps<T>): React.JSX.Element {
   return (
     <AriakitMenuItem
       {...props}
@@ -59,7 +62,10 @@ export function MenuItem<T extends ElementType = 'div'>({className, ...props}: M
   );
 }
 
-export function MenuSeparator<T extends ElementType = 'hr'>({className, ...props}: MenuSeparatorProps<T>) {
+export function MenuSeparator<T extends ElementType = 'hr'>({
+  className,
+  ...props
+}: MenuSeparatorProps<T>): React.JSX.Element {
   return (
     <AriakitMenuSeparator
       {...props}

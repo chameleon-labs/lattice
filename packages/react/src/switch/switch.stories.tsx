@@ -24,7 +24,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const labelled = (text: string) =>
-  function LabelledSwitch(args: SwitchProps) {
+  function LabelledSwitch(args: SwitchProps): React.JSX.Element {
     return (
       <div className="lat-story__row">
         <label htmlFor="story-switch">{text}</label>

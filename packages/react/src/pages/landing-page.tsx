@@ -199,7 +199,7 @@ const V1_OUT = [
 
 const FOOTER_LINKS = ['DECISIONS.md', 'GitHub', 'How it works', 'Score formula'];
 
-function Section({id, className, children}: {id?: string; className?: string; children: ReactNode}) {
+function Section({id, className, children}: {id?: string; className?: string; children: ReactNode}): React.JSX.Element {
   const cls = ['landing-page__section', className].filter((value): value is string => Boolean(value)).join(' ');
   return (
     <section id={id} className={cls}>
@@ -208,7 +208,7 @@ function Section({id, className, children}: {id?: string; className?: string; ch
   );
 }
 
-function ImpactBadge({impact, count}: {impact: Impact; count?: number}) {
+function ImpactBadge({impact, count}: {impact: Impact; count?: number}): React.JSX.Element {
   const Icon = IMPACT_ICON[impact];
   return (
     <Badge variant={impact as BadgeVariant}>
@@ -222,7 +222,7 @@ function ImpactBadge({impact, count}: {impact: Impact; count?: number}) {
 // highlighted row (`.landing-page__why-grid`'s `[data-highlight='true']`
 // descendant rule); X stays muted at 30% opacity in every row regardless —
 // see the CSS for why an absent feature never competes with a present one.
-function BoolCell({value}: {value: boolean}) {
+function BoolCell({value}: {value: boolean}): React.JSX.Element {
   return (
     <Td className="landing-page__bool-cell">
       {value ? (
@@ -235,7 +235,7 @@ function BoolCell({value}: {value: boolean}) {
   );
 }
 
-function UrlField({inputLabel}: {inputLabel: string}) {
+function UrlField({inputLabel}: {inputLabel: string}): React.JSX.Element {
   return (
     <div className="landing-page__url-row">
       <Input
@@ -254,7 +254,7 @@ function UrlField({inputLabel}: {inputLabel: string}) {
   );
 }
 
-function Nav() {
+function Nav(): React.JSX.Element {
   const [isDark, setIsDark] = useState(true);
 
   return (
@@ -295,7 +295,7 @@ function Nav() {
   );
 }
 
-function Hero() {
+function Hero(): React.JSX.Element {
   return (
     <Section className="landing-page__hero">
       <div className="landing-page__hero-grid">
@@ -396,7 +396,7 @@ function Hero() {
   );
 }
 
-function TrustBar() {
+function TrustBar(): React.JSX.Element {
   return (
     <div className="landing-page__trust-bar">
       <Section className="landing-page__trust-bar-inner">
@@ -408,7 +408,7 @@ function TrustBar() {
   );
 }
 
-function HowItWorks() {
+function HowItWorks(): React.JSX.Element {
   return (
     <Section id="how" className="landing-page__how">
       <Eyebrow rule tone="accent" className="landing-page__section-eyebrow">
@@ -447,7 +447,7 @@ function HowItWorks() {
  * hidden `Table` carries every point for anyone who wants more than the
  * headline.
  */
-function ScoreHistory() {
+function ScoreHistory(): React.JSX.Element {
   return (
     <Section className="landing-page__score-history">
       <Card>
@@ -495,7 +495,7 @@ function ScoreHistory() {
   );
 }
 
-function Why() {
+function Why(): React.JSX.Element {
   return (
     <Section id="why" className="landing-page__why">
       <Eyebrow rule tone="accent" className="landing-page__section-eyebrow">
@@ -561,7 +561,7 @@ function Why() {
   );
 }
 
-function V1Scope() {
+function V1Scope(): React.JSX.Element {
   return (
     <Section id="scope" className="landing-page__scope">
       <Eyebrow rule tone="accent" className="landing-page__section-eyebrow">
@@ -602,7 +602,7 @@ function V1Scope() {
   );
 }
 
-function CTA() {
+function CTA(): React.JSX.Element {
   return (
     <div className="landing-page__cta">
       <Section className="landing-page__cta-inner">
@@ -622,7 +622,7 @@ function CTA() {
   );
 }
 
-function Footer() {
+function Footer(): React.JSX.Element {
   return (
     <footer className="landing-page__footer">
       <Section className="landing-page__footer-inner">
@@ -645,7 +645,7 @@ function Footer() {
   );
 }
 
-export function LandingPage() {
+export function LandingPage(): React.JSX.Element {
   return (
     <div className="lat-page lat-surface landing-page">
       <Nav />

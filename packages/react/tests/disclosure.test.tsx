@@ -21,7 +21,9 @@ describe('Disclosure', () => {
   const content = () => {
     const id = screen.getByRole('button', {name: 'Affected nodes'}).getAttribute('aria-controls');
     const element = id === null ? null : document.getElementById(id);
-    if (element === null) {throw new Error('disclosure content was never rendered');}
+    if (element === null) {
+      throw new Error('disclosure content was never rendered');
+    }
     return element;
   };
 

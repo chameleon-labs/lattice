@@ -63,7 +63,9 @@ const SEMVER = /^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?$/;
 
 const parse = (version) => {
   const match = SEMVER.exec(version);
-  if (match === null) {throw new Error(`not a semver version: ${version}`);}
+  if (match === null) {
+    throw new Error(`not a semver version: ${version}`);
+  }
   return {
     major: Number(match[1]),
     minor: Number(match[2]),
@@ -87,7 +89,9 @@ const next = (current, kind, identifier = preid) => {
       return format(v);
 
     case 'release':
-      if (!isPre) {throw new Error(`${current} is not a prerelease — nothing to graduate`);}
+      if (!isPre) {
+        throw new Error(`${current} is not a prerelease — nothing to graduate`);
+      }
       return format({...v, prerelease: null});
 
     // A prerelease already sitting on the target version graduates rather than
@@ -124,8 +128,11 @@ const next = (current, kind, identifier = preid) => {
       }
       const parts = [...v.prerelease];
       const lastNumeric = parts.map((part) => /^\d+$/.test(part)).lastIndexOf(true);
-      if (lastNumeric === -1) {parts.push('0');}
-      else {parts[lastNumeric] = String(Number(parts[lastNumeric]) + 1);}
+      if (lastNumeric === -1) {
+        parts.push('0');
+      } else {
+        parts[lastNumeric] = String(Number(parts[lastNumeric]) + 1);
+      }
       return format({...v, prerelease: parts});
     }
 
@@ -168,7 +175,9 @@ if (selfTest) {
       actual = `threw: ${error.message}`;
     }
     const ok = actual === expected;
-    if (!ok) {failed += 1;}
+    if (!ok) {
+      failed += 1;
+    }
     console.log(
       `  ${ok ? 'ok  ' : 'FAIL'} ${from.padEnd(12)} ${kind.padEnd(11)} ${identifier.padEnd(5)} -> ${actual}${ok ? '' : `  (expected ${expected})`}`,
     );
@@ -223,7 +232,9 @@ if (to === from) {
       console.error(`could not rewrite the version in ${path}`);
       process.exit(1);
     }
-    if (!dryRun) {writeFileSync(path, updated);}
+    if (!dryRun) {
+      writeFileSync(path, updated);
+    }
     console.log(`  ${dryRun ? 'would set' : 'set'} ${path.replace(`${repoRoot}/`, '')} to ${to}`);
   }
 }

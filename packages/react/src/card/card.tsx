@@ -15,7 +15,7 @@ export type CardProps = ComponentPropsWithRef<'div'>;
  * through a real control inside it — a link whose hit area is stretched in CSS
  * — which keeps one accessible name and one tab stop instead of two.
  */
-export function Card({className, ...props}: CardProps) {
+export function Card({className, ...props}: CardProps): React.JSX.Element {
   return <div {...props} className={className === undefined ? 'lat-card' : `lat-card ${className}`} />;
 }
 
@@ -26,7 +26,7 @@ export interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {
   icon?: ReactNode;
 }
 
-export function CardHeader({label, icon, children, className, ...props}: CardHeaderProps) {
+export function CardHeader({label, icon, children, className, ...props}: CardHeaderProps): React.JSX.Element {
   return (
     <div {...props} className={className === undefined ? 'lat-card__header' : `lat-card__header ${className}`}>
       {icon}
@@ -38,6 +38,6 @@ export function CardHeader({label, icon, children, className, ...props}: CardHea
 
 export type CardBodyProps = HTMLAttributes<HTMLDivElement>;
 
-export function CardBody({className, ...props}: CardBodyProps) {
+export function CardBody({className, ...props}: CardBodyProps): React.JSX.Element {
   return <div {...props} className={className === undefined ? 'lat-card__body' : `lat-card__body ${className}`} />;
 }

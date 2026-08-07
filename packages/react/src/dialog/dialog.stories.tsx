@@ -22,7 +22,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-function Confirmation() {
+function Confirmation(): React.JSX.Element {
   return (
     <>
       <DialogHeading>Remove this page?</DialogHeading>

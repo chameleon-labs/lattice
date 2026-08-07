@@ -6,7 +6,7 @@ export interface StatProps extends HTMLAttributes<HTMLDivElement> {
   sub?: string;
 }
 
-export function Stat({value, label, sub, className, ...props}: StatProps) {
+export function Stat({value, label, sub, className, ...props}: StatProps): React.JSX.Element {
   return (
     <div {...props} className={className === undefined ? 'lat-stat' : `lat-stat ${className}`}>
       <div className="lat-stat__value">{value}</div>

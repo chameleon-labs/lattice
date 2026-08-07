@@ -14,7 +14,9 @@ function derive(mode: Mode, level: SeverityLevel): Swatch {
   // The only derivation the ramp needs: light `moderate`, placed by the same
   // lightness delta that separates the declared light and dark `serious`.
   const darkHex = SEVERITY_ANCHORS.dark[level];
-  if (darkHex === undefined) {throw new Error(`severity: no dark anchor for ${level}`);}
+  if (darkHex === undefined) {
+    throw new Error(`severity: no dark anchor for ${level}`);
+  }
 
   const dark = srgbToOklch(parseHex(darkHex));
   const fitted = fitToGamut({l: dark.l + LIGHT_LIGHTNESS_DELTA, c: dark.c, h: dark.h});
@@ -35,7 +37,9 @@ function derive(mode: Mode, level: SeverityLevel): Swatch {
 export function buildSeverity(mode: Mode): Swatch[] {
   return COLOURED.map((level) => {
     const hex = SEVERITY_ANCHORS[mode][level];
-    if (hex === undefined) {return derive(mode, level);}
+    if (hex === undefined) {
+      return derive(mode, level);
+    }
 
     const {l, c, h} = srgbToOklch(parseHex(hex));
     return {scale: 'severity', role: level, mode, hex, l, c, h, origin: 'anchored' as const};

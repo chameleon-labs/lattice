@@ -229,13 +229,13 @@ export function validateCategorical(
   checks.push({
     name: 'Contrast vs surface',
     state: faint.length === 0 ? 'pass' : 'warn',
-    detail:
-      `worst APCA Lc ${worstLc.toFixed(1)} (advisory) · ${ 
+    detail: `worst APCA Lc ${worstLc.toFixed(1)} (advisory) · ${
       faint.length === 0
         ? `all ${palette.length} at or above ${CHECKS.contrastMin}:1 against ${surface}`
         : `relief required for: ${faint
             .map((s) => `${s.name} ${contrastRatio(parseHex(s.hex), parseHex(surface)).toFixed(2)}:1`)
-            .join(', ')}`}`,
+            .join(', ')}`
+    }`,
   });
 
   // 6. The values are the generated ones. In a hand-run validator this is a

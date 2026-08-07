@@ -13,7 +13,7 @@ export interface IconProps extends Omit<SVGProps<SVGSVGElement>, 'viewBox' | 'fi
   size?: number;
 }
 
-function iconProps({size = 16, ...props}: IconProps) {
+function iconProps({size = 16, ...props}: IconProps): SVGProps<SVGSVGElement> {
   return {
     viewBox: '0 0 24 24',
     fill: 'none',
@@ -28,7 +28,7 @@ function iconProps({size = 16, ...props}: IconProps) {
   };
 }
 
-export function Copy(props: IconProps) {
+export function Copy(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
@@ -37,7 +37,7 @@ export function Copy(props: IconProps) {
   );
 }
 
-export function Check(props: IconProps) {
+export function Check(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <path d="M20 6 9 17l-5-5" />
@@ -45,7 +45,7 @@ export function Check(props: IconProps) {
   );
 }
 
-export function ChevronRight(props: IconProps) {
+export function ChevronRight(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <path d="m9 18 6-6-6-6" />
@@ -53,7 +53,7 @@ export function ChevronRight(props: IconProps) {
   );
 }
 
-export function Circle(props: IconProps) {
+export function Circle(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <circle cx="12" cy="12" r="10" />
@@ -61,7 +61,7 @@ export function Circle(props: IconProps) {
   );
 }
 
-export function Square(props: IconProps) {
+export function Square(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <rect width="18" height="18" x="3" y="3" rx="2" />
@@ -69,7 +69,7 @@ export function Square(props: IconProps) {
   );
 }
 
-export function Triangle(props: IconProps) {
+export function Triangle(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <path d="M13.73 4a2 2 0 0 0-3.46 0L2.71 18a2 2 0 0 0 1.73 3h15.14a2 2 0 0 0 1.73-3Z" />
@@ -77,7 +77,7 @@ export function Triangle(props: IconProps) {
   );
 }
 
-export function Sun(props: IconProps) {
+export function Sun(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <circle cx="12" cy="12" r="4" />
@@ -93,7 +93,7 @@ export function Sun(props: IconProps) {
   );
 }
 
-export function Moon(props: IconProps) {
+export function Moon(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
@@ -101,7 +101,7 @@ export function Moon(props: IconProps) {
   );
 }
 
-export function Zap(props: IconProps) {
+export function Zap(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />
@@ -109,7 +109,7 @@ export function Zap(props: IconProps) {
   );
 }
 
-export function ArrowRight(props: IconProps) {
+export function ArrowRight(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <path d="M5 12h14" />
@@ -118,7 +118,7 @@ export function ArrowRight(props: IconProps) {
   );
 }
 
-export function Globe(props: IconProps) {
+export function Globe(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <circle cx="12" cy="12" r="10" />
@@ -128,7 +128,7 @@ export function Globe(props: IconProps) {
   );
 }
 
-export function Mail(props: IconProps) {
+export function Mail(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <rect width="20" height="16" x="2" y="4" rx="2" />
@@ -137,7 +137,7 @@ export function Mail(props: IconProps) {
   );
 }
 
-export function TrendingDown(props: IconProps) {
+export function TrendingDown(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <path d="M16 17h6v-6" />
@@ -146,7 +146,7 @@ export function TrendingDown(props: IconProps) {
   );
 }
 
-export function ExternalLink(props: IconProps) {
+export function ExternalLink(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <path d="M15 3h6v6" />
@@ -156,7 +156,7 @@ export function ExternalLink(props: IconProps) {
   );
 }
 
-export function AlertCircle(props: IconProps) {
+export function AlertCircle(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <circle cx="12" cy="12" r="10" />
@@ -166,7 +166,7 @@ export function AlertCircle(props: IconProps) {
   );
 }
 
-export function AlertTriangle(props: IconProps) {
+export function AlertTriangle(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
@@ -176,7 +176,7 @@ export function AlertTriangle(props: IconProps) {
   );
 }
 
-export function Info(props: IconProps) {
+export function Info(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <circle cx="12" cy="12" r="10" />
@@ -186,7 +186,7 @@ export function Info(props: IconProps) {
   );
 }
 
-export function X(props: IconProps) {
+export function X(props: IconProps): React.JSX.Element {
   return (
     <svg {...iconProps(props)}>
       <path d="M18 6 6 18" />

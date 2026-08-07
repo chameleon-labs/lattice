@@ -47,7 +47,9 @@ describe("Callout's variant blocks", () => {
     // individually declared somewhere in the token package was never in
     // question, only which scale a given block reaches for.
     for (const scale of CHROMATIC_SCALES) {
-      if (scale === variant) {continue;}
+      if (scale === variant) {
+        continue;
+      }
       expect(block).not.toMatch(new RegExp(`--lat-${scale}-`));
     }
   });

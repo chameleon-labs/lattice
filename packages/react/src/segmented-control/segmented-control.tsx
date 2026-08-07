@@ -22,7 +22,7 @@ export function SegmentedControl({
   className,
   children,
   ...props
-}: SegmentedControlProps) {
+}: SegmentedControlProps): React.JSX.Element {
   return (
     // Every prop below is spread conditionally: exactOptionalPropertyTypes
     // distinguishes an absent key from one explicitly set to undefined, and
@@ -53,7 +53,12 @@ export interface SegmentedControlItemProps extends Omit<RadioProps, 'value'> {
   children: ReactNode;
 }
 
-export function SegmentedControlItem({value, className, children, ...props}: SegmentedControlItemProps) {
+export function SegmentedControlItem({
+  value,
+  className,
+  children,
+  ...props
+}: SegmentedControlItemProps): React.JSX.Element {
   return (
     <label
       className={className === undefined ? 'lat-segmented-control__item' : `lat-segmented-control__item ${className}`}

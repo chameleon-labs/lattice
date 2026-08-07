@@ -29,7 +29,9 @@ export const findColourLiterals = (css: string): string[] => {
 
   for (const match of source.matchAll(/\b(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\([^)]*\)/g)) {
     const value = match[0].replace(/\s+/g, ' ').trim();
-    if (PERMITTED_COLOUR_LITERALS.has(value)) {continue;}
+    if (PERMITTED_COLOUR_LITERALS.has(value)) {
+      continue;
+    }
     found.push(`${match[1]}(`);
   }
 
@@ -102,8 +104,12 @@ export const findAnimatedTransformsOutsideNoPreference = (css: string): string[]
 
     while (index < source.length && depth > 0) {
       const char = source[index];
-      if (char === '{') {depth += 1;}
-      if (char === '}') {depth -= 1;}
+      if (char === '{') {
+        depth += 1;
+      }
+      if (char === '}') {
+        depth -= 1;
+      }
       index += 1;
     }
 
@@ -113,8 +119,12 @@ export const findAnimatedTransformsOutsideNoPreference = (css: string): string[]
   const isGuarded = (at: number): boolean => guarded.some(([start, end]) => at >= start && at < end);
 
   for (const match of source.matchAll(/transition(-property)?:\s*([^;}]+)/g)) {
-    if (!/\btransform\b/.test(match[2] ?? '')) {continue;}
-    if (isGuarded(match.index ?? 0)) {continue;}
+    if (!/\btransform\b/.test(match[2] ?? '')) {
+      continue;
+    }
+    if (isGuarded(match.index ?? 0)) {
+      continue;
+    }
     found.push(match[0].trim());
   }
 
@@ -144,8 +154,12 @@ export const findBareFocusOutlines = (css: string): string[] => {
     const selector = (match[1] ?? '').trim();
     const body = match[2] ?? '';
 
-    if (!/outline/.test(body)) {continue;}
-    if (!/:focus(?!-visible|-within)\b/.test(selector)) {continue;}
+    if (!/outline/.test(body)) {
+      continue;
+    }
+    if (!/:focus(?!-visible|-within)\b/.test(selector)) {
+      continue;
+    }
 
     found.push(selector);
   }

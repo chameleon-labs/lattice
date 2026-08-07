@@ -102,7 +102,10 @@ describe('layout primitive generation', () => {
   it('keeps CSS and DTCG names and values in parity', () => {
     const css = layoutCss();
 
-    for (const [groupName, group] of Object.entries(layoutTokens()) as [string, Readonly<Record<string, DimensionToken>>][]) {
+    for (const [groupName, group] of Object.entries(layoutTokens()) as [
+      string,
+      Readonly<Record<string, DimensionToken>>,
+    ][]) {
       for (const [tokenName, token] of Object.entries(group)) {
         expect(token.$type, `${groupName}.${tokenName}`).toBe('dimension');
         expect(token.$value.unit, `${groupName}.${tokenName}`).toBe('rem');

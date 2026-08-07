@@ -39,10 +39,10 @@ export function CodeBlock({
   regionLabel = 'Code sample',
   className,
   ...props
-}: CodeBlockProps) {
+}: CodeBlockProps): React.JSX.Element {
   const [message, setMessage] = useState('');
 
-  const copy = async () => {
+  const copy = async (): Promise<void> => {
     await navigator.clipboard.writeText(code);
     setMessage('Copied to clipboard');
     // Cleared so a second copy of the same text announces again rather than

@@ -87,7 +87,7 @@ function forMode(mode: Mode): LedgerEntry[] {
   // each surface: light ships opaque, so the composite is the anchor itself,
   // while dark ships translucent and genuinely differs per surface — which is
   // why all three are measured rather than one standing in for the others.
-  const ringOn = (surface: Rgb) => over(parseHex(FOCUS_RING[mode].hex), FOCUS_RING[mode].alpha, surface);
+  const ringOn = (surface: Rgb): Rgb => over(parseHex(FOCUS_RING[mode].hex), FOCUS_RING[mode].alpha, surface);
   // ALPHA_CHANNEL holds 0..255 strings for CSS output; normalise to the 0..1
   // the colour maths uses.
   const channel = ALPHA_CHANNEL[mode].split(' ').map((v) => Number(v) / 255);

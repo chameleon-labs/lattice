@@ -16,7 +16,13 @@ export interface TableOptions {
 
 export type TableProps = ComponentPropsWithRef<'table'> & TableOptions;
 
-export function Table({caption, visuallyHiddenCaption = false, className, children, ...props}: TableProps) {
+export function Table({
+  caption,
+  visuallyHiddenCaption = false,
+  className,
+  children,
+  ...props
+}: TableProps): React.JSX.Element {
   return (
     <table {...props} className={className === undefined ? 'lat-table' : `lat-table ${className}`}>
       <caption className="lat-table__caption">
@@ -29,19 +35,19 @@ export function Table({caption, visuallyHiddenCaption = false, className, childr
 
 export type THeadProps = ComponentPropsWithRef<'thead'>;
 
-export function THead({className, ...props}: THeadProps) {
+export function THead({className, ...props}: THeadProps): React.JSX.Element {
   return <thead {...props} className={className === undefined ? 'lat-table__head' : `lat-table__head ${className}`} />;
 }
 
 export type TBodyProps = ComponentPropsWithRef<'tbody'>;
 
-export function TBody({className, ...props}: TBodyProps) {
+export function TBody({className, ...props}: TBodyProps): React.JSX.Element {
   return <tbody {...props} className={className === undefined ? 'lat-table__body' : `lat-table__body ${className}`} />;
 }
 
 export type TrProps = ComponentPropsWithRef<'tr'>;
 
-export function Tr({className, ...props}: TrProps) {
+export function Tr({className, ...props}: TrProps): React.JSX.Element {
   return <tr {...props} className={className === undefined ? 'lat-table__row' : `lat-table__row ${className}`} />;
 }
 
@@ -52,12 +58,12 @@ export type ThProps = Omit<ComponentPropsWithRef<'th'>, 'scope'> & {
   scope: 'col' | 'row';
 };
 
-export function Th({className, ...props}: ThProps) {
+export function Th({className, ...props}: ThProps): React.JSX.Element {
   return <th {...props} className={className === undefined ? 'lat-table__header' : `lat-table__header ${className}`} />;
 }
 
 export type TdProps = ComponentPropsWithRef<'td'>;
 
-export function Td({className, ...props}: TdProps) {
+export function Td({className, ...props}: TdProps): React.JSX.Element {
   return <td {...props} className={className === undefined ? 'lat-table__cell' : `lat-table__cell ${className}`} />;
 }

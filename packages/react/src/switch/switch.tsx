@@ -19,7 +19,7 @@ export type SwitchProps = CheckboxProps;
  * and both track states rendered identically until switch.css added an
  * explicit repaint, because a moving-but-invisible thumb is not a visible cue.
  */
-export function Switch({className, ...props}: SwitchProps) {
+export function Switch({className, ...props}: SwitchProps): React.JSX.Element {
   return (
     <AriakitCheckbox
       {...props}

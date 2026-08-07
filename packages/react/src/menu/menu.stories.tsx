@@ -20,7 +20,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-function Items() {
+function Items(): React.JSX.Element {
   return (
     <>
       <MenuItem>Pause monitoring</MenuItem>

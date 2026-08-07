@@ -29,7 +29,7 @@ export function Button<T extends ElementType = 'button'>({
   size = 'md',
   className,
   ...props
-}: ButtonProps<T>) {
+}: ButtonProps<T>): React.JSX.Element {
   return (
     <AriakitButton
       {...props}

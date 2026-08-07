@@ -22,12 +22,14 @@ export interface LiveRegionProps {
  * `assertive` interrupts whatever the user is hearing, so `polite` is the
  * default.
  */
-export function LiveRegion({message, politeness = 'polite'}: LiveRegionProps) {
+export function LiveRegion({message, politeness = 'polite'}: LiveRegionProps): React.JSX.Element {
   const [announced, setAnnounced] = useState('');
   const previous = useRef('');
 
   useEffect(() => {
-    if (message === previous.current) {return;}
+    if (message === previous.current) {
+      return;
+    }
 
     previous.current = message;
     setAnnounced(message);

@@ -162,9 +162,9 @@ const TYPE_SCALE = [
 /** Copies `text` to the clipboard and clears the sighted "copied" cue after
  *  a beat — the same shape `CodeBlock` uses internally, but this page also
  *  needs it for the per-swatch copy control `CodeBlock` has no slot for. */
-function useCopyFeedback() {
+function useCopyFeedback(): {copiedKey: string | null; copy: (key: string, text: string) => void} {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
-  const copy = (key: string, text: string) => {
+  const copy = (key: string, text: string): void => {
     void navigator.clipboard.writeText(text);
     setCopiedKey(key);
     window.setTimeout(() => setCopiedKey((current) => (current === key ? null : current)), 1200);
@@ -172,7 +172,7 @@ function useCopyFeedback() {
   return {copiedKey, copy};
 }
 
-function SectionHead({index, children}: {index: string; children: string}) {
+function SectionHead({index, children}: {index: string; children: string}): React.JSX.Element {
   return (
     <div className="system-page__section-head">
       <span className="system-page__section-index">{index}</span>
@@ -181,7 +181,7 @@ function SectionHead({index, children}: {index: string; children: string}) {
   );
 }
 
-function OverviewSection() {
+function OverviewSection(): React.JSX.Element {
   return (
     <section id="overview" className="system-page__section">
       <SectionHead index="00">Overview</SectionHead>
@@ -225,7 +225,7 @@ function OverviewSection() {
   );
 }
 
-function TokensSection() {
+function TokensSection(): React.JSX.Element {
   const {copiedKey, copy} = useCopyFeedback();
 
   return (
@@ -279,7 +279,7 @@ function TokensSection() {
   );
 }
 
-function TypographySection() {
+function TypographySection(): React.JSX.Element {
   return (
     <section id="typography" className="system-page__section">
       <SectionHead index="02">Typography</SectionHead>
@@ -316,7 +316,7 @@ function TypographySection() {
   );
 }
 
-function ComponentsSection() {
+function ComponentsSection(): React.JSX.Element {
   const [tokenName, setTokenName] = useState('');
   const [mode, setMode] = useState('system');
 
@@ -397,7 +397,7 @@ function ComponentsSection() {
   );
 }
 
-function PatternsSection() {
+function PatternsSection(): React.JSX.Element {
   return (
     <section id="patterns" className="system-page__section">
       <SectionHead index="04">Patterns</SectionHead>
@@ -456,10 +456,10 @@ function PatternsSection() {
   );
 }
 
-function MotionSection() {
+function MotionSection(): React.JSX.Element {
   const [playing, setPlaying] = useState<string | null>(null);
 
-  const play = (label: string) => {
+  const play = (label: string): void => {
     setPlaying(label);
     window.setTimeout(() => setPlaying((current) => (current === label ? null : current)), 700);
   };
@@ -494,7 +494,7 @@ function MotionSection() {
   );
 }
 
-function Sidebar({active, onNavigate}: {active: string; onNavigate: (id: string) => void}) {
+function Sidebar({active, onNavigate}: {active: string; onNavigate: (id: string) => void}): React.JSX.Element {
   return (
     <aside className="system-page__sidebar">
       <div className="system-page__logo">
@@ -533,7 +533,7 @@ function Sidebar({active, onNavigate}: {active: string; onNavigate: (id: string)
   );
 }
 
-function Topbar({active}: {active: string}) {
+function Topbar({active}: {active: string}): React.JSX.Element {
   const [isDark, setIsDark] = useState(true);
   const activeLabel = NAV.find((item) => item.id === active)?.label ?? active;
 
@@ -553,10 +553,10 @@ function Topbar({active}: {active: string}) {
   );
 }
 
-export function SystemPage() {
+export function SystemPage(): React.JSX.Element {
   const [active, setActive] = useState('overview');
 
-  const navigate = (id: string) => {
+  const navigate = (id: string): void => {
     setActive(id);
     document.getElementById(id)?.scrollIntoView({behavior: 'smooth'});
   };

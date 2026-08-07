@@ -58,7 +58,9 @@ const exportedComponents = (): string[] => {
   const names = new Set<string>();
 
   for (const match of barrel.matchAll(/export\s+(type\s+)?\{([^}]*)\}\s*from/g)) {
-    if (match[1] !== undefined) {continue;}
+    if (match[1] !== undefined) {
+      continue;
+    }
 
     for (const name of (match[2] ?? '').split(',')) {
       const trimmed = name
@@ -68,7 +70,9 @@ const exportedComponents = (): string[] => {
         ?.trim();
       // `export { type Foo, Bar }` — an inline type specifier inside a value
       // clause is still a type.
-      if (trimmed === undefined || trimmed === '' || trimmed.startsWith('type ')) {continue;}
+      if (trimmed === undefined || trimmed === '' || trimmed.startsWith('type ')) {
+        continue;
+      }
       names.add(trimmed);
     }
   }

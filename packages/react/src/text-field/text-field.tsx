@@ -15,7 +15,7 @@ export interface TextFieldProps extends Omit<InputProps, 'aria-describedby' | 'a
  * product exists to find — so the relationship is built here rather than
  * re-established correctly at every call site.
  */
-export function TextField({label, description, error, className, ...props}: TextFieldProps) {
+export function TextField({label, description, error, className, ...props}: TextFieldProps): React.JSX.Element {
   const base = useId();
   const inputId = `${base}-input`;
   const descriptionId = `${base}-description`;

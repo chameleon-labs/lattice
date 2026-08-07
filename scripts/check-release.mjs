@@ -29,8 +29,12 @@ const readManifest = (path) => JSON.parse(readFileSync(path, 'utf8'));
 
 /** Every string value in an `exports` map, however deeply conditioned. */
 const exportTargets = (node) => {
-  if (typeof node === 'string') {return [node];}
-  if (node === null || typeof node !== 'object') {return [];}
+  if (typeof node === 'string') {
+    return [node];
+  }
+  if (node === null || typeof node !== 'object') {
+    return [];
+  }
   return Object.values(node).flatMap(exportTargets);
 };
 
@@ -47,7 +51,9 @@ const packageDirs = readdirSync(packagesDir, {withFileTypes: true})
   .map((entry) => entry.name)
   .sort();
 
-if (packageDirs.length === 0) {fail('packages/', 'no packages found');}
+if (packageDirs.length === 0) {
+  fail('packages/', 'no packages found');
+}
 
 const releases = [];
 
@@ -92,11 +98,17 @@ for (const dir of packageDirs) {
   // whole working tree is present, and 404s for the consumer.
   const roots = (manifest.files ?? []).filter((pattern) => !pattern.startsWith('!'));
   for (const target of exportTargets(manifest.exports ?? {})) {
-    if (!target.startsWith('./')) {continue;}
+    if (!target.startsWith('./')) {
+      continue;
+    }
     const relative = target.slice(2);
-    if (relative === 'package.json') {continue;}
+    if (relative === 'package.json') {
+      continue;
+    }
     const covered = roots.some((root) => relative === root || relative.startsWith(`${root.replace(/\/$/, '')}/`));
-    if (!covered) {fail(where, `exports "${target}" is not covered by \`files\` — it would 404 for consumers`);}
+    if (!covered) {
+      fail(where, `exports "${target}" is not covered by \`files\` — it would 404 for consumers`);
+    }
   }
 }
 
@@ -112,7 +124,9 @@ for (const dir of packageDirs) {
 const workspaceNames = new Set(releases.map((release) => release.manifest.name));
 for (const {dir, manifest} of releases) {
   for (const [name, range] of Object.entries(manifest.peerDependencies ?? {})) {
-    if (!workspaceNames.has(name)) {continue;}
+    if (!workspaceNames.has(name)) {
+      continue;
+    }
     if (range !== 'workspace:*') {
       fail(
         `packages/${dir}/package.json`,
@@ -154,7 +168,9 @@ for (const {dir, manifest} of releases) {
 
 if (problems.length > 0) {
   console.error(`\n${problems.length} release precondition(s) failed:\n`);
-  for (const problem of problems) {console.error(`  ✗ ${problem}`);}
+  for (const problem of problems) {
+    console.error(`  ✗ ${problem}`);
+  }
   console.error('');
   process.exit(1);
 }

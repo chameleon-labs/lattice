@@ -39,7 +39,14 @@ export interface EyebrowProps extends HTMLAttributes<HTMLDivElement> {
   align?: EyebrowAlign;
 }
 
-export function Eyebrow({rule = false, tone = 'subtle', align = 'start', className, children, ...props}: EyebrowProps) {
+export function Eyebrow({
+  rule = false,
+  tone = 'subtle',
+  align = 'start',
+  className,
+  children,
+  ...props
+}: EyebrowProps): React.JSX.Element {
   return (
     <div
       {...props}

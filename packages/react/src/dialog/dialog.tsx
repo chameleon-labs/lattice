@@ -28,7 +28,7 @@ export type DialogDisclosureProps<T extends ElementType = 'button'> = AriakitDia
  * `--lat-elevation-overlay` with Menu — surface, border and shadow together,
  * because on a dark surface a shadow is not subtle but absent.
  */
-export function Dialog<T extends ElementType = 'div'>({className, ...props}: DialogProps<T>) {
+export function Dialog<T extends ElementType = 'div'>({className, ...props}: DialogProps<T>): React.JSX.Element {
   return (
     <AriakitDialog
       backdrop={<div className="lat-dialog__backdrop" />}
@@ -38,7 +38,10 @@ export function Dialog<T extends ElementType = 'div'>({className, ...props}: Dia
   );
 }
 
-export function DialogHeading<T extends ElementType = 'h1'>({className, ...props}: DialogHeadingProps<T>) {
+export function DialogHeading<T extends ElementType = 'h1'>({
+  className,
+  ...props
+}: DialogHeadingProps<T>): React.JSX.Element {
   return (
     <AriakitDialogHeading
       {...props}
@@ -47,7 +50,10 @@ export function DialogHeading<T extends ElementType = 'h1'>({className, ...props
   );
 }
 
-export function DialogDismiss<T extends ElementType = 'button'>({className, ...props}: DialogDismissProps<T>) {
+export function DialogDismiss<T extends ElementType = 'button'>({
+  className,
+  ...props
+}: DialogDismissProps<T>): React.JSX.Element {
   return (
     <AriakitDialogDismiss
       {...props}
@@ -56,7 +62,10 @@ export function DialogDismiss<T extends ElementType = 'button'>({className, ...p
   );
 }
 
-export function DialogDisclosure<T extends ElementType = 'button'>({className, ...props}: DialogDisclosureProps<T>) {
+export function DialogDisclosure<T extends ElementType = 'button'>({
+  className,
+  ...props
+}: DialogDisclosureProps<T>): React.JSX.Element {
   return (
     <AriakitDialogDisclosure
       {...props}

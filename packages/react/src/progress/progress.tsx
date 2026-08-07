@@ -15,7 +15,15 @@ export interface ProgressProps extends Omit<HTMLAttributes<HTMLDivElement>, 'rol
   valueText?: string;
 }
 
-export function Progress({value, max = 100, label, valueText, className, style, ...props}: ProgressProps) {
+export function Progress({
+  value,
+  max = 100,
+  label,
+  valueText,
+  className,
+  style,
+  ...props
+}: ProgressProps): React.JSX.Element {
   const safeMax = Number.isFinite(max) && max > 0 ? max : 100;
   const safeValue = Number.isFinite(value) ? value : 0;
   const clamped = Math.min(Math.max(safeValue, 0), safeMax);

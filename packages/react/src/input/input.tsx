@@ -43,7 +43,7 @@ export function Input({
   disabled = false,
   ref,
   ...props
-}: InputProps) {
+}: InputProps): React.JSX.Element {
   return (
     <div
       className={className === undefined ? 'lat-input-field' : `lat-input-field ${className}`}

@@ -48,8 +48,12 @@ const FORBIDDEN = [
 ];
 
 const exportTargets = (node) => {
-  if (typeof node === 'string') {return [node];}
-  if (node === null || typeof node !== 'object') {return [];}
+  if (typeof node === 'string') {
+    return [node];
+  }
+  if (node === null || typeof node !== 'object') {
+    return [];
+  }
   return Object.values(node).flatMap(exportTargets);
 };
 
@@ -99,7 +103,9 @@ for (const dir of packageDirs) {
 
   const required = ['package.json', 'README.md', 'LICENSE'];
   for (const target of exportTargets(manifest.exports ?? {})) {
-    if (!target.startsWith('./')) {continue;}
+    if (!target.startsWith('./')) {
+      continue;
+    }
     required.push(target.slice(2));
   }
 
@@ -109,8 +115,11 @@ for (const dir of packageDirs) {
     if (path.includes('*')) {
       const prefix = `package/${path.slice(0, path.indexOf('*'))}`;
       const matches = entries.filter((entry) => entry.startsWith(prefix));
-      if (matches.length === 0) {fail(where, `exports "./${path}" matched nothing`);}
-      else {console.log(`    ok  ${path}  (${matches.length} files)`);}
+      if (matches.length === 0) {
+        fail(where, `exports "./${path}" matched nothing`);
+      } else {
+        console.log(`    ok  ${path}  (${matches.length} files)`);
+      }
       continue;
     }
 
@@ -119,13 +128,18 @@ for (const dir of packageDirs) {
       continue;
     }
     const size = sizeOf(path);
-    if (size === 0) {fail(where, `${path} is empty`);}
-    else {console.log(`    ok  ${path}  (${size} bytes)`);}
+    if (size === 0) {
+      fail(where, `${path} is empty`);
+    } else {
+      console.log(`    ok  ${path}  (${size} bytes)`);
+    }
   }
 
   for (const entry of entries) {
     for (const {pattern, why} of FORBIDDEN) {
-      if (pattern.test(entry)) {fail(where, `${entry} should not ship — ${why}`);}
+      if (pattern.test(entry)) {
+        fail(where, `${entry} should not ship — ${why}`);
+      }
     }
   }
 
@@ -149,7 +163,9 @@ for (const {name, version, tarball, files} of packed) {
 
 if (problems.length > 0) {
   console.error(`\n${problems.length} tarball problem(s):\n`);
-  for (const problem of problems) {console.error(`  ✗ ${problem}`);}
+  for (const problem of problems) {
+    console.error(`  ✗ ${problem}`);
+  }
   console.error('');
   process.exit(1);
 }

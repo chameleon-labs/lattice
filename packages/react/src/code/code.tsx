@@ -17,7 +17,7 @@ import type {HTMLAttributes} from 'react';
  */
 export type CodeProps = HTMLAttributes<HTMLElement>;
 
-export function Code({className, children, ...props}: CodeProps) {
+export function Code({className, children, ...props}: CodeProps): React.JSX.Element {
   return (
     <code {...props} className={className === undefined ? 'lat-code' : `lat-code ${className}`}>
       {children}

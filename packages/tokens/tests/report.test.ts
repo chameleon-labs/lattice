@@ -136,7 +136,9 @@ describe('contrast ledger', () => {
   });
 
   it('reports APCA alongside every WCAG figure', () => {
-    for (const entry of buildLedger()) {expect(Number.isFinite(entry.apca)).toBe(true);}
+    for (const entry of buildLedger()) {
+      expect(Number.isFinite(entry.apca)).toBe(true);
+    }
   });
 
   it('measures the light danger tint missing its minimum by a hundredth', () => {

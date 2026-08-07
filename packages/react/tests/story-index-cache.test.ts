@@ -95,7 +95,9 @@ describe('the story index cache', () => {
     let attempt = 0;
     const {request, get} = stubRequest(async () => {
       attempt += 1;
-      if (attempt === 1) {throw new Error('read ECONNRESET');}
+      if (attempt === 1) {
+        throw new Error('read ECONNRESET');
+      }
       return ok();
     });
 

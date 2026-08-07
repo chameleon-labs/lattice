@@ -26,7 +26,7 @@ export interface ScoreArcProps {
  * attribute reading a custom property is not reliable across browsers,
  * while `currentColor` inheritance is universally supported.
  */
-export function ScoreArc({score, size = 120}: ScoreArcProps) {
+export function ScoreArc({score, size = 120}: ScoreArcProps): React.JSX.Element {
   const r = size * 0.38;
   const cx = size / 2;
   const cy = size / 2;
@@ -35,8 +35,8 @@ export function ScoreArc({score, size = 120}: ScoreArcProps) {
   const range = endAngle - startAngle;
   const filled = (score / 100) * range;
 
-  const toRad = (deg: number) => (deg * Math.PI) / 180;
-  const arc = (angle: number) => ({
+  const toRad = (deg: number): number => (deg * Math.PI) / 180;
+  const arc = (angle: number): {x: number; y: number} => ({
     x: cx + r * Math.cos(toRad(angle)),
     y: cy + r * Math.sin(toRad(angle)),
   });
