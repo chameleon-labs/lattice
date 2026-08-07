@@ -5,61 +5,32 @@ import { readFileSync } from 'node:fs'
  * axe violations the a11y sweep is allowed to let through, and classifies axe
  * violations against it.
  *
- * ## Why a generated set, not a hand-copied one
+ * The set is read from `dist/contrast-ledger.json`, which the tokens build
+ * already writes, rather than hand-copied here — a second list would drift the
+ * first time a token changed and only one place was updated. Adding or removing
+ * a ledger row changes the accepted set with no edit to this file. `dist/` is
+ * gitignored, so the tokens package must be built first; CI's "Build tokens"
+ * step already covers that for `lattice.css`.
  *
- * `docs/superpowers/specs/2026-08-03-lattice-identity-design.md` §9 documents
- * twenty-one contrast pairs that fail WCAG and ship anyway — a knowing,
- * approved decision, not an oversight. `packages/tokens/generate/report.ts`
- * already computes that ledger and prints it on every build; hand-copying it
- * into a second list here would let the two drift the first time a token
- * value changed and nobody remembered to update both places. Instead,
- * `packages/tokens/generate/build.ts` writes the ledger it already computed
- * to `dist/contrast-ledger.json`, and this module reads that file. Adding or
- * removing a ledger row changes this file's accepted set with no edit here.
+ * ## Why a floor rather than an exact pair match
  *
- * The read is a plain relative path across the package boundary — the same
- * pattern `tests/package-contract.test.ts` already uses to read the tokens
- * package's `package.json` — rather than a package-specifier import, so
- * this file has no runtime dependency on the tokens package's module graph,
- * only on the artifact it publishes to `dist/`. (It is also published as
- * `@chameleon-labs/lattice-tokens/contrast-ledger.json` in that package's
- * `exports` map, for anyone who does want to reach it that way.)
+ * The ledger measures token *pairs*, one named background per foreground. axe
+ * measures rendered *composites*, which are not always the same pair:
+ * `--lat-text-subtle` is recorded against `bg-raised` (3.67:1), but components
+ * also place it on `--lat-bg` (3.83:1) and on `--lat-wash` over `bg-raised`
+ * (3.27:1). Those are one deficient foreground in different contexts rather than
+ * new defects, and matching foreground *and* background would reject the
+ * contexts the ledger did not happen to name.
  *
- * `dist/` is gitignored, so the tokens package has to be built before this
- * file exists — already true of `dist/lattice.css`, which Storybook's preview
- * imports, so the a11y sweep could not run at all without it either. CI's
- * "Build tokens" step covers both.
+ * So acceptance keys on **foreground plus a floor**: the foreground hex must
+ * match one the ledger already records as failing, and the measured ratio must
+ * not be worse than the *worst* ratio recorded for it. Worst rather than best,
+ * so every context the design is known to use is covered without covering one
+ * no reviewer has seen.
  *
- * ## Why a floor, not an exact pair match
- *
- * The ledger measures token *pairs*: one named background per foreground.
- * axe measures rendered *composites*, and those are not always the same
- * pair. `--lat-text-subtle`, for instance, is measured in the ledger against
- * `bg-raised` (3.67:1) but components also place it directly on `--lat-bg`
- * (3.83:1) and on `--lat-wash` over `bg-raised` (3.27:1, captured separately
- * in the ledger as the severity-`minor` row, since that is the one other
- * context the design actually composites it in). Those are the same
- * deficient foreground in a different context, not a new defect — a strict
- * pair match (foreground *and* background hex) would reject the two contexts
- * the ledger did not happen to name, which is exactly the CSS-selector-style
- * churn this design is meant to avoid.
- *
- * So acceptance keys on **foreground colour plus a floor**: a `color-contrast`
- * violation is accepted only if (a) its foreground hex matches a foreground
- * the ledger already records as failing, and (b) its measured ratio is not
- * *worse* than the worst ratio the ledger records for that foreground. That
- * floor is deliberately the worst, not the best, of the ratios the ledger
- * already has on record for the colour — every context the design is already
- * known to place that foreground in is covered, without covering a ratio
- * worse than any the ledger has already put in front of a human reviewer.
- *
- * This is not "accept every color-contrast violation": a foreground that
- * never appears in a failing ledger row has no floor and is never accepted,
- * so a genuinely new bad pair — a colour the ledger has not flagged at all,
- * or the same deficient foreground measured *below* its worst recorded
- * ratio — still fails the suite. See tests/browser/a11y.spec.ts for where
- * this is wired in, and the three discrimination checks recorded in the
- * commit that introduced this file for proof it can still fail.
+ * This is not "accept every color-contrast violation". A foreground with no
+ * failing row has no floor and is never accepted, so a genuinely new bad pair
+ * still fails. Wired in at tests/browser/a11y.spec.ts.
  */
 
 /** Mirrors `LedgerEntry` from `packages/tokens/generate/report.ts`. */

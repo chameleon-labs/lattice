@@ -1,11 +1,7 @@
 /**
  * @vitest-environment node
  *
- * Assembles the stylesheet from source, the same way stylesheet.test.ts does
- * and for the same reason: reading dist/ passes locally and fails from a
- * clean tree (CI runs `test` before `build`), and this must not run under
- * jsdom, where the global URL resolves relative imports against the
- * document's base instead of import.meta.url.
+ * Assembled from source rather than read from dist/ — see stylesheet.test.ts.
  *
  * This mirrors badge-severity-css.test.ts, guarding against the exact shape
  * of regression a reviewer found in Badge: a variant block pointing at

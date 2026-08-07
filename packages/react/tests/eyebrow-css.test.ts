@@ -1,11 +1,7 @@
 /**
  * @vitest-environment node
  *
- * Assembles the stylesheet from source, the same way stylesheet.test.ts does
- * and for the same reason: reading dist/ passes locally and fails from a
- * clean tree (CI runs `test` before `build`), and this must not run under
- * jsdom, where the global URL resolves relative imports against the
- * document's base instead of import.meta.url.
+ * Assembled from source rather than read from dist/ — see stylesheet.test.ts.
  *
  * Eyebrow's entire reason for existing is that the 0.2em tracking value has
  * exactly one home. `stylesheet.test.ts`'s "references only tokens the token
