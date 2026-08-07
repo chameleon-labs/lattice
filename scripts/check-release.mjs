@@ -3,15 +3,13 @@
  * Release preflight. Static checks on the workspace manifests, run on every PR
  * and again — with the tag — at release.
  *
- * The failure this exists for is the one the release issue calls out: pnpm and
- * npm both **skip a `private` package silently**. `pnpm publish -r` prints
- * "There are no new packages that should be published" and exits 0, so a
- * forgotten `private: true` looks exactly like a successful release. Worse, the
- * guard is weaker than it appears in the path this repo actually uses: npm was
- * observed accepting `npm publish <tarball> --dry-run` for a manifest still
- * marked private, because publishing a tarball reads the manifest out of the
- * archive rather than treating the directory as a project. So `private` is
- * asserted here rather than relied on as a safety net anywhere else.
+ * The failure it exists for: pnpm and npm both **skip a `private` package
+ * silently**. `pnpm publish -r` prints "There are no new packages that should be
+ * published" and exits 0, so a forgotten `private: true` looks exactly like a
+ * successful release. The guard is weaker still in the path this repo uses — npm
+ * was observed accepting `npm publish <tarball> --dry-run` for a manifest marked
+ * private, since a tarball publish reads the manifest out of the archive. So
+ * `private` is asserted here rather than relied on anywhere else.
  *
  * Usage:
  *   node scripts/check-release.mjs            # PR mode: shape only

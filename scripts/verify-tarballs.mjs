@@ -1,33 +1,15 @@
 #!/usr/bin/env node
 /**
- * Packs every publishable package and verifies the tarball is consumable,
- * then leaves the archives in `.release/` for the release workflow to publish.
+ * Packs every publishable package, proves each tarball is consumable, and leaves
+ * the archives in `.release/` for the release workflow to publish.
  *
- * The tarballs this writes are the ones that ship. That is the point: the
- * release does not rebuild after verification, it publishes these exact bytes,
- * so there is no window in which the thing checked and the thing published can
- * differ.
+ * Those are the bytes that ship: the release does not rebuild after verifying,
+ * so nothing can change between the check and the publish.
  *
- * It is `pnpm pack` rather than `npm pack` because only pnpm rewrites the
- * `workspace:` protocol into a real semver range. It is `npm publish` in the
- * workflow rather than `pnpm publish` because only npm generates provenance —
- * pnpm 10.7 has no such flag. Each tool does the half it can do, and the
- * tarball is the handover.
- *
- * What is checked:
- *
- * - every path the `exports` map promises exists and is non-empty. Derived
- *   from the manifest rather than hand-listed, so a new export cannot be added
- *   without this check following it.
- * - `README.md` and `LICENSE` are present. npm renders the first as the package
- *   page; pnpm copies the second down from the workspace root.
- * - no `workspace:` range survived into the packed manifest. `files: ["dist"]`
- *   plus a gitignored `dist/` is the documented way to ship an empty package;
- *   an unrewritten `workspace:*` is the way to ship an uninstallable one.
- * - `private` is gone. See scripts/check-release.mjs for why that is not
- *   assumed to be caught later.
- * - nothing from the development surface leaked in — stories drag
- *   `@storybook/react-vite` into a consumer's module graph.
+ * `pnpm pack` rather than `npm pack`, because only pnpm rewrites the
+ * `workspace:` protocol into a real range; `npm publish` in the workflow rather
+ * than `pnpm publish`, because only npm generates provenance. Each tool does the
+ * half it can, and the tarball is the handover.
  *
  * Usage: node scripts/verify-tarballs.mjs [output-dir]
  */

@@ -3,17 +3,15 @@
  * Computes the next version and writes it to every publishable manifest.
  *
  * The two packages release in lockstep, so this reads one version, refuses if
- * they disagree, and writes one version back. That is why it exists rather than
- * `npm version` run twice: two independent bumps can drift, and the drift is
- * only visible at publish time.
+ * they disagree, and writes one back — `npm version` run twice can drift, and
+ * the drift only shows at publish time.
  *
- * The increments follow npm's own semantics, including the part that surprises
- * people: `patch` on a prerelease **graduates** it rather than incrementing.
- * `0.1.0-rc.1` + patch is `0.1.0`, not `0.1.1` — the release being prepared
- * *is* 0.1.0, and the candidate was a rehearsal of it.
+ * Increments follow npm's own semantics, including the surprising one: `patch`
+ * on a prerelease **graduates** it. `0.1.0-rc.1` + patch is `0.1.0`, not
+ * `0.1.1` — the release being prepared *is* 0.1.0.
  *
- * No semver dependency, deliberately: the workspace root installs nothing, and
- * this runs before `pnpm install` in the release path.
+ * No semver dependency: the workspace root installs nothing, and this runs
+ * before `pnpm install` in the release path.
  *
  * Usage:
  *   node scripts/bump-version.mjs prerelease            # 0.1.0-rc.1 -> 0.1.0-rc.2
