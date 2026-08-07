@@ -104,27 +104,19 @@ function themedBlock(mode: Mode): string {
 }
 
 /**
- * The stylesheet.
+ * Values ship as `oklch()` alone, with no hex companion, because a second
+ * declaration would not be a fallback: custom property values parse as a raw
+ * token stream, so a browser that cannot resolve `oklch()` still accepts the
+ * declaration and fails later at `var()` time — last one simply wins. A real
+ * fallback needs an `@supports` block duplicating every value; the verified hex
+ * lives in `tokens.json`, where DTCG defines a field for it.
  *
- * Values ship as `oklch()` alone, with no hex companion. A second declaration
- * would not be a fallback: custom property values are parsed as a raw token
- * stream, so a browser that cannot resolve `oklch()` still accepts the
- * declaration and only fails later, at `var()` time. Whichever declaration comes
- * last simply wins. A genuine fallback would need an `@supports` block
- * duplicating every value, and the verified hex is carried in `tokens.json`
- * instead, where DTCG defines a field for exactly that.
+ * `oklch()` buys **bit depth, not gamut**. Everything here is already fitted
+ * into sRGB and wide-gamut output is a stated non-goal; what it avoids is the
+ * 8-bit quantisation hex imposes.
  *
- * What `oklch()` actually buys in v1 is **bit depth, not gamut**. Every colour
- * here has already been fitted into sRGB, so nothing outside that gamut can be
- * expressed however it is written; wide-gamut output is a stated non-goal. What
- * it avoids is the 8-bit quantisation a hex value imposes, so a display with more
- * than 8 bits per channel renders the colour that was computed rather than the
- * nearest 1/255 step.
- *
- * One consequence to be aware of: contracts are verified against the quantised
- * hex, which is the conservative side of that difference — the ratio proven is
- * the one an 8-bit display produces, and the unquantised colour differs from it
- * by less than a single step.
+ * Contracts are verified against the quantised hex, which is the conservative
+ * side of that: the ratio proven is the one an 8-bit display produces.
  */
 export function emitCss(): string {
   const [light, dark] = MODES

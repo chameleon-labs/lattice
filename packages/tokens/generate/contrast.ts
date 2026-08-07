@@ -1,36 +1,28 @@
 /**
- * Contrast metrics for the token pipeline.
+ * Two standards with deliberately unequal authority.
  *
- * Two standards with deliberately unequal authority:
+ * **WCAG 2.x** decides pass or fail in every printed check — the contrast ledger
+ * and the chart palette checks both label entries by it. Neither stops the
+ * build: Lattice's values are the identity, several of its pairs miss their
+ * minimum, and they ship with the miss printed rather than hidden. See §9.
  *
- * - **WCAG 2.x** relative luminance and ratio decide **pass or fail** in every
- *   printed check — the contrast ledger (generate/report.ts) and the chart
- *   palette checks (generate/charts.ts) both label an entry this way. Neither
- *   stops the build on a miss: Lattice's values are the identity, several of
- *   its pairs miss their WCAG minimum, and the build ships them anyway with
- *   the miss printed rather than hidden. See the design spec's §9.
- * - **APCA** `Lc` is computed and reported alongside and **never** decides
- *   pass or fail. It is perceptually more accurate, particularly in dark mode,
- *   but it is not a conformance standard, and the audit engines a consuming
- *   product is measured by report WCAG 2. A palette justified by a different
- *   standard than the one it will be audited against would be indefensible.
- *   Reporting both keeps the gap between them visible rather than hidden.
+ * **APCA** `Lc` is reported alongside and never decides anything. It is
+ * perceptually more accurate, particularly in dark mode, but it is not a
+ * conformance standard and the engines a consuming product gets audited by
+ * report WCAG 2. Reporting both keeps the gap between them visible.
  */
 
 import { srgbToLinear, type Rgb } from './oklch.js'
 
 /**
- * Validates and clamps one channel.
- *
  * Clamping rather than refusing is the honest answer for a contrast metric: a
- * channel above 1 is shown by a display as 255, so the clamped value is what a
- * user actually sees. Callers measuring an OKLCH colour should still fit it to
- * the gamut first — this exists to absorb the float noise a fitted colour
- * carries, not to excuse measuring a colour that cannot ship.
+ * channel above 1 is shown as 255, so the clamped value is what a user sees.
+ * Callers should still gamut-fit first — this absorbs the float noise a fitted
+ * colour carries, not a colour that cannot ship.
  *
- * Non-finite is a different matter: NaN passes through Math.min/Math.max
- * untouched and would surface as a contract "failing" with an unreadable number
- * instead of naming the bug that produced it.
+ * Non-finite is different: NaN passes through Math.min/Math.max untouched and
+ * would surface as a contract failing with an unreadable number rather than
+ * naming the bug that produced it.
  */
 function channel(value: number): number {
   if (!Number.isFinite(value)) {
@@ -41,15 +33,10 @@ function channel(value: number): number {
 }
 
 /**
- * WCAG 2.x luminance coefficients, exactly as the standard publishes them.
- *
- * Not the values derived from the sRGB primaries via the XYZ matrix, which give
- * red 0.212639 rather than 0.2126 and shift a ratio by as much as 6e-4. axe-core
- * uses the published constants, so these have to: a gate that disagreed with the
- * engine auditing the product would pass a palette the audit then failed.
- *
- * They also sum to exactly 1, which is why every implementation agrees on greys
- * and only diverges on saturated colour.
+ * Exactly as the standard publishes them — not the values derived from the sRGB
+ * primaries via XYZ, which give red 0.212639 and shift a ratio by up to 6e-4.
+ * axe-core uses the published constants, so a gate using the derived ones would
+ * pass a palette the audit then failed.
  */
 const WCAG_RED = 0.2126
 const WCAG_GREEN = 0.7152
@@ -111,14 +98,11 @@ const LOW_OFFSET = 0.027
 const LOW_CLIP = 0.1
 
 // An early exit for luminances too close to separate, kept for parity with
-// apca-w3 so the two read the same side by side.
-//
-// It is redundant here, and provably so rather than merely untested: sweeping the
-// whole luminance range, the largest |SAPC| reachable while |dY| is under this
-// threshold is 0.0526, so LOW_CLIP already swallows every case with roughly a 2x
-// margin. Removing this line changes no result, which means no test can kill it —
-// noted so nobody spends an afternoon trying to write one. It earns its place only
-// if LOW_CLIP is ever lowered, at which point it becomes load-bearing again.
+// apca-w3. Redundant here, and provably so rather than merely untested: across
+// the whole luminance range the largest |SAPC| reachable while |dY| is under
+// this threshold is 0.0526, so LOW_CLIP already swallows every case with ~2x
+// margin. No test can kill this line — noted so nobody spends an afternoon
+// trying to write one. It becomes load-bearing again only if LOW_CLIP drops.
 const MIN_DELTA_Y = 0.0005
 
 function apcaLuminance({ r, g, b }: Rgb): number {
