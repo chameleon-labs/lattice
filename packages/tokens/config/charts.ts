@@ -1,15 +1,10 @@
 /**
- * Chart palettes: one categorical, one sequential.
+ * Two palettes for two jobs: categorical distinguishes unordered series,
+ * sequential encodes magnitude along one hue. Using either for the other's job
+ * is the most common data-visualisation error, so they carry separate checks.
  *
- * Two different jobs. The categorical palette distinguishes unordered series
- * from one another; the sequential ramp encodes magnitude along a single hue.
- * Using either for the other's job is the most common data-visualisation error,
- * so they are separate palettes with separate checks.
- *
- * Like every other colour here these are declared in OKLCH and generated, not
- * pasted. The hues are the outcome of enumerating all 5,040 orderings with violet
- * fixed in slot 1 and validating each in both modes; that search is history, and
- * what it produced is config.
+ * The categorical hue order is the outcome of enumerating all 5,040 orderings
+ * with violet fixed in slot 1 and validating each in both modes.
  */
 
 import { GRAY_ANCHORS } from './anchors.js'
@@ -20,10 +15,9 @@ export type Tier = 'hi' | 'lo'
 /**
  * The two lightness tiers adjacent slots alternate between.
  *
- * Separation is carried by **lightness, not hue**, which is what survives
- * protanopia and deuteranopia — a palette separated by hue alone collapses under
- * either. The high tier is mode-invariant, so half the palette is literally the
- * same colour in both themes.
+ * Separation is carried by **lightness, not hue** — a palette separated by hue
+ * alone collapses under protanopia and deuteranopia. The high tier is
+ * mode-invariant, so half the palette is the same colour in both themes.
  */
 export const TIERS: Record<Tier, Record<Mode, number>> = {
   hi: { light: 0.63, dark: 0.63 },
@@ -102,14 +96,12 @@ export const SEQUENTIAL: readonly SequentialStep[] = [
 export const ORDINAL_CLAMP: Record<Mode, number> = { light: 300, dark: 600 }
 
 /**
- * The surfaces the palettes are validated against: Lattice's real page
- * background (`GRAY_ANCHORS[mode].bg`) in each mode.
+ * Charts are drawn on the app background, so the palettes are validated against
+ * it rather than against a convenient white.
  *
- * Charts are drawn on the app background, so this is the real comparison rather
- * than a convenient white. This used to be `gray-1` from the retired numbered
- * scale — `#fdfdfd` light, `#111112` dark — which no longer exists and, worse,
- * was lighter than Lattice's actual light background, so every light-mode
- * measurement against it was optimistic.
+ * Referenced from `GRAY_ANCHORS` rather than copied: the previous hand-copied
+ * value outlived the scale it came from and was lighter than the real light
+ * background, making every light-mode measurement optimistic.
  */
 export const CHART_SURFACES: Record<Mode, string> = {
   light: GRAY_ANCHORS.light.bg,

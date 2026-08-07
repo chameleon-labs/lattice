@@ -1,29 +1,16 @@
 /**
- * Elevation.
+ * Four roles, because four is all the Figma bundle uses. The values are the
+ * Tailwind v4 shadows it emits, stored as layers rather than CSS strings so the
+ * stylesheet and the DTCG output render one source — and because `sm` and `lg`
+ * are each two stacked layers, which one string cannot represent legibly.
  *
- * Four roles, replacing the calibrated multi-level model, because four is all
- * the Figma bundle uses. Values are the Tailwind v4 shadows the bundle emits, stored
- * as data rather than as CSS strings.
+ * These shadows are pure black at 10–25% alpha, so over the `#0c0c14` page they
+ * are close to invisible: the identity reads as flat in dark mode and leans on
+ * the hairline instead, with `floating` the only one that carries. That ships as
+ * delivered; it is recorded so a future change is a decision, not a discovery.
  *
- * ## Why layers, not strings
- *
- * Stored structurally rather than as CSS strings so the stylesheet and the
- * DTCG output are two renderings of one source. A string would have forced
- * either a parser or a second hand-maintained copy — and `sm` and `lg` are
- * each two stacked layers, which a single CSS string cannot represent as
- * anything other than an opaque blob.
- *
- * ## Recorded, not fixed
- *
- * These shadows are pure black at 10-25% alpha. Over Lattice's `#0c0c14` page
- * they are close to invisible, which is why the identity reads as flat in dark
- * mode and leans on the hairline instead; `floating` is the only one that
- * carries. That is the design as delivered and it ships as delivered. The
- * observation is written down so a future change is a decision rather than a
- * discovery.
- *
- * Depth is not conveyed by shadow alone anywhere in this system: every raised
- * surface also carries a hairline border, which is what survives forced-colors.
+ * Depth is never conveyed by shadow alone — every raised surface also carries a
+ * hairline border, which is what survives forced-colors.
  */
 
 /** One layer of a (possibly multi-layer) shadow, in pixels. */
@@ -51,10 +38,9 @@ export const SHADOWS = {
 export type ShadowName = keyof typeof SHADOWS
 
 /**
- * What each role is for. `flat` is not an absence of styling — it is the
- * positive statement that a surface is distinguished by its hairline and its
- * fill, which is Lattice's default. It maps to `'none'` rather than a
- * `ShadowName` because it has no shadow to point at.
+ * `flat` is not an absence of styling but the positive statement that a surface
+ * is distinguished by its hairline and fill, which is Lattice's default. It maps
+ * to `'none'` because it has no shadow to point at.
  */
 export const ELEVATION_ROLES = {
   /** Cards, panels, inputs, buttons. Hairline only. */
