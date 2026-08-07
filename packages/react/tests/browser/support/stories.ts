@@ -42,8 +42,37 @@ export function storyFamilies(): string[] {
     .sort()
 }
 
+/**
+ * The index, fetched at most once per worker.
+ *
+ * Almost every test in the sweep needs the story list, and this used to fetch it
+ * afresh each time — around 126 of the 166 tests, each re-requesting a document
+ * that cannot change while the suite runs. That is not merely wasteful: every
+ * request is another chance for the connection to the dev server to drop, and
+ * one did, failing a whole CI run with `read ECONNRESET` from a test that never
+ * reached its assertion.
+ *
+ * Module state, so the cache is per worker process rather than global — which is
+ * the correct scope: each worker has its own `APIRequestContext`.
+ *
+ * The promise is cached rather than the value, so tests starting at the same
+ * moment share one request instead of racing to make several. A rejection is
+ * *not* kept: caching it would let a single dropped socket fail every remaining
+ * test in the worker, which is the opposite of the point.
+ */
+let indexRequest: Promise<StoryEntry[]> | undefined
+
 /** Every entry Storybook indexed as a story, in index order. */
 export async function fetchStories(request: APIRequestContext): Promise<StoryEntry[]> {
+  indexRequest ??= loadStories(request).catch((error: unknown) => {
+    indexRequest = undefined
+    throw error
+  })
+
+  return indexRequest
+}
+
+async function loadStories(request: APIRequestContext): Promise<StoryEntry[]> {
   const response = await request.get('/index.json')
 
   if (!response.ok()) {

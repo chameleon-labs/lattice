@@ -16,6 +16,17 @@ export default defineConfig({
   // for — so the opening navigations are slow, and slower still with every
   // worker asking at once. The tests themselves are not slow; the first visit is.
   timeout: 90_000,
+  // Nothing here is retried locally: a failure on a laptop should be looked at,
+  // not re-rolled until it passes, and a flaky assertion hidden by a retry is
+  // worse than one that fails.
+  //
+  // CI is the other case. A shared runner drops connections that a laptop does
+  // not, and this suite makes hundreds of requests to a dev server it started
+  // moments earlier — a single reset socket failed a whole run once, which is
+  // what prompted this. Two retries turn transport noise into a slower green
+  // run; they cannot hide a real failure, because a real failure fails all
+  // three attempts.
+  retries: process.env.CI === undefined ? 0 : 2,
   use: {
     baseURL: 'http://localhost:6006'
   },
