@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { CodeBlock } from './code-block.js'
+import type {Meta, StoryObj} from '@storybook/react-vite';
+import {CodeBlock} from './code-block.js';
 
 /**
  * A mono block with a copy control. The Figma bundle's own bundled version swaps a
@@ -15,25 +15,25 @@ const meta = {
   component: CodeBlock,
   tags: ['autodocs'],
   args: {
-    code: '--lat-solid'
-  }
-} satisfies Meta<typeof CodeBlock>
+    code: '--lat-solid',
+  },
+} satisfies Meta<typeof CodeBlock>;
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {}
+export const Default: Story = {};
 
 export const MultilineCode: Story = {
   args: {
-    code: '.lat-badge {\n  background: var(--lat-wash);\n  border: 1px solid var(--lat-border);\n}'
-  }
-}
+    code: '.lat-badge {\n  background: var(--lat-wash);\n  border: 1px solid var(--lat-border);\n}',
+  },
+};
 
 export const CustomCopyLabel: Story = {
   args: {
     code: '@chameleon-labs/lattice-react',
-    copyLabel: 'Copy package name'
-  }
-}
+    copyLabel: 'Copy package name',
+  },
+};

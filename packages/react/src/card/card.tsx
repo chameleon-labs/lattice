@@ -1,6 +1,6 @@
-import type { ComponentPropsWithRef, HTMLAttributes, ReactNode } from 'react'
+import type {ComponentPropsWithRef, HTMLAttributes, ReactNode} from 'react';
 
-export type CardProps = ComponentPropsWithRef<'div'>
+export type CardProps = ComponentPropsWithRef<'div'>;
 
 /**
  * A `--lat-bg-raised` surface with a hairline border. Flat by default — no
@@ -15,39 +15,29 @@ export type CardProps = ComponentPropsWithRef<'div'>
  * through a real control inside it — a link whose hit area is stretched in CSS
  * — which keeps one accessible name and one tab stop instead of two.
  */
-export function Card({ className, ...props }: CardProps) {
-  return (
-    <div {...props} className={className === undefined ? 'lat-card' : `lat-card ${className}`} />
-  )
+export function Card({className, ...props}: CardProps) {
+  return <div {...props} className={className === undefined ? 'lat-card' : `lat-card ${className}`} />;
 }
 
 export interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {
   /** The eyebrow label. Every panel in Lattice carries one. */
-  label: string
+  label: string;
   /** An optional leading icon, rendered before the label. */
-  icon?: ReactNode
+  icon?: ReactNode;
 }
 
-export function CardHeader({ label, icon, children, className, ...props }: CardHeaderProps) {
+export function CardHeader({label, icon, children, className, ...props}: CardHeaderProps) {
   return (
-    <div
-      {...props}
-      className={className === undefined ? 'lat-card__header' : `lat-card__header ${className}`}
-    >
+    <div {...props} className={className === undefined ? 'lat-card__header' : `lat-card__header ${className}`}>
       {icon}
       <span className="lat-card__label">{label}</span>
       {children}
     </div>
-  )
+  );
 }
 
-export type CardBodyProps = HTMLAttributes<HTMLDivElement>
+export type CardBodyProps = HTMLAttributes<HTMLDivElement>;
 
-export function CardBody({ className, ...props }: CardBodyProps) {
-  return (
-    <div
-      {...props}
-      className={className === undefined ? 'lat-card__body' : `lat-card__body ${className}`}
-    />
-  )
+export function CardBody({className, ...props}: CardBodyProps) {
+  return <div {...props} className={className === undefined ? 'lat-card__body' : `lat-card__body ${className}`} />;
 }

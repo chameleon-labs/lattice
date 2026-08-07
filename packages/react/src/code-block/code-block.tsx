@@ -1,12 +1,12 @@
-import type { HTMLAttributes } from 'react'
-import { useState } from 'react'
-import { LiveRegion } from '../live-region/live-region.js'
-import { VisuallyHidden } from '../visually-hidden/visually-hidden.js'
+import type {HTMLAttributes} from 'react';
+import {useState} from 'react';
+import {LiveRegion} from '../live-region/live-region.js';
+import {VisuallyHidden} from '../visually-hidden/visually-hidden.js';
 
 export interface CodeBlockProps extends HTMLAttributes<HTMLDivElement> {
-  code: string
+  code: string;
   /** Accessible name for the copy control. */
-  copyLabel?: string
+  copyLabel?: string;
   /**
    * Accessible name for the scrollable code region itself (the `<pre>`,
    * exposed as `role="region"` — see below). Defaults to a generic label
@@ -15,7 +15,7 @@ export interface CodeBlockProps extends HTMLAttributes<HTMLDivElement> {
    * default axe rule set) fails a document where two regions share both a
    * role and a name.
    */
-  regionLabel?: string
+  regionLabel?: string;
 }
 
 /**
@@ -40,29 +40,28 @@ export function CodeBlock({
   className,
   ...props
 }: CodeBlockProps) {
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState('');
 
   const copy = async () => {
-    await navigator.clipboard.writeText(code)
-    setMessage('Copied to clipboard')
+    await navigator.clipboard.writeText(code);
+    setMessage('Copied to clipboard');
     // Cleared so a second copy of the same text announces again rather than
     // being deduplicated as an unchanged region, and so the button's copied
     // state is transient rather than sticky.
-    window.setTimeout(() => setMessage(''), 1500)
-  }
+    window.setTimeout(() => setMessage(''), 1500);
+  };
 
   return (
-    <div
-      {...props}
-      className={className === undefined ? 'lat-code-block' : `lat-code-block ${className}`}
-    >
+    <div {...props} className={className === undefined ? 'lat-code-block' : `lat-code-block ${className}`}>
       {/* `overflow-x: auto` (code-block.css) makes this scrollable whenever a
           line overruns the block — reachable by mouse drag and, since the
           content is real text, by a screen reader, but with nothing to give
           it a tab stop a keyboard-only user could reach. `tabIndex={0}` puts
           it in the tab order; `role="region"` + `aria-label` gives it a name
           once focused, since a bare `<pre>` announces none. */}
-      <pre className="lat-code-block__pre" tabIndex={0} role="region" aria-label={regionLabel}>{code}</pre>
+      <pre className="lat-code-block__pre" tabIndex={0} role="region" aria-label={regionLabel}>
+        {code}
+      </pre>
       <button
         type="button"
         className="lat-code-block__copy"
@@ -79,5 +78,5 @@ export function CodeBlock({
         <LiveRegion message={message} />
       </VisuallyHidden>
     </div>
-  )
+  );
 }

@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react'
-import { useState } from 'react'
+import type {ReactNode} from 'react';
+import {useState} from 'react';
 import {
   Badge,
   Button,
@@ -15,9 +15,9 @@ import {
   Td,
   Th,
   Tr,
-  VisuallyHidden
-} from '../index.js'
-import type { BadgeVariant } from '../index.js'
+  VisuallyHidden,
+} from '../index.js';
+import type {BadgeVariant} from '../index.js';
 import {
   AlertCircle,
   AlertTriangle,
@@ -32,11 +32,11 @@ import {
   Sun,
   TrendingDown,
   X,
-  Zap
-} from './icons.js'
-import type { IconProps } from './icons.js'
-import { ScoreArc } from './score-arc.js'
-import { ScoreChart } from './score-chart.js'
+  Zap,
+} from './icons.js';
+import type {IconProps} from './icons.js';
+import {ScoreArc} from './score-arc.js';
+import {ScoreChart} from './score-chart.js';
 
 /**
  * The tabstop landing page, rebuilt from Lattice components alone.
@@ -58,101 +58,125 @@ import { ScoreChart } from './score-chart.js'
  * deuteranopia regardless of hue.
  */
 
-type Impact = 'critical' | 'serious' | 'moderate' | 'minor'
+type Impact = 'critical' | 'serious' | 'moderate' | 'minor';
 
 const IMPACT_ICON: Record<Impact, (props: IconProps) => ReactNode> = {
   critical: AlertCircle,
   serious: AlertTriangle,
   moderate: AlertTriangle,
-  minor: Info
-}
+  minor: Info,
+};
 
 const NAV_LINKS = [
-  { id: 'how', label: 'How it works' },
-  { id: 'why', label: 'Why tabstop' },
-  { id: 'scope', label: 'v1 scope' }
-] as const
+  {id: 'how', label: 'How it works'},
+  {id: 'why', label: 'Why tabstop'},
+  {id: 'scope', label: 'v1 scope'},
+] as const;
 
 const TRUST_STATS = [
-  { value: 'axe-core', label: 'Engine', sub: 'industry standard' },
-  { value: 'Chromium', label: 'Browser', sub: 'via Playwright' },
-  { value: 'Daily', label: 'Cadence', sub: 'automatic re-audits' },
-  { value: '<1 hr', label: 'Alert lag', sub: 'after deploy detected' },
-  { value: '30 sec', label: 'Setup time', sub: 'zero config' }
-] as const
+  {value: 'axe-core', label: 'Engine', sub: 'industry standard'},
+  {value: 'Chromium', label: 'Browser', sub: 'via Playwright'},
+  {value: 'Daily', label: 'Cadence', sub: 'automatic re-audits'},
+  {value: '<1 hr', label: 'Alert lag', sub: 'after deploy detected'},
+  {value: '30 sec', label: 'Setup time', sub: 'zero config'},
+] as const;
 
-const VIOLATIONS: ReadonlyArray<{ impact: Impact; count: number; rule: string; desc: string }> = [
+const VIOLATIONS: ReadonlyArray<{impact: Impact; count: number; rule: string; desc: string}> = [
   {
     impact: 'critical',
     count: 2,
     rule: 'color-contrast',
-    desc: 'Elements must meet minimum color contrast ratio'
+    desc: 'Elements must meet minimum color contrast ratio',
   },
   {
     impact: 'serious',
     count: 5,
     rule: 'image-alt',
-    desc: 'Images must have alternate text'
+    desc: 'Images must have alternate text',
   },
   {
     impact: 'moderate',
     count: 3,
     rule: 'label',
-    desc: 'Form elements must have labels'
+    desc: 'Form elements must have labels',
   },
   {
     impact: 'minor',
     count: 7,
     rule: 'region',
-    desc: 'All page content should be contained by landmarks'
-  }
-]
+    desc: 'All page content should be contained by landmarks',
+  },
+];
 
 // The Recharts line chart this replaces plotted these same nine points on a
 // continuous axis; a `Table` reads them as data instead of shape, which is
 // the trade the gap list records.
 const SCORE_HISTORY = [
-  { date: 'Jul 1', score: 91 },
-  { date: 'Jul 5', score: 89 },
-  { date: 'Jul 9', score: 91 },
-  { date: 'Jul 13', score: 88 },
-  { date: 'Jul 17', score: 84 },
-  { date: 'Jul 21', score: 61 },
-  { date: 'Jul 25', score: 63 },
-  { date: 'Jul 29', score: 66 },
-  { date: 'Aug 2', score: 71 }
-] as const
+  {date: 'Jul 1', score: 91},
+  {date: 'Jul 5', score: 89},
+  {date: 'Jul 9', score: 91},
+  {date: 'Jul 13', score: 88},
+  {date: 'Jul 17', score: 84},
+  {date: 'Jul 21', score: 61},
+  {date: 'Jul 25', score: 63},
+  {date: 'Jul 29', score: 66},
+  {date: 'Aug 2', score: 71},
+] as const;
 
 const STEPS = [
   {
     n: '01',
     title: 'Paste a URL',
     body: 'No account, no pipeline, no config files. Drop in any public URL and tabstop kicks off a real Chromium audit — the same engine behind most a11y tooling in the industry.',
-    detail: 'axe-core · Playwright · Chromium'
+    detail: 'axe-core · Playwright · Chromium',
   },
   {
     n: '02',
     title: 'Get a score and violation list',
     body: 'Violations are grouped by impact: critical, serious, moderate, minor. Each entry shows affected selectors and links to fix documentation. The score is designed for trending, not gatekeeping.',
-    detail: 'WCAG 2.1 AA · grouped by impact'
+    detail: 'WCAG 2.1 AA · grouped by impact',
   },
   {
     n: '03',
     title: 'Track it over time',
     body: 'Add the URL to monitoring and tabstop re-audits it every day. Your score is charted so regressions are obvious at a glance. Any new serious or critical violation — or a score drop — sends one email.',
-    detail: 'Daily cadence · one email per event'
-  }
-] as const
+    detail: 'Daily cadence · one email per event',
+  },
+] as const;
 
 // `highlight` — only the `tabstop` row carries it in the source, and it is
 // what the comparison table's four-way distinguishing treatment (row tint,
 // left rule, name weight/colour, Check colour) all key off. See `Why()`.
 const COMPETITORS = [
-  { name: 'Lighthouse CI', cost: 'Free', setup: 'Pipeline integration', trend: false, alert: false, zeroCfg: false, highlight: false },
-  { name: 'pa11y-dashboard', cost: 'Free', setup: 'Self-hosted', trend: true, alert: true, zeroCfg: false, highlight: false },
-  { name: 'axe Monitor', cost: '$$$', setup: 'Sales call', trend: true, alert: true, zeroCfg: false, highlight: false },
-  { name: 'tabstop', cost: 'Free in beta', setup: 'Paste a URL', trend: true, alert: true, zeroCfg: true, highlight: true }
-] as const
+  {
+    name: 'Lighthouse CI',
+    cost: 'Free',
+    setup: 'Pipeline integration',
+    trend: false,
+    alert: false,
+    zeroCfg: false,
+    highlight: false,
+  },
+  {
+    name: 'pa11y-dashboard',
+    cost: 'Free',
+    setup: 'Self-hosted',
+    trend: true,
+    alert: true,
+    zeroCfg: false,
+    highlight: false,
+  },
+  {name: 'axe Monitor', cost: '$$$', setup: 'Sales call', trend: true, alert: true, zeroCfg: false, highlight: false},
+  {
+    name: 'tabstop',
+    cost: 'Free in beta',
+    setup: 'Paste a URL',
+    trend: true,
+    alert: true,
+    zeroCfg: true,
+    highlight: true,
+  },
+] as const;
 
 const V1_IN = [
   'Single public URLs',
@@ -160,8 +184,8 @@ const V1_IN = [
   'Daily re-audit cadence',
   'Email alerts on regression',
   'Public shareable result pages',
-  'Score trend chart'
-]
+  'Score trend chart',
+];
 
 const V1_OUT = [
   'Site crawling',
@@ -170,43 +194,35 @@ const V1_OUT = [
   'Viewport matrix',
   'Teams & orgs',
   'Slack alerts',
-  'WCAG level config'
-]
+  'WCAG level config',
+];
 
-const FOOTER_LINKS = ['DECISIONS.md', 'GitHub', 'How it works', 'Score formula']
+const FOOTER_LINKS = ['DECISIONS.md', 'GitHub', 'How it works', 'Score formula'];
 
-function Section({
-  id,
-  className,
-  children
-}: {
-  id?: string
-  className?: string
-  children: ReactNode
-}) {
-  const cls = ['landing-page__section', className].filter((value): value is string => Boolean(value)).join(' ')
+function Section({id, className, children}: {id?: string; className?: string; children: ReactNode}) {
+  const cls = ['landing-page__section', className].filter((value): value is string => Boolean(value)).join(' ');
   return (
     <section id={id} className={cls}>
       {children}
     </section>
-  )
+  );
 }
 
-function ImpactBadge({ impact, count }: { impact: Impact; count?: number }) {
-  const Icon = IMPACT_ICON[impact]
+function ImpactBadge({impact, count}: {impact: Impact; count?: number}) {
+  const Icon = IMPACT_ICON[impact];
   return (
     <Badge variant={impact as BadgeVariant}>
       <Icon size={10} />
       {count === undefined ? impact : `${count} ${impact}`}
     </Badge>
-  )
+  );
 }
 
 // Check reads muted by default and only turns accent-coloured on the
 // highlighted row (`.landing-page__why-grid`'s `[data-highlight='true']`
 // descendant rule); X stays muted at 30% opacity in every row regardless —
 // see the CSS for why an absent feature never competes with a present one.
-function BoolCell({ value }: { value: boolean }) {
+function BoolCell({value}: {value: boolean}) {
   return (
     <Td className="landing-page__bool-cell">
       {value ? (
@@ -216,10 +232,10 @@ function BoolCell({ value }: { value: boolean }) {
       )}
       <VisuallyHidden>{value ? 'Yes' : 'No'}</VisuallyHidden>
     </Td>
-  )
+  );
 }
 
-function UrlField({ inputLabel }: { inputLabel: string }) {
+function UrlField({inputLabel}: {inputLabel: string}) {
   return (
     <div className="landing-page__url-row">
       <Input
@@ -235,11 +251,11 @@ function UrlField({ inputLabel }: { inputLabel: string }) {
         <Zap size={13} />
       </Button>
     </div>
-  )
+  );
 }
 
 function Nav() {
-  const [isDark, setIsDark] = useState(true)
+  const [isDark, setIsDark] = useState(true);
 
   return (
     <header className="landing-page__nav">
@@ -276,7 +292,7 @@ function Nav() {
         </Button>
       </div>
     </header>
-  )
+  );
 }
 
 function Hero() {
@@ -299,8 +315,8 @@ function Hero() {
           </h1>
 
           <p className="landing-page__lede">
-            Paste a URL, get an audit and a score. tabstop re-audits daily, charts your
-            score over time, and emails you the day a deploy makes things worse.
+            Paste a URL, get an audit and a score. tabstop re-audits daily, charts your score over time, and emails you
+            the day a deploy makes things worse.
           </p>
 
           <UrlField inputLabel="Website URL" />
@@ -377,7 +393,7 @@ function Hero() {
         </div>
       </div>
     </Section>
-  )
+  );
 }
 
 function TrustBar() {
@@ -385,17 +401,11 @@ function TrustBar() {
     <div className="landing-page__trust-bar">
       <Section className="landing-page__trust-bar-inner">
         {TRUST_STATS.map((s) => (
-          <Stat
-            key={s.label}
-            value={s.value}
-            label={s.label}
-            sub={s.sub}
-            className="landing-page__trust-stat"
-          />
+          <Stat key={s.label} value={s.value} label={s.label} sub={s.sub} className="landing-page__trust-stat" />
         ))}
       </Section>
     </div>
-  )
+  );
 }
 
 function HowItWorks() {
@@ -404,9 +414,7 @@ function HowItWorks() {
       <Eyebrow rule tone="accent" className="landing-page__section-eyebrow">
         How it works
       </Eyebrow>
-      <h2 className="landing-page__heading landing-page__heading--how">
-        Zero setup. Baseline in thirty seconds.
-      </h2>
+      <h2 className="landing-page__heading landing-page__heading--how">Zero setup. Baseline in thirty seconds.</h2>
 
       <div className="landing-page__steps">
         {STEPS.map((s) => (
@@ -421,7 +429,7 @@ function HowItWorks() {
         ))}
       </div>
     </Section>
-  )
+  );
 }
 
 /**
@@ -463,10 +471,7 @@ function ScoreHistory() {
           >
             <ScoreChart data={SCORE_HISTORY} referenceDate="Jul 21" />
             <VisuallyHidden>
-              <Table
-                caption="Score history for ariakit.org, nine audits from Jul 1 to Aug 2"
-                visuallyHiddenCaption
-              >
+              <Table caption="Score history for ariakit.org, nine audits from Jul 1 to Aug 2" visuallyHiddenCaption>
                 <THead>
                   <Tr>
                     <Th scope="col">Date</Th>
@@ -487,7 +492,7 @@ function ScoreHistory() {
         </CardBody>
       </Card>
     </Section>
-  )
+  );
 }
 
 function Why() {
@@ -507,23 +512,18 @@ function Why() {
             <span className="landing-page__muted-inline">Nobody sets it up.</span>
           </h2>
           <p className="landing-page__muted">
-            I contribute to Ariakit, an accessibility-focused UI component library. This
-            is the monitoring tool I kept wishing the people using it had — zero-setup,
-            monitoring rather than gating.
+            I contribute to Ariakit, an accessibility-focused UI component library. This is the monitoring tool I kept
+            wishing the people using it had — zero-setup, monitoring rather than gating.
           </p>
           <p className="landing-page__muted">
-            Existing options each miss the mark for small teams: CI tools need
-            engineering buy-in, dashboards need self-hosting, and commercial monitors
-            start with a sales call.
+            Existing options each miss the mark for small teams: CI tools need engineering buy-in, dashboards need
+            self-hosting, and commercial monitors start with a sales call.
           </p>
         </div>
 
         <Card>
           <CardBody>
-            <Table
-              caption="How tabstop compares to other accessibility monitoring tools"
-              visuallyHiddenCaption
-            >
+            <Table caption="How tabstop compares to other accessibility monitoring tools" visuallyHiddenCaption>
               <THead>
                 <Tr>
                   <Th scope="col">Tool</Th>
@@ -558,7 +558,7 @@ function Why() {
         </Card>
       </div>
     </Section>
-  )
+  );
 }
 
 function V1Scope() {
@@ -599,7 +599,7 @@ function V1Scope() {
         </Card>
       </div>
     </Section>
-  )
+  );
 }
 
 function CTA() {
@@ -610,9 +610,7 @@ function CTA() {
           <Eyebrow tone="accent" align="center" className="landing-page__cta-eyebrow">
             Early access — free
           </Eyebrow>
-          <h2 className="landing-page__heading landing-page__heading--cta">
-            Know the moment you break accessibility.
-          </h2>
+          <h2 className="landing-page__heading landing-page__heading--cta">Know the moment you break accessibility.</h2>
           <p className="landing-page__muted">No account needed to run your first audit.</p>
 
           <UrlField inputLabel="Website URL (early access)" />
@@ -621,7 +619,7 @@ function CTA() {
         </div>
       </Section>
     </div>
-  )
+  );
 }
 
 function Footer() {
@@ -644,7 +642,7 @@ function Footer() {
         </nav>
       </Section>
     </footer>
-  )
+  );
 }
 
 export function LandingPage() {
@@ -662,5 +660,5 @@ export function LandingPage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

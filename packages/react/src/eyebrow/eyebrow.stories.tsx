@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Eyebrow } from './eyebrow.js'
+import type {Meta, StoryObj} from '@storybook/react-vite';
+import {Eyebrow} from './eyebrow.js';
 
 /**
  * The uppercase 10px mono label at 0.2em tracking. It appears on every
@@ -12,15 +12,15 @@ const meta = {
   component: Eyebrow,
   tags: ['autodocs'],
   args: {
-    children: 'Coverage'
-  }
-} satisfies Meta<typeof Eyebrow>
+    children: 'Coverage',
+  },
+} satisfies Meta<typeof Eyebrow>;
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {}
+export const Default: Story = {};
 
 /**
  * The landing page's section labels — a short hairline drawn before the text,
@@ -30,9 +30,9 @@ export const Default: Story = {}
 export const WithRule: Story = {
   args: {
     rule: true,
-    children: 'Section'
-  }
-}
+    children: 'Section',
+  },
+};
 
 /**
  * The landing page CTA's kicker — centred inside a `text-align: center`
@@ -44,6 +44,6 @@ export const Centered: Story = {
   args: {
     align: 'center',
     tone: 'accent',
-    children: 'Early access — free'
-  }
-}
+    children: 'Early access — free',
+  },
+};

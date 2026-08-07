@@ -22,21 +22,21 @@
  * Alpha is composited over its surface before measuring, because that is what a
  * viewer sees.
  */
-import { ALPHA_CHANNEL, FOCUS_RING, HAIRLINE, TINT_FRACTIONS, WASH } from '../config/alpha.js'
-import { CHROMATIC_SCALES, GRAY_ANCHORS, ON_SOLID_ANCHORS, SOLID_ANCHORS } from '../config/anchors.js'
-import { MODES, type Mode } from '../config/modes.js'
-import { apcaLc, contrastRatio } from './contrast.js'
-import { formatHex, parseHex, type Rgb } from './oklch.js'
-import { buildSeverity } from './severity.js'
+import {ALPHA_CHANNEL, FOCUS_RING, HAIRLINE, TINT_FRACTIONS, WASH} from '../config/alpha.js';
+import {CHROMATIC_SCALES, GRAY_ANCHORS, ON_SOLID_ANCHORS, SOLID_ANCHORS} from '../config/anchors.js';
+import {MODES, type Mode} from '../config/modes.js';
+import {apcaLc, contrastRatio} from './contrast.js';
+import {formatHex, parseHex, type Rgb} from './oklch.js';
+import {buildSeverity} from './severity.js';
 
 export interface LedgerEntry {
-  readonly name: string
-  readonly text: string
-  readonly background: string
-  readonly ratio: number
-  readonly apca: number
-  readonly minimum: number
-  readonly passes: boolean
+  readonly name: string;
+  readonly text: string;
+  readonly background: string;
+  readonly ratio: number;
+  readonly apca: number;
+  readonly minimum: number;
+  readonly passes: boolean;
 }
 
 /**
@@ -55,12 +55,12 @@ export function over(fg: Rgb, alpha: number, bg: Rgb): Rgb {
   return {
     r: alpha * fg.r + (1 - alpha) * bg.r,
     g: alpha * fg.g + (1 - alpha) * bg.g,
-    b: alpha * fg.b + (1 - alpha) * bg.b
-  }
+    b: alpha * fg.b + (1 - alpha) * bg.b,
+  };
 }
 
 function entry(name: string, text: Rgb, background: Rgb, minimum: number): LedgerEntry {
-  const ratio = contrastRatio(text, background)
+  const ratio = contrastRatio(text, background);
   return {
     name,
     // formatHex, not a manual rgb() string: the channels are 0..1 floats and
@@ -72,37 +72,37 @@ function entry(name: string, text: Rgb, background: Rgb, minimum: number): Ledge
     minimum,
     // Rounded to two places first: a pair measuring 4.499 prints as 4.50 and
     // must not be reported as passing something it prints as meeting.
-    passes: Number(ratio.toFixed(2)) >= minimum
-  }
+    passes: Number(ratio.toFixed(2)) >= minimum,
+  };
 }
 
 function forMode(mode: Mode): LedgerEntry[] {
-  const gray = GRAY_ANCHORS[mode]
-  const bg = parseHex(gray.bg)
-  const raised = parseHex(gray['bg-raised'])
-  const solid = parseHex(SOLID_ANCHORS.accent[mode])
-  const onSolid = parseHex(ON_SOLID_ANCHORS.accent![mode])
-  const field = parseHex(gray['field-bg'])
+  const gray = GRAY_ANCHORS[mode];
+  const bg = parseHex(gray.bg);
+  const raised = parseHex(gray['bg-raised']);
+  const solid = parseHex(SOLID_ANCHORS.accent[mode]);
+  const onSolid = parseHex(ON_SOLID_ANCHORS.accent![mode]);
+  const field = parseHex(gray['field-bg']);
   // The ring is anchored, not derived from `solid`. It is still composited over
   // each surface: light ships opaque, so the composite is the anchor itself,
   // while dark ships translucent and genuinely differs per surface — which is
   // why all three are measured rather than one standing in for the others.
-  const ringOn = (surface: Rgb) => over(parseHex(FOCUS_RING[mode].hex), FOCUS_RING[mode].alpha, surface)
+  const ringOn = (surface: Rgb) => over(parseHex(FOCUS_RING[mode].hex), FOCUS_RING[mode].alpha, surface);
   // ALPHA_CHANNEL holds 0..255 strings for CSS output; normalise to the 0..1
   // the colour maths uses.
-  const channel = ALPHA_CHANNEL[mode].split(' ').map((v) => Number(v) / 255)
-  const hairline = { r: channel[0]!, g: channel[1]!, b: channel[2]! }
+  const channel = ALPHA_CHANNEL[mode].split(' ').map((v) => Number(v) / 255);
+  const hairline = {r: channel[0]!, g: channel[1]!, b: channel[2]!};
 
   // The tinted triple: a scale's solid as text on its own tint, composited over
   // bg-raised — what every Badge, the destructive Button and every Callout are
   // built from. Accent tints richer (15%) than the status scales (10%); see
   // TINT_FRACTIONS.
   const tints = CHROMATIC_SCALES.map((scale) => {
-    const scaleSolid = parseHex(SOLID_ANCHORS[scale][mode])
-    const fraction = scale === 'accent' ? TINT_FRACTIONS.accent.fill : TINT_FRACTIONS.default.fill
-    const tint = over(scaleSolid, fraction, raised)
-    return entry(`${mode} ${scale} text on its tint`, scaleSolid, tint, 4.5)
-  })
+    const scaleSolid = parseHex(SOLID_ANCHORS[scale][mode]);
+    const fraction = scale === 'accent' ? TINT_FRACTIONS.accent.fill : TINT_FRACTIONS.default.fill;
+    const tint = over(scaleSolid, fraction, raised);
+    return entry(`${mode} ${scale} text on its tint`, scaleSolid, tint, 4.5);
+  });
 
   // The same tinted triple again, composited over `bg` instead of `bg-raised`.
   // `resolveTints` emits every `--lat-*-tint` token as a translucent colour
@@ -120,11 +120,11 @@ function forMode(mode: Mode): LedgerEntry[] {
   // affected foreground, in light mode, wherever a tinted component sits
   // directly on the page background rather than inside a raised surface.
   const tintsOnBg = CHROMATIC_SCALES.map((scale) => {
-    const scaleSolid = parseHex(SOLID_ANCHORS[scale][mode])
-    const fraction = scale === 'accent' ? TINT_FRACTIONS.accent.fill : TINT_FRACTIONS.default.fill
-    const tint = over(scaleSolid, fraction, bg)
-    return entry(`${mode} ${scale} text on its tint over bg`, scaleSolid, tint, 4.5)
-  })
+    const scaleSolid = parseHex(SOLID_ANCHORS[scale][mode]);
+    const fraction = scale === 'accent' ? TINT_FRACTIONS.accent.fill : TINT_FRACTIONS.default.fill;
+    const tint = over(scaleSolid, fraction, bg);
+    return entry(`${mode} ${scale} text on its tint over bg`, scaleSolid, tint, 4.5);
+  });
 
   // The severity ramp's own tinted triple — Phase 2 gave severity its own
   // tint tokens rather than reusing a chromatic scale, so these four pairs
@@ -134,10 +134,10 @@ function forMode(mode: Mode): LedgerEntry[] {
   // Lattice's one derived severity colour (see severity.ts), which is
   // exactly where an unmeasured pair is most likely to be wrong.
   const severityColoured = buildSeverity(mode).map((swatch) => {
-    const swatchSolid = parseHex(swatch.hex)
-    const tint = over(swatchSolid, TINT_FRACTIONS.default.fill, raised)
-    return entry(`${mode} severity ${swatch.role} text on its tint`, swatchSolid, tint, 4.5)
-  })
+    const swatchSolid = parseHex(swatch.hex);
+    const tint = over(swatchSolid, TINT_FRACTIONS.default.fill, raised);
+    return entry(`${mode} severity ${swatch.role} text on its tint`, swatchSolid, tint, 4.5);
+  });
 
   // Severity's tinted triple over `bg`, for the same reason as `tintsOnBg`
   // above — a severity Badge (`critical`/`serious`/`moderate`) is exactly as
@@ -145,10 +145,10 @@ function forMode(mode: Mode): LedgerEntry[] {
   // and `moderate` in particular has no chromatic-scale sibling to borrow a
   // floor from, so without this row its bg composite is entirely unmeasured.
   const severityColouredOnBg = buildSeverity(mode).map((swatch) => {
-    const swatchSolid = parseHex(swatch.hex)
-    const tint = over(swatchSolid, TINT_FRACTIONS.default.fill, bg)
-    return entry(`${mode} severity ${swatch.role} text on its tint over bg`, swatchSolid, tint, 4.5)
-  })
+    const swatchSolid = parseHex(swatch.hex);
+    const tint = over(swatchSolid, TINT_FRACTIONS.default.fill, bg);
+    return entry(`${mode} severity ${swatch.role} text on its tint over bg`, swatchSolid, tint, 4.5);
+  });
 
   // `minor` carries no swatch of its own — it aliases to text-subtle on wash
   // (see resolveSeverityTints in severity.ts) — so it is measured the same
@@ -158,8 +158,8 @@ function forMode(mode: Mode): LedgerEntry[] {
     `${mode} severity minor text on its tint`,
     parseHex(gray['text-subtle']),
     over(hairline, WASH, raised),
-    4.5
-  )
+    4.5,
+  );
 
   return [
     entry(`${mode} text on bg`, parseHex(gray.text), bg, 4.5),
@@ -180,20 +180,22 @@ function forMode(mode: Mode): LedgerEntry[] {
     ...tintsOnBg,
     ...severityColoured,
     ...severityColouredOnBg,
-    severityMinor
-  ]
+    severityMinor,
+  ];
 }
 
 export function buildLedger(): LedgerEntry[] {
-  return MODES.flatMap(forMode)
+  return MODES.flatMap(forMode);
 }
 
 export function formatLedger(entries: readonly LedgerEntry[]): string {
   return entries
     .map((e) => {
-      const marker = e.passes ? '    ' : 'FAIL'
-      return `  ${marker} ${e.name.padEnd(34)} ${e.ratio.toFixed(2).padStart(6)}:1  ` +
+      const marker = e.passes ? '    ' : 'FAIL';
+      return (
+        `  ${marker} ${e.name.padEnd(34)} ${e.ratio.toFixed(2).padStart(6)}:1  ` +
         `min ${e.minimum.toFixed(1)}  Lc ${e.apca.toFixed(1)}`
+      );
     })
-    .join('\n')
+    .join('\n');
 }

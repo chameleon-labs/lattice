@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { SystemPage } from './system-page.js'
+import type {Meta, StoryObj} from '@storybook/react-vite';
+import {SystemPage} from './system-page.js';
 
 /**
  * The bundle's documentation site, rebuilt from Lattice components alone.
@@ -11,10 +11,10 @@ import { SystemPage } from './system-page.js'
 const meta = {
   title: 'Pages/System',
   component: SystemPage,
-  parameters: { layout: 'fullscreen' }
-} satisfies Meta<typeof SystemPage>
+  parameters: {layout: 'fullscreen'},
+} satisfies Meta<typeof SystemPage>;
 
-export default meta
+export default meta;
 
-export const Dark: StoryObj<typeof meta> = { globals: { theme: 'dark' } }
-export const Light: StoryObj<typeof meta> = { globals: { theme: 'light' } }
+export const Dark: StoryObj<typeof meta> = {globals: {theme: 'dark'}};
+export const Light: StoryObj<typeof meta> = {globals: {theme: 'light'}};

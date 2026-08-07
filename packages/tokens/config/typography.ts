@@ -8,12 +8,12 @@
  * eyebrow, badge and table header in both demo pages.
  */
 
-const SYSTEM_SANS = ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'] as const
+const SYSTEM_SANS = ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'] as const;
 
 export const FONT_FAMILIES = {
   sans: ['Instrument Sans', ...SYSTEM_SANS],
-  mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace']
-} as const
+  mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
+} as const;
 
 export const FONT_SIZES = {
   /**
@@ -37,10 +37,10 @@ export const FONT_SIZES = {
   '4xl': 2.25,
   '5xl': 3,
   /** 60px — the hero `h1`'s `md:text-6xl`. */
-  '6xl': 3.75
-} as const
+  '6xl': 3.75,
+} as const;
 
-export const FONT_WEIGHTS = { regular: 400, medium: 500, semibold: 600, bold: 700 } as const
+export const FONT_WEIGHTS = {regular: 400, medium: 500, semibold: 600, bold: 700} as const;
 
 /**
  * Tracking, in **em**, because it has to scale with the text it tracks. The
@@ -56,8 +56,8 @@ export const LETTER_SPACINGS = {
   /** Panel labels. `tracking-widest`. */
   wider: 0.1,
   /** Eyebrows. The literal `tracking-[0.2em]` the bundle writes out. */
-  eyebrow: 0.2
-} as const
+  eyebrow: 0.2,
+} as const;
 
 export const LINE_HEIGHTS = {
   /** Display only. `leading-none`. */
@@ -89,5 +89,5 @@ export const LINE_HEIGHTS = {
    * A decimal here has the same problem as in `control` above: `1.333333`
    * multiplies back to 15.999996.
    */
-  compact: 16 / 12
-} as const
+  compact: 16 / 12,
+} as const;

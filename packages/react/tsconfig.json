@@ -7,12 +7,5 @@
     "jsx": "react-jsx",
     "lib": ["ES2024", "DOM", "DOM.Iterable"]
   },
-  "include": [
-    "src",
-    "scripts",
-    "tests",
-    ".storybook",
-    "vitest.config.ts",
-    "playwright.config.ts"
-  ]
+  "include": ["src", "scripts", "tests", ".storybook", "vitest.config.ts", "playwright.config.ts"]
 }

@@ -6,6 +6,6 @@
  * list lives on its own rather than inside a file named for a thing that no
  * longer exists.
  */
-export type Mode = 'light' | 'dark'
+export type Mode = 'light' | 'dark';
 
-export const MODES: readonly Mode[] = ['light', 'dark']
+export const MODES: readonly Mode[] = ['light', 'dark'];

@@ -1,4 +1,4 @@
-import type { StorybookConfig } from '@storybook/react-vite'
+import type {StorybookConfig} from '@storybook/react-vite';
 
 /**
  * Stories are co-located with the component they document, so the two move
@@ -12,12 +12,12 @@ import type { StorybookConfig } from '@storybook/react-vite'
 const config: StorybookConfig = {
   framework: {
     name: '@storybook/react-vite',
-    options: {}
+    options: {},
   },
   core: {
     // Playwright boots this on every browser-test run, including in CI. A
     // network call on start-up is latency the suite pays for nothing.
-    disableTelemetry: true
+    disableTelemetry: true,
   },
   stories: ['../src/**/*.stories.tsx'],
   addons: [
@@ -27,8 +27,8 @@ const config: StorybookConfig = {
     // Developer feedback in the sidebar panel. This is *not* the gate — the
     // gate is the Playwright sweep in tests/browser/a11y.spec.ts, which runs in
     // CI at two root font sizes and in both themes.
-    '@storybook/addon-a11y'
-  ]
-}
+    '@storybook/addon-a11y',
+  ],
+};
 
-export default config
+export default config;

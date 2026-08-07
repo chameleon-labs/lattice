@@ -5,39 +5,39 @@
 
 /** sRGB channels, gamma-encoded, nominally 0..1. */
 export interface Rgb {
-  readonly r: number
-  readonly g: number
-  readonly b: number
+  readonly r: number;
+  readonly g: number;
+  readonly b: number;
 }
 
 /** Perceptual lightness 0..1, chroma, and hue in degrees 0..360. */
 export interface Oklch {
-  readonly l: number
-  readonly c: number
-  readonly h: number
+  readonly l: number;
+  readonly c: number;
+  readonly h: number;
 }
 
 interface Oklab {
-  readonly l: number
-  readonly a: number
-  readonly b: number
+  readonly l: number;
+  readonly a: number;
+  readonly b: number;
 }
 
-const SIX_HEX_DIGITS = /^[0-9a-f]{6}$/i
+const SIX_HEX_DIGITS = /^[0-9a-f]{6}$/i;
 
 /** Reads `#rrggbb` (hash optional, any case) as channels in 0..1. */
 export function parseHex(hex: string): Rgb {
-  const digits = hex.trim().replace(/^#/, '')
+  const digits = hex.trim().replace(/^#/, '');
   if (!SIX_HEX_DIGITS.test(digits)) {
-    throw new Error(`not a six-digit hex colour: ${hex}`)
+    throw new Error(`not a six-digit hex colour: ${hex}`);
   }
 
-  const packed = Number.parseInt(digits, 16)
+  const packed = Number.parseInt(digits, 16);
   return {
     r: ((packed >> 16) & 0xff) / 255,
     g: ((packed >> 8) & 0xff) / 255,
-    b: (packed & 0xff) / 255
-  }
+    b: (packed & 0xff) / 255,
+  };
 }
 
 function channelToByte(value: number): string {
@@ -45,18 +45,18 @@ function channelToByte(value: number): string {
   // stylesheet would contain '#NaNNaNNaN' and still parse as valid CSS. A build
   // that stops is strictly better than a token file that is quietly wrong.
   if (!Number.isFinite(value)) {
-    throw new Error(`channel is not finite: ${value}`)
+    throw new Error(`channel is not finite: ${value}`);
   }
 
-  const clamped = Math.min(1, Math.max(0, value))
+  const clamped = Math.min(1, Math.max(0, value));
   return Math.round(clamped * 255)
     .toString(16)
-    .padStart(2, '0')
+    .padStart(2, '0');
 }
 
 /** Writes channels as `#rrggbb`, clamping anything outside 0..1. */
-export function formatHex({ r, g, b }: Rgb): string {
-  return `#${channelToByte(r)}${channelToByte(g)}${channelToByte(b)}`
+export function formatHex({r, g, b}: Rgb): string {
+  return `#${channelToByte(r)}${channelToByte(g)}${channelToByte(b)}`;
 }
 
 /**
@@ -67,50 +67,50 @@ export function formatHex({ r, g, b }: Rgb): string {
  * makes it awkward to pass a linear value where an encoded one belongs.
  */
 export function srgbToLinear(value: number): number {
-  return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4
+  return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
 }
 
 /** Inverse of {@link srgbToLinear}. Values outside 0..1 stay outside it. */
 export function linearToSrgb(value: number): number {
-  return value <= 0.0031308 ? value * 12.92 : 1.055 * value ** (1 / 2.4) - 0.055
+  return value <= 0.0031308 ? value * 12.92 : 1.055 * value ** (1 / 2.4) - 0.055;
 }
 
 // Ottosson's OKLab matrices. Linear sRGB to a cone-response space, cube-rooted,
 // then to Lab. https://bottosson.github.io/posts/oklab/
-function srgbToOklab({ r, g, b }: Rgb): Oklab {
-  const red = srgbToLinear(r)
-  const green = srgbToLinear(g)
-  const blue = srgbToLinear(b)
+function srgbToOklab({r, g, b}: Rgb): Oklab {
+  const red = srgbToLinear(r);
+  const green = srgbToLinear(g);
+  const blue = srgbToLinear(b);
 
-  const long = Math.cbrt(0.4122214708 * red + 0.5363325363 * green + 0.0514459929 * blue)
-  const medium = Math.cbrt(0.2119034982 * red + 0.6806995451 * green + 0.1073969566 * blue)
-  const short = Math.cbrt(0.0883024619 * red + 0.2817188376 * green + 0.6299787005 * blue)
+  const long = Math.cbrt(0.4122214708 * red + 0.5363325363 * green + 0.0514459929 * blue);
+  const medium = Math.cbrt(0.2119034982 * red + 0.6806995451 * green + 0.1073969566 * blue);
+  const short = Math.cbrt(0.0883024619 * red + 0.2817188376 * green + 0.6299787005 * blue);
 
   return {
     l: 0.2104542553 * long + 0.793617785 * medium - 0.0040720468 * short,
     a: 1.9779984951 * long - 2.428592205 * medium + 0.4505937099 * short,
-    b: 0.0259040371 * long + 0.7827717662 * medium - 0.808675766 * short
-  }
+    b: 0.0259040371 * long + 0.7827717662 * medium - 0.808675766 * short,
+  };
 }
 
-function oklabToSrgb({ l, a, b }: Oklab): Rgb {
-  const long = (l + 0.3963377774 * a + 0.2158037573 * b) ** 3
-  const medium = (l - 0.1055613458 * a - 0.0638541728 * b) ** 3
-  const short = (l - 0.0894841775 * a - 1.291485548 * b) ** 3
+function oklabToSrgb({l, a, b}: Oklab): Rgb {
+  const long = (l + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const medium = (l - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const short = (l - 0.0894841775 * a - 1.291485548 * b) ** 3;
 
   return {
     r: linearToSrgb(4.0767416621 * long - 3.3077115913 * medium + 0.2309699292 * short),
     g: linearToSrgb(-1.2684380046 * long + 2.6097574011 * medium - 0.3413193965 * short),
-    b: linearToSrgb(-0.0041960863 * long - 0.7034186147 * medium + 1.707614701 * short)
-  }
+    b: linearToSrgb(-0.0041960863 * long - 0.7034186147 * medium + 1.707614701 * short),
+  };
 }
 
 /** Converts an sRGB colour to OKLCH. Hue is normalised to 0..360. */
 export function srgbToOklch(rgb: Rgb): Oklch {
-  const { l, a, b } = srgbToOklab(rgb)
-  const degrees = (Math.atan2(b, a) * 180) / Math.PI
+  const {l, a, b} = srgbToOklab(rgb);
+  const degrees = (Math.atan2(b, a) * 180) / Math.PI;
 
-  return { l, c: Math.hypot(a, b), h: ((degrees % 360) + 360) % 360 }
+  return {l, c: Math.hypot(a, b), h: ((degrees % 360) + 360) % 360};
 }
 
 /**
@@ -118,10 +118,10 @@ export function srgbToOklch(rgb: Rgb): Oklch {
  * representable in sRGB — the caller decides whether to fit or reject, so this
  * never silently clamps.
  */
-export function oklchToSrgb({ l, c, h }: Oklch): Rgb {
-  const radians = (h * Math.PI) / 180
+export function oklchToSrgb({l, c, h}: Oklch): Rgb {
+  const radians = (h * Math.PI) / 180;
 
-  return oklabToSrgb({ l, a: c * Math.cos(radians), b: c * Math.sin(radians) })
+  return oklabToSrgb({l, a: c * Math.cos(radians), b: c * Math.sin(radians)});
 }
 
 /**
@@ -137,17 +137,17 @@ export function oklchToSrgb({ l, c, h }: Oklch): Rgb {
  * 1e-12 holds that error near 1e-4 while still leaving a thousandfold margin
  * over the float noise it exists to absorb.
  */
-const GAMUT_TOLERANCE = 1e-12
+const GAMUT_TOLERANCE = 1e-12;
 
 function representable(channel: number): boolean {
-  return channel >= -GAMUT_TOLERANCE && channel <= 1 + GAMUT_TOLERANCE
+  return channel >= -GAMUT_TOLERANCE && channel <= 1 + GAMUT_TOLERANCE;
 }
 
 /** Whether sRGB can represent this colour without clipping a channel. */
 export function inGamut(color: Oklch): boolean {
-  const { r, g, b } = oklchToSrgb(color)
+  const {r, g, b} = oklchToSrgb(color);
 
-  return representable(r) && representable(g) && representable(b)
+  return representable(r) && representable(g) && representable(b);
 }
 
 /**
@@ -155,7 +155,7 @@ export function inGamut(color: Oklch): boolean {
  * (1/255 ≈ 3.9e-3), so the recorded chroma is well inside the quantisation that
  * emitting a hex value imposes anyway.
  */
-const CHROMA_RESOLUTION = 1e-5
+const CHROMA_RESOLUTION = 1e-5;
 
 /**
  * Fits a requested chroma into sRGB by binary search, holding lightness and hue.
@@ -173,33 +173,33 @@ export function fitToGamut(color: Oklch): Oklch {
   // chroma is the opposite failure: it fails the loop condition immediately and
   // returns chroma 0, silently reporting grey as the fitted colour.
   if (!Number.isFinite(color.l) || !Number.isFinite(color.c) || !Number.isFinite(color.h)) {
-    throw new Error(`cannot fit a non-finite colour: oklch(${color.l} ${color.c} ${color.h})`)
+    throw new Error(`cannot fit a non-finite colour: oklch(${color.l} ${color.c} ${color.h})`);
   }
 
   if (inGamut(color)) {
-    return color
+    return color;
   }
 
-  let fits = 0
-  let clips = color.c
+  let fits = 0;
+  let clips = color.c;
 
   while (clips - fits > CHROMA_RESOLUTION) {
-    const midpoint = (fits + clips) / 2
+    const midpoint = (fits + clips) / 2;
 
-    if (inGamut({ ...color, c: midpoint })) {
-      fits = midpoint
+    if (inGamut({...color, c: midpoint})) {
+      fits = midpoint;
     } else {
-      clips = midpoint
+      clips = midpoint;
     }
   }
 
-  return { ...color, c: fits }
+  return {...color, c: fits};
 }
 
 /** A requested colour, resolved to what sRGB can actually show. */
 export interface Shipped {
-  readonly oklch: Oklch
-  readonly hex: string
+  readonly oklch: Oklch;
+  readonly hex: string;
 }
 
 /**
@@ -210,7 +210,7 @@ export interface Shipped {
  * `generate/solve.ts` until the contrast solver that surrounded it was retired.
  */
 export function ship(request: Oklch): Shipped {
-  const fitted = fitToGamut(request)
+  const fitted = fitToGamut(request);
 
-  return { oklch: fitted, hex: formatHex(oklchToSrgb(fitted)) }
+  return {oklch: fitted, hex: formatHex(oklchToSrgb(fitted))};
 }

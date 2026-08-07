@@ -10,5 +10,5 @@
  * does nothing and one more name to keep in step with an upstream change.
  * Consistency is not worth a fake wrapper.
  */
-export { VisuallyHidden } from '@ariakit/react'
-export type { VisuallyHiddenProps } from '@ariakit/react'
+export {VisuallyHidden} from '@ariakit/react';
+export type {VisuallyHiddenProps} from '@ariakit/react';

@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { TextField } from './text-field.js'
+import type {Meta, StoryObj} from '@storybook/react-vite';
+import {TextField} from './text-field.js';
 
 /**
  * The wiring between a label, its description and its error is not hard — it is
@@ -13,24 +13,24 @@ const meta = {
   tags: ['autodocs'],
   args: {
     label: 'Page URL',
-    placeholder: 'https://example.com/checkout'
-  }
-} satisfies Meta<typeof TextField>
+    placeholder: 'https://example.com/checkout',
+  },
+} satisfies Meta<typeof TextField>;
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {}
+export const Default: Story = {};
 
 export const WithDescription: Story = {
-  args: { description: 'We audit the page at this address.' }
-}
+  args: {description: 'We audit the page at this address.'},
+};
 
 /** `error` sets `aria-invalid` on the input and points `aria-describedby` at the message. */
 export const WithError: Story = {
-  args: { error: "That address can't be audited." }
-}
+  args: {error: "That address can't be audited."},
+};
 
 /**
  * Both at once, which is the case worth rendering: `aria-describedby` has to
@@ -39,10 +39,10 @@ export const WithError: Story = {
 export const WithDescriptionAndError: Story = {
   args: {
     description: 'We audit the page at this address.',
-    error: "That address can't be audited."
-  }
-}
+    error: "That address can't be audited.",
+  },
+};
 
 export const Disabled: Story = {
-  args: { disabled: true }
-}
+  args: {disabled: true},
+};

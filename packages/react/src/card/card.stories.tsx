@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Badge } from '../badge/badge.js'
-import { Button } from '../button/button.js'
-import { Card, CardBody, CardHeader } from './card.js'
+import type {Meta, StoryObj} from '@storybook/react-vite';
+import {Badge} from '../badge/badge.js';
+import {Button} from '../button/button.js';
+import {Card, CardBody, CardHeader} from './card.js';
 
 /**
  * A `--lat-bg-raised` surface with a hairline border. Every panel in both
@@ -14,12 +14,12 @@ import { Card, CardBody, CardHeader } from './card.js'
 const meta = {
   title: 'Components/Card',
   component: Card,
-  tags: ['autodocs']
-} satisfies Meta<typeof Card>
+  tags: ['autodocs'],
+} satisfies Meta<typeof Card>;
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: (args) => (
@@ -30,8 +30,8 @@ export const Default: Story = {
         <p>Score 72 — 3 critical, 5 serious.</p>
       </CardBody>
     </Card>
-  )
-}
+  ),
+};
 
 /**
  * `data-elevation="floating"` is the escape hatch, not a default — the one
@@ -46,8 +46,8 @@ export const Floating: Story = {
         <p>Score 72 — 3 critical, 5 serious.</p>
       </CardBody>
     </Card>
-  )
-}
+  ),
+};
 
 /**
  * `CardHeader`'s children render after the label, so a caller can put a count
@@ -61,8 +61,8 @@ export const HeaderWithAside: Story = {
       </CardHeader>
       <CardBody>content</CardBody>
     </Card>
-  )
-}
+  ),
+};
 
 /**
  * A card never takes `role="button"`. An interactive card exposes its action
@@ -88,5 +88,5 @@ export const WithAction: Story = {
         <Button render={<a href="#story" />}>Open the report</Button>
       </CardBody>
     </Card>
-  )
-}
+  ),
+};

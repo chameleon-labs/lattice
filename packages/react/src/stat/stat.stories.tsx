@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Stat } from './stat.js'
+import type {Meta, StoryObj} from '@storybook/react-vite';
+import {Stat} from './stat.js';
 
 /**
  * A value, a label and an optional sub-label, with the numeric role's tabular
@@ -12,23 +12,23 @@ const meta = {
   tags: ['autodocs'],
   args: {
     value: '84',
-    label: 'Components'
-  }
-} satisfies Meta<typeof Stat>
+    label: 'Components',
+  },
+} satisfies Meta<typeof Stat>;
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {}
+export const Default: Story = {};
 
 export const WithSub: Story = {
   args: {
     value: '84',
     label: 'Components',
-    sub: 'production-ready'
-  }
-}
+    sub: 'production-ready',
+  },
+};
 
 /**
  * The guarantee made visible: three stats of different widths, laid out in a
@@ -42,5 +42,5 @@ export const Row: Story = {
       <Stat value="14" label="Families" sub="phase 2" />
       <Stat value="1,204" label="Audits run" />
     </div>
-  )
-}
+  ),
+};

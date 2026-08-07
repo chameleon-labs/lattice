@@ -1,6 +1,6 @@
-import { Checkbox as AriakitCheckbox, type CheckboxProps } from '@ariakit/react'
+import {Checkbox as AriakitCheckbox, type CheckboxProps} from '@ariakit/react';
 
-export type SwitchProps = CheckboxProps
+export type SwitchProps = CheckboxProps;
 
 /**
  * A binary control whose state is not a colour.
@@ -19,12 +19,12 @@ export type SwitchProps = CheckboxProps
  * and both track states rendered identically until switch.css added an
  * explicit repaint, because a moving-but-invisible thumb is not a visible cue.
  */
-export function Switch({ className, ...props }: SwitchProps) {
+export function Switch({className, ...props}: SwitchProps) {
   return (
     <AriakitCheckbox
       {...props}
       role="switch"
       className={className === undefined ? 'lat-switch' : `lat-switch ${className}`}
     />
-  )
+  );
 }

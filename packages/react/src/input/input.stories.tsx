@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Input } from './input.js'
+import type {Meta, StoryObj} from '@storybook/react-vite';
+import {Input} from './input.js';
 
 /**
  * A bare input, with no label of its own.
@@ -15,24 +15,24 @@ const meta = {
   tags: ['autodocs'],
   args: {
     'aria-label': 'Page URL',
-    placeholder: 'https://example.com/checkout'
-  }
-} satisfies Meta<typeof Input>
+    placeholder: 'https://example.com/checkout',
+  },
+} satisfies Meta<typeof Input>;
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {}
+export const Default: Story = {};
 
 /** `invalid` sets `aria-invalid`; the red border is the confirmation, never the message. */
 export const Invalid: Story = {
-  args: { invalid: true, 'aria-label': 'Page URL, invalid' }
-}
+  args: {invalid: true, 'aria-label': 'Page URL, invalid'},
+};
 
 export const Disabled: Story = {
-  args: { disabled: true, 'aria-label': 'Page URL, unavailable' }
-}
+  args: {disabled: true, 'aria-label': 'Page URL, unavailable'},
+};
 
 /**
  * `addonStart` renders inside the same wrapper that carries the border and
@@ -61,6 +61,6 @@ export const WithLeadingIcon: Story = {
         <line x1="2" x2="22" y1="12" y2="12" />
         <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
       </svg>
-    )
-  }
-}
+    ),
+  },
+};

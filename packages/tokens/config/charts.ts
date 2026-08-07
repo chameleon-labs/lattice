@@ -7,10 +7,10 @@
  * with violet fixed in slot 1 and validating each in both modes.
  */
 
-import { GRAY_ANCHORS } from './anchors.js'
-import type { Mode } from './modes.js'
+import {GRAY_ANCHORS} from './anchors.js';
+import type {Mode} from './modes.js';
 
-export type Tier = 'hi' | 'lo'
+export type Tier = 'hi' | 'lo';
 
 /**
  * The two lightness tiers adjacent slots alternate between.
@@ -20,35 +20,35 @@ export type Tier = 'hi' | 'lo'
  * mode-invariant, so half the palette is the same colour in both themes.
  */
 export const TIERS: Record<Tier, Record<Mode, number>> = {
-  hi: { light: 0.63, dark: 0.63 },
-  lo: { light: 0.545, dark: 0.565 }
-}
+  hi: {light: 0.63, dark: 0.63},
+  lo: {light: 0.545, dark: 0.565},
+};
 
 /**
  * Requested chroma, uniform across the palette. Hues sRGB cannot hold this
  * saturated are fitted down — aqua lands at 0.108 and yellow at 0.112 — which is
  * why the chroma floor is a check rather than an assumption.
  */
-export const CATEGORICAL_CHROMA = 0.17
+export const CATEGORICAL_CHROMA = 0.17;
 
 export interface CategoricalSlot {
   /** 1-based. The order is fixed and never cycled. */
-  readonly slot: number
-  readonly name: string
-  readonly hue: number
-  readonly tier: Tier
+  readonly slot: number;
+  readonly name: string;
+  readonly hue: number;
+  readonly tier: Tier;
 }
 
 export const CATEGORICAL: readonly CategoricalSlot[] = [
-  { slot: 1, name: 'violet', hue: 305, tier: 'hi' },
-  { slot: 2, name: 'orange', hue: 45, tier: 'lo' },
-  { slot: 3, name: 'aqua', hue: 195, tier: 'hi' },
-  { slot: 4, name: 'yellow', hue: 95, tier: 'lo' },
-  { slot: 5, name: 'magenta', hue: 345, tier: 'hi' },
-  { slot: 6, name: 'green', hue: 158, tier: 'lo' },
-  { slot: 7, name: 'blue', hue: 250, tier: 'hi' },
-  { slot: 8, name: 'red', hue: 12, tier: 'lo' }
-]
+  {slot: 1, name: 'violet', hue: 305, tier: 'hi'},
+  {slot: 2, name: 'orange', hue: 45, tier: 'lo'},
+  {slot: 3, name: 'aqua', hue: 195, tier: 'hi'},
+  {slot: 4, name: 'yellow', hue: 95, tier: 'lo'},
+  {slot: 5, name: 'magenta', hue: 345, tier: 'hi'},
+  {slot: 6, name: 'green', hue: 158, tier: 'lo'},
+  {slot: 7, name: 'blue', hue: 250, tier: 'hi'},
+  {slot: 8, name: 'red', hue: 12, tier: 'lo'},
+];
 
 /**
  * How many leading slots stay separable when every pair is compared, not just
@@ -58,7 +58,7 @@ export const CATEGORICAL: readonly CategoricalSlot[] = [
  * small-multiples put any two slots side by side, and past three the palette
  * cannot hold that — fold the tail into "Other" or facet instead.
  */
-export const ALL_PAIRS_CAP = 3
+export const ALL_PAIRS_CAP = 3;
 
 /**
  * The sequential ramp: one hue, from pale to deep.
@@ -67,24 +67,24 @@ export const ALL_PAIRS_CAP = 3
  * (H 120 in dark, H 129 in light). The ramp was never repointed to it, so it
  * still carries the retired violet-adjacent hue.
  */
-export const SEQUENTIAL_HUE = 305
+export const SEQUENTIAL_HUE = 305;
 
 export interface SequentialStep {
   /** Named on the 100..700 convention rather than the 1..12 step contract. */
-  readonly step: number
-  readonly l: number
-  readonly c: number
+  readonly step: number;
+  readonly l: number;
+  readonly c: number;
 }
 
 export const SEQUENTIAL: readonly SequentialStep[] = [
-  { step: 100, l: 0.93, c: 0.05 },
-  { step: 200, l: 0.86, c: 0.075 },
-  { step: 300, l: 0.78, c: 0.1 },
-  { step: 400, l: 0.7, c: 0.125 },
-  { step: 500, l: 0.62, c: 0.15 },
-  { step: 600, l: 0.53, c: 0.175 },
-  { step: 700, l: 0.42, c: 0.2 }
-]
+  {step: 100, l: 0.93, c: 0.05},
+  {step: 200, l: 0.86, c: 0.075},
+  {step: 300, l: 0.78, c: 0.1},
+  {step: 400, l: 0.7, c: 0.125},
+  {step: 500, l: 0.62, c: 0.15},
+  {step: 600, l: 0.53, c: 0.175},
+  {step: 700, l: 0.42, c: 0.2},
+];
 
 /**
  * Where an **ordinal** encoding clamps the ramp.
@@ -93,7 +93,7 @@ export const SEQUENTIAL: readonly SequentialStep[] = [
  * into the surface without harm. Ordinal marks each have to read as a mark, so
  * light starts no lighter than 300 and dark goes no darker than 600.
  */
-export const ORDINAL_CLAMP: Record<Mode, number> = { light: 300, dark: 600 }
+export const ORDINAL_CLAMP: Record<Mode, number> = {light: 300, dark: 600};
 
 /**
  * Charts are drawn on the app background, so the palettes are validated against
@@ -105,8 +105,8 @@ export const ORDINAL_CLAMP: Record<Mode, number> = { light: 300, dark: 600 }
  */
 export const CHART_SURFACES: Record<Mode, string> = {
   light: GRAY_ANCHORS.light.bg,
-  dark: GRAY_ANCHORS.dark.bg
-}
+  dark: GRAY_ANCHORS.dark.bg,
+};
 
 /**
  * Thresholds for the palette checks.
@@ -118,7 +118,7 @@ export const CHART_SURFACES: Record<Mode, string> = {
  */
 export const CHECKS = {
   /** OKLCH lightness must stay inside the mode's band. */
-  band: { light: [0.43, 0.77], dark: [0.48, 0.67] } as Record<Mode, readonly [number, number]>,
+  band: {light: [0.43, 0.77], dark: [0.48, 0.67]} as Record<Mode, readonly [number, number]>,
   /** Below this chroma a hue reads as grey. */
   chromaFloor: 0.1,
   /** Target separation under protanopia and deuteranopia. */
@@ -138,5 +138,5 @@ export const CHECKS = {
   /** Minimum lightness gap between adjacent sequential steps. */
   ordinalMinDeltaL: 0.06,
   /** The palest ordinal step still has to read against the surface. */
-  ordinalLightFloor: 2
-} as const
+  ordinalLightFloor: 2,
+} as const;

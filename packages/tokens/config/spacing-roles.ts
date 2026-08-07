@@ -18,12 +18,12 @@
  *
  * Values are primitive *names*, so a change to `SPACES` flows through.
  */
-import type { SpaceName } from './layout.js'
+import type {SpaceName} from './layout.js';
 
-export type { SpaceName }
+export type {SpaceName};
 
 /** A pair travels together: `[block, inline]`. A string is symmetric. */
-export type InsetValue = readonly [SpaceName, SpaceName] | SpaceName
+export type InsetValue = readonly [SpaceName, SpaceName] | SpaceName;
 
 export const INSET_ROLES = {
   'label-sm': ['1', '3'],
@@ -41,10 +41,10 @@ export const INSET_ROLES = {
   'surface-sm': '3',
   'surface-md': '4',
   'surface-lg': '5',
-  'surface-xl': '6'
-} as const satisfies Readonly<Record<string, InsetValue>>
+  'surface-xl': '6',
+} as const satisfies Readonly<Record<string, InsetValue>>;
 
-export type InsetRole = keyof typeof INSET_ROLES
+export type InsetRole = keyof typeof INSET_ROLES;
 
 /**
  * Gaps are named by size, not purpose — unlike insets, the measurement showed
@@ -59,7 +59,7 @@ export const GAP_ROLES = {
   xs: '1',
   sm: '2',
   md: '3',
-  lg: '4'
-} as const satisfies Readonly<Record<string, SpaceName>>
+  lg: '4',
+} as const satisfies Readonly<Record<string, SpaceName>>;
 
-export type GapRole = keyof typeof GAP_ROLES
+export type GapRole = keyof typeof GAP_ROLES;

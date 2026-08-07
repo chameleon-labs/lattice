@@ -13,32 +13,32 @@
  * reading a generic component-fill token instead of the one the Figma bundle declares
  * specifically for it, or the checked state losing its --lat-solid fill.
  */
-import { fileURLToPath } from 'node:url'
-import { describe, expect, it } from 'vitest'
-import { assembleCss } from '../scripts/assemble-css.js'
+import {fileURLToPath} from 'node:url';
+import {describe, expect, it} from 'vitest';
+import {assembleCss} from '../scripts/assemble-css.js';
 
-const css = await assembleCss(fileURLToPath(new URL('../src/styles.css', import.meta.url)))
+const css = await assembleCss(fileURLToPath(new URL('../src/styles.css', import.meta.url)));
 
 function block(selector: string): string {
-  const pattern = new RegExp(`${selector.replace(/[.[\]']/g, '\\$&')}\\s*\\{([^}]*)\\}`)
-  const match = pattern.exec(css)
+  const pattern = new RegExp(`${selector.replace(/[.[\]']/g, '\\$&')}\\s*\\{([^}]*)\\}`);
+  const match = pattern.exec(css);
   if (match === null) {
-    throw new Error(`no ${selector} block found in the assembled stylesheet`)
+    throw new Error(`no ${selector} block found in the assembled stylesheet`);
   }
-  return match[1] ?? ''
+  return match[1] ?? '';
 }
 
 describe("Switch's stylesheet", () => {
   it('fills its track from the token the Figma bundle declares for it, not a generic component fill', () => {
-    const rule = block('.lat-switch')
+    const rule = block('.lat-switch');
 
-    expect(rule).toContain('background-color: var(--lat-switch-track);')
-    expect(rule).not.toMatch(/background-color:\s*var\(--lat-component\);/)
-  })
+    expect(rule).toContain('background-color: var(--lat-switch-track);');
+    expect(rule).not.toMatch(/background-color:\s*var\(--lat-component\);/);
+  });
 
   it('fills the checked track with the solid, not left unchanged', () => {
-    const rule = block(`.lat-switch[aria-checked='true']`)
+    const rule = block(`.lat-switch[aria-checked='true']`);
 
-    expect(rule).toContain('background-color: var(--lat-solid);')
-  })
-})
+    expect(rule).toContain('background-color: var(--lat-solid);');
+  });
+});

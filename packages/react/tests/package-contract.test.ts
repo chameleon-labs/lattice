@@ -6,21 +6,21 @@
  * against the document's base — http://localhost:3000 — rather than the passed
  * file: base, and readFileSync then rejects the result.
  */
-import { readFileSync } from 'node:fs'
-import { describe, expect, it } from 'vitest'
+import {readFileSync} from 'node:fs';
+import {describe, expect, it} from 'vitest';
 
 interface PackageJson {
-  readonly dependencies?: Record<string, string>
-  readonly devDependencies?: Record<string, string>
-  readonly peerDependencies?: Record<string, string>
-  readonly optionalDependencies?: Record<string, string>
+  readonly dependencies?: Record<string, string>;
+  readonly devDependencies?: Record<string, string>;
+  readonly peerDependencies?: Record<string, string>;
+  readonly optionalDependencies?: Record<string, string>;
 }
 
 const load = (relative: string): PackageJson =>
-  JSON.parse(readFileSync(new URL(relative, import.meta.url), 'utf8')) as PackageJson
+  JSON.parse(readFileSync(new URL(relative, import.meta.url), 'utf8')) as PackageJson;
 
-const react = load('../package.json')
-const tokens = load('../../tokens/package.json')
+const react = load('../package.json');
+const tokens = load('../../tokens/package.json');
 
 describe('lattice-react package boundary', () => {
   it('declares React, Ariakit and the token package as peers', () => {
@@ -28,14 +28,14 @@ describe('lattice-react package boundary', () => {
       '@ariakit/react',
       '@chameleon-labs/lattice-tokens',
       'react',
-      'react-dom'
-    ])
-  })
+      'react-dom',
+    ]);
+  });
 
   it('ships no runtime dependencies', () => {
-    expect(react.dependencies ?? {}).toEqual({})
-  })
-})
+    expect(react.dependencies ?? {}).toEqual({});
+  });
+});
 
 describe('lattice-tokens stays installable without React', () => {
   it('names no React or Ariakit package in any dependency field', () => {
@@ -46,13 +46,13 @@ describe('lattice-tokens stays installable without React', () => {
       ...tokens.dependencies,
       ...tokens.devDependencies,
       ...tokens.peerDependencies,
-      ...tokens.optionalDependencies
-    }
+      ...tokens.optionalDependencies,
+    };
 
     const offenders = Object.keys(combined).filter(
-      (name) => name === 'react' || name === 'react-dom' || name.startsWith('@ariakit/')
-    )
+      (name) => name === 'react' || name === 'react-dom' || name.startsWith('@ariakit/'),
+    );
 
-    expect(offenders).toEqual([])
-  })
-})
+    expect(offenders).toEqual([]);
+  });
+});

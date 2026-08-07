@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Menu, MenuButton, MenuItem, MenuProvider, MenuSeparator } from './menu.js'
+import type {Meta, StoryObj} from '@storybook/react-vite';
+import {Menu, MenuButton, MenuItem, MenuProvider, MenuSeparator} from './menu.js';
 
 /**
  * Ariakit supplies roving focus, typeahead and focus return; Lattice supplies
@@ -13,12 +13,12 @@ import { Menu, MenuButton, MenuItem, MenuProvider, MenuSeparator } from './menu.
 const meta = {
   title: 'Components/Menu',
   component: Menu,
-  tags: ['autodocs']
-} satisfies Meta<typeof Menu>
+  tags: ['autodocs'],
+} satisfies Meta<typeof Menu>;
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
 function Items() {
   return (
@@ -28,7 +28,7 @@ function Items() {
       <MenuSeparator />
       <MenuItem>Remove page</MenuItem>
     </>
-  )
+  );
 }
 
 /** `tests/browser/a11y.spec.ts` opens this one and asserts focus returns on Escape. */
@@ -40,8 +40,8 @@ export const Closed: Story = {
         <Items />
       </Menu>
     </MenuProvider>
-  )
-}
+  ),
+};
 
 /** Open on arrival, so the sweep scans the menu surface rather than only its button. */
 export const Open: Story = {
@@ -52,5 +52,5 @@ export const Open: Story = {
         <Items />
       </Menu>
     </MenuProvider>
-  )
-}
+  ),
+};

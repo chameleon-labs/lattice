@@ -15,8 +15,8 @@
  * it the second test would inherit the first test's resolved promise and pass
  * for the wrong reason.
  */
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import type { APIRequestContext } from '@playwright/test'
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import type {APIRequestContext} from '@playwright/test';
 
 const INDEX = {
   entries: {
@@ -24,97 +24,97 @@ const INDEX = {
       id: 'components-button--default',
       title: 'Components/Button',
       name: 'Default',
-      type: 'story'
+      type: 'story',
     },
     'components-button--docs': {
       id: 'components-button--docs',
       title: 'Components/Button',
       name: 'Docs',
-      type: 'docs'
-    }
-  }
-}
+      type: 'docs',
+    },
+  },
+};
 
 /** Just enough of Playwright's request context for `fetchStories`. */
 const stubRequest = (
-  respond: () => Promise<{ ok: () => boolean; status: () => number; json: () => Promise<unknown> }>
+  respond: () => Promise<{ok: () => boolean; status: () => number; json: () => Promise<unknown>}>,
 ) => {
-  const get = vi.fn(respond)
-  return { request: { get } as unknown as APIRequestContext, get }
-}
+  const get = vi.fn(respond);
+  return {request: {get} as unknown as APIRequestContext, get};
+};
 
 const ok = async () => ({
   ok: () => true,
   status: () => 200,
-  json: async () => INDEX
-})
+  json: async () => INDEX,
+});
 
 beforeEach(() => {
-  vi.resetModules()
-})
+  vi.resetModules();
+});
 
 describe('the story index cache', () => {
   it('fetches the index once however many tests ask for it', async () => {
-    const { fetchStories } = await import('./browser/support/stories.js')
-    const { request, get } = stubRequest(ok)
+    const {fetchStories} = await import('./browser/support/stories.js');
+    const {request, get} = stubRequest(ok);
 
-    await fetchStories(request)
-    await fetchStories(request)
-    await fetchStories(request)
+    await fetchStories(request);
+    await fetchStories(request);
+    await fetchStories(request);
 
-    expect(get).toHaveBeenCalledTimes(1)
-  })
+    expect(get).toHaveBeenCalledTimes(1);
+  });
 
   it('shares one request between callers that start together', async () => {
-    const { fetchStories } = await import('./browser/support/stories.js')
-    const { request, get } = stubRequest(ok)
+    const {fetchStories} = await import('./browser/support/stories.js');
+    const {request, get} = stubRequest(ok);
 
     // Concurrent, not sequential: caching the resolved value rather than the
     // promise would let these race and issue three requests.
-    await Promise.all([fetchStories(request), fetchStories(request), fetchStories(request)])
+    await Promise.all([fetchStories(request), fetchStories(request), fetchStories(request)]);
 
-    expect(get).toHaveBeenCalledTimes(1)
-  })
+    expect(get).toHaveBeenCalledTimes(1);
+  });
 
   it('drops `docs` entries, which are Storybook chrome rather than stories', async () => {
-    const { fetchStories } = await import('./browser/support/stories.js')
-    const { request } = stubRequest(ok)
+    const {fetchStories} = await import('./browser/support/stories.js');
+    const {request} = stubRequest(ok);
 
-    const stories = await fetchStories(request)
+    const stories = await fetchStories(request);
 
-    expect(stories.map((story) => story.id)).toEqual(['components-button--default'])
-  })
+    expect(stories.map((story) => story.id)).toEqual(['components-button--default']);
+  });
 
   /**
    * The failure this whole change exists for. One dropped socket cost a CI run;
    * caching the rejection would have cost every remaining test in the worker.
    */
   it('does not cache a failure — the next caller tries again', async () => {
-    const { fetchStories } = await import('./browser/support/stories.js')
+    const {fetchStories} = await import('./browser/support/stories.js');
 
-    let attempt = 0
-    const { request, get } = stubRequest(async () => {
-      attempt += 1
-      if (attempt === 1) throw new Error('read ECONNRESET')
-      return ok()
-    })
+    let attempt = 0;
+    const {request, get} = stubRequest(async () => {
+      attempt += 1;
+      if (attempt === 1) throw new Error('read ECONNRESET');
+      return ok();
+    });
 
-    await expect(fetchStories(request)).rejects.toThrow('ECONNRESET')
+    await expect(fetchStories(request)).rejects.toThrow('ECONNRESET');
 
-    const stories = await fetchStories(request)
+    const stories = await fetchStories(request);
 
-    expect(stories).toHaveLength(1)
-    expect(get).toHaveBeenCalledTimes(2)
-  })
+    expect(stories).toHaveLength(1);
+    expect(get).toHaveBeenCalledTimes(2);
+  });
 
   it('reports a non-ok response rather than parsing it', async () => {
-    const { fetchStories } = await import('./browser/support/stories.js')
-    const { request } = stubRequest(async () => ({
+    const {fetchStories} = await import('./browser/support/stories.js');
+    const {request} = stubRequest(async () => ({
       ok: () => false,
       status: () => 503,
-      json: async () => ({})
-    }))
+      json: async () => ({}),
+    }));
 
-    await expect(fetchStories(request)).rejects.toThrow('503')
-  })
-})
+    await expect(fetchStories(request)).rejects.toThrow('503');
+  });
+});

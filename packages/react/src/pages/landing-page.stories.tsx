@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { LandingPage } from './landing-page.js'
+import type {Meta, StoryObj} from '@storybook/react-vite';
+import {LandingPage} from './landing-page.js';
 
 /**
  * The tabstop landing page, rebuilt from Lattice components alone.
@@ -28,10 +28,10 @@ import { LandingPage } from './landing-page.js'
 const meta = {
   title: 'Pages/Landing',
   component: LandingPage,
-  parameters: { layout: 'fullscreen' }
-} satisfies Meta<typeof LandingPage>
+  parameters: {layout: 'fullscreen'},
+} satisfies Meta<typeof LandingPage>;
 
-export default meta
+export default meta;
 
-export const Dark: StoryObj<typeof meta> = { globals: { theme: 'dark' } }
-export const Light: StoryObj<typeof meta> = { globals: { theme: 'light' } }
+export const Dark: StoryObj<typeof meta> = {globals: {theme: 'dark'}};
+export const Light: StoryObj<typeof meta> = {globals: {theme: 'light'}};

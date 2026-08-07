@@ -1,4 +1,4 @@
-import { defineConfig } from '@playwright/test'
+import {defineConfig} from '@playwright/test';
 
 // The two Firefox projects are carried over from the token package: 16px and
 // 20px root font size, so every component is checked at a non-default user
@@ -28,7 +28,7 @@ export default defineConfig({
   // three attempts.
   retries: process.env.CI === undefined ? 0 : 2,
   use: {
-    baseURL: 'http://localhost:6006'
+    baseURL: 'http://localhost:6006',
   },
   webServer: {
     command: 'pnpm exec storybook dev -p 6006 --no-open --quiet',
@@ -39,28 +39,28 @@ export default defineConfig({
     url: 'http://localhost:6006/index.json',
     // A cold Storybook boot exceeds Playwright's 60s default on CI.
     timeout: 180_000,
-    reuseExistingServer: process.env.CI === undefined
+    reuseExistingServer: process.env.CI === undefined,
   },
   projects: [
     {
       name: 'firefox-default-16',
       use: {
         browserName: 'firefox',
-        viewport: { width: 700, height: 900 }
-      }
+        viewport: {width: 700, height: 900},
+      },
     },
     {
       name: 'firefox-default-20',
       use: {
         browserName: 'firefox',
-        viewport: { width: 700, height: 900 },
+        viewport: {width: 700, height: 900},
         launchOptions: {
           firefoxUserPrefs: {
             'font.size.variable.x-western': 20,
-            'font.size.fixed.x-western': 20
-          }
-        }
-      }
-    }
-  ]
-})
+            'font.size.fixed.x-western': 20,
+          },
+        },
+      },
+    },
+  ],
+});

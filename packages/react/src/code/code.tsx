@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from 'react'
+import type {HTMLAttributes} from 'react';
 
 /**
  * A code fragment inside running text. `CodeBlock` covers the standalone,
@@ -15,12 +15,12 @@ import type { HTMLAttributes } from 'react'
  * No props: an inline fragment has no variants, and any colour a caller reached
  * for would be a status this component is not entitled to assert.
  */
-export type CodeProps = HTMLAttributes<HTMLElement>
+export type CodeProps = HTMLAttributes<HTMLElement>;
 
-export function Code({ className, children, ...props }: CodeProps) {
+export function Code({className, children, ...props}: CodeProps) {
   return (
     <code {...props} className={className === undefined ? 'lat-code' : `lat-code ${className}`}>
       {children}
     </code>
-  )
+  );
 }

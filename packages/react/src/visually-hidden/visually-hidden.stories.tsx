@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Button } from '../button/button.js'
-import { VisuallyHidden } from './visually-hidden.js'
+import type {Meta, StoryObj} from '@storybook/react-vite';
+import {Button} from '../button/button.js';
+import {VisuallyHidden} from './visually-hidden.js';
 
 /**
  * Re-exported from Ariakit unchanged, and deliberately so: its implementation
@@ -16,12 +16,12 @@ import { VisuallyHidden } from './visually-hidden.js'
 const meta = {
   title: 'Components/VisuallyHidden',
   component: VisuallyHidden,
-  tags: ['autodocs']
-} satisfies Meta<typeof VisuallyHidden>
+  tags: ['autodocs'],
+} satisfies Meta<typeof VisuallyHidden>;
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: () => (
@@ -29,8 +29,8 @@ export const Default: Story = {
       Score 72
       <VisuallyHidden> out of 100, audited on 30 July at 09:14 UTC</VisuallyHidden>
     </p>
-  )
-}
+  ),
+};
 
 /**
  * The case it earns its place on: a control whose visible label is an icon or a
@@ -42,5 +42,5 @@ export const AsAnAccessibleName: Story = {
       <span aria-hidden="true">×</span>
       <VisuallyHidden>Dismiss this notification</VisuallyHidden>
     </Button>
-  )
-}
+  ),
+};

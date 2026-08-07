@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Switch, type SwitchProps } from './switch.js'
+import type {Meta, StoryObj} from '@storybook/react-vite';
+import {Switch, type SwitchProps} from './switch.js';
 
 /**
  * A native checkbox carrying `role="switch"`, paired with a real `<label>`.
@@ -16,12 +16,12 @@ import { Switch, type SwitchProps } from './switch.js'
 const meta = {
   title: 'Components/Switch',
   component: Switch,
-  tags: ['autodocs']
-} satisfies Meta<typeof Switch>
+  tags: ['autodocs'],
+} satisfies Meta<typeof Switch>;
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
 const labelled = (text: string) =>
   function LabelledSwitch(args: SwitchProps) {
@@ -30,19 +30,19 @@ const labelled = (text: string) =>
         <label htmlFor="story-switch">{text}</label>
         <Switch {...args} id="story-switch" />
       </div>
-    )
-  }
+    );
+  };
 
 export const Off: Story = {
-  render: labelled('Paused')
-}
+  render: labelled('Paused'),
+};
 
 export const On: Story = {
-  args: { defaultChecked: true },
-  render: labelled('Monitoring')
-}
+  args: {defaultChecked: true},
+  render: labelled('Monitoring'),
+};
 
 export const Disabled: Story = {
-  args: { disabled: true },
-  render: labelled('Unavailable')
-}
+  args: {disabled: true},
+  render: labelled('Unavailable'),
+};

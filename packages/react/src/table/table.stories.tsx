@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Badge } from '../badge/badge.js'
-import { TBody, THead, Table, Td, Th, Tr } from './table.js'
+import type {Meta, StoryObj} from '@storybook/react-vite';
+import {Badge} from '../badge/badge.js';
+import {TBody, THead, Table, Td, Th, Tr} from './table.js';
 
 /**
  * `caption` and `scope` are required by the type rather than optional.
@@ -18,19 +18,19 @@ const meta = {
   // cannot be written without one, which is the same guarantee the component
   // makes to consumers, enforced one level up.
   args: {
-    caption: 'Audit history'
-  }
-} satisfies Meta<typeof Table>
+    caption: 'Audit history',
+  },
+} satisfies Meta<typeof Table>;
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
 const rows = [
-  { date: '30 July', score: 72, change: 'down 12', variant: 'danger' },
-  { date: '29 July', score: 84, change: 'up 3', variant: 'success' },
-  { date: '28 July', score: 81, change: 'no change', variant: 'default' }
-] as const
+  {date: '30 July', score: 72, change: 'down 12', variant: 'danger'},
+  {date: '29 July', score: 84, change: 'up 3', variant: 'success'},
+  {date: '28 July', score: 81, change: 'no change', variant: 'default'},
+] as const;
 
 export const Default: Story = {
   render: (args) => (
@@ -54,8 +54,8 @@ export const Default: Story = {
         ))}
       </TBody>
     </Table>
-  )
-}
+  ),
+};
 
 /**
  * The caption stays in the accessibility tree while leaving the layout.
@@ -84,5 +84,5 @@ export const VisuallyHiddenCaption: Story = {
         </TBody>
       </Table>
     </>
-  )
-}
+  ),
+};

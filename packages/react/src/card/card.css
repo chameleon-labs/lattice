@@ -8,7 +8,9 @@
   overflow: hidden;
 }
 
-.lat-card[data-elevation='floating'] { box-shadow: var(--lat-elevation-floating); }
+.lat-card[data-elevation='floating'] {
+  box-shadow: var(--lat-elevation-floating);
+}
 
 .lat-card__header {
   display: flex;
@@ -28,4 +30,6 @@
   text-transform: var(--lat-text-eyebrow-text-transform);
 }
 
-.lat-card__body { padding: var(--lat-inset-surface-lg); }
+.lat-card__body {
+  padding: var(--lat-inset-surface-lg);
+}

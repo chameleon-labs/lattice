@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Code } from './code.js'
+import type {Meta, StoryObj} from '@storybook/react-vite';
+import {Code} from './code.js';
 
 /**
  * A code fragment inside running text. `CodeBlock` is the standalone,
@@ -10,15 +10,15 @@ const meta = {
   component: Code,
   tags: ['autodocs'],
   args: {
-    children: 'color-contrast'
-  }
-} satisfies Meta<typeof Code>
+    children: 'color-contrast',
+  },
+} satisfies Meta<typeof Code>;
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {}
+export const Default: Story = {};
 
 /**
  * The case the component exists for. A CSS selector is a single unbreakable
@@ -27,13 +27,12 @@ export const Default: Story = {}
  */
 export const LongSelector: Story = {
   render: () => (
-    <p style={{ maxWidth: '16rem' }}>
-      The rule fired on{' '}
-      <Code>div.iana-header &gt; a.more-link:not([aria-hidden]) span.label</Code> and four other
+    <p style={{maxWidth: '16rem'}}>
+      The rule fired on <Code>div.iana-header &gt; a.more-link:not([aria-hidden]) span.label</Code> and four other
       elements.
     </p>
-  )
-}
+  ),
+};
 
 /**
  * In a sentence, at the size the surrounding prose sets — the mono role is a
@@ -44,5 +43,5 @@ export const InProse: Story = {
     <p>
       Set <Code>lang</Code> on the <Code>&lt;html&gt;</Code> element, then re-run the audit.
     </p>
-  )
-}
+  ),
+};

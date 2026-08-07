@@ -11,7 +11,7 @@
  * is L 0.905 H 120 in dark and L 0.630 H 129 in light — so keeping the curve
  * would have meant approximating the identity rather than applying it.
  */
-import type { Mode } from './modes.js'
+import type {Mode} from './modes.js';
 
 /** The grey roles Lattice names. Each is anchored in both modes. */
 export const GRAY_ROLES = [
@@ -22,22 +22,15 @@ export const GRAY_ROLES = [
   'field-bg',
   'switch-track',
   'text-subtle',
-  'text'
-] as const
+  'text',
+] as const;
 
-export type GrayRole = (typeof GRAY_ROLES)[number]
+export type GrayRole = (typeof GRAY_ROLES)[number];
 
 /** Scales carrying a single anchored solid fill. */
-export const CHROMATIC_SCALES = [
-  'accent',
-  'danger',
-  'warning',
-  'success',
-  'info',
-  'decorative'
-] as const
+export const CHROMATIC_SCALES = ['accent', 'danger', 'warning', 'success', 'info', 'decorative'] as const;
 
-export type ChromaticScale = (typeof CHROMATIC_SCALES)[number]
+export type ChromaticScale = (typeof CHROMATIC_SCALES)[number];
 
 /**
  * Grey.
@@ -59,7 +52,7 @@ export const GRAY_ANCHORS: Record<Mode, Record<GrayRole, string>> = {
     'field-bg': '#1a1a2e',
     'switch-track': '#2a2a48',
     'text-subtle': '#6b6b90',
-    text: '#e2e2ee'
+    text: '#e2e2ee',
   },
   light: {
     bg: '#f0f0f8',
@@ -69,9 +62,9 @@ export const GRAY_ANCHORS: Record<Mode, Record<GrayRole, string>> = {
     'field-bg': '#e8e8f2',
     'switch-track': '#c8c8dc',
     'text-subtle': '#58588a',
-    text: '#0c0c14'
-  }
-}
+    text: '#0c0c14',
+  },
+};
 
 /**
  * The solid fill of each chromatic scale.
@@ -82,13 +75,13 @@ export const GRAY_ANCHORS: Record<Mode, Record<GrayRole, string>> = {
  * token table while binding them to those slots.
  */
 export const SOLID_ANCHORS: Record<ChromaticScale, Record<Mode, string>> = {
-  accent: { dark: '#cff23a', light: '#6a9b00' },
-  danger: { dark: '#ff4d6a', light: '#d41240' },
-  warning: { dark: '#fb923c', light: '#ea580c' },
-  success: { dark: '#34d399', light: '#059669' },
-  info: { dark: '#38bdf8', light: '#0284c7' },
-  decorative: { dark: '#a78bfa', light: '#7c3aed' }
-}
+  accent: {dark: '#cff23a', light: '#6a9b00'},
+  danger: {dark: '#ff4d6a', light: '#d41240'},
+  warning: {dark: '#fb923c', light: '#ea580c'},
+  success: {dark: '#34d399', light: '#059669'},
+  info: {dark: '#38bdf8', light: '#0284c7'},
+  decorative: {dark: '#a78bfa', light: '#7c3aed'},
+};
 
 /**
  * Text on a solid fill.
@@ -98,8 +91,8 @@ export const SOLID_ANCHORS: Record<ChromaticScale, Record<Mode, string>> = {
  * on-solid answer.
  */
 export const ON_SOLID_ANCHORS: Partial<Record<ChromaticScale, Record<Mode, string>>> = {
-  accent: { dark: '#0c0c14', light: '#ffffff' }
-}
+  accent: {dark: '#0c0c14', light: '#ffffff'},
+};
 
 /**
  * The vivid accent.
@@ -109,4 +102,4 @@ export const ON_SOLID_ANCHORS: Partial<Record<ChromaticScale, Record<Mode, strin
  * white label can sit on it. Emitted separately so a caller can reach the brand
  * colour without going through the primary fill.
  */
-export const ACCENT_VIVID = '#cff23a'
+export const ACCENT_VIVID = '#cff23a';

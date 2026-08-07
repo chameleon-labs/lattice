@@ -1,18 +1,18 @@
-import type { ComponentPropsWithRef, ReactNode } from 'react'
+import type {ComponentPropsWithRef, ReactNode} from 'react';
 
 export interface InputOptions {
   /** Sets `aria-invalid`. `TextField` passes this for you when it renders an error. */
-  invalid?: boolean
+  invalid?: boolean;
   /** Rendered inside the field, before the control. A decorative icon here must carry `aria-hidden`. */
-  addonStart?: ReactNode
+  addonStart?: ReactNode;
   /** Rendered inside the field, after the control. */
-  addonEnd?: ReactNode
+  addonEnd?: ReactNode;
   /**
    * Applied to the `<input>` itself, not the wrapper. `className` reaches
    * the wrapper — the box a caller positions or sizes — so this is the
    * escape hatch for the rare case a caller needs to reach the control.
    */
-  inputClassName?: string
+  inputClassName?: string;
 }
 
 // Fields are one size everywhere in the bundle — no variant of
@@ -20,7 +20,7 @@ export interface InputOptions {
 // size knob the design never turns is worse than not offering it, so there is
 // no custom `size` prop here; the native `size` attribute (visible character
 // width) passes through untouched.
-export type InputProps = ComponentPropsWithRef<'input'> & InputOptions
+export type InputProps = ComponentPropsWithRef<'input'> & InputOptions;
 
 /**
  * The wrapper (`.lat-input-field`) always renders, addons or not: it owns the
@@ -60,5 +60,5 @@ export function Input({
       />
       {addonEnd}
     </div>
-  )
+  );
 }

@@ -14,30 +14,30 @@
  * from the hairline rule above would look plausible in review and be wrong:
  * a selected tab would be indistinguishable from an unselected one.
  */
-import { fileURLToPath } from 'node:url'
-import { describe, expect, it } from 'vitest'
-import { assembleCss } from '../scripts/assemble-css.js'
+import {fileURLToPath} from 'node:url';
+import {describe, expect, it} from 'vitest';
+import {assembleCss} from '../scripts/assemble-css.js';
 
-const css = await assembleCss(fileURLToPath(new URL('../src/styles.css', import.meta.url)))
+const css = await assembleCss(fileURLToPath(new URL('../src/styles.css', import.meta.url)));
 
 function escapeRegExp(text: string): string {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function block(selector: string): string {
-  const pattern = new RegExp(`${escapeRegExp(selector)}\\s*\\{([^}]*)\\}`)
-  const match = pattern.exec(css)
+  const pattern = new RegExp(`${escapeRegExp(selector)}\\s*\\{([^}]*)\\}`);
+  const match = pattern.exec(css);
   if (match === null) {
-    throw new Error(`no ${selector} block found in the assembled stylesheet`)
+    throw new Error(`no ${selector} block found in the assembled stylesheet`);
   }
-  return match[1] ?? ''
+  return match[1] ?? '';
 }
 
 describe("Tabs' stylesheet", () => {
   it("marks the selected tab's indicator with --lat-solid, not the list's own hairline colour", () => {
-    const rule = block(".lat-tab[aria-selected='true']")
+    const rule = block(".lat-tab[aria-selected='true']");
 
-    expect(rule).toContain('border-bottom-color: var(--lat-solid);')
-    expect(rule).not.toContain('var(--lat-border)')
-  })
-})
+    expect(rule).toContain('border-bottom-color: var(--lat-solid);');
+    expect(rule).not.toContain('var(--lat-border)');
+  });
+});
