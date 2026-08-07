@@ -1,42 +1,26 @@
 /**
- * The contrast ledger.
+ * A missed contract does not stop the build. Lattice's values are the identity
+ * and several of its documented pairs miss WCAG, so the check reports rather
+ * than gates: measured, printed, shipped anyway.
  *
- * Until 2026-08-03 a missed contract stopped the build. Lattice's values are
- * the identity and a number of its documented pairs miss WCAG, so the check
- * became a report: measured, printed, and shipped anyway.
+ * The ledger is what keeps those misses visible. A number nobody prints becomes
+ * folklore within a release, and the light-mode focus ring — a focus indicator a
+ * keyboard user cannot see — is not something to rediscover.
  *
- * The ledger exists so those misses stay visible. A number nobody prints
- * becomes folklore within a release, and the light-mode focus ring in
- * particular — a focus indicator a keyboard user cannot see — is not something
- * to rediscover.
+ * `forMode` measures the grey and accent pairs, plus the tinted triple for every
+ * chromatic scale and for the severity ramp: a scale's solid as text on its own
+ * tint, which is what every Badge, the destructive Button and every Callout are
+ * built from.
  *
- * `forMode` measures the grey and accent pairs, plus the tinted triple for
- * every chromatic scale — a scale's solid as text on its own tint, composited
- * over `bg-raised`, which is what every Badge, the destructive Button and
- * every Callout are built from — and, since 2026-08-04, the severity ramp's
- * own tinted triple: `critical`, `serious` and `moderate` each carry their own
- * tint tokens rather than reusing a chromatic scale, and `minor` aliases to
- * text-subtle on wash. Phase 2 shipped these without adding them here.
+ * Each tinted triple is measured **twice**, over `bg-raised` and over `bg`. The
+ * tint tokens are translucent, so they composite over whichever surface they are
+ * placed on, and `.lat-surface` paints several real pages at `--lat-bg`
+ * directly. Light danger, warning, success, info, accent and severity moderate
+ * all measure worse over `bg` than over `bg-raised`; same accepted colours,
+ * measured in a context the shipped CSS already produces.
  *
- * Also since 2026-08-04: every tinted triple (chromatic and severity) is
- * measured a second time, composited over `bg` rather than `bg-raised`. The
- * tint tokens are translucent (see `resolveTints`/`resolveSeverityTints` in
- * `generate/anchors.ts` and `generate/severity.ts`), so they composite over
- * whichever surface they are actually placed on — `.lat-surface` paints every
- * story's root, and several real pages, at `--lat-bg` directly, not
- * `--lat-bg-raised`. That second composite was going unmeasured, which
- * `packages/react`'s a11y sweep surfaced once its `color-contrast` assertion
- * started checking measured axe ratios against this ledger instead of
- * asserting zero violations outright: several already-accepted foregrounds
- * (light danger, warning, success, info, accent, and severity moderate) render
- * measurably worse over `bg` than the ledger's sole `bg-raised` row recorded
- * for them, verified independently against axe's own reported ratios. This is
- * not a new colour decision — nothing here changes a value — it is the same
- * accepted colours, measured in a context the identity's shipped CSS already
- * produces.
- *
- * Alpha values are composited over their surface before measuring, because that
- * is what a viewer sees.
+ * Alpha is composited over its surface before measuring, because that is what a
+ * viewer sees.
  */
 import { ALPHA_CHANNEL, FOCUS_RING, HAIRLINE, TINT_FRACTIONS, WASH } from '../config/alpha.js'
 import { CHROMATIC_SCALES, GRAY_ANCHORS, ON_SOLID_ANCHORS, SOLID_ANCHORS } from '../config/anchors.js'

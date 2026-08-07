@@ -12,17 +12,14 @@ import { buildSeverity } from './severity.js'
  * Build entrypoint. Emits `dist/lattice.css`, `dist/tokens.json` and
  * `dist/contrast-ledger.json`.
  *
- * This build does not gate. Lattice's values are the identity, and a number of
- * its documented pairs miss WCAG; refusing to write them would refuse to ship
- * the design. Every pair is still measured and printed — see generate/report.ts.
+ * It does not gate: Lattice's values are the identity and several documented
+ * pairs miss WCAG, so every pair is measured and printed instead — see
+ * generate/report.ts.
  *
- * `dist/contrast-ledger.json` is that same measurement, written out as data.
- * `packages/react`'s a11y sweep reads it to know which `color-contrast` axe
- * violations are documented, accepted deficiencies rather than new defects —
- * see `packages/react/tests/browser/support/contrast-ledger.ts`. Emitting it
- * here, next to `tokens.json`, means the accepted set is generated from this
- * package's own ledger and cannot drift from it the way a hand-copied list in
- * the react package would.
+ * The ledger is that measurement as data. `packages/react`'s a11y sweep reads it
+ * to tell a documented, accepted deficiency from a new defect, so emitting it
+ * here means the accepted set is generated from this package's own numbers
+ * rather than hand-copied into the react package and left to drift.
  */
 const dist = fileURLToPath(new URL('../dist/', import.meta.url))
 await mkdir(dist, { recursive: true })
