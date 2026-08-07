@@ -32,6 +32,15 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # Before the build and the suites, because they are the two cheapest
+      # checks here — seconds against minutes — and a failure in either is
+      # something the author can fix without reading a test log.
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format
+        run: pnpm format:check
+
       - name: Install Firefox
         run: pnpm --filter @chameleon-labs/lattice-tokens exec playwright install --with-deps firefox
 
