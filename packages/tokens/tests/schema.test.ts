@@ -25,15 +25,17 @@ const schema = JSON.parse(
   readFileSync(fileURLToPath(new URL('fixtures/dtcg-format-2025.10.json', import.meta.url)), 'utf8')
 ) as Record<string, unknown>
 
-describe('tokens.json against the published DTCG schema', () => {
-  const ajv = new Ajv({ strict: false, allErrors: true })
-  // Not decoration: Ajv skips an unknown format rather than failing, so without
-  // this the schema's `uri-reference` and `json-pointer-uri-fragment` go
-  // unchecked. `.default` because ajv-formats is CommonJS.
-  formatsPlugin.default(ajv)
-  const validate = ajv.compile(schema)
-  const tokens = emitTokens()
+const ajv = new Ajv({ strict: false, allErrors: true })
+// Not decoration: Ajv skips an unknown format rather than failing, so without
+// this the schema's `uri-reference` and `json-pointer-uri-fragment` go
+// unchecked. `.default` because ajv-formats is CommonJS. The last describe in
+// this file fails if it is removed.
+formatsPlugin.default(ajv)
 
+const validate = ajv.compile(schema)
+const tokens = emitTokens()
+
+describe('tokens.json against the published DTCG schema', () => {
   it('validates', () => {
     const valid = validate(tokens)
     const errors = (validate.errors ?? [])
@@ -188,5 +190,46 @@ describe('tokens.json against the published DTCG schema', () => {
     broken['$notAKnownProperty'] = { $type: 'color', $value: '{light.gray.bg}' }
 
     expect(validate(broken)).toBe(false)
+  })
+})
+
+/**
+ * The format registration is silent when it goes missing: remove it and every
+ * assertion above still passes, because the artefact is conformant either way
+ * and Ajv skips a format it does not know rather than failing. These are the
+ * assertions that would fail.
+ *
+ * Each case is paired against an Ajv *without* the plugin, which accepts the
+ * same value — so what is demonstrated is that the registration does the work,
+ * rather than the value happening to break some other constraint.
+ */
+describe('the formats the schema declares are enforced, not skipped', () => {
+  // The same configuration minus the plugin. `logger: false` because its
+  // "unknown format ignored" warning is precisely the noise this file exists to
+  // have removed, and reintroducing it here would defeat the point.
+  const unregistered = new Ajv({ strict: false, allErrors: true, logger: false })
+
+  const uriReference = { type: 'string', format: 'uri-reference' }
+  const jsonPointer = (schema['definitions'] as Record<string, object>)['jsonPointerReference']!
+
+  it('rejects a $schema that is not a URI reference', () => {
+    expect(validate({ ...tokens, $schema: 'not a uri reference' })).toBe(false)
+    // Named, so this cannot pass because the document broke some other rule.
+    expect(validate.errors?.some((error) => error.keyword === 'format')).toBe(true)
+  })
+
+  /**
+   * `jsonPointerReference` also carries `pattern: "^#/"`, so the value has to
+   * satisfy that for the *format* to be what rejects it — `#/invalid~escape`
+   * is a well-formed fragment containing an invalid JSON-pointer escape.
+   */
+  it('rejects a JSON pointer whose escape is invalid', () => {
+    expect(ajv.validate(jsonPointer, '#/invalid~escape')).toBe(false)
+    expect(ajv.validate(jsonPointer, '#/valid/pointer')).toBe(true)
+  })
+
+  it('accepts both without the plugin, which is what makes the registration load-bearing', () => {
+    expect(unregistered.validate(uriReference, 'not a uri reference')).toBe(true)
+    expect(unregistered.validate(jsonPointer, '#/invalid~escape')).toBe(true)
   })
 })
