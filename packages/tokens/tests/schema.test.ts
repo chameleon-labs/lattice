@@ -57,8 +57,8 @@ describe('tokens.json against the published DTCG schema', () => {
   it('accepts both value shapes the artefact emits', () => {
     const light = tokens['light'] as Record<string, Record<string, unknown>>;
 
-    expect((light['gray']?.['bg'] as {$value: unknown}).$value).toBeTypeOf('object');
-    expect((light['role']?.['text'] as {$value: unknown}).$value).toBe('{light.gray.text}');
+    expect((light['gray']!['bg'] as {$value: unknown}).$value).toBeTypeOf('object');
+    expect((light['role']!['text'] as {$value: unknown}).$value).toBe('{light.gray.text}');
   });
 
   it('accepts every typography primitive value shape', () => {

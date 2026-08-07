@@ -635,7 +635,12 @@ function Footer(): React.JSX.Element {
 
         <nav className="landing-page__footer-links" aria-label="Footer links">
           {FOOTER_LINKS.map((label) => (
-            <Button key={label} variant="link" size="sm" render={<a href="#" />}>
+            <Button
+              key={label}
+              variant="link"
+              size="sm"
+              render={<a href={`#${label.toLowerCase().replaceAll(' ', '-')}`} />}
+            >
               {label}
             </Button>
           ))}

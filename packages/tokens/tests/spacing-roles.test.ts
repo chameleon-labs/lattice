@@ -96,18 +96,22 @@ describe('the emitted spacing roles', () => {
     // spot-checking, so a missing rung fails here rather than in a snapshot.
     const tokens = spacingRoleTokens();
 
-    for (const [role, value] of Object.entries(INSET_ROLES)) {
-      const emitted = tokens.inset[role];
-      expect(emitted, `inset.${role} is missing`).toBeDefined();
-      if (Array.isArray(value)) {
-        const [block, inline] = value as readonly [string, string];
-        const pair = emitted as {block: {$value: string}; inline: {$value: string}};
-        expect(pair.block.$value, `inset.${role}.block`).toBe(`{global.space.${block}}`);
-        expect(pair.inline.$value, `inset.${role}.inline`).toBe(`{global.space.${inline}}`);
-      } else {
-        const single = emitted as {$value: string};
-        expect(single.$value, `inset.${role}`).toBe(`{global.space.${value}}`);
-      }
+    const roleEntries = Object.entries(INSET_ROLES);
+
+    for (const [role] of roleEntries) {
+      expect(tokens.inset[role], `inset.${role} is missing`).toBeDefined();
+    }
+
+    for (const [role, value] of roleEntries.filter(([, v]) => Array.isArray(v))) {
+      const [block, inline] = value as readonly [string, string];
+      const pair = tokens.inset[role] as {block: {$value: string}; inline: {$value: string}};
+      expect(pair.block.$value, `inset.${role}.block`).toBe(`{global.space.${block}}`);
+      expect(pair.inline.$value, `inset.${role}.inline`).toBe(`{global.space.${inline}}`);
+    }
+
+    for (const [role, value] of roleEntries.filter(([, v]) => !Array.isArray(v))) {
+      const single = tokens.inset[role] as {$value: string};
+      expect(single.$value, `inset.${role}`).toBe(`{global.space.${value}}`);
     }
 
     for (const [role, name] of Object.entries(GAP_ROLES)) {

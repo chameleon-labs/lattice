@@ -105,7 +105,7 @@ for (const dir of packageDirs) {
     if (relative === 'package.json') {
       continue;
     }
-    const covered = roots.some((root) => relative === root || relative.startsWith(`${root.replace(/\/$/, '')}/`));
+    const covered = roots.some((prefix) => relative === prefix || relative.startsWith(`${prefix.replace(/\/$/, '')}/`));
     if (!covered) {
       fail(where, `exports "${target}" is not covered by \`files\` — it would 404 for consumers`);
     }

@@ -1,7 +1,7 @@
 import {describe, expect, it} from 'vitest';
 
 import {ALL_PAIRS_CAP, CATEGORICAL, CHART_SURFACES, CHECKS, ORDINAL_CLAMP, SEQUENTIAL} from '../config/charts.js';
-import {MODES, type Mode} from '../config/modes.js';
+import {MODES} from '../config/modes.js';
 import {
   allPairsCap,
   buildCategorical,
@@ -46,12 +46,14 @@ describe('the categorical palette', () => {
     const light = buildCategorical('light');
     const dark = buildCategorical('dark');
 
-    for (const [index, entry] of CATEGORICAL.entries()) {
-      if (entry.tier === 'hi') {
-        expect(light[index]?.hex).toBe(dark[index]?.hex);
-      } else {
-        expect(light[index]?.hex).not.toBe(dark[index]?.hex);
-      }
+    const entries = [...CATEGORICAL.entries()];
+
+    for (const [index] of entries.filter(([, entry]) => entry.tier === 'hi')) {
+      expect(light[index]?.hex).toBe(dark[index]?.hex);
+    }
+
+    for (const [index] of entries.filter(([, entry]) => entry.tier !== 'hi')) {
+      expect(light[index]?.hex).not.toBe(dark[index]?.hex);
     }
   });
 
@@ -152,15 +154,16 @@ describe('the six categorical checks', () => {
   // accepted, recorded state rather than leaving the shortfall unasserted.
   // Every other light slot still clears 3:1 outright.
   it('needs relief for aqua alone in light mode; every other slot clears 3:1', () => {
-    for (const swatch of buildCategorical('light')) {
-      const measured = ratio(swatch.hex, CHART_SURFACES.light);
+    const palette = buildCategorical('light');
 
-      if (swatch.name === 'aqua') {
-        expect(measured, swatch.name).toBeCloseTo(2.94, 2);
-        expect(measured, swatch.name).toBeLessThan(CHECKS.contrastMin);
-      } else {
-        expect(measured, swatch.name).toBeGreaterThanOrEqual(CHECKS.contrastMin);
-      }
+    for (const swatch of palette.filter((entry) => entry.name === 'aqua')) {
+      const measured = ratio(swatch.hex, CHART_SURFACES.light);
+      expect(measured, swatch.name).toBeCloseTo(2.94, 2);
+      expect(measured, swatch.name).toBeLessThan(CHECKS.contrastMin);
+    }
+
+    for (const swatch of palette.filter((entry) => entry.name !== 'aqua')) {
+      expect(ratio(swatch.hex, CHART_SURFACES.light), swatch.name).toBeGreaterThanOrEqual(CHECKS.contrastMin);
     }
   });
 
@@ -171,7 +174,7 @@ describe('the six categorical checks', () => {
   });
 
   it('fails a palette whose order has been disturbed', () => {
-    const shuffled = buildCategorical('light').slice().reverse();
+    const shuffled = buildCategorical('light').toReversed();
     const report = validateCategorical(shuffled, 'light');
 
     expect(report.ok).toBe(false);
@@ -202,9 +205,8 @@ describe('the six categorical checks', () => {
   });
 
   it('fails a palette whose values have drifted from the generated ones', () => {
-    const tampered = buildCategorical('light').map((swatch, index) =>
-      index === 3 ? {...swatch, hex: '#123456'} : swatch,
-    );
+    const tampered = buildCategorical('light');
+    tampered[3] = {...tampered[3]!, hex: '#123456'};
 
     expect(validateCategorical(tampered, 'light').ok).toBe(false);
   });
@@ -354,7 +356,8 @@ describe('the sequential ramp', () => {
 
   it('fails an ordinal check when a step is moved too close to its neighbour', () => {
     const ramp = buildSequential();
-    const crowded = ramp.map((swatch, index) => (index === 2 ? {...swatch, l: ramp[1]!.l - 0.01} : swatch));
+    const crowded = [...ramp];
+    crowded[2] = {...crowded[2]!, l: ramp[1]!.l - 0.01};
 
     expect(validateSequential(crowded, 'light').ok).toBe(false);
   });
@@ -383,7 +386,7 @@ describe('a ramp declared the other way round', () => {
   // Monotone in either direction is still a ramp, but the reported direction has
   // to be the one actually found — the detail is what a build log shows.
   it('passes, and is described as ascending', () => {
-    const ascending = [...buildSequential()].reverse();
+    const ascending = buildSequential().toReversed();
     const monotone = validateSequential(ascending, 'light').checks.find((check) => check.name === 'Lightness monotone');
 
     expect(monotone?.state).toBe('pass');

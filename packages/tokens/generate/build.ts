@@ -21,6 +21,8 @@ import {buildSeverity} from './severity.js';
  * here means the accepted set is generated from this package's own numbers
  * rather than hand-copied into the react package and left to drift.
  */
+const MARKERS = {pass: '    ', warn: 'WARN', fail: 'FAIL'} as const;
+
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 await mkdir(dist, {recursive: true});
 
@@ -51,7 +53,7 @@ for (const mode of MODES) {
   const ordinal = validateSequential(ordinalRange(mode), mode);
   for (const report of [categorical, ordinal]) {
     for (const check of report.checks) {
-      const marker = check.state === 'pass' ? '    ' : check.state === 'warn' ? 'WARN' : 'FAIL';
+      const marker = MARKERS[check.state];
       console.log('  %s %s  %s  %s', marker, mode.padEnd(5), check.name.padEnd(20), check.detail);
     }
   }

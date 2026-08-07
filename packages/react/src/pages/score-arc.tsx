@@ -48,12 +48,12 @@ export function ScoreArc({score, size = 120}: ScoreArcProps): React.JSX.Element 
   const trackP2 = arc(endAngle);
   const trackLarge = range > 180 ? 1 : 0;
 
-  const thresholdClass =
-    score >= 80
-      ? 'landing-page__score-arc--good'
-      : score >= 60
-        ? 'landing-page__score-arc--warn'
-        : 'landing-page__score-arc--bad';
+  let thresholdClass = 'landing-page__score-arc--bad';
+  if (score >= 80) {
+    thresholdClass = 'landing-page__score-arc--good';
+  } else if (score >= 60) {
+    thresholdClass = 'landing-page__score-arc--warn';
+  }
 
   return (
     <svg

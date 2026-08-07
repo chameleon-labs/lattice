@@ -85,6 +85,7 @@ const REVERSE_BACKGROUND = 0.65;
 // Below this luminance APCA soft-clamps rather than letting the exponent run
 // away, modelling the flare that stops a display from reaching true black.
 const BLACK_THRESHOLD = 0.022;
+// oxlint-disable-next-line oxc/approx-constant -- apca-w3 specifies 1.414, not √2.
 const BLACK_CLAMP_EXPONENT = 1.414;
 
 const SCALE = 1.14;

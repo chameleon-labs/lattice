@@ -147,7 +147,12 @@ export interface ViolationSummaryEntry {
 function contrastData(node: AxeNodeResult): ContrastCheckData | undefined {
   for (const check of node.any) {
     const data = check.data as ContrastCheckData | null | undefined;
-    if (data != null && typeof data.fgColor === 'string' && typeof data.contrastRatio === 'number') {
+    if (
+      data !== null &&
+      data !== undefined &&
+      typeof data.fgColor === 'string' &&
+      typeof data.contrastRatio === 'number'
+    ) {
       return data;
     }
   }

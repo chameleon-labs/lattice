@@ -109,7 +109,7 @@ for (const dir of packageDirs) {
     required.push(target.slice(2));
   }
 
-  for (const path of [...new Set(required)]) {
+  for (const path of new Set(required)) {
     // `./fonts/*` and friends: the export is a directory contract, so the
     // requirement is "at least one file under here", not a specific name.
     if (path.includes('*')) {

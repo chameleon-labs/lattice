@@ -21,7 +21,7 @@ describe('parseHex', () => {
   });
 
   it('rejects a string that is not six hex digits', () => {
-    expect(() => parseHex('#fff')).toThrow();
+    expect(() => parseHex('#fff')).toThrow('not a six-digit hex colour');
   });
 });
 

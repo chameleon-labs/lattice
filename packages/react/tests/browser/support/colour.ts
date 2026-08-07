@@ -14,7 +14,8 @@ export async function channelsOf(page: Page, selector: string): Promise<{r: numb
     .evaluate((el) => {
       const colour = getComputedStyle(el).backgroundColor;
       const canvas = document.createElement('canvas');
-      canvas.width = canvas.height = 1;
+      canvas.width = 1;
+      canvas.height = 1;
       const ctx = canvas.getContext('2d')!;
       ctx.fillStyle = colour;
       ctx.fillRect(0, 0, 1, 1);

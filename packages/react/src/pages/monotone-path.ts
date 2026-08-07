@@ -77,7 +77,7 @@ export function monotoneLinePath(points: readonly Point[]): string {
   }
 
   const n = points.length;
-  const tangents: number[] = new Array(n);
+  const tangents: number[] = Array.from({length: n});
 
   // Interior tangents first — each needs both neighbours.
   for (let i = 1; i < n - 1; i += 1) {

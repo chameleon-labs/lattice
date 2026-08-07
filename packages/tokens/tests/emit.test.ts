@@ -247,10 +247,10 @@ describe('lattice.css', () => {
   });
 
   it('terminates every declaration', () => {
-    for (const line of css.split('\n')) {
-      if (line.trimStart().startsWith('--lat-')) {
-        expect(line.trimEnd().endsWith(';')).toBe(true);
-      }
+    const declarations = css.split('\n').filter((line) => line.trimStart().startsWith('--lat-'));
+
+    for (const line of declarations) {
+      expect(line.trimEnd().endsWith(';')).toBe(true);
     }
   });
 
@@ -375,7 +375,7 @@ describe('tokens.json', () => {
     const global = tokens['global'] as Record<string, Record<string, {$type: string; $value: unknown}>>;
 
     for (const [name, layers] of Object.entries(SHADOWS)) {
-      const token = global['shadow']?.[name]!;
+      const token = global['shadow']![name]!;
       expect(token.$type, name).toBe('shadow');
       const value = token.$value as readonly {
         readonly color: {readonly alpha: number};
@@ -442,15 +442,18 @@ describe('tokens.json', () => {
       // 60% of the measurement is the surface. It stays in this tier because it
       // is still declared as a colour *and* a fraction — dark still uses 0.4 —
       // rather than because the fraction is always less than one.
-      if (path.includes('.alpha.')) {
-        expect(token.$value.alpha, path).toBeGreaterThan(0);
-        expect(token.$value.alpha, path).toBeLessThanOrEqual(1);
-        if (!path.endsWith('.focus-ring')) {
-          expect(token.$value.alpha, path).toBeLessThan(1);
-        }
-      } else {
-        expect(token.$value.alpha, path).toBe(1);
-      }
+      expect(token.$value.alpha, path).toBeGreaterThan(0);
+      expect(token.$value.alpha, path).toBeLessThanOrEqual(1);
+    }
+
+    const alphaLeaves = colorLeaves().filter((leaf) => leaf.path.includes('.alpha.'));
+
+    for (const {path, token} of alphaLeaves.filter((leaf) => !leaf.path.endsWith('.focus-ring'))) {
+      expect(token.$value.alpha, path).toBeLessThan(1);
+    }
+
+    for (const {path, token} of colorLeaves().filter((leaf) => !leaf.path.includes('.alpha.'))) {
+      expect(token.$value.alpha, path).toBe(1);
     }
   });
 
@@ -627,10 +630,8 @@ describe('tokens.json', () => {
 
   // The usage rule is only useful if it travels with the tokens.
   it('carries the icon-and-label rule on every severity token', () => {
-    for (const {path, token} of leaves()) {
-      if (path.includes('.severity.')) {
-        expect(token.$description, path).toMatch(/icon and a text label/);
-      }
+    for (const {path, token} of leaves().filter((leaf) => leaf.path.includes('.severity.'))) {
+      expect(token.$description, path).toMatch(/icon and a text label/);
     }
   });
 

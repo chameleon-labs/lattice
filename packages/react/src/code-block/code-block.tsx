@@ -59,6 +59,8 @@ export function CodeBlock({
           it a tab stop a keyboard-only user could reach. `tabIndex={0}` puts
           it in the tab order; `role="region"` + `aria-label` gives it a name
           once focused, since a bare `<pre>` announces none. */}
+      {/* oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- the tab
+          stop is the point; see above. */}
       <pre className="lat-code-block__pre" tabIndex={0} role="region" aria-label={regionLabel}>
         {code}
       </pre>

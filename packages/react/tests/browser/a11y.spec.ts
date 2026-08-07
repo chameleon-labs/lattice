@@ -4,6 +4,7 @@
 // over at runtime while `tsc` correctly rejects it as not constructable.
 import {AxeBuilder} from '@axe-core/playwright';
 import {expect, test} from '@playwright/test';
+import type {APIRequestContext, Page} from '@playwright/test';
 import {acceptedContrastFloors, summarizeViolations} from './support/contrast-ledger.js';
 import {PAGE_SCOPED_RULES, THEMES, fetchStories, settle, storyFamilies, storyUrl, titleFor} from './support/stories.js';
 
@@ -140,7 +141,7 @@ for (const family of families) {
  * actually fails.
  */
 test.describe('page stories', () => {
-  const pageStories = async (request: import('@playwright/test').APIRequestContext) =>
+  const pageStories = async (request: APIRequestContext) =>
     (await fetchStories(request)).filter((story) => story.title.startsWith('Pages/'));
 
   test('the page-story index is populated', async ({request}) => {
@@ -198,7 +199,7 @@ test.describe('page stories', () => {
  * `pnpm test` was red. It never ran under forced-colors at all, so it also
  * caught nothing of C1.
  */
-async function focusRing(page: import('@playwright/test').Page) {
+async function focusRing(page: Page) {
   await page.locator('.lat-button').waitFor();
 
   // Drive focus purely by keyboard. A programmatic .focus() does not set the

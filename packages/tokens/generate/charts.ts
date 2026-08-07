@@ -203,12 +203,12 @@ export function validateCategorical(
     }
   }
 
-  const separation: CheckState =
-    worstNormal.distance < CHECKS.normalFloor || worst.distance < CHECKS.cvdFloor
-      ? 'fail'
-      : worst.distance < CHECKS.cvdTarget
-        ? 'warn'
-        : 'pass';
+  let separation: CheckState = 'pass';
+  if (worstNormal.distance < CHECKS.normalFloor || worst.distance < CHECKS.cvdFloor) {
+    separation = 'fail';
+  } else if (worst.distance < CHECKS.cvdTarget) {
+    separation = 'warn';
+  }
 
   checks.push({
     name: 'Separation',
@@ -280,6 +280,16 @@ export function ordinalRange(mode: Mode): SequentialSwatch[] {
  * the check the clamp exists to satisfy, and running it against the unclamped
  * ramp fails by construction.
  */
+function monotoneDetail(descending: boolean, ascending: boolean, lightnesses: number[]): string {
+  if (descending) {
+    return 'steps read light to dark';
+  }
+  if (ascending) {
+    return 'steps read dark to light';
+  }
+  return `not monotone: ${lightnesses.map((l) => l.toFixed(3)).join(', ')}`;
+}
+
 export function validateSequential(
   palette: readonly SequentialSwatch[],
   mode: Mode,
@@ -303,11 +313,7 @@ export function validateSequential(
   checks.push({
     name: 'Lightness monotone',
     state: ascending || descending ? 'pass' : 'fail',
-    detail: descending
-      ? 'steps read light to dark'
-      : ascending
-        ? 'steps read dark to light'
-        : `not monotone: ${lightnesses.map((l) => l.toFixed(3)).join(', ')}`,
+    detail: monotoneDetail(descending, ascending, lightnesses),
   });
 
   // Adjacent gaps. Filtered on the raw gap rather than a rounded one, so a gap
