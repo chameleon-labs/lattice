@@ -24,7 +24,7 @@ const tokens = load('../../tokens/package.json');
 
 describe('lattice-react package boundary', () => {
   it('declares React, Ariakit and the token package as peers', () => {
-    expect(Object.keys(react.peerDependencies ?? {}).sort()).toEqual([
+    expect(Object.keys(react.peerDependencies ?? {}).toSorted()).toEqual([
       '@ariakit/react',
       '@chameleon-labs/lattice-tokens',
       'react',

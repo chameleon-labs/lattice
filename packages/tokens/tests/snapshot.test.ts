@@ -36,7 +36,7 @@ describe('the emitted artefacts', () => {
   });
 
   it('matches the committed token shape', async () => {
-    const paths = tokenPaths(emitTokens()).sort();
+    const paths = tokenPaths(emitTokens()).toSorted();
 
     await expect(`${paths.join('\n')}\n`).toMatchFileSnapshot('__snapshots__/tokens.paths.txt');
   });

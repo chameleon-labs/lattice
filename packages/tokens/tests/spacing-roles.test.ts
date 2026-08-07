@@ -42,7 +42,7 @@ describe('spacing roles', () => {
     const sizes = (['surface-sm', 'surface-md', 'surface-lg', 'surface-xl'] as const).map(
       (r) => SPACES[INSET_ROLES[r]].multiplier,
     );
-    expect(sizes).toEqual([...sizes].sort((a, b) => a - b));
+    expect(sizes).toEqual([...sizes].toSorted((a, b) => a - b));
     expect(new Set(sizes).size).toBe(sizes.length);
   });
 
@@ -132,7 +132,9 @@ describe('the emitted spacing roles', () => {
       if (typeof value === 'string') {
         referenced.push(value);
       } else {
-        for (const child of Object.values(record)) walk(child);
+        for (const child of Object.values(record)) {
+          walk(child);
+        }
       }
     };
     walk(spacingRoleTokens());

@@ -7,7 +7,7 @@ import type {Page} from '@playwright/test';
  * reading it back through a canvas gives channels, which are what we actually
  * mean.
  */
-export async function channelsOf(page: Page, selector: string): Promise<{r: number; g: number; b: number}> {
+export function channelsOf(page: Page, selector: string): Promise<{r: number; g: number; b: number}> {
   return page
     .locator(selector)
     .first()

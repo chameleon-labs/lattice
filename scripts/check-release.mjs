@@ -20,7 +20,7 @@ import {dirname, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
-const releaseTag = process.argv[2];
+const [, , releaseTag] = process.argv;
 
 const problems = [];
 const fail = (where, message) => problems.push(`${where}: ${message}`);
@@ -49,7 +49,7 @@ const packagesDir = join(repoRoot, 'packages');
 const packageDirs = readdirSync(packagesDir, {withFileTypes: true})
   .filter((entry) => entry.isDirectory())
   .map((entry) => entry.name)
-  .sort();
+  .toSorted();
 
 if (packageDirs.length === 0) {
   fail('packages/', 'no packages found');

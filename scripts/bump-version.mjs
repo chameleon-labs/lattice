@@ -44,7 +44,7 @@ const BUMPS = [
 
 const args = process.argv.slice(2);
 const selfTest = args.includes('--self-test');
-const bump = args[0];
+const [bump] = args;
 const dryRun = args.includes('--dry-run');
 const preidIndex = args.indexOf('--preid');
 const preid = preidIndex === -1 ? 'rc' : args[preidIndex + 1];
@@ -200,7 +200,7 @@ const manifests = readdirSync(packagesDir, {withFileTypes: true})
   .filter((entry) => entry.isDirectory())
   .map((entry) => join(packagesDir, entry.name, 'package.json'))
   .filter((path) => JSON.parse(readFileSync(path, 'utf8')).private !== true)
-  .sort();
+  .toSorted();
 
 if (manifests.length === 0) {
   console.error('no publishable packages found');
@@ -213,7 +213,7 @@ if (current.length > 1) {
   process.exit(1);
 }
 
-const from = current[0];
+const [from] = current;
 const to = next(from, bump);
 
 if (to === from) {

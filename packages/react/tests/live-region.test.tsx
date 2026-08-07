@@ -37,7 +37,9 @@ describe('LiveRegion', () => {
     rerender(<LiveRegion message="Fetching the page" />);
     rerender(<LiveRegion message="Fetching the page" />);
 
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    await new Promise((resolve) => {
+      setTimeout(resolve, 20);
+    });
 
     expect(mutations).not.toHaveBeenCalled();
 

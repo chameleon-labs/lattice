@@ -30,7 +30,7 @@ const componentDirectories = (): string[] =>
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
     .filter((name) => !NON_COMPONENT_DIRECTORIES.has(name))
-    .sort();
+    .toSorted();
 
 /**
  * Every value a component family's own module exports at runtime — a

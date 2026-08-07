@@ -44,7 +44,7 @@ describe('findColourLiterals', () => {
 describe('findTokenReferences', () => {
   it('returns every referenced custom property once', () => {
     const css = `.a { color: var(--lat-text); background: var(--lat-bg); outline-color: var(--lat-text); }`;
-    expect(findTokenReferences(css).sort()).toEqual(['--lat-bg', '--lat-text']);
+    expect(findTokenReferences(css).toSorted()).toEqual(['--lat-bg', '--lat-text']);
   });
 
   it('ignores private component properties', () => {
@@ -142,7 +142,7 @@ describe('findBlockSelectors', () => {
       .lat-field__label { color: green; }
       .lat-card { color: teal; }
     `;
-    expect(findBlockSelectors(css).sort()).toEqual(['.lat-button', '.lat-card']);
+    expect(findBlockSelectors(css).toSorted()).toEqual(['.lat-button', '.lat-card']);
   });
 
   // Dialog and Menu redeclare their block inside the no-preference query to add

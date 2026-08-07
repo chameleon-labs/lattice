@@ -22,7 +22,7 @@ describe('typography primitives', () => {
   });
 
   it('carries the four weights the Figma bundle uses', () => {
-    expect(Object.values(FONT_WEIGHTS).sort()).toEqual([400, 500, 600, 700]);
+    expect(Object.values(FONT_WEIGHTS).toSorted()).toEqual([400, 500, 600, 700]);
   });
 
   it('emits tracking in em, not rem', () => {

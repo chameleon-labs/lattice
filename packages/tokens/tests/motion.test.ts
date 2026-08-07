@@ -105,6 +105,6 @@ describe('Lattice motion presets', () => {
   });
 
   it('carries out and in-out, and no spring curve', () => {
-    expect(Object.keys(EASINGS).sort()).toEqual(['in-out', 'out']);
+    expect(Object.keys(EASINGS).toSorted()).toEqual(['in-out', 'out']);
   });
 });

@@ -43,11 +43,12 @@ const stubRequest = (
   return {request: {get} as unknown as APIRequestContext, get};
 };
 
-const ok = async () => ({
-  ok: () => true,
-  status: () => 200,
-  json: async () => INDEX,
-});
+const ok = (): Promise<{ok: () => boolean; status: () => number; json: () => Promise<unknown>}> =>
+  Promise.resolve({
+    ok: () => true,
+    status: () => 200,
+    json: () => Promise.resolve(INDEX),
+  });
 
 beforeEach(() => {
   vi.resetModules();
@@ -93,10 +94,10 @@ describe('the story index cache', () => {
     const {fetchStories} = await import('./browser/support/stories.js');
 
     let attempt = 0;
-    const {request, get} = stubRequest(async () => {
+    const {request, get} = stubRequest(() => {
       attempt += 1;
       if (attempt === 1) {
-        throw new Error('read ECONNRESET');
+        return Promise.reject(new Error('read ECONNRESET'));
       }
       return ok();
     });
@@ -111,11 +112,13 @@ describe('the story index cache', () => {
 
   it('reports a non-ok response rather than parsing it', async () => {
     const {fetchStories} = await import('./browser/support/stories.js');
-    const {request} = stubRequest(async () => ({
-      ok: () => false,
-      status: () => 503,
-      json: async () => ({}),
-    }));
+    const {request} = stubRequest(() =>
+      Promise.resolve({
+        ok: () => false,
+        status: () => 503,
+        json: () => Promise.resolve({}),
+      }),
+    );
 
     await expect(fetchStories(request)).rejects.toThrow('503');
   });

@@ -48,7 +48,7 @@ export const findTokenReferences = (css: string): string[] => {
   const names = new Set<string>();
 
   for (const match of stripComments(css).matchAll(/var\(\s*(--lat-[a-z0-9-]+)/g)) {
-    const name = match[1];
+    const [, name] = match;
     if (name !== undefined) {
       names.add(name);
     }

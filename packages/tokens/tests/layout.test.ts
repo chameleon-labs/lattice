@@ -42,7 +42,7 @@ describe('layout primitive contracts', () => {
     const values: readonly number[] = Object.values(BREAKPOINTS);
 
     expect(new Set(values).size).toBe(values.length);
-    expect(values).toEqual([...values].sort((left, right) => left - right));
+    expect(values).toEqual([...values].toSorted((left, right) => left - right));
   });
 
   it('keeps containers finite and omits a full token', () => {

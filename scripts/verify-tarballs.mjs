@@ -64,7 +64,7 @@ const packagesDir = join(repoRoot, 'packages');
 const packageDirs = readdirSync(packagesDir, {withFileTypes: true})
   .filter((entry) => entry.isDirectory())
   .map((entry) => entry.name)
-  .sort();
+  .toSorted();
 
 const packed = [];
 

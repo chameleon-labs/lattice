@@ -25,7 +25,7 @@ describe('published surface', () => {
   });
 
   it('exports the barrel, the stylesheet and package.json', () => {
-    expect(Object.keys(pkg.exports ?? {}).sort()).toEqual(['.', './package.json', './styles.css']);
+    expect(Object.keys(pkg.exports ?? {}).toSorted()).toEqual(['.', './package.json', './styles.css']);
   });
 
   it('points every export at dist, except package.json itself', () => {

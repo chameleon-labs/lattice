@@ -333,7 +333,7 @@ export function validateSequential(
   });
 
   // The palest end still has to read as a mark against the surface.
-  const byLightness = [...palette].sort((a, b) => a.l - b.l);
+  const byLightness = [...palette].toSorted((a, b) => a.l - b.l);
   const palest = mode === 'light' ? byLightness.at(-1)! : byLightness[0]!;
   const ratio = contrastRatio(parseHex(palest.hex), parseHex(surface));
   checks.push({

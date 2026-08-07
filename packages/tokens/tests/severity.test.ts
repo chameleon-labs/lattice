@@ -47,11 +47,11 @@ describe('severity tints', () => {
     for (const mode of MODES) {
       const roles = resolveSeverityTints(mode)
         .map((t) => t.role)
-        .sort();
+        .toSorted();
       expect(roles).toEqual(
         ['critical', 'serious', 'moderate']
           .flatMap((level) => [`severity-${level}-tint`, `severity-${level}-tint-border`])
-          .sort(),
+          .toSorted(),
       );
       for (const t of resolveSeverityTints(mode)) {
         expect(t.value).toMatch(/^rgb\(\d+ \d+ \d+ \/ 0\.(1|2)\)$/);

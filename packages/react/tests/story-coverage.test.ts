@@ -77,7 +77,7 @@ const exportedComponents = (): string[] => {
     }
   }
 
-  return [...names].sort();
+  return [...names].toSorted();
 };
 
 /**
@@ -95,7 +95,7 @@ const componentDirectories = (): string[] =>
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
     .filter((name) => !NON_COMPONENT_DIRECTORIES.has(name))
-    .sort();
+    .toSorted();
 
 describe('story coverage', () => {
   it('finds the barrel and the stories, so the assertions below are not vacuous', () => {

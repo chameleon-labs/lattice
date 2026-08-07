@@ -38,7 +38,7 @@ export function storyFamilies(): string[] {
       .filter((entry) => entry.name !== 'pages')
       .filter((entry) => readdirSync(new URL(`${entry.name}/`, src)).some((file) => file.endsWith('.stories.tsx')))
       .map((entry) => entry.name)
-      .sort()
+      .toSorted()
   );
 }
 
@@ -63,7 +63,7 @@ export function storyFamilies(): string[] {
 let indexRequest: Promise<StoryEntry[]> | undefined;
 
 /** Every entry Storybook indexed as a story, in index order. */
-export async function fetchStories(request: APIRequestContext): Promise<StoryEntry[]> {
+export function fetchStories(request: APIRequestContext): Promise<StoryEntry[]> {
   indexRequest ??= loadStories(request).catch((error: unknown) => {
     indexRequest = undefined;
     throw error;
@@ -139,7 +139,12 @@ export const THEMES = ['light', 'dark'] as const;
  */
 export async function settle(page: Page): Promise<void> {
   await page.evaluate(async () => {
-    const frame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    const frame = (): Promise<void> =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => {
+          resolve();
+        });
+      });
 
     for (let round = 0; round < 3; round += 1) {
       await frame();

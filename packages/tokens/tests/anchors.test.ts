@@ -37,12 +37,12 @@ describe('anchors', () => {
     for (const mode of MODES) {
       const grayRoles = resolveGray(mode)
         .map((s) => s.role)
-        .sort();
-      expect(grayRoles).toEqual(Object.keys(GRAY_ANCHORS[mode]).sort());
+        .toSorted();
+      expect(grayRoles).toEqual(Object.keys(GRAY_ANCHORS[mode]).toSorted());
       const solids = resolveSolids(mode)
         .map((s) => s.scale)
-        .sort();
-      expect(solids).toEqual(Object.keys(SOLID_ANCHORS).sort());
+        .toSorted();
+      expect(solids).toEqual(Object.keys(SOLID_ANCHORS).toSorted());
     }
   });
 });
