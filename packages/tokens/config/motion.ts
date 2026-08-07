@@ -1,33 +1,26 @@
 /**
- * Theme-independent motion primitives.
+ * Values are stored unformatted — a bare number of milliseconds, a bare
+ * `cubic-bezier()` tuple — so the CSS and DTCG emitters format one source rather
+ * than parse strings.
  *
- * Durations are stored as the numeric part of a `ms` duration and easings as the
- * four-number tuple a `cubic-bezier()` takes, so the CSS and DTCG emitters format
- * the same source without parsing strings.
- *
- * What this file does **not** carry is reduced-motion behavior. Honouring
- * `prefers-reduced-motion` means removing transform and positional movement while
- * keeping opacity and colour feedback, and that is a decision about which
- * property a component transitions — something a value cannot know. It belongs to
- * the component layer, tracked on #11.
+ * Reduced-motion behaviour is deliberately not here. Honouring
+ * `prefers-reduced-motion` means dropping transform and positional movement
+ * while keeping opacity and colour, which is a decision about *which property*
+ * a component transitions and cannot be expressed as a value. See #11.
  */
 
 /** The four control-point components a `cubic-bezier()` takes. */
 export type EasingCurve = readonly [number, number, number, number]
 
 /**
- * Motion.
- *
  * The Figma bundle's five presets, from its documentation site's motion section.
  *
- * `expressive` is a duration and nothing else. Its listed easing is "spring",
- * which no CSS timing function reproduces, and Lattice does not take a
- * JavaScript animation dependency to provide one. The token records the 500ms
- * intent; a caller wanting true spring behaviour brings its own library. No
- * component in this system uses it.
+ * `expressive` is a duration with no easing: the bundle lists "spring", which no
+ * CSS timing function reproduces and which is not worth a JavaScript animation
+ * dependency. The token records the 500ms intent and nothing here uses it.
  *
- * `instant` exists so a state change that must not animate can say so with a
- * token, rather than by omitting one.
+ * `instant` exists so "must not animate" can be said with a token rather than by
+ * omitting one.
  */
 export const DURATIONS = {
   instant: 0,

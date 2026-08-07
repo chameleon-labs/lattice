@@ -1,34 +1,22 @@
 /**
- * Semantic spacing roles — tier 2 of the spacing layer.
+ * Extracted from the component stylesheets rather than designed ahead of them: a
+ * draft `--lat-inset-sm|md|lg` failed on the first component written against it,
+ * because two axes climbing one three-step scale collide at the top.
  *
- * Extracted from the component stylesheets rather than designed ahead of them,
- * because a draft that specified `--lat-inset-sm|md|lg` before any component
- * existed failed on the first one written against it: two axes climbing one
- * three-step scale collide at the top, and the largest size repeats a value.
+ * Three families, each answering a different question:
  *
- * What the measurement showed instead is three families, each answering a
- * different question:
+ * - **label** — room for a short label. Inline leads block by two steps at every
+ *   rung, a short string reading as cramped long before a paragraph does.
+ * - **row** — room for a row in a list. Inline leads by one, a row already being
+ *   bounded by its siblings.
+ * - **surface** — room a container gives its children. Symmetric.
  *
- * - **label** — how much room an element gives a short label. Inline leads
- *   block by two steps at every rung, because a short string reads as cramped
- *   long before a paragraph does.
- * - **row** — how much room a row in a list gives its content. Inline leads by
- *   one, because a row is already bounded by its siblings.
- * - **surface** — how much room a container gives its children. Symmetric.
+ * `label` and `row` are not neighbours on one scale — they encode a difference
+ * in kind, which is what stops a menu item reaching for a button's inset.
+ * `label` is named for what its consumers share, a short string needing
+ * horizontal room, rather than for interactivity: two of the seven are headers.
  *
- * The label/row split is the useful part: they are not neighbours on one
- * scale, they encode a difference in kind, and naming them by purpose is what
- * stops a menu item reaching for a button's inset.
- *
- * `label` was called `control` until the migration was already written, which
- * is when it became clear the name did not fit its own consumers: two of the
- * seven are headers rather than controls — `.lat-table__header` is a `<th>`
- * and `.lat-card__header` a `<div>` wrapping `.lat-card__label`. What every
- * consumer shares is a short label needing horizontal room, not interactivity.
- * The grouping was right and the name was wrong.
- *
- * Values are primitive *names*, not numbers, so a change to `SPACES` flows
- * through every role rather than being restated here.
+ * Values are primitive *names*, so a change to `SPACES` flows through.
  */
 import type { SpaceName } from './layout.js'
 
@@ -46,11 +34,9 @@ export const INSET_ROLES = {
   'row-md': ['3', '4'],
 
   /**
-   * Only `sm` and `md` repeat across the library; `lg` and `xl` are used once
-   * each. They exist anyway because the alternative — snapping Dialog from
-   * space-6 to space-5 so a rung earns its place — changes rendering to tidy a
-   * token table. A single-use rung on an ordered scale is defensible in a way a
-   * single-use pair would not be.
+   * `lg` and `xl` are used once each. They exist anyway: the alternative —
+   * snapping Dialog from space-6 to space-5 so a rung earns its place — changes
+   * rendering to tidy a token table.
    */
   'surface-sm': '3',
   'surface-md': '4',

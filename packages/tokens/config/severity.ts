@@ -1,17 +1,12 @@
 /**
- * The severity ramp.
- *
- * Taken from the impact badges on the Figma bundle's tabstop landing page. `minor`
- * carries no colour of its own — it uses `--lat-text-subtle`, which is what the
+ * Taken from the impact badges on the Figma bundle's tabstop landing page.
+ * `minor` carries no colour of its own — it uses `--lat-text-subtle`, as the
  * bundle does — so it is not anchored here.
  *
- * ## The rule that makes this safe
- *
- * Colour never carries severity alone. Every severity indicator ships an icon
- * **and** a text label. That is a hard rule, not a recommendation. The lightness
- * ordering below is a safety net for when hue fails — `serious` at hue 56 and
- * `moderate` at hue 84 are 28 degrees apart, which protanopia and deuteranopia
- * do not preserve — and the net is not the defence.
+ * Colour never carries severity alone: every severity indicator ships an icon
+ * **and** a text label, as a hard rule. The lightness ordering is only the
+ * safety net for when hue fails — `serious` at hue 56 and `moderate` at 84 are
+ * 28 degrees apart, which protanopia and deuteranopia do not preserve.
  */
 import type { Mode } from './modes.js'
 
@@ -49,15 +44,10 @@ export const SEVERITY_ANCHORS: Record<Mode, Record<SeverityLevel, string | undef
  * | critical | 0.678 | 0.556 | −0.122 |
  * | serious | 0.758 | 0.646 | **−0.112** |
  *
- * `serious` is the basis because it is `moderate`'s neighbour in both the ramp
- * and the colour wheel — serious sits at hue 56 and moderate at 84, both warm,
- * while critical is red at 16. How far a colour can drop in lightness between
- * modes depends on how much gamut headroom its hue has, so extrapolating from
- * the nearest hue is the smaller leap. Using critical's −0.122 instead would
- * put the derived value at L ≈ 0.715.
- *
- * Applied to dark `moderate` to place its light counterpart, so the derived
- * value sits where the palette's own arithmetic puts it rather than where it
- * looked right.
+ * `serious` is the basis because it neighbours `moderate` in both the ramp and
+ * the colour wheel — 56 and 84, both warm, where critical is red at 16 — and how
+ * far a hue can drop between modes depends on its gamut headroom, so the nearest
+ * hue is the smaller leap. Critical's −0.122 would put the derived value at
+ * L ≈ 0.715 instead.
  */
 export const LIGHT_LIGHTNESS_DELTA = -0.112
