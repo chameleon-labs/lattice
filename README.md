@@ -162,10 +162,7 @@ Both packages ship at one version, and releasing is one button: **Actions → Cu
 
 **Only repository members can start one.** Both triggers — `workflow_dispatch` and pushing a `v*` tag — require write access, enforced by GitHub rather than by anything in the workflow; a fork or an outside contributor cannot reach either. The `npm-publish` environment on the release job is where that tightens further: add required reviewers in *Settings → Environments* and every release waits for an approval, with no change to the workflow. `NPM_TOKEN` belongs to that environment rather than to the repository at large, so no other workflow can read it.
 
-Two things about the automation are worth knowing, because both are surprising:
-
-- **A tag pushed by Actions does not trigger the release.** GitHub suppresses workflow events raised by the default `GITHUB_TOKEN` so a workflow cannot trigger itself in a loop, so `on: push: tags` never fires for it. `workflow_dispatch` is a documented exception, so `cut-release.yml` tags *and then dispatches* `release.yml` explicitly. A tag pushed from a laptop still triggers it the ordinary way — both paths work, for different reasons.
-- **The version bump is pushed straight to `main`.** The branch ruleset requires pull requests, so that push is made by the `lattice-release` GitHub App rather than by Actions' own token — [`cut-release.yml`](./.github/workflows/cut-release.yml) explains why and how.
+One thing about the automation is worth knowing: **the version bump and the tag are pushed by the `lattice-release` GitHub App, not by Actions' own token.** A direct push to `main` is not a pull request, and `GITHUB_TOKEN` cannot hold the ruleset bypass that lets one through. Because the tag arrives from a different credential, `on: push: tags` fires normally and that is what starts `release.yml`; the `workflow_dispatch` trigger there is for re-running a release against a tag that already exists. [`cut-release.yml`](./.github/workflows/cut-release.yml) has the detail.
 
 The manual path still works if you would rather do it yourself — bump both manifests, commit, then `git tag v0.1.0-rc.1 && git push origin v0.1.0-rc.1`.
 
