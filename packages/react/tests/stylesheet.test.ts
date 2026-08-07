@@ -77,4 +77,12 @@ describe('the shipped stylesheet', () => {
     // mentions @import, and a comment is not a request.
     expect(css).not.toMatch(/^\s*@import/m)
   })
+
+  it('ships no acceptance-fixture styles', () => {
+    const fixtureSelectors = [...css.matchAll(/\.(landing-page|system-page)[\w-]*/g)].map(
+      (match) => match[0]
+    )
+
+    expect([...new Set(fixtureSelectors)]).toEqual([])
+  })
 })

@@ -5,6 +5,7 @@ import { useLayoutEffect } from 'react'
 // it, so it has to be present before the component stylesheet is applied.
 import '@chameleon-labs/lattice-tokens/lattice.css'
 import '../src/styles.css'
+import '../src/pages/pages.css'
 import './preview.css'
 
 /**

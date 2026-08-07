@@ -11,6 +11,14 @@
  * scripts/assemble-css.ts, which the build and the contract tests share.
  * Order is alphabetical and carries no cascade meaning:
  * no rule here depends on another family's specificity.
+ *
+ * `pages/pages.css` is deliberately absent. It styles the two acceptance
+ * fixtures — the landing page and the system page — which exist to be swept by
+ * axe, not to be imported: `index.ts` exports nothing from `pages/`, and the
+ * `exports` map has no wildcard, so no consumer can reach that markup. Shipping
+ * its stylesheet anyway made it 63KB of a 114KB download, more than half of
+ * every consumer's CSS spent on two pages they cannot use. Storybook loads it
+ * from `.storybook/preview.tsx` instead, where the fixtures actually live.
  */
 
 /* The base layer comes first and is the one @import whose position carries
@@ -29,7 +37,6 @@
 @import './input/input.css';
 @import './live-region/live-region.css';
 @import './menu/menu.css';
-@import './pages/pages.css';
 @import './progress/progress.css';
 @import './segmented-control/segmented-control.css';
 @import './stat/stat.css';
