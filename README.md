@@ -165,7 +165,7 @@ Both packages ship at one version, and releasing is one button: **Actions → Cu
 Two things about the automation are worth knowing, because both are surprising:
 
 - **A tag pushed by Actions does not trigger the release.** GitHub suppresses workflow events raised by the default `GITHUB_TOKEN` so a workflow cannot trigger itself in a loop, so `on: push: tags` never fires for it. `workflow_dispatch` is a documented exception, so `cut-release.yml` tags *and then dispatches* `release.yml` explicitly. A tag pushed from a laptop still triggers it the ordinary way — both paths work, for different reasons.
-- **A bot commits the version bump straight to `main`**, so if `main` is protected the push needs an exemption.
+- **The version bump is pushed straight to `main`.** The branch ruleset requires pull requests, so that push is made by the `lattice-release` GitHub App rather than by Actions' own token — [`cut-release.yml`](./.github/workflows/cut-release.yml) explains why and how.
 
 The manual path still works if you would rather do it yourself — bump both manifests, commit, then `git tag v0.1.0-rc.1 && git push origin v0.1.0-rc.1`.
 

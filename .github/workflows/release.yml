@@ -21,10 +21,16 @@ name: Release
 on:
   push:
     tags: ['v*']
-  # Dispatched by cut-release.yml, which is the normal path. A tag it pushes
-  # with the default GITHUB_TOKEN does not fire the `push` trigger above —
-  # GitHub suppresses that so a workflow cannot trigger itself into a loop — so
-  # the release is started explicitly instead.
+  # The manual path: re-running a release against a tag that already exists,
+  # after fixing whatever made the first attempt fail.
+  #
+  # It is no longer how `cut-release.yml` starts a release. That used to dispatch
+  # this workflow explicitly, because a tag pushed with GITHUB_TOKEN does not
+  # fire the `push` trigger above — GitHub suppresses events raised by that token
+  # so a workflow cannot loop. `cut-release` now pushes with a GitHub App
+  # installation token, which is not GITHUB_TOKEN and does fire it, so the tag
+  # event is the normal path again and dispatching as well would start the same
+  # release twice.
   workflow_dispatch:
     inputs:
       tag:
