@@ -1,12 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Button } from '../button/button.js'
-import {
-  Dialog,
-  DialogDisclosure,
-  DialogDismiss,
-  DialogHeading,
-  DialogProvider
-} from './dialog.js'
+import type {Meta, StoryObj} from '@storybook/react-vite';
+import {Button} from '../button/button.js';
+import {Dialog, DialogDisclosure, DialogDismiss, DialogHeading, DialogProvider} from './dialog.js';
 
 /**
  * Focus trapped, focus returned, scroll locked, labelled — all four owned by
@@ -21,14 +15,14 @@ import {
 const meta = {
   title: 'Components/Dialog',
   component: Dialog,
-  tags: ['autodocs']
-} satisfies Meta<typeof Dialog>
+  tags: ['autodocs'],
+} satisfies Meta<typeof Dialog>;
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
-function Confirmation() {
+function Confirmation(): React.JSX.Element {
   return (
     <>
       <DialogHeading>Remove this page?</DialogHeading>
@@ -38,7 +32,7 @@ function Confirmation() {
         <DialogDismiss render={<Button variant="destructive" />}>Remove</DialogDismiss>
       </div>
     </>
-  )
+  );
 }
 
 /** The trigger alone. Opening it is what the browser tests do. */
@@ -50,8 +44,8 @@ export const Closed: Story = {
         <Confirmation />
       </Dialog>
     </DialogProvider>
-  )
-}
+  ),
+};
 
 /**
  * Open on arrival, so the accessibility sweep actually scans the dialog surface.
@@ -68,5 +62,5 @@ export const Open: Story = {
         <Confirmation />
       </Dialog>
     </DialogProvider>
-  )
-}
+  ),
+};

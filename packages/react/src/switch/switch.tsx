@@ -1,6 +1,7 @@
-import { Checkbox as AriakitCheckbox, type CheckboxProps } from '@ariakit/react'
+/* oxlint-disable jsx-a11y/role-has-required-aria-props -- native checkbox: the browser maps its `checked` to `aria-checked`. */
+import {Checkbox as AriakitCheckbox, type CheckboxProps} from '@ariakit/react';
 
-export type SwitchProps = CheckboxProps
+export type SwitchProps = CheckboxProps;
 
 /**
  * A binary control whose state is not a colour.
@@ -19,12 +20,14 @@ export type SwitchProps = CheckboxProps
  * and both track states rendered identically until switch.css added an
  * explicit repaint, because a moving-but-invisible thumb is not a visible cue.
  */
-export function Switch({ className, ...props }: SwitchProps) {
+export function Switch({className, ...props}: SwitchProps): React.JSX.Element {
   return (
+    // oxlint-disable-next-line jsx-a11y/role-has-required-aria-props -- native
+    // checkbox: the browser maps its `checked` to `aria-checked`.
     <AriakitCheckbox
       {...props}
       role="switch"
       className={className === undefined ? 'lat-switch' : `lat-switch ${className}`}
     />
-  )
+  );
 }

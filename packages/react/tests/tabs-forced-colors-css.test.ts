@@ -17,29 +17,32 @@
  * covers the non-forced-colors rule, so neither would catch the
  * `@media (forced-colors: active)` block going missing.
  */
-import { fileURLToPath } from 'node:url'
-import { describe, expect, it } from 'vitest'
-import { assembleCss } from '../scripts/assemble-css.js'
+import {fileURLToPath} from 'node:url';
+import {describe, expect, it} from 'vitest';
+import {assembleCss} from '../scripts/assemble-css.js';
 
-const css = await assembleCss(fileURLToPath(new URL('../src/styles.css', import.meta.url)))
+const css = await assembleCss(fileURLToPath(new URL('../src/styles.css', import.meta.url)));
 
 function escapeRegExp(text: string): string {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /** Extracts a `{ ... }` body with balanced-brace matching, unlike a `[^}]*`
  * regex, which breaks the moment the body contains a nested block — as
  * `@media` blocks always do. */
 function balancedBlock(source: string, openBraceIndex: number): string {
-  let depth = 0
+  let depth = 0;
   for (let i = openBraceIndex; i < source.length; i++) {
-    if (source[i] === '{') depth++
-    else if (source[i] === '}') {
-      depth--
-      if (depth === 0) return source.slice(openBraceIndex + 1, i)
+    if (source[i] === '{') {
+      depth++;
+    } else if (source[i] === '}') {
+      depth--;
+      if (depth === 0) {
+        return source.slice(openBraceIndex + 1, i);
+      }
     }
   }
-  throw new Error('unbalanced braces: no matching closing brace found')
+  throw new Error('unbalanced braces: no matching closing brace found');
 }
 
 // More than one component in this package declares its own
@@ -50,42 +53,42 @@ function balancedBlock(source: string, openBraceIndex: number): string {
 // a regex anchored to the first occurrence would silently start reading a
 // sibling component's block once a second (or third) one existed.
 function mediaBlock(query: string): string {
-  const pattern = new RegExp(`${escapeRegExp(query)}\\s*\\{`, 'g')
-  const blocks: string[] = []
+  const pattern = new RegExp(`${escapeRegExp(query)}\\s*\\{`, 'g');
+  const blocks: string[] = [];
 
   for (const match of css.matchAll(pattern)) {
-    blocks.push(balancedBlock(css, (match.index ?? 0) + match[0].length - 1))
+    blocks.push(balancedBlock(css, (match.index ?? 0) + match[0].length - 1));
   }
 
   if (blocks.length === 0) {
-    throw new Error(`no ${query} block found in the assembled stylesheet`)
+    throw new Error(`no ${query} block found in the assembled stylesheet`);
   }
 
-  return blocks.join('\n')
+  return blocks.join('\n');
 }
 
 function block(source: string, selector: string): string {
-  const pattern = new RegExp(`${escapeRegExp(selector)}\\s*\\{([^}]*)\\}`)
-  const match = pattern.exec(source)
+  const pattern = new RegExp(`${escapeRegExp(selector)}\\s*\\{([^}]*)\\}`);
+  const match = pattern.exec(source);
   if (match === null) {
-    throw new Error(`no ${selector} block found`)
+    throw new Error(`no ${selector} block found`);
   }
-  return match[1] ?? ''
+  return match[1] ?? '';
 }
 
 describe("Tabs' forced-colors fallback", () => {
   it('declares a forced-colors block', () => {
-    expect(css).toMatch(/@media \(forced-colors: active\)\s*\{/)
-  })
+    expect(css).toMatch(/@media \(forced-colors: active\)\s*\{/);
+  });
 
   it('gives the selected tab a forced border-colour, adjusted so the UA keeps it', () => {
-    const media = mediaBlock('@media (forced-colors: active)')
-    const rule = block(media, ".lat-tab[aria-selected='true']")
+    const media = mediaBlock('@media (forced-colors: active)');
+    const rule = block(media, ".lat-tab[aria-selected='true']");
 
-    expect(rule).toContain('border-bottom-color: Highlight;')
+    expect(rule).toContain('border-bottom-color: Highlight;');
     // forced-color-adjust: none is what stops the UA overriding Highlight
     // straight back to whatever it would otherwise force border-color to —
     // without it the block above is a no-op.
-    expect(rule).toContain('forced-color-adjust: none;')
-  })
-})
+    expect(rule).toContain('forced-color-adjust: none;');
+  });
+});

@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef, ReactNode } from 'react'
+import type {ComponentPropsWithRef, ReactNode} from 'react';
 
 /**
  * The six chromatic scales, a neutral default, and the four severity levels.
@@ -25,23 +25,22 @@ export type BadgeVariant =
   | 'critical'
   | 'serious'
   | 'moderate'
-  | 'minor'
+  | 'minor';
 
 export interface BadgeOptions {
-  variant?: BadgeVariant
+  variant?: BadgeVariant;
 }
 
 // `children` is required rather than optional, which is the whole guarantee:
 // a badge that signalled by colour alone cannot be written.
-export type BadgeProps = Omit<ComponentPropsWithRef<'span'>, 'children'> &
-  BadgeOptions & { children: ReactNode }
+export type BadgeProps = Omit<ComponentPropsWithRef<'span'>, 'children'> & BadgeOptions & {children: ReactNode};
 
-export function Badge({ variant = 'default', className, ...props }: BadgeProps) {
+export function Badge({variant = 'default', className, ...props}: BadgeProps): React.JSX.Element {
   return (
     <span
       {...props}
       className={className === undefined ? 'lat-badge' : `lat-badge ${className}`}
       data-variant={variant}
     />
-  )
+  );
 }

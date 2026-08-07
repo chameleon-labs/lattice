@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import {readFileSync} from 'node:fs';
 
 /**
  * Turns the tokens package's contrast ledger into the set of `color-contrast`
@@ -35,31 +35,31 @@ import { readFileSync } from 'node:fs'
 
 /** Mirrors `LedgerEntry` from `packages/tokens/generate/report.ts`. */
 interface LedgerEntry {
-  readonly name: string
-  readonly text: string
-  readonly background: string
-  readonly ratio: number
-  readonly apca: number
-  readonly minimum: number
-  readonly passes: boolean
+  readonly name: string;
+  readonly text: string;
+  readonly background: string;
+  readonly ratio: number;
+  readonly apca: number;
+  readonly minimum: number;
+  readonly passes: boolean;
 }
 
 function loadLedger(): LedgerEntry[] {
-  const url = new URL('../../../../tokens/dist/contrast-ledger.json', import.meta.url)
+  const url = new URL('../../../../tokens/dist/contrast-ledger.json', import.meta.url);
 
-  let raw: string
+  let raw: string;
   try {
-    raw = readFileSync(url, 'utf8')
+    raw = readFileSync(url, 'utf8');
   } catch (cause) {
     throw new Error(
       'contrast-ledger.json is missing. Run `pnpm --filter @chameleon-labs/lattice-tokens ' +
         'build` before the react a11y sweep — it emits dist/contrast-ledger.json alongside ' +
         'dist/lattice.css, which Storybook already needs to render at all.',
-      { cause }
-    )
+      {cause},
+    );
   }
 
-  return JSON.parse(raw) as LedgerEntry[]
+  return JSON.parse(raw) as LedgerEntry[];
 }
 
 /**
@@ -86,30 +86,32 @@ function loadLedger(): LedgerEntry[] {
  * its floored value changes.
  */
 export function acceptedContrastFloors(): ReadonlyMap<string, number> {
-  const floors = new Map<string, number>()
+  const floors = new Map<string, number>();
 
   for (const entry of loadLedger()) {
-    if (entry.passes) continue
+    if (entry.passes) {
+      continue;
+    }
 
-    const key = entry.text.toLowerCase()
-    const flooredRatio = Math.floor(entry.ratio * 100) / 100
-    const worst = floors.get(key)
+    const key = entry.text.toLowerCase();
+    const flooredRatio = Math.floor(entry.ratio * 100) / 100;
+    const worst = floors.get(key);
     if (worst === undefined || flooredRatio < worst) {
-      floors.set(key, flooredRatio)
+      floors.set(key, flooredRatio);
     }
   }
 
-  return floors
+  return floors;
 }
 
 /** The subset of an axe `CheckResult["data"]` this module reads. */
 interface ContrastCheckData {
-  readonly fgColor?: string
-  readonly bgColor?: string
-  readonly contrastRatio?: number
-  readonly expectedContrastRatio?: string
-  readonly fontSize?: string
-  readonly fontWeight?: string
+  readonly fgColor?: string;
+  readonly bgColor?: string;
+  readonly contrastRatio?: number;
+  readonly expectedContrastRatio?: string;
+  readonly fontSize?: string;
+  readonly fontWeight?: string;
 }
 
 // Structural, minimal shapes for the slice of `axe-core`'s `Result` type this
@@ -119,37 +121,42 @@ interface ContrastCheckData {
 // `AxeResults['violations']` from `@axe-core/playwright` structurally
 // satisfies this at every call site.
 interface AxeCheckResult {
-  readonly data?: unknown
+  readonly data?: unknown;
 }
 
 interface AxeNodeResult {
-  readonly target: readonly unknown[]
-  readonly any: readonly AxeCheckResult[]
+  readonly target: readonly unknown[];
+  readonly any: readonly AxeCheckResult[];
 }
 
 export interface AxeViolation {
-  readonly id: string
-  readonly impact?: string | null
-  readonly help: string
-  readonly nodes: readonly AxeNodeResult[]
+  readonly id: string;
+  readonly impact?: string | null;
+  readonly help: string;
+  readonly nodes: readonly AxeNodeResult[];
 }
 
 export interface ViolationSummaryEntry {
-  readonly rule: string
-  readonly impact: string | null | undefined
-  readonly help: string
-  readonly targets: readonly string[]
+  readonly rule: string;
+  readonly impact: string | null | undefined;
+  readonly help: string;
+  readonly targets: readonly string[];
 }
 
 /** The first check on a node whose data looks like a contrast measurement. */
 function contrastData(node: AxeNodeResult): ContrastCheckData | undefined {
   for (const check of node.any) {
-    const data = check.data as ContrastCheckData | null | undefined
-    if (data != null && typeof data.fgColor === 'string' && typeof data.contrastRatio === 'number') {
-      return data
+    const data = check.data as ContrastCheckData | null | undefined;
+    if (
+      data !== null &&
+      data !== undefined &&
+      typeof data.fgColor === 'string' &&
+      typeof data.contrastRatio === 'number'
+    ) {
+      return data;
     }
   }
-  return undefined
+  return undefined;
 }
 
 /**
@@ -171,9 +178,9 @@ function contrastData(node: AxeNodeResult): ContrastCheckData | undefined {
  */
 export function summarizeViolations(
   violations: readonly AxeViolation[],
-  floors: ReadonlyMap<string, number>
+  floors: ReadonlyMap<string, number>,
 ): ViolationSummaryEntry[] {
-  const summary: ViolationSummaryEntry[] = []
+  const summary: ViolationSummaryEntry[] = [];
 
   for (const violation of violations) {
     if (violation.id !== 'color-contrast') {
@@ -181,37 +188,37 @@ export function summarizeViolations(
         rule: violation.id,
         impact: violation.impact,
         help: violation.help,
-        targets: violation.nodes.map((node) => node.target.join(' '))
-      })
-      continue
+        targets: violation.nodes.map((node) => node.target.join(' ')),
+      });
+      continue;
     }
 
-    const unaccepted: string[] = []
+    const unaccepted: string[] = [];
 
     for (const node of violation.nodes) {
-      const data = contrastData(node)
-      const target = node.target.join(' ')
+      const data = contrastData(node);
+      const target = node.target.join(' ');
 
       if (data === undefined) {
         // No parseable fg/bg/ratio data to check against the ledger — cannot
         // prove this is an accepted deficiency, so it is not treated as one.
-        unaccepted.push(`${target} — color-contrast violation with no measurable fg/bg data`)
-        continue
+        unaccepted.push(`${target} — color-contrast violation with no measurable fg/bg data`);
+        continue;
       }
 
-      const floor = floors.get(data.fgColor!.toLowerCase())
-      const accepted = floor !== undefined && data.contrastRatio! >= floor
+      const floor = floors.get(data.fgColor!.toLowerCase());
+      const accepted = floor !== undefined && data.contrastRatio! >= floor;
 
       if (!accepted) {
         const reason =
           floor === undefined
             ? 'foreground is not a documented deficiency in the contrast ledger'
-            : `below the ${floor}:1 floor the ledger records for this foreground`
+            : `below the ${floor}:1 floor the ledger records for this foreground`;
 
         unaccepted.push(
           `${target} — fg ${data.fgColor} on bg ${data.bgColor}, measured ${data.contrastRatio}:1, ` +
-            `expected ${data.expectedContrastRatio}, font ${data.fontSize} ${data.fontWeight} (${reason})`
-        )
+            `expected ${data.expectedContrastRatio}, font ${data.fontSize} ${data.fontWeight} (${reason})`,
+        );
       }
     }
 
@@ -220,10 +227,10 @@ export function summarizeViolations(
         rule: violation.id,
         impact: violation.impact,
         help: violation.help,
-        targets: unaccepted
-      })
+        targets: unaccepted,
+      });
     }
   }
 
-  return summary
+  return summary;
 }

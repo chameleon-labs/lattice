@@ -1,11 +1,5 @@
-import {
-  Radio,
-  RadioGroup,
-  RadioProvider,
-  type RadioGroupProps,
-  type RadioProps
-} from '@ariakit/react'
-import type { ReactNode } from 'react'
+import {Radio, RadioGroup, RadioProvider, type RadioGroupProps, type RadioProps} from '@ariakit/react';
+import type {ReactNode} from 'react';
 
 /**
  * Lattice's segmented control.
@@ -15,10 +9,10 @@ import type { ReactNode } from 'react'
  * announces, so it is not a styling choice.
  */
 export interface SegmentedControlProps extends Omit<RadioGroupProps, 'defaultValue'> {
-  defaultValue?: string
-  value?: string
-  setValue?: (value: string) => void
-  children: ReactNode
+  defaultValue?: string;
+  value?: string;
+  setValue?: (value: string) => void;
+  children: ReactNode;
 }
 
 export function SegmentedControl({
@@ -28,7 +22,7 @@ export function SegmentedControl({
   className,
   children,
   ...props
-}: SegmentedControlProps) {
+}: SegmentedControlProps): React.JSX.Element {
   return (
     // Every prop below is spread conditionally: exactOptionalPropertyTypes
     // distinguishes an absent key from one explicitly set to undefined, and
@@ -38,29 +32,25 @@ export function SegmentedControl({
     // SegmentedControlItem requires one, so setValue's adapter narrows back
     // down rather than widening SegmentedControlProps to match the store.
     <RadioProvider
-      {...(defaultValue === undefined ? {} : { defaultValue })}
-      {...(value === undefined ? {} : { value })}
+      {...(defaultValue === undefined ? {} : {defaultValue})}
+      {...(value === undefined ? {} : {value})}
       {...(setValue === undefined
         ? {}
-        : { setValue: (next: string | number | null) => setValue(next === null ? '' : String(next)) })}
+        : {setValue: (next: string | number | null) => setValue(next === null ? '' : String(next))})}
     >
       <RadioGroup
         {...props}
-        className={
-          className === undefined
-            ? 'lat-segmented-control'
-            : `lat-segmented-control ${className}`
-        }
+        className={className === undefined ? 'lat-segmented-control' : `lat-segmented-control ${className}`}
       >
         {children}
       </RadioGroup>
     </RadioProvider>
-  )
+  );
 }
 
 export interface SegmentedControlItemProps extends Omit<RadioProps, 'value'> {
-  value: string
-  children: ReactNode
+  value: string;
+  children: ReactNode;
 }
 
 export function SegmentedControlItem({
@@ -68,17 +58,13 @@ export function SegmentedControlItem({
   className,
   children,
   ...props
-}: SegmentedControlItemProps) {
+}: SegmentedControlItemProps): React.JSX.Element {
   return (
     <label
-      className={
-        className === undefined
-          ? 'lat-segmented-control__item'
-          : `lat-segmented-control__item ${className}`
-      }
+      className={className === undefined ? 'lat-segmented-control__item' : `lat-segmented-control__item ${className}`}
     >
       <Radio {...props} value={value} className="lat-segmented-control__input" />
       <span className="lat-segmented-control__label">{children}</span>
     </label>
-  )
+  );
 }

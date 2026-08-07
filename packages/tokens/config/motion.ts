@@ -10,7 +10,7 @@
  */
 
 /** The four control-point components a `cubic-bezier()` takes. */
-export type EasingCurve = readonly [number, number, number, number]
+export type EasingCurve = readonly [number, number, number, number];
 
 /**
  * The Figma bundle's five presets, from its documentation site's motion section.
@@ -27,8 +27,8 @@ export const DURATIONS = {
   swift: 100,
   default: 200,
   deliberate: 350,
-  expressive: 500
-} as const satisfies Readonly<Record<string, number>>
+  expressive: 500,
+} as const satisfies Readonly<Record<string, number>>;
 
 /**
  * Two curves, because Lattice names two: `ease-out` for entrances and state
@@ -36,8 +36,8 @@ export const DURATIONS = {
  */
 export const EASINGS = {
   out: [0, 0, 0.2, 1],
-  'in-out': [0.4, 0, 0.2, 1]
-} as const satisfies Readonly<Record<string, EasingCurve>>
+  'in-out': [0.4, 0, 0.2, 1],
+} as const satisfies Readonly<Record<string, EasingCurve>>;
 
-export type DurationName = keyof typeof DURATIONS
-export type EasingName = keyof typeof EASINGS
+export type DurationName = keyof typeof DURATIONS;
+export type EasingName = keyof typeof EASINGS;

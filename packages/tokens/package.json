@@ -2,30 +2,30 @@
   "name": "@chameleon-labs/lattice-tokens",
   "version": "0.1.0-rc.1",
   "description": "The token layer of Lattice, an accessibility-first design system. Colour, typography, and layout values are generated from reviewed config; contrast is measured and reported at build time, not gated.",
+  "keywords": [
+    "accessibility",
+    "color",
+    "design-system",
+    "design-tokens",
+    "oklch",
+    "typography",
+    "wcag"
+  ],
+  "homepage": "https://github.com/chameleon-labs/lattice#readme",
+  "bugs": "https://github.com/chameleon-labs/lattice/issues",
   "license": "MIT",
   "author": "George Karan",
-  "homepage": "https://github.com/chameleon-labs/lattice#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/chameleon-labs/lattice.git",
     "directory": "packages/tokens"
   },
-  "bugs": "https://github.com/chameleon-labs/lattice/issues",
-  "keywords": [
-    "design-system",
-    "design-tokens",
-    "color",
-    "typography",
-    "oklch",
-    "accessibility",
-    "wcag"
-  ],
-  "type": "module",
-  "publishConfig": {
-    "access": "public"
-  },
   "files": [
     "dist"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
   ],
   "exports": {
     "./lattice.css": "./dist/lattice.css",
@@ -34,9 +34,9 @@
     "./fonts/*": "./dist/fonts/*",
     "./package.json": "./package.json"
   },
-  "sideEffects": [
-    "**/*.css"
-  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "node ../../scripts/clean.mjs dist && tsc --noEmit && tsx generate/build.ts",
     "prepack": "pnpm build",

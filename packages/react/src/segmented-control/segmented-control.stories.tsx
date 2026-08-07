@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { SegmentedControl, SegmentedControlItem } from './segmented-control.js'
+import type {Meta, StoryObj} from '@storybook/react-vite';
+import {SegmentedControl, SegmentedControlItem} from './segmented-control.js';
 
 /**
  * Built on Ariakit's radio store rather than its tabs: the control selects a
@@ -9,23 +9,23 @@ import { SegmentedControl, SegmentedControlItem } from './segmented-control.js'
 const meta = {
   title: 'Components/SegmentedControl',
   component: SegmentedControl,
-  tags: ['autodocs']
-} satisfies Meta<typeof SegmentedControl>
+  tags: ['autodocs'],
+} satisfies Meta<typeof SegmentedControl>;
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { children: null },
+  args: {children: null},
   render: () => (
     <SegmentedControl defaultValue="system" aria-label="Theme">
       <SegmentedControlItem value="system">System</SegmentedControlItem>
       <SegmentedControlItem value="light">Light</SegmentedControlItem>
       <SegmentedControlItem value="dark">Dark</SegmentedControlItem>
     </SegmentedControl>
-  )
-}
+  ),
+};
 
 /**
  * A disabled item is skipped entirely by arrow-key navigation, not merely
@@ -37,7 +37,7 @@ export const Default: Story = {
  * correct default here, not a gap to paper over.
  */
 export const WithDisabledItem: Story = {
-  args: { children: null },
+  args: {children: null},
   render: () => (
     <SegmentedControl defaultValue="page" aria-label="Audit scope">
       <SegmentedControlItem value="page">This page</SegmentedControlItem>
@@ -46,5 +46,5 @@ export const WithDisabledItem: Story = {
         User flow
       </SegmentedControlItem>
     </SegmentedControl>
-  )
-}
+  ),
+};

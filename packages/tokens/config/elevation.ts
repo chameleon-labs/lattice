@@ -15,27 +15,27 @@
 
 /** One layer of a (possibly multi-layer) shadow, in pixels. */
 export interface ShadowLayer {
-  readonly offsetX: number
-  readonly offsetY: number
-  readonly blur: number
-  readonly spread: number
+  readonly offsetX: number;
+  readonly offsetY: number;
+  readonly blur: number;
+  readonly spread: number;
   /** Alpha of the (always black) shadow colour, 0..1. */
-  readonly alpha: number
+  readonly alpha: number;
 }
 
 export const SHADOWS = {
   sm: [
-    { offsetX: 0, offsetY: 1, blur: 3, spread: 0, alpha: 0.1 },
-    { offsetX: 0, offsetY: 1, blur: 2, spread: -1, alpha: 0.1 }
+    {offsetX: 0, offsetY: 1, blur: 3, spread: 0, alpha: 0.1},
+    {offsetX: 0, offsetY: 1, blur: 2, spread: -1, alpha: 0.1},
   ],
   lg: [
-    { offsetX: 0, offsetY: 10, blur: 15, spread: -3, alpha: 0.1 },
-    { offsetX: 0, offsetY: 4, blur: 6, spread: -4, alpha: 0.1 }
+    {offsetX: 0, offsetY: 10, blur: 15, spread: -3, alpha: 0.1},
+    {offsetX: 0, offsetY: 4, blur: 6, spread: -4, alpha: 0.1},
   ],
-  '2xl': [{ offsetX: 0, offsetY: 25, blur: 50, spread: -12, alpha: 0.25 }]
-} as const satisfies Record<string, readonly ShadowLayer[]>
+  '2xl': [{offsetX: 0, offsetY: 25, blur: 50, spread: -12, alpha: 0.25}],
+} as const satisfies Record<string, readonly ShadowLayer[]>;
 
-export type ShadowName = keyof typeof SHADOWS
+export type ShadowName = keyof typeof SHADOWS;
 
 /**
  * `flat` is not an absence of styling but the positive statement that a surface
@@ -50,5 +50,5 @@ export const ELEVATION_ROLES = {
   /** Tooltip, popover, menu. */
   overlay: 'lg',
   /** The hero audit card. The only shadow that reads in dark mode. */
-  floating: '2xl'
-} as const satisfies Record<string, ShadowName | 'none'>
+  floating: '2xl',
+} as const satisfies Record<string, ShadowName | 'none'>;

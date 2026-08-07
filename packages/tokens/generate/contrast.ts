@@ -12,7 +12,7 @@
  * report WCAG 2. Reporting both keeps the gap between them visible.
  */
 
-import { srgbToLinear, type Rgb } from './oklch.js'
+import {srgbToLinear, type Rgb} from './oklch.js';
 
 /**
  * Clamping rather than refusing is the honest answer for a contrast metric: a
@@ -26,10 +26,10 @@ import { srgbToLinear, type Rgb } from './oklch.js'
  */
 function channel(value: number): number {
   if (!Number.isFinite(value)) {
-    throw new Error(`channel is not finite: ${value}`)
+    throw new Error(`channel is not finite: ${value}`);
   }
 
-  return Math.min(1, Math.max(0, value))
+  return Math.min(1, Math.max(0, value));
 }
 
 /**
@@ -38,17 +38,15 @@ function channel(value: number): number {
  * axe-core uses the published constants, so a gate using the derived ones would
  * pass a palette the audit then failed.
  */
-const WCAG_RED = 0.2126
-const WCAG_GREEN = 0.7152
-const WCAG_BLUE = 0.0722
+const WCAG_RED = 0.2126;
+const WCAG_GREEN = 0.7152;
+const WCAG_BLUE = 0.0722;
 
 /** WCAG 2.x relative luminance, 0 for black and 1 for white. */
-export function relativeLuminance({ r, g, b }: Rgb): number {
+export function relativeLuminance({r, g, b}: Rgb): number {
   return (
-    WCAG_RED * srgbToLinear(channel(r)) +
-    WCAG_GREEN * srgbToLinear(channel(g)) +
-    WCAG_BLUE * srgbToLinear(channel(b))
-  )
+    WCAG_RED * srgbToLinear(channel(r)) + WCAG_GREEN * srgbToLinear(channel(g)) + WCAG_BLUE * srgbToLinear(channel(b))
+  );
 }
 
 /**
@@ -58,10 +56,10 @@ export function relativeLuminance({ r, g, b }: Rgb): number {
  * unlike {@link apcaLc} the arguments cannot be got the wrong way round.
  */
 export function contrastRatio(a: Rgb, b: Rgb): number {
-  const first = relativeLuminance(a)
-  const second = relativeLuminance(b)
+  const first = relativeLuminance(a);
+  const second = relativeLuminance(b);
 
-  return (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05)
+  return (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05);
 }
 
 // APCA 0.1.9 constants, matching Myndex's apca-w3 reference implementation.
@@ -72,30 +70,31 @@ export function contrastRatio(a: Rgb, b: Rgb): number {
 // luminance and the two are not interchangeable — for #111112 they differ by
 // almost 4x (0.00152 against 0.00564), which is precisely the near-black region
 // where the standards disagree about dark mode.
-const APCA_EXPONENT = 2.4
-const APCA_RED = 0.2126729
-const APCA_GREEN = 0.7151522
-const APCA_BLUE = 0.072175
+const APCA_EXPONENT = 2.4;
+const APCA_RED = 0.2126729;
+const APCA_GREEN = 0.7151522;
+const APCA_BLUE = 0.072175;
 
 // Perceptual exponents, one pair per polarity. Their asymmetry is the reason
 // white-on-black and black-on-white have different magnitudes.
-const NORMAL_BACKGROUND = 0.56
-const NORMAL_TEXT = 0.57
-const REVERSE_TEXT = 0.62
-const REVERSE_BACKGROUND = 0.65
+const NORMAL_BACKGROUND = 0.56;
+const NORMAL_TEXT = 0.57;
+const REVERSE_TEXT = 0.62;
+const REVERSE_BACKGROUND = 0.65;
 
 // Below this luminance APCA soft-clamps rather than letting the exponent run
 // away, modelling the flare that stops a display from reaching true black.
-const BLACK_THRESHOLD = 0.022
-const BLACK_CLAMP_EXPONENT = 1.414
+const BLACK_THRESHOLD = 0.022;
+// oxlint-disable-next-line oxc/approx-constant -- apca-w3 specifies 1.414, not √2.
+const BLACK_CLAMP_EXPONENT = 1.414;
 
-const SCALE = 1.14
-const LOW_OFFSET = 0.027
+const SCALE = 1.14;
+const LOW_OFFSET = 0.027;
 
 // LOW_CLIP discards a result too small to mean anything: APCA reports exactly 0
 // rather than a fraction of an Lc, because a fraction would imply a usable
 // difference where there is none.
-const LOW_CLIP = 0.1
+const LOW_CLIP = 0.1;
 
 // An early exit for luminances too close to separate, kept for parity with
 // apca-w3. Redundant here, and provably so rather than merely untested: across
@@ -103,20 +102,18 @@ const LOW_CLIP = 0.1
 // this threshold is 0.0526, so LOW_CLIP already swallows every case with ~2x
 // margin. No test can kill this line — noted so nobody spends an afternoon
 // trying to write one. It becomes load-bearing again only if LOW_CLIP drops.
-const MIN_DELTA_Y = 0.0005
+const MIN_DELTA_Y = 0.0005;
 
-function apcaLuminance({ r, g, b }: Rgb): number {
+function apcaLuminance({r, g, b}: Rgb): number {
   return (
     APCA_RED * channel(r) ** APCA_EXPONENT +
     APCA_GREEN * channel(g) ** APCA_EXPONENT +
     APCA_BLUE * channel(b) ** APCA_EXPONENT
-  )
+  );
 }
 
 function softClampBlack(luminance: number): number {
-  return luminance > BLACK_THRESHOLD
-    ? luminance
-    : luminance + (BLACK_THRESHOLD - luminance) ** BLACK_CLAMP_EXPONENT
+  return luminance > BLACK_THRESHOLD ? luminance : luminance + (BLACK_THRESHOLD - luminance) ** BLACK_CLAMP_EXPONENT;
 }
 
 /**
@@ -130,26 +127,20 @@ function softClampBlack(luminance: number): number {
  * order is part of the answer rather than a convention.
  */
 export function apcaLc(text: Rgb, background: Rgb): number {
-  const textLuminance = apcaLuminance(text)
-  const backgroundLuminance = apcaLuminance(background)
+  const textLuminance = apcaLuminance(text);
+  const backgroundLuminance = apcaLuminance(background);
 
   if (Math.abs(backgroundLuminance - textLuminance) < MIN_DELTA_Y) {
-    return 0
+    return 0;
   }
 
   if (backgroundLuminance > textLuminance) {
-    const contrast =
-      (backgroundLuminance ** NORMAL_BACKGROUND -
-        softClampBlack(textLuminance) ** NORMAL_TEXT) *
-      SCALE
+    const contrast = (backgroundLuminance ** NORMAL_BACKGROUND - softClampBlack(textLuminance) ** NORMAL_TEXT) * SCALE;
 
-    return contrast < LOW_CLIP ? 0 : (contrast - LOW_OFFSET) * 100
+    return contrast < LOW_CLIP ? 0 : (contrast - LOW_OFFSET) * 100;
   }
 
-  const contrast =
-    (softClampBlack(backgroundLuminance) ** REVERSE_BACKGROUND -
-      textLuminance ** REVERSE_TEXT) *
-    SCALE
+  const contrast = (softClampBlack(backgroundLuminance) ** REVERSE_BACKGROUND - textLuminance ** REVERSE_TEXT) * SCALE;
 
-  return contrast > -LOW_CLIP ? 0 : (contrast + LOW_OFFSET) * 100
+  return contrast > -LOW_CLIP ? 0 : (contrast + LOW_OFFSET) * 100;
 }

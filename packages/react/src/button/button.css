@@ -19,9 +19,15 @@
   transition-timing-function: var(--lat-easing-out);
 }
 
-.lat-button[data-size='sm'] { padding: var(--lat-inset-label-sm); }
-.lat-button[data-size='md'] { padding: var(--lat-inset-label-md); }
-.lat-button[data-size='lg'] { padding: var(--lat-inset-label-lg); }
+.lat-button[data-size='sm'] {
+  padding: var(--lat-inset-label-sm);
+}
+.lat-button[data-size='md'] {
+  padding: var(--lat-inset-label-md);
+}
+.lat-button[data-size='lg'] {
+  padding: var(--lat-inset-label-lg);
+}
 
 /* Primary: the solid fill. Semibold, because Lattice's is the only button
    weighted above medium. */
@@ -30,7 +36,9 @@
   color: var(--lat-on-solid);
   font-weight: var(--lat-font-weight-semibold);
 }
-.lat-button[data-variant='primary']:hover:not(:disabled):not([aria-disabled='true']) { opacity: 0.9; }
+.lat-button[data-variant='primary']:hover:not(:disabled):not([aria-disabled='true']) {
+  opacity: 0.9;
+}
 
 /* Secondary: the component fill with a hairline. */
 .lat-button[data-variant='secondary'] {
@@ -41,7 +49,9 @@
 }
 /* 0.95 is the Figma bundle's own literal secondary-hover treatment, not a value with
    a semantic token name — there is no brightness scale to reach for. */
-.lat-button[data-variant='secondary']:hover:not(:disabled):not([aria-disabled='true']) { filter: brightness(0.95); }
+.lat-button[data-variant='secondary']:hover:not(:disabled):not([aria-disabled='true']) {
+  filter: brightness(0.95);
+}
 
 /* Ghost: transparent with a hairline, washed on hover. */
 .lat-button[data-variant='ghost'] {
@@ -50,7 +60,9 @@
   color: var(--lat-text);
   font-weight: var(--lat-font-weight-medium);
 }
-.lat-button[data-variant='ghost']:hover:not(:disabled):not([aria-disabled='true']) { background: var(--lat-wash); }
+.lat-button[data-variant='ghost']:hover:not(:disabled):not([aria-disabled='true']) {
+  background: var(--lat-wash);
+}
 
 /* Destructive: the tinted triple, not a solid fill. */
 .lat-button[data-variant='destructive'] {
@@ -59,7 +71,9 @@
   color: var(--lat-danger-solid);
   font-weight: var(--lat-font-weight-medium);
 }
-.lat-button[data-variant='destructive']:hover:not(:disabled):not([aria-disabled='true']) { opacity: 0.9; }
+.lat-button[data-variant='destructive']:hover:not(:disabled):not([aria-disabled='true']) {
+  opacity: 0.9;
+}
 
 /* Link: text with a hairline underline. */
 .lat-button[data-variant='link'] {
@@ -70,7 +84,9 @@
   text-decoration-color: var(--lat-border);
   text-underline-offset: 2px;
 }
-.lat-button[data-variant='link']:hover:not(:disabled):not([aria-disabled='true']) { color: var(--lat-text); }
+.lat-button[data-variant='link']:hover:not(:disabled):not([aria-disabled='true']) {
+  color: var(--lat-text);
+}
 
 /*
  * Both spellings, deliberately. Ariakit renders `aria-disabled="true"` rather

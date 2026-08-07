@@ -40,36 +40,36 @@
  * `background` or `border` back onto `.lat-input`, every test above would
  * still pass — they only check *values*, not *which selector* declares them.
  */
-import { fileURLToPath } from 'node:url'
-import { describe, expect, it } from 'vitest'
-import { assembleCss } from '../scripts/assemble-css.js'
+import {fileURLToPath} from 'node:url';
+import {describe, expect, it} from 'vitest';
+import {assembleCss} from '../scripts/assemble-css.js';
 
-const css = await assembleCss(fileURLToPath(new URL('../src/styles.css', import.meta.url)))
+const css = await assembleCss(fileURLToPath(new URL('../src/styles.css', import.meta.url)));
 
 function block(selector: string): string {
-  const pattern = new RegExp(`${selector.replace(/[.[\]']/g, '\\$&')}\\s*\\{([^}]*)\\}`)
-  const match = pattern.exec(css)
+  const pattern = new RegExp(`${selector.replace(/[.[\]']/g, '\\$&')}\\s*\\{([^}]*)\\}`);
+  const match = pattern.exec(css);
   if (match === null) {
-    throw new Error(`no ${selector} block found in the assembled stylesheet`)
+    throw new Error(`no ${selector} block found in the assembled stylesheet`);
   }
-  return match[1] ?? ''
+  return match[1] ?? '';
 }
 
 describe("Input's stylesheet", () => {
   it('fills from the field surface, not the page background or a raised one', () => {
-    const rule = block('.lat-input-field')
+    const rule = block('.lat-input-field');
 
-    expect(rule).toContain('background: var(--lat-field-bg);')
-    expect(rule).not.toMatch(/background:\s*var\(--lat-bg\);/)
-    expect(rule).not.toMatch(/background:\s*var\(--lat-bg-raised\);/)
-  })
+    expect(rule).toContain('background: var(--lat-field-bg);');
+    expect(rule).not.toMatch(/background:\s*var\(--lat-bg\);/);
+    expect(rule).not.toMatch(/background:\s*var\(--lat-bg-raised\);/);
+  });
 
   it('sets its value in the mono field role, not the sans ui role', () => {
-    const rule = block('.lat-input')
+    const rule = block('.lat-input');
 
-    expect(rule).toContain('font-family: var(--lat-text-field-font-family);')
-    expect(rule).not.toContain('font-family: var(--lat-text-ui-font-family);')
-  })
+    expect(rule).toContain('font-family: var(--lat-text-field-font-family);');
+    expect(rule).not.toContain('font-family: var(--lat-text-ui-font-family);');
+  });
 
   // The exact regression this whole exercise closes: `field` and `code` are
   // both mono, both "declared somewhere" in the token package, and it is easy
@@ -80,26 +80,26 @@ describe("Input's stylesheet", () => {
   // Verified to discriminate: breaking this back to `--lat-text-code-line-height`
   // by hand fails the assertion, and restoring it passes again.
   it('reads the field role line-height, not the code role line-height', () => {
-    const rule = block('.lat-input')
+    const rule = block('.lat-input');
 
-    expect(rule).toContain('line-height: var(--lat-text-field-line-height);')
-    expect(rule).not.toContain('line-height: var(--lat-text-code-line-height);')
-  })
+    expect(rule).toContain('line-height: var(--lat-text-field-line-height);');
+    expect(rule).not.toContain('line-height: var(--lat-text-code-line-height);');
+  });
 
   it('turns an invalid field visibly invalid, in --lat-danger-solid, not the ordinary border', () => {
-    const rule = block(`.lat-input-field[data-invalid]`)
+    const rule = block(`.lat-input-field[data-invalid]`);
 
-    expect(rule).toContain('border-color: var(--lat-danger-solid);')
-    expect(rule).not.toMatch(/border-color:\s*var\(--lat-border\);/)
-  })
+    expect(rule).toContain('border-color: var(--lat-danger-solid);');
+    expect(rule).not.toMatch(/border-color:\s*var\(--lat-border\);/);
+  });
 
   it('keeps the danger cue through focus, rather than losing it to the accent focus ring', () => {
-    const rule = block(`.lat-input-field[data-invalid]:focus-within`)
+    const rule = block(`.lat-input-field[data-invalid]:focus-within`);
 
-    expect(rule).toContain('border-color: var(--lat-danger-solid);')
-    expect(rule).toContain('box-shadow: 0 0 0 1px var(--lat-danger-solid);')
-    expect(rule).not.toMatch(/var\(--lat-focus-ring\)/)
-  })
+    expect(rule).toContain('border-color: var(--lat-danger-solid);');
+    expect(rule).toContain('box-shadow: 0 0 0 1px var(--lat-danger-solid);');
+    expect(rule).not.toMatch(/var\(--lat-focus-ring\)/);
+  });
 
   /*
    * The regression this whole refactor exists to fix: chrome living on
@@ -110,13 +110,13 @@ describe("Input's stylesheet", () => {
    * confirming it actually discriminates rather than passing vacuously.
    */
   it('puts the border and background on the wrapper, and none on the control', () => {
-    const field = block('.lat-input-field')
-    const control = block('.lat-input')
+    const field = block('.lat-input-field');
+    const control = block('.lat-input');
 
-    expect(field).toContain('background: var(--lat-field-bg);')
-    expect(field).toMatch(/border:\s*1px solid var\(--lat-border\);/)
+    expect(field).toContain('background: var(--lat-field-bg);');
+    expect(field).toMatch(/border:\s*1px solid var\(--lat-border\);/);
 
-    expect(control).not.toMatch(/background:\s*var\(--lat-field-bg\)/)
-    expect(control).toMatch(/border:\s*none;/)
-  })
-})
+    expect(control).not.toMatch(/background:\s*var\(--lat-field-bg\)/);
+    expect(control).toMatch(/border:\s*none;/);
+  });
+});

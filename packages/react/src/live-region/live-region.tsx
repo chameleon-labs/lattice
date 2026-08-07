@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import {useEffect, useRef, useState} from 'react';
 
 export interface LiveRegionProps {
-  message: string
-  politeness?: 'polite' | 'assertive'
+  message: string;
+  politeness?: 'polite' | 'assertive';
 }
 
 /**
@@ -22,24 +22,22 @@ export interface LiveRegionProps {
  * `assertive` interrupts whatever the user is hearing, so `polite` is the
  * default.
  */
-export function LiveRegion({ message, politeness = 'polite' }: LiveRegionProps) {
-  const [announced, setAnnounced] = useState('')
-  const previous = useRef('')
+export function LiveRegion({message, politeness = 'polite'}: LiveRegionProps): React.JSX.Element {
+  const [announced, setAnnounced] = useState('');
+  const previous = useRef('');
 
   useEffect(() => {
-    if (message === previous.current) return
+    if (message === previous.current) {
+      return;
+    }
 
-    previous.current = message
-    setAnnounced(message)
-  }, [message])
+    previous.current = message;
+    setAnnounced(message);
+  }, [message]);
 
   return (
-    <div
-      className="lat-live-region"
-      role={politeness === 'assertive' ? 'alert' : 'status'}
-      aria-live={politeness}
-    >
+    <div className="lat-live-region" role={politeness === 'assertive' ? 'alert' : 'status'} aria-live={politeness}>
       {announced}
     </div>
-  )
+  );
 }

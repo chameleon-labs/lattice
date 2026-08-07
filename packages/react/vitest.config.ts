@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config'
+import {defineConfig} from 'vitest/config';
 
 export default defineConfig({
   test: {
@@ -7,6 +7,6 @@ export default defineConfig({
     // specs named *.spec.ts. The two runners must never pick up each other's
     // files.
     include: ['tests/**/*.test.{ts,tsx}'],
-    setupFiles: ['tests/setup.ts']
-  }
-})
+    setupFiles: ['tests/setup.ts'],
+  },
+});

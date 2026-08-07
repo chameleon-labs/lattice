@@ -13,11 +13,11 @@
  * which is exactly the kind of drift a value repeated across stylesheets
  * invites.
  */
-import { fileURLToPath } from 'node:url'
-import { describe, expect, it } from 'vitest'
-import { assembleCss } from '../scripts/assemble-css.js'
+import {fileURLToPath} from 'node:url';
+import {describe, expect, it} from 'vitest';
+import {assembleCss} from '../scripts/assemble-css.js';
 
-const css = await assembleCss(fileURLToPath(new URL('../src/styles.css', import.meta.url)))
+const css = await assembleCss(fileURLToPath(new URL('../src/styles.css', import.meta.url)));
 
 // Scoped to the exact selector — matched whole, not as a substring, so the
 // `[data-tone='accent'] .lat-eyebrow__text` compound (which contains this
@@ -26,25 +26,25 @@ const css = await assembleCss(fileURLToPath(new URL('../src/styles.css', import.
 // doesn't get swept into the "selector" capture. Requiring exactly one hit
 // guards against a duplicated block silently shadowing a broken one.
 function selectorBlock(source: string, selector: string): string {
-  const stripped = source.replace(/\/\*[\s\S]*?\*\//g, '')
+  const stripped = source.replace(/\/\*[\s\S]*?\*\//g, '');
   const matches = [...stripped.matchAll(/([^{}]+)\{([^}]*)\}/g)].filter(
-    (match) => (match[1] ?? '').trim() === selector
-  )
-  expect(matches).toHaveLength(1)
-  return matches[0]?.[2] ?? ''
+    (match) => (match[1] ?? '').trim() === selector,
+  );
+  expect(matches).toHaveLength(1);
+  return matches[0]?.[2] ?? '';
 }
 
 function eyebrowTextBlock(source: string): string {
-  return selectorBlock(source, '.lat-eyebrow__text')
+  return selectorBlock(source, '.lat-eyebrow__text');
 }
 
 describe("Eyebrow's stylesheet", () => {
   it('reads its tracking from the eyebrow role, not a raw letter-spacing primitive', () => {
-    const rule = eyebrowTextBlock(css)
+    const rule = eyebrowTextBlock(css);
 
-    expect(rule).toContain('letter-spacing: var(--lat-text-eyebrow-letter-spacing);')
-    expect(rule).not.toMatch(/letter-spacing:\s*var\(--lat-letter-spacing-/)
-  })
+    expect(rule).toContain('letter-spacing: var(--lat-text-eyebrow-letter-spacing);');
+    expect(rule).not.toMatch(/letter-spacing:\s*var\(--lat-letter-spacing-/);
+  });
 
   // The landing page's `SectionEyebrow` (lime, `text-primary`) and the docs
   // page's `SectionLabel` (`text-muted-foreground`) are the same construction
@@ -53,18 +53,18 @@ describe("Eyebrow's stylesheet", () => {
   // untagged `.lat-eyebrow__text` rule above, and the accent block covers the
   // `[data-tone='accent']` override, so a future edit that pointed either one
   // at the wrong token, or collapsed them into a single colour, fails here.
-  it("default tone reads --lat-text-subtle", () => {
-    const rule = eyebrowTextBlock(css)
+  it('default tone reads --lat-text-subtle', () => {
+    const rule = eyebrowTextBlock(css);
 
-    expect(rule).toContain('color: var(--lat-text-subtle);')
-  })
+    expect(rule).toContain('color: var(--lat-text-subtle);');
+  });
 
   it("tone='accent' reads --lat-solid", () => {
-    const rule = selectorBlock(css, ".lat-eyebrow[data-tone='accent'] .lat-eyebrow__text")
+    const rule = selectorBlock(css, ".lat-eyebrow[data-tone='accent'] .lat-eyebrow__text");
 
-    expect(rule).toContain('color: var(--lat-solid);')
-    expect(rule).not.toContain('--lat-text-subtle')
-  })
+    expect(rule).toContain('color: var(--lat-solid);');
+    expect(rule).not.toContain('--lat-text-subtle');
+  });
 
   // `.lat-eyebrow` is `display: flex`, so an ancestor's `text-align: center`
   // never reaches it — the landing page CTA's kicker needs `align="center"`
@@ -73,14 +73,14 @@ describe("Eyebrow's stylesheet", () => {
   // 'center']` qualifier) leaves `.lat-eyebrow` at its unqualified
   // `justify-content: normal` default and fails this.
   it("align='center' centres the flex container's own justify-content", () => {
-    const rule = selectorBlock(css, ".lat-eyebrow[data-align='center']")
+    const rule = selectorBlock(css, ".lat-eyebrow[data-align='center']");
 
-    expect(rule).toContain('justify-content: center;')
-  })
+    expect(rule).toContain('justify-content: center;');
+  });
 
   it('the base .lat-eyebrow rule sets no justify-content of its own', () => {
-    const rule = selectorBlock(css, '.lat-eyebrow')
+    const rule = selectorBlock(css, '.lat-eyebrow');
 
-    expect(rule).not.toContain('justify-content')
-  })
-})
+    expect(rule).not.toContain('justify-content');
+  });
+});

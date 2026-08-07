@@ -8,11 +8,11 @@
  * safety net for when hue fails — `serious` at hue 56 and `moderate` at 84 are
  * 28 degrees apart, which protanopia and deuteranopia do not preserve.
  */
-import type { Mode } from './modes.js'
+import type {Mode} from './modes.js';
 
-export const SEVERITY_LEVELS = ['critical', 'serious', 'moderate', 'minor'] as const
+export const SEVERITY_LEVELS = ['critical', 'serious', 'moderate', 'minor'] as const;
 
-export type SeverityLevel = (typeof SEVERITY_LEVELS)[number]
+export type SeverityLevel = (typeof SEVERITY_LEVELS)[number];
 
 /**
  * `undefined` means the Figma bundle did not declare it and the generator must derive
@@ -23,15 +23,15 @@ export const SEVERITY_ANCHORS: Record<Mode, Record<SeverityLevel, string | undef
     critical: '#ff4d6a',
     serious: '#fb923c',
     moderate: '#fbbf24',
-    minor: undefined
+    minor: undefined,
   },
   light: {
     critical: '#d41240',
     serious: '#ea580c',
     moderate: undefined,
-    minor: undefined
-  }
-}
+    minor: undefined,
+  },
+};
 
 /**
  * How far light sits below dark for the same level.
@@ -50,4 +50,4 @@ export const SEVERITY_ANCHORS: Record<Mode, Record<SeverityLevel, string | undef
  * hue is the smaller leap. Critical's −0.122 would put the derived value at
  * L ≈ 0.715 instead.
  */
-export const LIGHT_LIGHTNESS_DELTA = -0.112
+export const LIGHT_LIGHTNESS_DELTA = -0.112;

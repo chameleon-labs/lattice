@@ -2,18 +2,17 @@ import {
   Disclosure as AriakitDisclosure,
   DisclosureContent as AriakitDisclosureContent,
   type DisclosureContentProps as AriakitDisclosureContentProps,
-  type DisclosureProps as AriakitDisclosureProps
-} from '@ariakit/react'
-import type { ElementType } from 'react'
+  type DisclosureProps as AriakitDisclosureProps,
+} from '@ariakit/react';
+import type {ElementType} from 'react';
 
 // Re-exported untouched: the provider renders nothing, so there is nothing to
 // style and a wrapper would only add a name to keep in step.
-export { DisclosureProvider } from '@ariakit/react'
-export type { DisclosureProviderProps } from '@ariakit/react'
+export {DisclosureProvider} from '@ariakit/react';
+export type {DisclosureProviderProps} from '@ariakit/react';
 
-export type DisclosureProps<T extends ElementType = 'button'> = AriakitDisclosureProps<T>
-export type DisclosureContentProps<T extends ElementType = 'div'> =
-  AriakitDisclosureContentProps<T>
+export type DisclosureProps<T extends ElementType = 'button'> = AriakitDisclosureProps<T>;
+export type DisclosureContentProps<T extends ElementType = 'div'> = AriakitDisclosureContentProps<T>;
 
 /**
  * A real `<button>` carrying `aria-expanded`, paired with its content.
@@ -25,27 +24,23 @@ export type DisclosureContentProps<T extends ElementType = 'div'> =
 export function Disclosure<T extends ElementType = 'button'>({
   className,
   ...props
-}: DisclosureProps<T>) {
+}: DisclosureProps<T>): React.JSX.Element {
   return (
     <AriakitDisclosure
       {...props}
       className={className === undefined ? 'lat-disclosure' : `lat-disclosure ${className}`}
     />
-  )
+  );
 }
 
 export function DisclosureContent<T extends ElementType = 'div'>({
   className,
   ...props
-}: DisclosureContentProps<T>) {
+}: DisclosureContentProps<T>): React.JSX.Element {
   return (
     <AriakitDisclosureContent
       {...props}
-      className={
-        className === undefined
-          ? 'lat-disclosure__content'
-          : `lat-disclosure__content ${className}`
-      }
+      className={className === undefined ? 'lat-disclosure__content' : `lat-disclosure__content ${className}`}
     />
-  )
+  );
 }

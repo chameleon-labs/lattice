@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Tab, TabList, TabPanel, TabProvider } from './tabs.js'
+import type {Meta, StoryObj} from '@storybook/react-vite';
+import {Tab, TabList, TabPanel, TabProvider} from './tabs.js';
 
 /**
  * Tabs activate automatically on arrow-key movement.
@@ -11,12 +11,12 @@ import { Tab, TabList, TabPanel, TabProvider } from './tabs.js'
 const meta = {
   title: 'Components/Tabs',
   component: TabList,
-  tags: ['autodocs']
-} satisfies Meta<typeof TabList>
+  tags: ['autodocs'],
+} satisfies Meta<typeof TabList>;
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: () => (
@@ -30,8 +30,8 @@ export const Default: Story = {
       <TabPanel tabId="window-90">Ninety days of history.</TabPanel>
       <TabPanel tabId="window-365">A year of history.</TabPanel>
     </TabProvider>
-  )
-}
+  ),
+};
 
 /** A disabled tab stays in the roving-focus order; it just cannot be selected. */
 export const WithDisabledTab: Story = {
@@ -48,5 +48,5 @@ export const WithDisabledTab: Story = {
       <TabPanel tabId="scope-site">Every page we can reach from the root.</TabPanel>
       <TabPanel tabId="scope-flow">Not available on this plan.</TabPanel>
     </TabProvider>
-  )
-}
+  ),
+};

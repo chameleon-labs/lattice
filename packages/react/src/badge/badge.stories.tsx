@@ -1,8 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import type { ReactElement } from 'react'
-import { Badge, type BadgeVariant } from './badge.js'
+import type {Meta, StoryObj} from '@storybook/react-vite';
+import type {ReactElement} from 'react';
+import {Badge, type BadgeVariant} from './badge.js';
 
-const VARIANTS: readonly BadgeVariant[] = ['default', 'primary', 'info', 'success', 'danger', 'warning']
+const VARIANTS: readonly BadgeVariant[] = ['default', 'primary', 'info', 'success', 'danger', 'warning'];
 
 /**
  * `children` is required rather than optional, which is the whole guarantee: a
@@ -14,18 +14,18 @@ const meta = {
   component: Badge,
   tags: ['autodocs'],
   args: {
-    children: 'Passing'
+    children: 'Passing',
   },
   argTypes: {
-    variant: { control: 'select', options: VARIANTS }
-  }
-} satisfies Meta<typeof Badge>
+    variant: {control: 'select', options: VARIANTS},
+  },
+} satisfies Meta<typeof Badge>;
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {}
+export const Default: Story = {};
 
 export const Variants: Story = {
   render: (args) => (
@@ -36,8 +36,8 @@ export const Variants: Story = {
         </Badge>
       ))}
     </div>
-  )
-}
+  ),
+};
 
 /**
  * Impact severity, as used by the landing page's `ImpactBadge` (an axe impact
@@ -54,7 +54,7 @@ export const Variants: Story = {
  * both an icon *and* a text label, so the ramp stays legible under
  * protanopia and deuteranopia, where these hues are hardest to tell apart.
  */
-const SEVERITY: ReadonlyArray<{ level: BadgeVariant; icon: ReactElement }> = [
+const SEVERITY: readonly {level: BadgeVariant; icon: ReactElement}[] = [
   {
     level: 'critical',
     icon: (
@@ -73,7 +73,7 @@ const SEVERITY: ReadonlyArray<{ level: BadgeVariant; icon: ReactElement }> = [
         <line x1="12" x2="12" y1="8" y2="12" />
         <line x1="12" x2="12.01" y1="16" y2="16" />
       </svg>
-    )
+    ),
   },
   {
     level: 'serious',
@@ -93,7 +93,7 @@ const SEVERITY: ReadonlyArray<{ level: BadgeVariant; icon: ReactElement }> = [
         <path d="M12 9v4" />
         <path d="M12 17h.01" />
       </svg>
-    )
+    ),
   },
   {
     level: 'moderate',
@@ -113,7 +113,7 @@ const SEVERITY: ReadonlyArray<{ level: BadgeVariant; icon: ReactElement }> = [
         <line x1="12" x2="12" y1="8" y2="12" />
         <line x1="12" x2="12.01" y1="16" y2="16" />
       </svg>
-    )
+    ),
   },
   {
     level: 'minor',
@@ -133,19 +133,19 @@ const SEVERITY: ReadonlyArray<{ level: BadgeVariant; icon: ReactElement }> = [
         <path d="M12 16v-4" />
         <path d="M12 8h.01" />
       </svg>
-    )
-  }
-]
+    ),
+  },
+];
 
 export const Impact: Story = {
   render: (args) => (
     <div className="lat-story__row">
-      {SEVERITY.map(({ level, icon }) => (
+      {SEVERITY.map(({level, icon}) => (
         <Badge {...args} key={level} variant={level}>
           {icon}
           {level}
         </Badge>
       ))}
     </div>
-  )
-}
+  ),
+};

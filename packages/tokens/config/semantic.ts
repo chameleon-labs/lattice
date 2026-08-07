@@ -21,20 +21,20 @@
 
 export interface RoleAlias {
   /** The custom property name, without the `--lat-` prefix. */
-  readonly role: string
+  readonly role: string;
   /** The primitive it points at, without the `--lat-` prefix. */
-  readonly source: string
+  readonly source: string;
 }
 
 export const ROLE_ALIASES: readonly RoleAlias[] = [
-  { role: 'bg', source: 'gray-bg' },
-  { role: 'bg-raised', source: 'gray-bg-raised' },
-  { role: 'bg-subtle', source: 'gray-bg-subtle' },
-  { role: 'component', source: 'gray-component' },
-  { role: 'field-bg', source: 'gray-field-bg' },
-  { role: 'switch-track', source: 'gray-switch-track' },
-  { role: 'text', source: 'gray-text' },
-  { role: 'text-subtle', source: 'gray-text-subtle' },
-  { role: 'solid', source: 'accent-solid' },
-  { role: 'on-solid', source: 'accent-on-solid' }
-]
+  {role: 'bg', source: 'gray-bg'},
+  {role: 'bg-raised', source: 'gray-bg-raised'},
+  {role: 'bg-subtle', source: 'gray-bg-subtle'},
+  {role: 'component', source: 'gray-component'},
+  {role: 'field-bg', source: 'gray-field-bg'},
+  {role: 'switch-track', source: 'gray-switch-track'},
+  {role: 'text', source: 'gray-text'},
+  {role: 'text-subtle', source: 'gray-text-subtle'},
+  {role: 'solid', source: 'accent-solid'},
+  {role: 'on-solid', source: 'accent-on-solid'},
+];

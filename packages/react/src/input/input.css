@@ -69,7 +69,9 @@
   outline: none;
 }
 
-.lat-input::placeholder { color: var(--lat-text-subtle); }
+.lat-input::placeholder {
+  color: var(--lat-text-subtle);
+}
 
 /*
  * :focus-within, not :focus-visible. For a text input, :focus-visible matches

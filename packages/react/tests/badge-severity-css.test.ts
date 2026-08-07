@@ -27,45 +27,42 @@
  * copy-paste of a chromatic block's tokens into a severity block fails here
  * instead of shipping silently.
  */
-import { fileURLToPath } from 'node:url'
-import { describe, expect, it } from 'vitest'
-import { assembleCss } from '../scripts/assemble-css.js'
+import {fileURLToPath} from 'node:url';
+import {describe, expect, it} from 'vitest';
+import {assembleCss} from '../scripts/assemble-css.js';
 
-const css = await assembleCss(fileURLToPath(new URL('../src/styles.css', import.meta.url)))
+const css = await assembleCss(fileURLToPath(new URL('../src/styles.css', import.meta.url)));
 
 // The six chromatic scales severity must never reach for — there is no
 // chromatic scale at any severity level's hue, so a variant block that
 // references one of these is necessarily borrowing from the wrong ramp.
-const CHROMATIC_SCALES = ['accent', 'danger', 'warning', 'success', 'info', 'decorative'] as const
+const CHROMATIC_SCALES = ['accent', 'danger', 'warning', 'success', 'info', 'decorative'] as const;
 
-const SEVERITY_LEVELS = ['critical', 'serious', 'moderate', 'minor'] as const
+const SEVERITY_LEVELS = ['critical', 'serious', 'moderate', 'minor'] as const;
 
 function badgeVariantBlock(level: string): string {
-  const pattern = new RegExp(`\\.lat-badge\\[data-variant='${level}'\\]\\s*\\{([^}]*)\\}`)
-  const match = pattern.exec(css)
+  const pattern = new RegExp(`\\.lat-badge\\[data-variant='${level}'\\]\\s*\\{([^}]*)\\}`);
+  const match = pattern.exec(css);
   if (match === null) {
-    throw new Error(`no .lat-badge[data-variant='${level}'] block found in the assembled stylesheet`)
+    throw new Error(`no .lat-badge[data-variant='${level}'] block found in the assembled stylesheet`);
   }
-  return match[1] ?? ''
+  return match[1] ?? '';
 }
 
 describe("Badge's severity variant blocks", () => {
-  it.each(SEVERITY_LEVELS)(
-    "'%s' reads its own severity tokens, and no chromatic scale's",
-    (level) => {
-      const block = badgeVariantBlock(level)
+  it.each(SEVERITY_LEVELS)("'%s' reads its own severity tokens, and no chromatic scale's", (level) => {
+    const block = badgeVariantBlock(level);
 
-      expect(block).toContain(`--_tint: var(--lat-severity-${level}-tint);`)
-      expect(block).toContain(`--_tint-border: var(--lat-severity-${level}-tint-border);`)
-      expect(block).toContain(`--_text: var(--lat-severity-${level});`)
+    expect(block).toContain(`--_tint: var(--lat-severity-${level}-tint);`);
+    expect(block).toContain(`--_tint-border: var(--lat-severity-${level}-tint-border);`);
+    expect(block).toContain(`--_text: var(--lat-severity-${level});`);
 
-      // The negative half is the important half — this is the exact shape
-      // the regression took: every token above being individually declared
-      // somewhere in the token package was never in question, only which
-      // scale a given block reaches for.
-      for (const scale of CHROMATIC_SCALES) {
-        expect(block).not.toMatch(new RegExp(`--lat-${scale}-`))
-      }
+    // The negative half is the important half — this is the exact shape
+    // the regression took: every token above being individually declared
+    // somewhere in the token package was never in question, only which
+    // scale a given block reaches for.
+    for (const scale of CHROMATIC_SCALES) {
+      expect(block).not.toMatch(new RegExp(`--lat-${scale}-`));
     }
-  )
-})
+  });
+});

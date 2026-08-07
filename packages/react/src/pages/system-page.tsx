@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import {useState} from 'react';
 import {
   Badge,
   Button,
@@ -16,9 +16,9 @@ import {
   Td,
   Th,
   Tr,
-  TextField
-} from '../index.js'
-import { Check, ChevronRight, Circle, Copy, Moon, Square, Sun, Triangle, Zap } from './icons.js'
+  TextField,
+} from '../index.js';
+import {Check, ChevronRight, Circle, Copy, Moon, Square, Sun, Triangle, Zap} from './icons.js';
 
 /**
  * The bundle's documentation site, rebuilt from Lattice components alone.
@@ -34,85 +34,103 @@ import { Check, ChevronRight, Circle, Copy, Moon, Square, Sun, Triangle, Zap } f
  */
 
 const NAV = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'tokens', label: 'Tokens' },
-  { id: 'typography', label: 'Typography' },
-  { id: 'components', label: 'Components' },
-  { id: 'patterns', label: 'Patterns' },
-  { id: 'motion', label: 'Motion' }
-] as const
+  {id: 'overview', label: 'Overview'},
+  {id: 'tokens', label: 'Tokens'},
+  {id: 'typography', label: 'Typography'},
+  {id: 'components', label: 'Components'},
+  {id: 'patterns', label: 'Patterns'},
+  {id: 'motion', label: 'Motion'},
+] as const;
 
-const RESOURCES = ['Figma Kit', 'GitHub', 'Changelog', 'RFC Process']
+const RESOURCES = ['Figma Kit', 'GitHub', 'Changelog', 'RFC Process'];
 
 // Every value below is a live `--lat-*` role, not the bundle's `#cff23a` —
 // the point of this page is to prove the token, so the swatch reads the
 // custom property directly and lets the active theme resolve its colour.
 const COLOR_TOKENS = [
-  { token: '--lat-bg', label: 'Background' },
-  { token: '--lat-bg-raised', label: 'Raised' },
-  { token: '--lat-bg-subtle', label: 'Subtle' },
-  { token: '--lat-text', label: 'Foreground' },
-  { token: '--lat-text-subtle', label: 'Muted' },
-  { token: '--lat-accent-solid', label: 'Primary' },
-  { token: '--lat-border', label: 'Border' },
-  { token: '--lat-info-solid', label: 'Info' },
-  { token: '--lat-success-solid', label: 'Success' },
-  { token: '--lat-danger-solid', label: 'Destructive' },
-  { token: '--lat-warning-solid', label: 'Warning' },
-  { token: '--lat-chart-3', label: 'Accent' }
-]
+  {token: '--lat-bg', label: 'Background'},
+  {token: '--lat-bg-raised', label: 'Raised'},
+  {token: '--lat-bg-subtle', label: 'Subtle'},
+  {token: '--lat-text', label: 'Foreground'},
+  {token: '--lat-text-subtle', label: 'Muted'},
+  {token: '--lat-accent-solid', label: 'Primary'},
+  {token: '--lat-border', label: 'Border'},
+  {token: '--lat-info-solid', label: 'Info'},
+  {token: '--lat-success-solid', label: 'Success'},
+  {token: '--lat-danger-solid', label: 'Destructive'},
+  {token: '--lat-warning-solid', label: 'Warning'},
+  {token: '--lat-chart-3', label: 'Accent'},
+];
 
 const SPACING_TOKENS = [
-  { token: '--lat-space-1', px: 4 },
-  { token: '--lat-space-2', px: 8 },
-  { token: '--lat-space-3', px: 12 },
-  { token: '--lat-space-4', px: 16 },
-  { token: '--lat-space-6', px: 24 },
-  { token: '--lat-space-8', px: 32 },
-  { token: '--lat-space-12', px: 48 },
-  { token: '--lat-space-16', px: 64 },
-  { token: '--lat-space-24', px: 96 },
-  { token: '--lat-space-32', px: 128 }
-]
+  {token: '--lat-space-1', px: 4},
+  {token: '--lat-space-2', px: 8},
+  {token: '--lat-space-3', px: 12},
+  {token: '--lat-space-4', px: 16},
+  {token: '--lat-space-6', px: 24},
+  {token: '--lat-space-8', px: 32},
+  {token: '--lat-space-12', px: 48},
+  {token: '--lat-space-16', px: 64},
+  {token: '--lat-space-24', px: 96},
+  {token: '--lat-space-32', px: 128},
+];
 
 // Lattice's own duration scale, in place of the bundle's arbitrary ms list —
 // there are exactly five steps in each, so the swap is one-to-one.
 const MOTION_PRESETS = [
-  { label: 'Instant', duration: 'instant', easing: undefined, easingLabel: 'instant' },
-  { label: 'Swift', duration: 'swift', easing: 'out', easingLabel: 'ease-out' },
-  { label: 'Default', duration: 'default', easing: 'out', easingLabel: 'ease-out' },
-  { label: 'Deliberate', duration: 'deliberate', easing: 'in-out', easingLabel: 'ease-in-out' },
-  { label: 'Expressive', duration: 'expressive', easing: 'in-out', easingLabel: 'ease-in-out' }
-] as const
+  {label: 'Instant', duration: 'instant', easing: undefined, easingLabel: 'instant'},
+  {label: 'Swift', duration: 'swift', easing: 'out', easingLabel: 'ease-out'},
+  {label: 'Default', duration: 'default', easing: 'out', easingLabel: 'ease-out'},
+  {label: 'Deliberate', duration: 'deliberate', easing: 'in-out', easingLabel: 'ease-in-out'},
+  {label: 'Expressive', duration: 'expressive', easing: 'in-out', easingLabel: 'ease-in-out'},
+] as const;
 
 const CARD_ANATOMY = [
-  { icon: Circle, tone: 'primary', title: 'Primitive', tag: 'headless', desc: 'Unstyled base with slot architecture. Compose with your own tokens.' },
-  { icon: Square, tone: 'info', title: 'Styled', tag: 'opinionated', desc: 'Opinionated defaults from the Lattice token set. Ready to ship.' },
-  { icon: Triangle, tone: 'accent', title: 'Compound', tag: 'compound', desc: 'Multi-part components with coordinated state. Complex patterns simplified.' }
-] as const
+  {
+    icon: Circle,
+    tone: 'primary',
+    title: 'Primitive',
+    tag: 'headless',
+    desc: 'Unstyled base with slot architecture. Compose with your own tokens.',
+  },
+  {
+    icon: Square,
+    tone: 'info',
+    title: 'Styled',
+    tag: 'opinionated',
+    desc: 'Opinionated defaults from the Lattice token set. Ready to ship.',
+  },
+  {
+    icon: Triangle,
+    tone: 'accent',
+    title: 'Compound',
+    tag: 'compound',
+    desc: 'Multi-part components with coordinated state. Complex patterns simplified.',
+  },
+] as const;
 
 const PALETTE_ROWS = [
-  { name: '--lat-accent-solid', label: 'Color' },
-  { name: '--lat-radius-none', label: 'Radius' },
-  { name: '--lat-font-sans', label: 'Font' }
-]
+  {name: '--lat-accent-solid', label: 'Color'},
+  {name: '--lat-radius-none', label: 'Radius'},
+  {name: '--lat-font-sans', label: 'Font'},
+];
 
 const TABLE_ROWS = [
-  { name: 'color.accent.solid', value: 'accent-solid', status: 'stable' },
-  { name: 'color.bg', value: 'bg', status: 'stable' },
-  { name: 'radius.none', value: '0px', status: 'stable' },
-  { name: 'chart.decorative', value: 'chart-3', status: 'beta' },
-  { name: 'gradient.mesh', value: 'complex', status: 'draft' }
-] as const
+  {name: 'color.accent.solid', value: 'accent-solid', status: 'stable'},
+  {name: 'color.bg', value: 'bg', status: 'stable'},
+  {name: 'radius.none', value: '0px', status: 'stable'},
+  {name: 'chart.decorative', value: 'chart-3', status: 'beta'},
+  {name: 'gradient.mesh', value: 'complex', status: 'draft'},
+] as const;
 
-const STATUS_VARIANT = { stable: 'success', beta: 'info', draft: 'default' } as const
+const STATUS_VARIANT = {stable: 'success', beta: 'info', draft: 'default'} as const;
 
 const OVERVIEW_STATS = [
-  { value: '39', label: 'Components', sub: 'public exports' },
-  { value: '223', label: 'Tokens', sub: 'design variables' },
-  { value: '18', label: 'Families', sub: 'restyled in phase 2' },
-  { value: '161', label: 'Unit tests', sub: 'passing' }
-]
+  {value: '39', label: 'Components', sub: 'public exports'},
+  {value: '223', label: 'Tokens', sub: 'design variables'},
+  {value: '18', label: 'Families', sub: 'restyled in phase 2'},
+  {value: '161', label: 'Unit tests', sub: 'passing'},
+];
 
 // `as` picks the element the sample renders as. h1/h2/h3 read their size from
 // base.css's own bare-element rules — the same free styling a consumer's
@@ -120,38 +138,50 @@ const OVERVIEW_STATS = [
 // class reading their `--lat-text-*` role directly (base.css has no bare-body
 // rule to lean on the way it does for headings).
 const TYPE_SCALE = [
-  { name: 'Display', desc: '48 / bold', sample: 'Aa', as: 'div', role: 'display' },
-  { name: 'Heading 1', desc: '30 / semibold', sample: 'Heading one', as: 'h1', role: undefined },
-  { name: 'Heading 2', desc: '24 / medium', sample: 'Heading two', as: 'h2', role: undefined },
-  { name: 'Heading 3', desc: '20 / medium', sample: 'Heading three', as: 'h3', role: undefined },
-  { name: 'Body', desc: '16 / regular', sample: 'The quick brown fox jumps over the lazy dog.', as: 'p', role: undefined },
-  { name: 'Small', desc: '14 / regular', sample: 'Caption and helper text appear at this scale.', as: 'p', role: 'small' },
-  { name: 'Mono', desc: '14 mono / regular', sample: 'const value = tokens.accentSolid', as: 'p', role: 'mono' }
-] as const
+  {name: 'Display', desc: '48 / bold', sample: 'Aa', as: 'div', role: 'display'},
+  {name: 'Heading 1', desc: '30 / semibold', sample: 'Heading one', as: 'h1', role: undefined},
+  {name: 'Heading 2', desc: '24 / medium', sample: 'Heading two', as: 'h2', role: undefined},
+  {name: 'Heading 3', desc: '20 / medium', sample: 'Heading three', as: 'h3', role: undefined},
+  {
+    name: 'Body',
+    desc: '16 / regular',
+    sample: 'The quick brown fox jumps over the lazy dog.',
+    as: 'p',
+    role: undefined,
+  },
+  {
+    name: 'Small',
+    desc: '14 / regular',
+    sample: 'Caption and helper text appear at this scale.',
+    as: 'p',
+    role: 'small',
+  },
+  {name: 'Mono', desc: '14 mono / regular', sample: 'const value = tokens.accentSolid', as: 'p', role: 'mono'},
+] as const;
 
 /** Copies `text` to the clipboard and clears the sighted "copied" cue after
  *  a beat — the same shape `CodeBlock` uses internally, but this page also
  *  needs it for the per-swatch copy control `CodeBlock` has no slot for. */
-function useCopyFeedback() {
-  const [copiedKey, setCopiedKey] = useState<string | null>(null)
-  const copy = (key: string, text: string) => {
-    void navigator.clipboard.writeText(text)
-    setCopiedKey(key)
-    window.setTimeout(() => setCopiedKey((current) => (current === key ? null : current)), 1200)
-  }
-  return { copiedKey, copy }
+function useCopyFeedback(): {copiedKey: string | null; copy: (key: string, text: string) => void} {
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const copy = (key: string, text: string): void => {
+    void navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    window.setTimeout(() => setCopiedKey((current) => (current === key ? null : current)), 1200);
+  };
+  return {copiedKey, copy};
 }
 
-function SectionHead({ index, children }: { index: string; children: string }) {
+function SectionHead({index, children}: {index: string; children: string}): React.JSX.Element {
   return (
     <div className="system-page__section-head">
       <span className="system-page__section-index">{index}</span>
       <Eyebrow rule>{children}</Eyebrow>
     </div>
-  )
+  );
 }
 
-function OverviewSection() {
+function OverviewSection(): React.JSX.Element {
   return (
     <section id="overview" className="system-page__section">
       <SectionHead index="00">Overview</SectionHead>
@@ -169,8 +199,8 @@ function OverviewSection() {
               <span className="system-page__display-accent">Design System</span>
             </h1>
             <p className="system-page__lede">
-              A precise, developer-first component library built for teams who care about the
-              details. Every token intentional. Every interaction considered.
+              A precise, developer-first component library built for teams who care about the details. Every token
+              intentional. Every interaction considered.
             </p>
           </CardBody>
         </Card>
@@ -192,11 +222,11 @@ function OverviewSection() {
         regionLabel="Install command"
       />
     </section>
-  )
+  );
 }
 
-function TokensSection() {
-  const { copiedKey, copy } = useCopyFeedback()
+function TokensSection(): React.JSX.Element {
+  const {copiedKey, copy} = useCopyFeedback();
 
   return (
     <section id="tokens" className="system-page__section">
@@ -210,10 +240,7 @@ function TokensSection() {
           <div className="system-page__swatch-grid">
             {COLOR_TOKENS.map((t) => (
               <Card key={t.token}>
-                <div
-                  className="system-page__swatch-color"
-                  style={{ background: `var(${t.token})` }}
-                />
+                <div className="system-page__swatch-color" style={{background: `var(${t.token})`}} />
                 <CardBody>
                   <div className="system-page__swatch-row">
                     <span className="system-page__swatch-label">{t.label}</span>
@@ -241,10 +268,7 @@ function TokensSection() {
             {SPACING_TOKENS.map((s) => (
               <div key={s.token} className="system-page__spacing-row">
                 <span className="system-page__spacing-name">{s.token}</span>
-                <div
-                  className="system-page__spacing-bar"
-                  style={{ inlineSize: `var(${s.token})` }}
-                />
+                <div className="system-page__spacing-bar" style={{inlineSize: `var(${s.token})`}} />
                 <span className="system-page__spacing-px">{s.px}px</span>
               </div>
             ))}
@@ -252,10 +276,10 @@ function TokensSection() {
         </CardBody>
       </Card>
     </section>
-  )
+  );
 }
 
-function TypographySection() {
+function TypographySection(): React.JSX.Element {
   return (
     <section id="typography" className="system-page__section">
       <SectionHead index="02">Typography</SectionHead>
@@ -263,13 +287,13 @@ function TypographySection() {
       <Card className="system-page__panel">
         <CardBody className="system-page__type-scale">
           {TYPE_SCALE.map((t) => {
-            const Tag = t.as
+            const Tag = t.as;
             const sampleClass = [
               'system-page__type-sample',
-              t.role === undefined ? null : `system-page__type-${t.role}`
+              t.role === undefined ? null : `system-page__type-${t.role}`,
             ]
               .filter(Boolean)
-              .join(' ')
+              .join(' ');
             return (
               <div key={t.name} className="system-page__type-row">
                 <div className="system-page__type-meta">
@@ -278,7 +302,7 @@ function TypographySection() {
                 </div>
                 <Tag className={sampleClass}>{t.sample}</Tag>
               </div>
-            )
+            );
           })}
         </CardBody>
       </Card>
@@ -289,12 +313,12 @@ function TypographySection() {
         regionLabel="Font stack"
       />
     </section>
-  )
+  );
 }
 
-function ComponentsSection() {
-  const [tokenName, setTokenName] = useState('')
-  const [mode, setMode] = useState('system')
+function ComponentsSection(): React.JSX.Element {
+  const [tokenName, setTokenName] = useState('');
+  const [mode, setMode] = useState('system');
 
   return (
     <section id="components" className="system-page__section">
@@ -370,10 +394,10 @@ function ComponentsSection() {
         </CardBody>
       </Card>
     </section>
-  )
+  );
 }
 
-function PatternsSection() {
+function PatternsSection(): React.JSX.Element {
   return (
     <section id="patterns" className="system-page__section">
       <SectionHead index="04">Patterns</SectionHead>
@@ -388,11 +412,7 @@ function PatternsSection() {
                 <Badge variant="default">⌘K</Badge>
               </div>
               {PALETTE_ROWS.map((r, i) => (
-                <div
-                  key={r.name}
-                  className="system-page__palette-row"
-                  data-active={i === 0 ? '' : undefined}
-                >
+                <div key={r.name} className="system-page__palette-row" data-active={i === 0 ? '' : undefined}>
                   {i === 0 ? (
                     <ChevronRight size={11} className="system-page__tone" data-tone="primary" />
                   ) : (
@@ -433,16 +453,16 @@ function PatternsSection() {
         </Card>
       </div>
     </section>
-  )
+  );
 }
 
-function MotionSection() {
-  const [playing, setPlaying] = useState<string | null>(null)
+function MotionSection(): React.JSX.Element {
+  const [playing, setPlaying] = useState<string | null>(null);
 
-  const play = (label: string) => {
-    setPlaying(label)
-    window.setTimeout(() => setPlaying((current) => (current === label ? null : current)), 700)
-  }
+  const play = (label: string): void => {
+    setPlaying(label);
+    window.setTimeout(() => setPlaying((current) => (current === label ? null : current)), 700);
+  };
 
   return (
     <section id="motion" className="system-page__section">
@@ -471,10 +491,10 @@ function MotionSection() {
         </CardBody>
       </Card>
     </section>
-  )
+  );
 }
 
-function Sidebar({ active, onNavigate }: { active: string; onNavigate: (id: string) => void }) {
+function Sidebar({active, onNavigate}: {active: string; onNavigate: (id: string) => void}): React.JSX.Element {
   return (
     <aside className="system-page__sidebar">
       <div className="system-page__logo">
@@ -510,12 +530,12 @@ function Sidebar({ active, onNavigate }: { active: string; onNavigate: (id: stri
         <Badge variant="primary">v1.0.0</Badge>
       </div>
     </aside>
-  )
+  );
 }
 
-function Topbar({ active }: { active: string }) {
-  const [isDark, setIsDark] = useState(true)
-  const activeLabel = NAV.find((item) => item.id === active)?.label ?? active
+function Topbar({active}: {active: string}): React.JSX.Element {
+  const [isDark, setIsDark] = useState(true);
+  const activeLabel = NAV.find((item) => item.id === active)?.label ?? active;
 
   return (
     <header className="system-page__topbar">
@@ -530,16 +550,16 @@ function Topbar({ active }: { active: string }) {
         </Button>
       </div>
     </header>
-  )
+  );
 }
 
-export function SystemPage() {
-  const [active, setActive] = useState('overview')
+export function SystemPage(): React.JSX.Element {
+  const [active, setActive] = useState('overview');
 
-  const navigate = (id: string) => {
-    setActive(id)
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-  }
+  const navigate = (id: string): void => {
+    setActive(id);
+    document.getElementById(id)?.scrollIntoView({behavior: 'smooth'});
+  };
 
   return (
     <div className="lat-page lat-surface system-page">
@@ -556,5 +576,5 @@ export function SystemPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }

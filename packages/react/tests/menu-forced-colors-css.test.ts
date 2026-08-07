@@ -14,29 +14,32 @@
  * entire signal in that mode — leaving every menu item, active or not,
  * rendered identically to a forced-colors user.
  */
-import { fileURLToPath } from 'node:url'
-import { describe, expect, it } from 'vitest'
-import { assembleCss } from '../scripts/assemble-css.js'
+import {fileURLToPath} from 'node:url';
+import {describe, expect, it} from 'vitest';
+import {assembleCss} from '../scripts/assemble-css.js';
 
-const css = await assembleCss(fileURLToPath(new URL('../src/styles.css', import.meta.url)))
+const css = await assembleCss(fileURLToPath(new URL('../src/styles.css', import.meta.url)));
 
 function escapeRegExp(text: string): string {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /** Extracts a `{ ... }` body with balanced-brace matching, unlike a `[^}]*`
  * regex, which breaks the moment the body contains a nested block — as
  * `@media` blocks always do. */
 function balancedBlock(source: string, openBraceIndex: number): string {
-  let depth = 0
+  let depth = 0;
   for (let i = openBraceIndex; i < source.length; i++) {
-    if (source[i] === '{') depth++
-    else if (source[i] === '}') {
-      depth--
-      if (depth === 0) return source.slice(openBraceIndex + 1, i)
+    if (source[i] === '{') {
+      depth++;
+    } else if (source[i] === '}') {
+      depth--;
+      if (depth === 0) {
+        return source.slice(openBraceIndex + 1, i);
+      }
     }
   }
-  throw new Error('unbalanced braces: no matching closing brace found')
+  throw new Error('unbalanced braces: no matching closing brace found');
 }
 
 // Each of the two components with a forced-colors fallback declares its own
@@ -48,43 +51,43 @@ function balancedBlock(source: string, openBraceIndex: number): string {
 // block once a second one existed, which is exactly what broke
 // segmented-control-forced-colors-css.test.ts when this one was added.
 function mediaBlock(query: string): string {
-  const pattern = new RegExp(`${escapeRegExp(query)}\\s*\\{`, 'g')
-  const blocks: string[] = []
+  const pattern = new RegExp(`${escapeRegExp(query)}\\s*\\{`, 'g');
+  const blocks: string[] = [];
 
   for (const match of css.matchAll(pattern)) {
-    blocks.push(balancedBlock(css, (match.index ?? 0) + match[0].length - 1))
+    blocks.push(balancedBlock(css, (match.index ?? 0) + match[0].length - 1));
   }
 
   if (blocks.length === 0) {
-    throw new Error(`no ${query} block found in the assembled stylesheet`)
+    throw new Error(`no ${query} block found in the assembled stylesheet`);
   }
 
-  return blocks.join('\n')
+  return blocks.join('\n');
 }
 
 function block(source: string, selector: string): string {
-  const pattern = new RegExp(`${escapeRegExp(selector)}\\s*\\{([^}]*)\\}`)
-  const match = pattern.exec(source)
+  const pattern = new RegExp(`${escapeRegExp(selector)}\\s*\\{([^}]*)\\}`);
+  const match = pattern.exec(source);
   if (match === null) {
-    throw new Error(`no ${selector} block found`)
+    throw new Error(`no ${selector} block found`);
   }
-  return match[1] ?? ''
+  return match[1] ?? '';
 }
 
 describe("Menu's forced-colors fallback", () => {
   it('declares a forced-colors block', () => {
-    expect(css).toMatch(/@media \(forced-colors: active\)\s*\{/)
-  })
+    expect(css).toMatch(/@media \(forced-colors: active\)\s*\{/);
+  });
 
   it('gives the active item both a background and a colour inside that block, from the system palette', () => {
-    const media = mediaBlock('@media (forced-colors: active)')
-    const rule = block(media, ".lat-menu__item[data-active-item]")
+    const media = mediaBlock('@media (forced-colors: active)');
+    const rule = block(media, '.lat-menu__item[data-active-item]');
 
-    expect(rule).toContain('background: Highlight;')
-    expect(rule).toContain('color: HighlightText;')
+    expect(rule).toContain('background: Highlight;');
+    expect(rule).toContain('color: HighlightText;');
     // forced-color-adjust: none is what stops the UA overriding Highlight/
     // HighlightText straight back to its own defaults — without it the block
     // above is a no-op.
-    expect(rule).toContain('forced-color-adjust: none;')
-  })
-})
+    expect(rule).toContain('forced-color-adjust: none;');
+  });
+});

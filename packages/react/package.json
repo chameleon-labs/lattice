@@ -2,29 +2,29 @@
   "name": "@chameleon-labs/lattice-react",
   "version": "0.1.0-rc.1",
   "description": "The component layer of Lattice, an accessibility-first design system. Ariakit supplies behaviour; Lattice decides appearance and guarantees legibility.",
+  "keywords": [
+    "accessibility",
+    "ariakit",
+    "components",
+    "design-system",
+    "react",
+    "wcag"
+  ],
+  "homepage": "https://github.com/chameleon-labs/lattice#readme",
+  "bugs": "https://github.com/chameleon-labs/lattice/issues",
   "license": "MIT",
   "author": "George Karan",
-  "homepage": "https://github.com/chameleon-labs/lattice#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/chameleon-labs/lattice.git",
     "directory": "packages/react"
   },
-  "bugs": "https://github.com/chameleon-labs/lattice/issues",
-  "keywords": [
-    "design-system",
-    "react",
-    "ariakit",
-    "components",
-    "accessibility",
-    "wcag"
-  ],
-  "type": "module",
-  "publishConfig": {
-    "access": "public"
-  },
   "files": [
     "dist"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
   ],
   "exports": {
     ".": {
@@ -34,9 +34,9 @@
     "./styles.css": "./dist/styles.css",
     "./package.json": "./package.json"
   },
-  "sideEffects": [
-    "**/*.css"
-  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "node ../../scripts/clean.mjs dist && tsc -p tsconfig.build.json && tsx scripts/build-css.ts",
     "prepack": "pnpm build",
@@ -47,12 +47,6 @@
     "test:unit": "vitest run",
     "test:browser": "playwright test",
     "test:watch": "vitest"
-  },
-  "peerDependencies": {
-    "@ariakit/react": "^0.4.35",
-    "@chameleon-labs/lattice-tokens": "workspace:*",
-    "react": ">=19",
-    "react-dom": ">=19"
   },
   "devDependencies": {
     "@ariakit/react": "^0.4.35",
@@ -76,5 +70,11 @@
     "typescript": "^7.0.2",
     "vite": "^8.2.0",
     "vitest": "^4.1.10"
+  },
+  "peerDependencies": {
+    "@ariakit/react": "^0.4.35",
+    "@chameleon-labs/lattice-tokens": "workspace:*",
+    "react": ">=19",
+    "react-dom": ">=19"
   }
 }

@@ -6,8 +6,8 @@
  * against the document's base — http://localhost:3000 — rather than the passed
  * file: base, and readFileSync then rejects the result.
  */
-import { readFileSync, readdirSync } from 'node:fs'
-import { describe, expect, it } from 'vitest'
+import {readFileSync, readdirSync} from 'node:fs';
+import {describe, expect, it} from 'vitest';
 
 /**
  * The other half of the accessibility guarantee.
@@ -20,13 +20,13 @@ import { describe, expect, it } from 'vitest'
  * So the sweep proves every story is accessible, and this proves every component
  * is a story. Neither is sufficient alone.
  */
-const src = new URL('../src/', import.meta.url)
+const src = new URL('../src/', import.meta.url);
 
-const barrel = readFileSync(new URL('index.ts', src), 'utf8')
+const barrel = readFileSync(new URL('index.ts', src), 'utf8');
 
-const storyFiles = readdirSync(src, { recursive: true, encoding: 'utf8' }).filter((entry) =>
-  entry.endsWith('.stories.tsx')
-)
+const storyFiles = readdirSync(src, {recursive: true, encoding: 'utf8'}).filter((entry) =>
+  entry.endsWith('.stories.tsx'),
+);
 
 /**
  * Story sources with their import statements removed.
@@ -36,11 +36,11 @@ const storyFiles = readdirSync(src, { recursive: true, encoding: 'utf8' }).filte
  * passing because of the line that introduces the name. Stripping imports means
  * a name found here is a name the story actually uses.
  */
-const IMPORT_STATEMENT = /^import\b[\s\S]*?\bfrom\s+'[^']+'/gm
+const IMPORT_STATEMENT = /^import\b[\s\S]*?\bfrom\s+'[^']+'/gm;
 
 const storyBodies = storyFiles
   .map((file) => readFileSync(new URL(file, src), 'utf8').replace(IMPORT_STATEMENT, ''))
-  .join('\n')
+  .join('\n');
 
 /**
  * Value exports only.
@@ -55,22 +55,30 @@ const storyBodies = storyFiles
  * Matching both and rejecting one makes the rule visible and testable.
  */
 const exportedComponents = (): string[] => {
-  const names = new Set<string>()
+  const names = new Set<string>();
 
   for (const match of barrel.matchAll(/export\s+(type\s+)?\{([^}]*)\}\s*from/g)) {
-    if (match[1] !== undefined) continue
+    if (match[1] !== undefined) {
+      continue;
+    }
 
     for (const name of (match[2] ?? '').split(',')) {
-      const trimmed = name.trim().split(/\s+as\s+/).pop()?.trim()
+      const trimmed = name
+        .trim()
+        .split(/\s+as\s+/)
+        .pop()
+        ?.trim();
       // `export { type Foo, Bar }` — an inline type specifier inside a value
       // clause is still a type.
-      if (trimmed === undefined || trimmed === '' || trimmed.startsWith('type ')) continue
-      names.add(trimmed)
+      if (trimmed === undefined || trimmed === '' || trimmed.startsWith('type ')) {
+        continue;
+      }
+      names.add(trimmed);
     }
   }
 
-  return [...names].sort()
-}
+  return [...names].toSorted();
+};
 
 /**
  * `pages/` is the one directory under src/ that is not a component family —
@@ -79,60 +87,58 @@ const exportedComponents = (): string[] => {
  * about "gives every component directory a stories file" below; it exists so
  * that check keeps meaning what its name says.
  */
-const NON_COMPONENT_DIRECTORIES = ['pages']
+const NON_COMPONENT_DIRECTORIES = new Set(['pages']);
 
 /** Directories under src/ that hold a component, i.e. everything but the barrel. */
 const componentDirectories = (): string[] =>
-  readdirSync(src, { withFileTypes: true })
+  readdirSync(src, {withFileTypes: true})
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
-    .filter((name) => !NON_COMPONENT_DIRECTORIES.includes(name))
-    .sort()
+    .filter((name) => !NON_COMPONENT_DIRECTORIES.has(name))
+    .toSorted();
 
 describe('story coverage', () => {
   it('finds the barrel and the stories, so the assertions below are not vacuous', () => {
-    expect(exportedComponents().length).toBeGreaterThan(0)
-    expect(storyFiles.length).toBeGreaterThan(0)
-  })
+    expect(exportedComponents().length).toBeGreaterThan(0);
+    expect(storyFiles.length).toBeGreaterThan(0);
+  });
 
   it('gives every component directory a stories file', () => {
     const without = componentDirectories().filter(
-      (directory) => !storyFiles.some((file) => file.startsWith(`${directory}/`))
-    )
+      (directory) => !storyFiles.some((file) => file.startsWith(`${directory}/`)),
+    );
 
-    expect(without).toEqual([])
-  })
+    expect(without).toEqual([]);
+  });
 
   it('drops type-only exports, which have nothing to render', () => {
-    const exported = exportedComponents()
+    const exported = exportedComponents();
 
     // Named rather than pattern-matched: these are real entries in the barrel's
     // `export type` clauses, so if the type filter stopped working they would
     // appear here and demand stories that cannot exist.
-    expect(exported).not.toContain('ButtonProps')
-    expect(exported).not.toContain('BadgeTone')
-    expect(exported).not.toContain('TableOptions')
+    expect(exported).not.toContain('ButtonProps');
+    expect(exported).not.toContain('BadgeTone');
+    expect(exported).not.toContain('TableOptions');
 
     // …while the value export sitting beside them is still found.
-    expect(exported).toContain('Button')
-  })
+    expect(exported).toContain('Button');
+  });
 
   it('uses every exported component in the body of at least one story', () => {
-    const missing = exportedComponents().filter(
-      (name) => !new RegExp(`\\b${name}\\b`).test(storyBodies)
-    )
+    const missing = exportedComponents().filter((name) => !new RegExp(`\\b${name}\\b`).test(storyBodies));
 
-    expect(missing).toEqual([])
-  })
+    expect(missing).toEqual([]);
+  });
 
   it('titles every story file under the Components or Pages namespace', () => {
     const untitled = storyFiles.filter(
-      (file) => !/title:\s*'(Components|Pages)\/\w+'/.test(readFileSync(new URL(file, src), 'utf8'))
-    )
+      (file) => !/title:\s*'(Components|Pages)\/\w+'/.test(readFileSync(new URL(file, src), 'utf8')),
+    );
 
     // The browser sweep matches stories by `Components/<Family>` and
     // `Pages/<Page>`, so a story titled anything else would be indexed,
     // rendered, and never scanned.
-    expect(untitled).toEqual([])
-  })
-})
+    expect(untitled).toEqual([]);
+  });
+});

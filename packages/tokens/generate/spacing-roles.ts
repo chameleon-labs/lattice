@@ -23,33 +23,32 @@
  * and would forfeit the existing guarantee that every alias resolves to a token
  * that exists.
  */
-import { GAP_ROLES, INSET_ROLES, type InsetValue, type SpaceName } from '../config/spacing-roles.js'
+import {GAP_ROLES, INSET_ROLES, type InsetValue, type SpaceName} from '../config/spacing-roles.js';
 
 /**
  * A DTCG dimension expressed as a reference to a layout primitive. The colour
  * tier's `AliasToken` is the same idea for `$type: 'color'`.
  */
 export interface DimensionAlias {
-  readonly $type: 'dimension'
-  readonly $value: string
+  readonly $type: 'dimension';
+  readonly $value: string;
 }
 
 /** A pair, as DTCG must express it: two dimensions under one group. */
 export interface InsetPairGroup {
-  readonly block: DimensionAlias
-  readonly inline: DimensionAlias
+  readonly block: DimensionAlias;
+  readonly inline: DimensionAlias;
 }
 
 export interface SpacingRoleTokenGroups {
-  readonly inset: Readonly<Record<string, DimensionAlias | InsetPairGroup>>
-  readonly gap: Readonly<Record<string, DimensionAlias>>
+  readonly inset: Readonly<Record<string, DimensionAlias | InsetPairGroup>>;
+  readonly gap: Readonly<Record<string, DimensionAlias>>;
 }
 
 /** Custom properties emitted, which is one per role in either family. */
-export const SPACING_ROLE_COUNT =
-  Object.keys(INSET_ROLES).length + Object.keys(GAP_ROLES).length
+export const SPACING_ROLE_COUNT = Object.keys(INSET_ROLES).length + Object.keys(GAP_ROLES).length;
 
-const reference = (name: SpaceName): string => `var(--lat-space-${name})`
+const reference = (name: SpaceName): string => `var(--lat-space-${name})`;
 
 /**
  * Block axis first — the order `padding` and `margin` already define for two
@@ -57,22 +56,18 @@ const reference = (name: SpaceName): string => `var(--lat-space-${name})`
  * every padded element in the library coming out the wrong shape.
  */
 const insetValue = (value: InsetValue): string =>
-  Array.isArray(value)
-    ? `${reference(value[0])} ${reference(value[1])}`
-    : reference(value as SpaceName)
+  Array.isArray(value) ? `${reference(value[0])} ${reference(value[1])}` : reference(value as SpaceName);
 
 const dimensionAlias = (name: SpaceName): DimensionAlias => ({
   $type: 'dimension',
-  $value: `{global.space.${name}}`
-})
+  $value: `{global.space.${name}}`,
+});
 
 export function spacingRoleCss(): string {
   return [
-    ...Object.entries(INSET_ROLES).map(
-      ([role, value]) => `  --lat-inset-${role}: ${insetValue(value)};`
-    ),
-    ...Object.entries(GAP_ROLES).map(([role, name]) => `  --lat-gap-${role}: ${reference(name)};`)
-  ].join('\n')
+    ...Object.entries(INSET_ROLES).map(([role, value]) => `  --lat-inset-${role}: ${insetValue(value)};`),
+    ...Object.entries(GAP_ROLES).map(([role, name]) => `  --lat-gap-${role}: ${reference(name)};`),
+  ].join('\n');
 }
 
 export function spacingRoleTokens(): SpacingRoleTokenGroups {
@@ -81,12 +76,10 @@ export function spacingRoleTokens(): SpacingRoleTokenGroups {
       Object.entries(INSET_ROLES).map(([role, value]) => [
         role,
         Array.isArray(value)
-          ? { block: dimensionAlias(value[0]), inline: dimensionAlias(value[1]) }
-          : dimensionAlias(value as SpaceName)
-      ])
+          ? {block: dimensionAlias(value[0]), inline: dimensionAlias(value[1])}
+          : dimensionAlias(value as SpaceName),
+      ]),
     ),
-    gap: Object.fromEntries(
-      Object.entries(GAP_ROLES).map(([role, name]) => [role, dimensionAlias(name)])
-    )
-  }
+    gap: Object.fromEntries(Object.entries(GAP_ROLES).map(([role, name]) => [role, dimensionAlias(name)])),
+  };
 }

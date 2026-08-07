@@ -1,5 +1,5 @@
-import { Button as AriakitButton, type ButtonProps as AriakitButtonProps } from '@ariakit/react'
-import type { ElementType } from 'react'
+import {Button as AriakitButton, type ButtonProps as AriakitButtonProps} from '@ariakit/react';
+import type {ElementType} from 'react';
 
 /**
  * Lattice's five variants.
@@ -14,22 +14,22 @@ import type { ElementType } from 'react'
  * shows, and it is what keeps a destructive action from outweighing the primary
  * one on the same row.
  */
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'link'
-export type ButtonSize = 'sm' | 'md' | 'lg'
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'link';
+export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonOptions {
-  variant?: ButtonVariant
-  size?: ButtonSize
+  variant?: ButtonVariant;
+  size?: ButtonSize;
 }
 
-export type ButtonProps<T extends ElementType = 'button'> = AriakitButtonProps<T> & ButtonOptions
+export type ButtonProps<T extends ElementType = 'button'> = AriakitButtonProps<T> & ButtonOptions;
 
 export function Button<T extends ElementType = 'button'>({
   variant = 'secondary',
   size = 'md',
   className,
   ...props
-}: ButtonProps<T>) {
+}: ButtonProps<T>): React.JSX.Element {
   return (
     <AriakitButton
       {...props}
@@ -37,5 +37,5 @@ export function Button<T extends ElementType = 'button'>({
       data-variant={variant}
       data-size={size}
     />
-  )
+  );
 }

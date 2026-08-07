@@ -39,7 +39,9 @@
   transform: translateY(-50%);
 }
 
-.lat-switch[aria-checked='true'] { background-color: var(--lat-solid); }
+.lat-switch[aria-checked='true'] {
+  background-color: var(--lat-solid);
+}
 
 .lat-switch[aria-checked='true']::before {
   transform: translateY(-50%) translateX(var(--lat-space-3));

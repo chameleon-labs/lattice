@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from 'react'
+import type {HTMLAttributes} from 'react';
 
 /**
  * `subtle` is the docs page's `SectionLabel` colour (`text-muted-foreground`)
@@ -8,7 +8,7 @@ import type { HTMLAttributes } from 'react'
  * source uses it for every section label on that page plus both "Early
  * access" kickers, never for a panel label.
  */
-export type EyebrowTone = 'subtle' | 'accent'
+export type EyebrowTone = 'subtle' | 'accent';
 
 /**
  * `start` (the default) is every eyebrow but one: a section head or panel
@@ -21,7 +21,7 @@ export type EyebrowTone = 'subtle' | 'accent'
  * flex container in the first place. A prop is the honest fix: a centred
  * eyebrow is a normal thing to want, not a one-off.
  */
-export type EyebrowAlign = 'start' | 'center'
+export type EyebrowAlign = 'start' | 'center';
 
 /**
  * The uppercase mono label at 0.2em tracking.
@@ -34,9 +34,9 @@ export type EyebrowAlign = 'start' | 'center'
  * use.
  */
 export interface EyebrowProps extends HTMLAttributes<HTMLDivElement> {
-  rule?: boolean
-  tone?: EyebrowTone
-  align?: EyebrowAlign
+  rule?: boolean;
+  tone?: EyebrowTone;
+  align?: EyebrowAlign;
 }
 
 export function Eyebrow({
@@ -46,7 +46,7 @@ export function Eyebrow({
   className,
   children,
   ...props
-}: EyebrowProps) {
+}: EyebrowProps): React.JSX.Element {
   return (
     <div
       {...props}
@@ -57,5 +57,5 @@ export function Eyebrow({
       {rule ? <span className="lat-eyebrow__rule" aria-hidden="true" /> : null}
       <span className="lat-eyebrow__text">{children}</span>
     </div>
-  )
+  );
 }

@@ -1,10 +1,10 @@
-import { useId } from 'react'
-import { Input, type InputProps } from '../input/input.js'
+import {useId} from 'react';
+import {Input, type InputProps} from '../input/input.js';
 
 export interface TextFieldProps extends Omit<InputProps, 'aria-describedby' | 'aria-invalid'> {
-  label: string
-  description?: string
-  error?: string
+  label: string;
+  description?: string;
+  error?: string;
 }
 
 /**
@@ -15,20 +15,17 @@ export interface TextFieldProps extends Omit<InputProps, 'aria-describedby' | 'a
  * product exists to find — so the relationship is built here rather than
  * re-established correctly at every call site.
  */
-export function TextField({ label, description, error, className, ...props }: TextFieldProps) {
-  const base = useId()
-  const inputId = `${base}-input`
-  const descriptionId = `${base}-description`
-  const errorId = `${base}-error`
+export function TextField({label, description, error, className, ...props}: TextFieldProps): React.JSX.Element {
+  const base = useId();
+  const inputId = `${base}-input`;
+  const descriptionId = `${base}-description`;
+  const errorId = `${base}-error`;
 
   // Only ids that were actually rendered. An empty aria-describedby is worse
   // than an absent one: it points assistive technology at nothing.
-  const describedBy = [
-    description === undefined ? null : descriptionId,
-    error === undefined ? null : errorId
-  ]
+  const describedBy = [description === undefined ? null : descriptionId, error === undefined ? null : errorId]
     .filter((id): id is string => id !== null)
-    .join(' ')
+    .join(' ');
 
   return (
     <div className={className === undefined ? 'lat-text-field' : `lat-text-field ${className}`}>
@@ -46,7 +43,7 @@ export function TextField({ label, description, error, className, ...props }: Te
         {...props}
         id={inputId}
         invalid={error !== undefined}
-        {...(describedBy === '' ? {} : { 'aria-describedby': describedBy })}
+        {...(describedBy === '' ? {} : {'aria-describedby': describedBy})}
       />
 
       {/*
@@ -59,5 +56,5 @@ export function TextField({ label, description, error, className, ...props }: Te
         </p>
       )}
     </div>
-  )
+  );
 }

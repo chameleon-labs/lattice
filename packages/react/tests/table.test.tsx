@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
-import { TBody, THead, Table, Td, Th, Tr } from '../src/table/table.js'
+import {render, screen} from '@testing-library/react';
+import {describe, expect, it} from 'vitest';
+import {TBody, THead, Table, Td, Th, Tr} from '../src/table/table.js';
 
 const history = (
   <Table caption="Audit history">
@@ -17,21 +17,21 @@ const history = (
       </Tr>
     </TBody>
   </Table>
-)
+);
 
 describe('Table', () => {
   it('renders the caption as a real <caption>', () => {
-    render(history)
-    const caption = screen.getByText('Audit history')
+    render(history);
+    const caption = screen.getByText('Audit history');
 
-    expect(caption.closest('caption')).not.toBeNull()
-  })
+    expect(caption.closest('caption')).not.toBeNull();
+  });
 
   it('takes its accessible name from the caption', () => {
-    render(history)
+    render(history);
 
-    expect(screen.getByRole('table', { name: 'Audit history' })).toBeDefined()
-  })
+    expect(screen.getByRole('table', {name: 'Audit history'})).toBeDefined();
+  });
 
   it('keeps a visually hidden caption in the accessibility tree', () => {
     render(
@@ -41,30 +41,30 @@ describe('Table', () => {
             <Td>72</Td>
           </Tr>
         </TBody>
-      </Table>
-    )
+      </Table>,
+    );
 
     // Still the accessible name, even though it is not visible.
-    expect(screen.getByRole('table', { name: 'Audit history' })).toBeDefined()
-  })
+    expect(screen.getByRole('table', {name: 'Audit history'})).toBeDefined();
+  });
 
   it('gives every header cell a scope', () => {
-    render(history)
+    render(history);
 
     for (const header of screen.getAllByRole('columnheader')) {
-      expect(header.getAttribute('scope')).toBe('col')
+      expect(header.getAttribute('scope')).toBe('col');
     }
-    expect(screen.getByRole('rowheader').getAttribute('scope')).toBe('row')
-  })
+    expect(screen.getByRole('rowheader').getAttribute('scope')).toBe('row');
+  });
 
   it('renders rows and cells with their own classes', () => {
-    const { container } = render(history)
+    const {container} = render(history);
 
-    expect(container.querySelector('.lat-table')).not.toBeNull()
-    expect(container.querySelector('.lat-table__header')).not.toBeNull()
-    expect(container.querySelector('.lat-table__cell')).not.toBeNull()
-  })
-})
+    expect(container.querySelector('.lat-table')).not.toBeNull();
+    expect(container.querySelector('.lat-table__header')).not.toBeNull();
+    expect(container.querySelector('.lat-table__cell')).not.toBeNull();
+  });
+});
 
 /*
  * The two guarantees are type-level, so they are asserted by the compiler
@@ -89,5 +89,5 @@ export function TypeAssertions() {
         </THead>
       </Table>
     </>
-  )
+  );
 }

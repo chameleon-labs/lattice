@@ -5,22 +5,22 @@
  *
  * Every fraction here appears literally in the Figma bundle. They are not tuned.
  */
-import type { Mode } from './modes.js'
+import type {Mode} from './modes.js';
 
 /** The channel each mode's alpha layers are drawn from. */
 export const ALPHA_CHANNEL: Record<Mode, string> = {
   dark: '255 255 255',
-  light: '0 0 0'
-}
+  light: '0 0 0',
+};
 
 /** Resting edge. `border-white/[0.07]` and `border-black/[0.08]` in the bundle. */
-export const HAIRLINE: Record<Mode, number> = { dark: 0.07, light: 0.08 }
+export const HAIRLINE: Record<Mode, number> = {dark: 0.07, light: 0.08};
 
 /** Hover edge. `hover:border-white/15`. */
-export const HAIRLINE_STRONG = 0.15
+export const HAIRLINE_STRONG = 0.15;
 
 /** Hover fill. `hover:bg-foreground/5`. */
-export const WASH = 0.05
+export const WASH = 0.05;
 
 /**
  * The accent runs richer than the status scales — `bg-primary/15 border-primary/25`
@@ -28,9 +28,9 @@ export const WASH = 0.05
  * a near-black surface is close to invisible.
  */
 export const TINT_FRACTIONS = {
-  accent: { fill: 0.15, border: 0.25 },
-  default: { fill: 0.1, border: 0.2 }
-} as const
+  accent: {fill: 0.15, border: 0.25},
+  default: {fill: 0.1, border: 0.2},
+} as const;
 
 /**
  * Anchored per mode rather than derived from `--lat-solid`, which was being
@@ -53,6 +53,6 @@ export const TINT_FRACTIONS = {
  * written out so a future change to the accent does not drag focus with it.
  */
 export const FOCUS_RING = {
-  light: { hex: '#4f7300', alpha: 1 },
-  dark: { hex: '#cff23a', alpha: 0.4 }
-} as const satisfies Readonly<Record<'light' | 'dark', { hex: string; alpha: number }>>
+  light: {hex: '#4f7300', alpha: 1},
+  dark: {hex: '#cff23a', alpha: 0.4},
+} as const satisfies Readonly<Record<'light' | 'dark', {hex: string; alpha: number}>>;

@@ -25,5 +25,5 @@ export function fontFaceCss(): string {
   font-weight: 100 800;
   font-style: normal;
   font-display: swap;
-}`
+}`;
 }

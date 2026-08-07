@@ -1,15 +1,15 @@
-import { readdirSync } from 'node:fs'
-import type { APIRequestContext, Page } from '@playwright/test'
+import {readdirSync} from 'node:fs';
+import type {APIRequestContext, Page} from '@playwright/test';
 
 export interface StoryEntry {
-  readonly id: string
-  readonly title: string
-  readonly name: string
-  readonly type: string
+  readonly id: string;
+  readonly title: string;
+  readonly name: string;
+  readonly type: string;
 }
 
 interface StoryIndex {
-  readonly entries: Record<string, StoryEntry>
+  readonly entries: Record<string, StoryEntry>;
 }
 
 /**
@@ -25,21 +25,21 @@ interface StoryIndex {
  * shard come from the index. Neither is a hand-maintained list.
  */
 export function storyFamilies(): string[] {
-  const src = new URL('../../../src/', import.meta.url)
+  const src = new URL('../../../src/', import.meta.url);
 
-  return readdirSync(src, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    // `pages/` ships full-page stories titled `Pages/<Page>`, not
-    // `Components/<Family>` — see the matching exclusion in
-    // tests/exports.test.ts. This sweep is keyed to the Components
-    // namespace, so a page story needs its own coverage rather than being
-    // folded into a walk that assumes every directory is a component family.
-    .filter((entry) => entry.name !== 'pages')
-    .filter((entry) =>
-      readdirSync(new URL(`${entry.name}/`, src)).some((file) => file.endsWith('.stories.tsx'))
-    )
-    .map((entry) => entry.name)
-    .sort()
+  return (
+    readdirSync(src, {withFileTypes: true})
+      .filter((entry) => entry.isDirectory())
+      // `pages/` ships full-page stories titled `Pages/<Page>`, not
+      // `Components/<Family>` — see the matching exclusion in
+      // tests/exports.test.ts. This sweep is keyed to the Components
+      // namespace, so a page story needs its own coverage rather than being
+      // folded into a walk that assumes every directory is a component family.
+      .filter((entry) => entry.name !== 'pages')
+      .filter((entry) => readdirSync(new URL(`${entry.name}/`, src)).some((file) => file.endsWith('.stories.tsx')))
+      .map((entry) => entry.name)
+      .toSorted()
+  );
 }
 
 /**
@@ -60,32 +60,32 @@ export function storyFamilies(): string[] {
  * *not* kept: caching it would let a single dropped socket fail every remaining
  * test in the worker, which is the opposite of the point.
  */
-let indexRequest: Promise<StoryEntry[]> | undefined
+let indexRequest: Promise<StoryEntry[]> | undefined;
 
 /** Every entry Storybook indexed as a story, in index order. */
-export async function fetchStories(request: APIRequestContext): Promise<StoryEntry[]> {
+export function fetchStories(request: APIRequestContext): Promise<StoryEntry[]> {
   indexRequest ??= loadStories(request).catch((error: unknown) => {
-    indexRequest = undefined
-    throw error
-  })
+    indexRequest = undefined;
+    throw error;
+  });
 
-  return indexRequest
+  return indexRequest;
 }
 
 async function loadStories(request: APIRequestContext): Promise<StoryEntry[]> {
-  const response = await request.get('/index.json')
+  const response = await request.get('/index.json');
 
   if (!response.ok()) {
-    throw new Error(`/index.json responded ${response.status()} — is Storybook serving?`)
+    throw new Error(`/index.json responded ${response.status()} — is Storybook serving?`);
   }
 
-  const index = (await response.json()) as StoryIndex
+  const index = (await response.json()) as StoryIndex;
 
   // `docs` entries are autodocs pages: Storybook's own chrome around a prop
   // table. Scanning those would measure Storybook rather than Lattice, the same
   // reason the :focus-visible pointer heuristic is asserted statically instead
   // of in a browser.
-  return Object.values(index.entries).filter((entry) => entry.type === 'story')
+  return Object.values(index.entries).filter((entry) => entry.type === 'story');
 }
 
 /** A directory name — `text-field` — as it appears in a story title: `TextField`. */
@@ -93,7 +93,7 @@ export function titleFor(family: string): string {
   return family
     .split('-')
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join('')
+    .join('');
 }
 
 /**
@@ -115,12 +115,12 @@ export function titleFor(family: string): string {
  * and only because it is bringing its own axe.
  */
 export function storyUrl(id: string, theme: 'light' | 'dark'): string {
-  const globals = `theme:${theme};a11y.manual:!true`
+  const globals = `theme:${theme};a11y.manual:!true`;
 
-  return `/iframe.html?id=${encodeURIComponent(id)}&viewMode=story&globals=${encodeURIComponent(globals)}`
+  return `/iframe.html?id=${encodeURIComponent(id)}&viewMode=story&globals=${encodeURIComponent(globals)}`;
 }
 
-export const THEMES = ['light', 'dark'] as const
+export const THEMES = ['light', 'dark'] as const;
 
 /**
  * Wait for the story to stop moving before measuring it.
@@ -139,15 +139,18 @@ export const THEMES = ['light', 'dark'] as const
  */
 export async function settle(page: Page): Promise<void> {
   await page.evaluate(async () => {
-    const frame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+    const frame = (): Promise<void> =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => {
+          resolve();
+        });
+      });
 
     for (let round = 0; round < 3; round += 1) {
-      await frame()
-      await Promise.all(
-        document.getAnimations().map((animation) => animation.finished.catch(() => undefined))
-      )
+      await frame();
+      await Promise.all(document.getAnimations().map((animation) => animation.finished.catch(() => undefined)));
     }
-  })
+  });
 }
 
 /**
@@ -158,10 +161,4 @@ export async function settle(page: Page): Promise<void> {
  * scaffolding around each story would make these rules pass while testing
  * nothing. Every rule that judges the component itself stays on.
  */
-export const PAGE_SCOPED_RULES = [
-  'region',
-  'landmark-one-main',
-  'page-has-heading-one',
-  'bypass',
-  'html-has-lang'
-]
+export const PAGE_SCOPED_RULES = ['region', 'landmark-one-main', 'page-has-heading-one', 'bypass', 'html-has-lang'];

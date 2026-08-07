@@ -510,12 +510,24 @@
   transition-timing-function: var(--lat-easing-out);
 }
 
-.system-page__motion-dot[data-duration='instant'] { transition-duration: var(--lat-duration-instant); }
-.system-page__motion-dot[data-duration='swift'] { transition-duration: var(--lat-duration-swift); }
-.system-page__motion-dot[data-duration='default'] { transition-duration: var(--lat-duration-default); }
-.system-page__motion-dot[data-duration='deliberate'] { transition-duration: var(--lat-duration-deliberate); }
-.system-page__motion-dot[data-duration='expressive'] { transition-duration: var(--lat-duration-expressive); }
-.system-page__motion-dot[data-easing='in-out'] { transition-timing-function: var(--lat-easing-in-out); }
+.system-page__motion-dot[data-duration='instant'] {
+  transition-duration: var(--lat-duration-instant);
+}
+.system-page__motion-dot[data-duration='swift'] {
+  transition-duration: var(--lat-duration-swift);
+}
+.system-page__motion-dot[data-duration='default'] {
+  transition-duration: var(--lat-duration-default);
+}
+.system-page__motion-dot[data-duration='deliberate'] {
+  transition-duration: var(--lat-duration-deliberate);
+}
+.system-page__motion-dot[data-duration='expressive'] {
+  transition-duration: var(--lat-duration-expressive);
+}
+.system-page__motion-dot[data-easing='in-out'] {
+  transition-timing-function: var(--lat-easing-in-out);
+}
 
 .system-page__motion-dot[data-playing] {
   inset-inline-start: calc(100% - var(--lat-space-3));
@@ -908,9 +920,15 @@
   border-radius: var(--lat-radius-full);
 }
 
-.landing-page__audit-dot--critical { background: color-mix(in oklch, var(--lat-severity-critical) 60%, transparent); }
-.landing-page__audit-dot--serious { background: color-mix(in oklch, var(--lat-severity-serious) 60%, transparent); }
-.landing-page__audit-dot--primary { background: color-mix(in oklch, var(--lat-solid) 60%, transparent); }
+.landing-page__audit-dot--critical {
+  background: color-mix(in oklch, var(--lat-severity-critical) 60%, transparent);
+}
+.landing-page__audit-dot--serious {
+  background: color-mix(in oklch, var(--lat-severity-serious) 60%, transparent);
+}
+.landing-page__audit-dot--primary {
+  background: color-mix(in oklch, var(--lat-solid) 60%, transparent);
+}
 
 /* The URL: normal-case mono, not the eyebrow `CardHeader` would have given it. */
 .landing-page__audit-url {
@@ -969,9 +987,15 @@
   font-family: var(--lat-font-sans);
 }
 
-.landing-page__score-arc--good { color: var(--lat-accent-vivid); }
-.landing-page__score-arc--warn { color: var(--lat-severity-serious); }
-.landing-page__score-arc--bad { color: var(--lat-severity-critical); }
+.landing-page__score-arc--good {
+  color: var(--lat-accent-vivid);
+}
+.landing-page__score-arc--warn {
+  color: var(--lat-severity-serious);
+}
+.landing-page__score-arc--bad {
+  color: var(--lat-severity-critical);
+}
 
 .landing-page__audit-signals {
   display: flex;
@@ -999,10 +1023,18 @@
   font-size: var(--lat-font-size-xs);
 }
 
-.landing-page__audit-count--critical { color: var(--lat-severity-critical); }
-.landing-page__audit-count--serious { color: var(--lat-severity-serious); }
-.landing-page__audit-count--moderate { color: var(--lat-severity-moderate); }
-.landing-page__audit-count--minor { color: var(--lat-severity-minor); }
+.landing-page__audit-count--critical {
+  color: var(--lat-severity-critical);
+}
+.landing-page__audit-count--serious {
+  color: var(--lat-severity-serious);
+}
+.landing-page__audit-count--moderate {
+  color: var(--lat-severity-moderate);
+}
+.landing-page__audit-count--minor {
+  color: var(--lat-severity-minor);
+}
 
 .landing-page__audit-trend,
 .landing-page__audit-alert {
@@ -1013,8 +1045,12 @@
   font-size: var(--lat-font-size-3xs);
 }
 
-.landing-page__audit-trend { color: var(--lat-severity-serious); }
-.landing-page__audit-alert { color: var(--lat-text-subtle); }
+.landing-page__audit-trend {
+  color: var(--lat-severity-serious);
+}
+.landing-page__audit-alert {
+  color: var(--lat-text-subtle);
+}
 
 .landing-page__audit-violations {
   display: flex;
@@ -1216,9 +1252,15 @@
   line-height: 2.25rem;
 }
 
-.landing-page__heading--how { margin-block-end: var(--lat-space-16); }
-.landing-page__heading--why { margin-block-end: var(--lat-space-6); }
-.landing-page__heading--scope { margin-block-end: var(--lat-space-10); }
+.landing-page__heading--how {
+  margin-block-end: var(--lat-space-16);
+}
+.landing-page__heading--why {
+  margin-block-end: var(--lat-space-6);
+}
+.landing-page__heading--scope {
+  margin-block-end: var(--lat-space-10);
+}
 
 /* The CTA's heading is the one instance sized `text-4xl` (36px) rather than
    `text-3xl` — its own literal line-height pair, 2.5rem for the same reason
@@ -1376,9 +1418,15 @@
   stroke-width: 2;
 }
 
-.landing-page__chart-dot--good { fill: var(--lat-solid); }
-.landing-page__chart-dot--warn { fill: var(--lat-severity-serious); }
-.landing-page__chart-dot--bad { fill: var(--lat-severity-critical); }
+.landing-page__chart-dot--good {
+  fill: var(--lat-solid);
+}
+.landing-page__chart-dot--warn {
+  fill: var(--lat-severity-serious);
+}
+.landing-page__chart-dot--bad {
+  fill: var(--lat-severity-critical);
+}
 
 .landing-page__chart-refline {
   stroke: var(--lat-severity-critical);

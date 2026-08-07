@@ -1,12 +1,12 @@
-import type { Decorator, Preview } from '@storybook/react-vite'
-import { useLayoutEffect } from 'react'
+import type {Decorator, Preview} from '@storybook/react-vite';
+import {useLayoutEffect} from 'react';
 
 // The token stylesheet first: every component value is a var() reference into
 // it, so it has to be present before the component stylesheet is applied.
-import '@chameleon-labs/lattice-tokens/lattice.css'
-import '../src/styles.css'
-import '../src/pages/pages.css'
-import './preview.css'
+import '@chameleon-labs/lattice-tokens/lattice.css';
+import '../src/styles.css';
+import '../src/pages/pages.css';
+import './preview.css';
 
 /**
  * The theme is a Storybook global rather than a story per mode.
@@ -17,7 +17,7 @@ import './preview.css'
  * stories per component would put the burden back on whoever adds the next one.
  */
 const withTheme: Decorator = (Story, context) => {
-  const theme = String(context.globals['theme'] ?? 'light')
+  const theme = String(context.globals['theme'] ?? 'light');
 
   // Ariakit components that portal — Dialog today, Menu and others later —
   // render their content as a sibling of this wrapper once mounted, appended
@@ -35,16 +35,16 @@ const withTheme: Decorator = (Story, context) => {
   // mount/unmount pair — the next story's effect just overwrites the
   // attribute value, which is what we want.
   useLayoutEffect(() => {
-    document.body.classList.add('lat-surface')
-    document.body.dataset['latTheme'] = theme
-  }, [theme])
+    document.body.classList.add('lat-surface');
+    document.body.dataset['latTheme'] = theme;
+  }, [theme]);
 
   return (
     <div className="lat-story lat-surface" data-lat-theme={theme}>
       <Story />
     </div>
-  )
-}
+  );
+};
 
 const preview: Preview = {
   decorators: [withTheme],
@@ -56,18 +56,18 @@ const preview: Preview = {
         title: 'Theme',
         icon: 'contrast',
         items: [
-          { value: 'light', title: 'Light' },
-          { value: 'dark', title: 'Dark' }
+          {value: 'light', title: 'Light'},
+          {value: 'dark', title: 'Dark'},
         ],
-        dynamicTitle: true
-      }
-    }
+        dynamicTitle: true,
+      },
+    },
   },
 
   // Storybook 9 moved the default off `globalTypes.defaultValue`, which is now
   // ignored. Without this the first render has no theme attribute at all.
   initialGlobals: {
-    theme: 'dark'
+    theme: 'dark',
   },
 
   parameters: {
@@ -78,10 +78,10 @@ const preview: Preview = {
     controls: {
       matchers: {
         color: /(background|color)$/i,
-        date: /Date$/i
-      }
-    }
-  }
-}
+        date: /Date$/i,
+      },
+    },
+  },
+};
 
-export default preview
+export default preview;

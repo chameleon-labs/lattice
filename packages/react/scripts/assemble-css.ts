@@ -1,5 +1,5 @@
-import { readFile } from 'node:fs/promises'
-import { dirname, resolve } from 'node:path'
+import {readFile} from 'node:fs/promises';
+import {dirname, resolve} from 'node:path';
 
 /**
  * Inlines every `@import` in the entry stylesheet, depth-first.
@@ -15,19 +15,19 @@ import { dirname, resolve } from 'node:path'
  * build, so a broken write is caught separately from a broken stylesheet.
  */
 export async function assembleCss(entry: string): Promise<string> {
-  const source = await readFile(entry, 'utf8')
-  const parts: string[] = []
+  const source = await readFile(entry, 'utf8');
+  const parts: string[] = [];
 
   for (const line of source.split('\n')) {
-    const match = /^@import\s+'([^']+)';/.exec(line.trim())
+    const match = /^@import\s+'([^']+)';/.exec(line.trim());
 
     if (match === null || match[1] === undefined) {
-      parts.push(line)
-      continue
+      parts.push(line);
+      continue;
     }
 
-    parts.push(await assembleCss(resolve(dirname(entry), match[1])))
+    parts.push(await assembleCss(resolve(dirname(entry), match[1])));
   }
 
-  return parts.join('\n')
+  return parts.join('\n');
 }
