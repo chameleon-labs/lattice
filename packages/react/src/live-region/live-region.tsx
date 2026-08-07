@@ -27,7 +27,7 @@ export function LiveRegion({message, politeness = 'polite'}: LiveRegionProps) {
   const previous = useRef('');
 
   useEffect(() => {
-    if (message === previous.current) return;
+    if (message === previous.current) {return;}
 
     previous.current = message;
     setAnnounced(message);

@@ -30,11 +30,11 @@ function sampleCubic(p0: Point, c1: Point, c2: Point, p1: Point, steps: number):
 // Parses the `M`/`C` path this module emits back into per-segment control
 // points, so the test can sample the actual curve rather than re-deriving
 // tangents independently (which would just test the test).
-function parseSegments(d: string): Array<[Point, Point, Point, Point]> {
+function parseSegments(d: string): [Point, Point, Point, Point][] {
   const commands = d.match(/[MC][^MC]*/g) ?? [];
   const nums = (s: string) => s.slice(1).split(',').map(Number);
   let cursor: Point = {x: 0, y: 0};
-  const segments: Array<[Point, Point, Point, Point]> = [];
+  const segments: [Point, Point, Point, Point][] = [];
 
   for (const command of commands) {
     if (command.startsWith('M')) {

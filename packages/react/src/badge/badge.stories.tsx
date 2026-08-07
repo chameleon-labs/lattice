@@ -54,7 +54,7 @@ export const Variants: Story = {
  * both an icon *and* a text label, so the ramp stays legible under
  * protanopia and deuteranopia, where these hues are hardest to tell apart.
  */
-const SEVERITY: ReadonlyArray<{level: BadgeVariant; icon: ReactElement}> = [
+const SEVERITY: readonly {level: BadgeVariant; icon: ReactElement}[] = [
   {
     level: 'critical',
     icon: (

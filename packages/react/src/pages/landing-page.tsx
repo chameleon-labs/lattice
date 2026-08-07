@@ -81,7 +81,7 @@ const TRUST_STATS = [
   {value: '30 sec', label: 'Setup time', sub: 'zero config'},
 ] as const;
 
-const VIOLATIONS: ReadonlyArray<{impact: Impact; count: number; rule: string; desc: string}> = [
+const VIOLATIONS: readonly {impact: Impact; count: number; rule: string; desc: string}[] = [
   {
     impact: 'critical',
     count: 2,

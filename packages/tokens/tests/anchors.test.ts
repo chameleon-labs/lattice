@@ -17,7 +17,7 @@ describe('anchors', () => {
   it('round-trips every anchor back to its source hex', () => {
     for (const mode of MODES) {
       for (const swatch of resolveAll(mode)) {
-        if (swatch.origin !== 'anchored') continue;
+        if (swatch.origin !== 'anchored') {continue;}
         expect(swatch.hex).toMatch(/^#[0-9a-f]{6}$/);
       }
     }

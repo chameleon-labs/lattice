@@ -6,7 +6,7 @@
  * classification remains internal metadata for accessibility contracts.
  */
 
-import {FONT_FAMILIES, FONT_SIZES, FONT_WEIGHTS, LETTER_SPACINGS, LINE_HEIGHTS} from './typography.js';
+import type {FONT_FAMILIES, FONT_SIZES, FONT_WEIGHTS, LETTER_SPACINGS, LINE_HEIGHTS} from './typography.js';
 
 export interface TypographyRole {
   readonly fontFamily: keyof typeof FONT_FAMILIES;

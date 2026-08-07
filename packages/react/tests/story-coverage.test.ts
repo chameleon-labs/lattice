@@ -58,7 +58,7 @@ const exportedComponents = (): string[] => {
   const names = new Set<string>();
 
   for (const match of barrel.matchAll(/export\s+(type\s+)?\{([^}]*)\}\s*from/g)) {
-    if (match[1] !== undefined) continue;
+    if (match[1] !== undefined) {continue;}
 
     for (const name of (match[2] ?? '').split(',')) {
       const trimmed = name
@@ -68,7 +68,7 @@ const exportedComponents = (): string[] => {
         ?.trim();
       // `export { type Foo, Bar }` — an inline type specifier inside a value
       // clause is still a type.
-      if (trimmed === undefined || trimmed === '' || trimmed.startsWith('type ')) continue;
+      if (trimmed === undefined || trimmed === '' || trimmed.startsWith('type ')) {continue;}
       names.add(trimmed);
     }
   }
@@ -83,14 +83,14 @@ const exportedComponents = (): string[] => {
  * about "gives every component directory a stories file" below; it exists so
  * that check keeps meaning what its name says.
  */
-const NON_COMPONENT_DIRECTORIES = ['pages'];
+const NON_COMPONENT_DIRECTORIES = new Set(['pages']);
 
 /** Directories under src/ that hold a component, i.e. everything but the barrel. */
 const componentDirectories = (): string[] =>
   readdirSync(src, {withFileTypes: true})
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
-    .filter((name) => !NON_COMPONENT_DIRECTORIES.includes(name))
+    .filter((name) => !NON_COMPONENT_DIRECTORIES.has(name))
     .sort();
 
 describe('story coverage', () => {

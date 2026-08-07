@@ -386,8 +386,8 @@ export function emitTokens(): DesignTokens {
       sequential[String(swatch.step)] = {
         $type: 'color',
         $description:
-          `Sequential step ${swatch.step}.` +
-          (usableForOrdinal ? '' : ` Sequential encoding only — outside the ordinal clamp at ${clamp}.`),
+          `Sequential step ${swatch.step}.${ 
+          usableForOrdinal ? '' : ` Sequential encoding only — outside the ordinal clamp at ${clamp}.`}`,
         $value: colorValue(swatch.l, swatch.c, swatch.h, swatch.hex),
       };
     }

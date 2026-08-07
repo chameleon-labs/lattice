@@ -208,7 +208,7 @@ async function focusRing(page: import('@playwright/test').Page) {
 
   return page.evaluate(() => {
     const el = document.activeElement;
-    if (el === null) return null;
+    if (el === null) {return null;}
     const style = getComputedStyle(el);
     return {
       className: el.className,

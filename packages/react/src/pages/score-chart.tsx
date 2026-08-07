@@ -60,8 +60,8 @@ const Y_TICKS = [50, 65, 80, 100];
 // The dot-fill threshold from the source's inline `dot` render prop —
 // primary at 80+, the serious severity colour at 60+, critical below that.
 function dotToneClass(score: number): 'good' | 'warn' | 'bad' {
-  if (score >= 80) return 'good';
-  if (score >= 60) return 'warn';
+  if (score >= 80) {return 'good';}
+  if (score >= 60) {return 'warn';}
   return 'bad';
 }
 
@@ -105,11 +105,11 @@ export function ScoreChart({data, referenceDate}: ScoreChartProps) {
 
   useLayoutEffect(() => {
     const el = containerRef.current;
-    if (el === null) return undefined;
+    if (el === null) {return undefined;}
 
     const observer = new ResizeObserver((entries) => {
       const measured = entries[0]?.contentRect.width;
-      if (measured !== undefined) setWidth(measured);
+      if (measured !== undefined) {setWidth(measured);}
     });
     observer.observe(el);
     return () => observer.disconnect();

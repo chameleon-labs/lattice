@@ -65,11 +65,11 @@ const declarations = (): Declaration[] => {
   const out: Declaration[] = [];
   for (const rule of stripped.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
     const selector = rule[1]!.trim().replace(/\s+/g, ' ');
-    if (!selector.includes('.lat-')) continue;
-    if (PAGE_SELECTORS.some((page) => selector.includes(page))) continue;
+    if (!selector.includes('.lat-')) {continue;}
+    if (PAGE_SELECTORS.some((page) => selector.includes(page))) {continue;}
     for (const declaration of rule[2]!.split(';')) {
       const [rawProperty, ...rest] = declaration.split(':');
-      if (rest.length === 0) continue;
+      if (rest.length === 0) {continue;}
       out.push({
         selector,
         property: rawProperty!.trim(),

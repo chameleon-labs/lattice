@@ -89,7 +89,7 @@ export function acceptedContrastFloors(): ReadonlyMap<string, number> {
   const floors = new Map<string, number>();
 
   for (const entry of loadLedger()) {
-    if (entry.passes) continue;
+    if (entry.passes) {continue;}
 
     const key = entry.text.toLowerCase();
     const flooredRatio = Math.floor(entry.ratio * 100) / 100;

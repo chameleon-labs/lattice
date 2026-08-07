@@ -33,10 +33,10 @@ function escapeRegExp(text: string): string {
 function balancedBlock(source: string, openBraceIndex: number): string {
   let depth = 0;
   for (let i = openBraceIndex; i < source.length; i++) {
-    if (source[i] === '{') depth++;
+    if (source[i] === '{') {depth++;}
     else if (source[i] === '}') {
       depth--;
-      if (depth === 0) return source.slice(openBraceIndex + 1, i);
+      if (depth === 0) {return source.slice(openBraceIndex + 1, i);}
     }
   }
   throw new Error('unbalanced braces: no matching closing brace found');

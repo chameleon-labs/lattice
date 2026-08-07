@@ -15,19 +15,19 @@ describe('spacing roles', () => {
     // horizontal room for its label, a row is already bounded by its siblings.
     const lead = (role: InsetRole) => {
       const v: InsetValue = INSET_ROLES[role];
-      if (!Array.isArray(v)) throw new Error(`${role} is not a pair`);
+      if (!Array.isArray(v)) {throw new Error(`${role} is not a pair`);}
       const [block, inline] = v as readonly [SpaceName, SpaceName];
       return SPACES[inline].multiplier - SPACES[block].multiplier;
     };
     for (const role of ['label-sm', 'label-md', 'label-lg'] as const) {
       expect(lead(role)).toBe(2);
     }
-    for (const role of ['row-sm', 'row-md'] as const) expect(lead(role)).toBe(1);
+    for (const role of ['row-sm', 'row-md'] as const) {expect(lead(role)).toBe(1);}
   });
 
   it('keeps every surface inset symmetric', () => {
     for (const [name, value] of Object.entries(INSET_ROLES)) {
-      if (!name.startsWith('surface-')) continue;
+      if (!name.startsWith('surface-')) {continue;}
       expect(Array.isArray(value)).toBe(false);
     }
   });
@@ -45,7 +45,7 @@ describe('spacing roles', () => {
       ...Object.values(INSET_ROLES).flatMap((v) => (Array.isArray(v) ? v : [v])),
       ...Object.values(GAP_ROLES),
     ];
-    for (const name of names) expect(SPACES).toHaveProperty(name);
+    for (const name of names) {expect(SPACES).toHaveProperty(name);}
   });
 });
 
@@ -74,7 +74,7 @@ describe('the emitted spacing roles', () => {
     // inline first would be silently wrong: it still parses, and every padded
     // the library would come out the wrong shape.
     for (const [role, value] of Object.entries(INSET_ROLES)) {
-      if (!Array.isArray(value)) continue;
+      if (!Array.isArray(value)) {continue;}
       const [block, inline] = value as readonly [string, string];
       expect(css).toContain(`--lat-inset-${role}: var(--lat-space-${block}) var(--lat-space-${inline});`);
     }
@@ -110,11 +110,11 @@ describe('the emitted spacing roles', () => {
     // pointed at `--lat-space-7` would emit happily and resolve to nothing.
     const referenced: string[] = [];
     const walk = (node: unknown): void => {
-      if (typeof node !== 'object' || node === null) return;
+      if (typeof node !== 'object' || node === null) {return;}
       const record = node as Record<string, unknown>;
       const value = record['$value'];
-      if (typeof value === 'string') referenced.push(value);
-      else for (const child of Object.values(record)) walk(child);
+      if (typeof value === 'string') {referenced.push(value);}
+      else {for (const child of Object.values(record)) walk(child);}
     };
     walk(spacingRoleTokens());
 

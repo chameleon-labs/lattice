@@ -22,14 +22,14 @@ const barrel = readFileSync(new URL('index.ts', src), 'utf8');
  * consumer would, through `../index.js`, so this directory's own exports
  * (`SystemPage`, the icon components) are deliberately private to it.
  */
-const NON_COMPONENT_DIRECTORIES = ['pages'];
+const NON_COMPONENT_DIRECTORIES = new Set(['pages']);
 
 /** Directories under src/ that hold a component, i.e. everything but the barrel. */
 const componentDirectories = (): string[] =>
   readdirSync(src, {withFileTypes: true})
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
-    .filter((name) => !NON_COMPONENT_DIRECTORIES.includes(name))
+    .filter((name) => !NON_COMPONENT_DIRECTORIES.has(name))
     .sort();
 
 /**
@@ -53,7 +53,7 @@ const runtimeExportsOf = async (directory: string): Promise<string[]> => {
     for (const [name, value] of Object.entries(mod)) {
       // Components and re-exported Ariakit providers are functions named in
       // PascalCase; anything else (a type) leaves no runtime binding to see.
-      if (typeof value === 'function' && /^[A-Z]/.test(name)) names.push(name);
+      if (typeof value === 'function' && /^[A-Z]/.test(name)) {names.push(name);}
     }
   }
   return names;
@@ -98,7 +98,7 @@ describe('public API', () => {
 
     for (const directory of componentDirectories()) {
       for (const name of await runtimeExportsOf(directory)) {
-        if (!(name in lattice)) missing.push(`${directory}: ${name}`);
+        if (!(name in lattice)) {missing.push(`${directory}: ${name}`);}
       }
     }
 
