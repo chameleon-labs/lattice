@@ -39,7 +39,6 @@ test('a field and a button of the same size are the same height', async ({page})
     expect(row.field, `${row.size} field vs button`).toBeCloseTo(row.button, 1);
   }
 
-  // Ascending, so a "scale" that rendered three identical boxes would fail.
   expect(rows[0]!.field).toBeLessThan(rows[1]!.field);
   expect(rows[1]!.field).toBeLessThan(rows[2]!.field);
 });

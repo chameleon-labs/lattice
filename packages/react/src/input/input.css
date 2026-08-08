@@ -38,10 +38,6 @@
   transition-timing-function: var(--lat-easing-out);
 }
 
-/* Both elements carry `data-size` so each selects its own axis directly. The
-   descendant form (`.lat-input-field[data-size='lg'] .lat-input`) would read
-   more naturally but reaches across elements for a value the element already
-   knows, and it defeats the duplicate-block check in stylesheet.test.ts. */
 .lat-input-field[data-size='sm'] {
   padding-inline: var(--lat-space-3);
 }
@@ -54,10 +50,7 @@
   padding-inline: var(--lat-space-4);
 }
 
-/* The block padding is Button's at the same step, so a field and a button of
-   one size are the same height — 30, 38 and 46px. `field.spec.ts` measures the
-   pair. The inline gutter stays narrower than Button's: a field's text starts
-   closer to its edge than a label centred in a button does. */
+/* Button's block padding at each step, so the two match in height. */
 .lat-input[data-size='sm'] {
   padding-block: var(--lat-space-1);
 }

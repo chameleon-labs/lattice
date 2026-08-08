@@ -3,7 +3,7 @@ import type {ComponentPropsWithRef, ReactNode} from 'react';
 export type InputSize = 'sm' | 'md' | 'lg';
 
 export interface InputOptions {
-  /** Matches Button's scale, so a field and a button in the same row are the same height. */
+  /** Button's scale, so a field and a button in a row match in height. */
   size?: InputSize;
   /** Sets `aria-invalid`. `TextField` passes this for you when it renders an error. */
   invalid?: boolean;
@@ -19,8 +19,7 @@ export interface InputOptions {
   inputClassName?: string;
 }
 
-// `size` is the design-system scale, so it shadows the native attribute
-// (visible character width). Set an explicit width in CSS instead.
+// Shadows the native `size` attribute (visible character width).
 export type InputProps = Omit<ComponentPropsWithRef<'input'>, 'size'> & InputOptions;
 
 /**

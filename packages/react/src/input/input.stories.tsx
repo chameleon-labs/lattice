@@ -66,10 +66,7 @@ export const WithLeadingIcon: Story = {
   },
 };
 
-/**
- * The scale matches Button's, so a field and a button in the same row are the
- * same height — the landing hero pairs a `lg` field with a `lg` button.
- */
+/** The scale matches Button's, so a field and a button in a row are the same height. */
 export const Sizes: Story = {
   render: () => (
     <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>

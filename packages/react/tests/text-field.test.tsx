@@ -24,14 +24,12 @@ describe('Input', () => {
     expect(screen.getByLabelText('URL').closest('.lat-input-field')?.getAttribute('data-size')).toBe('md');
   });
 
-  // Both boxes carry it: the wrapper pads the inline axis, the input the block axis.
   it('puts the size on both boxes the padding rules select', () => {
     render(<Input aria-label="URL" size="lg" />);
     const input = screen.getByLabelText('URL');
 
     expect(input.dataset['size']).toBe('lg');
     expect(input.closest('.lat-input-field')?.getAttribute('data-size')).toBe('lg');
-    // The DS scale shadows the native attribute rather than passing through as one.
     expect(input.getAttribute('size')).toBeNull();
   });
 

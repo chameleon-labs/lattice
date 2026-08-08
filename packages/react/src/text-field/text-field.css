@@ -18,11 +18,7 @@
   text-transform: var(--lat-text-eyebrow-text-transform);
 }
 
-/* The one property the size axis moves. `md` is the eyebrow role's own step,
-   so a field that never asks for a size is unchanged; `sm` and `lg` take the
-   primitives either side of it. The role's leading is unitless and follows on
-   its own, and the label carries `data-size` for the same reason the control
-   does — the rule selects the element that owns the property. */
+/* The role's leading is unitless, so font-size is the only property that moves. */
 .lat-text-field__label[data-size='sm'] {
   font-size: var(--lat-font-size-4xs);
 }
