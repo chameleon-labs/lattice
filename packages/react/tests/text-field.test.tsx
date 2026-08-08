@@ -18,13 +18,21 @@ describe('Input', () => {
     expect(screen.getByLabelText('URL').getAttribute('aria-invalid')).toBe('true');
   });
 
-  // There is no size prop: every field in the source design renders at
-  // one size, so this system doesn't offer a knob the design never turns.
-  it('does not accept a size prop', () => {
+  it('defaults to the md size', () => {
     render(<Input aria-label="URL" />);
+
+    expect(screen.getByLabelText('URL').closest('.lat-input-field')?.dataset['size']).toBe('md');
+  });
+
+  // Both boxes carry it: the wrapper pads the inline axis, the input the block axis.
+  it('puts the size on both boxes the padding rules select', () => {
+    render(<Input aria-label="URL" size="lg" />);
     const input = screen.getByLabelText('URL');
 
-    expect(input.dataset['size']).toBeUndefined();
+    expect(input.dataset['size']).toBe('lg');
+    expect(input.closest('.lat-input-field')?.dataset['size']).toBe('lg');
+    // The DS scale shadows the native attribute rather than passing through as one.
+    expect(input.getAttribute('size')).toBeNull();
   });
 
   // className moved from the <input> to the wrapper it always renders inside
@@ -180,5 +188,11 @@ describe('TextField', () => {
 
     expect(error.getAttribute('role')).toBeNull();
     expect(error.getAttribute('aria-live')).toBeNull();
+  });
+
+  it('forwards size to the input it wraps', () => {
+    render(<TextField label="Page URL" size="lg" />);
+
+    expect(screen.getByLabelText('Page URL').closest('.lat-input-field')?.dataset['size']).toBe('lg');
   });
 });

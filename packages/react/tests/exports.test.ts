@@ -124,7 +124,7 @@ describe('public API', () => {
     expect(toneTypes).toEqual([]);
   });
 
-  it('no longer exports the retired InputSize type', () => {
-    expect(barrel).not.toContain('InputSize');
+  it('exports InputSize, so a caller can match a field to the button beside it', () => {
+    expect(barrel).toContain('InputSize');
   });
 });

@@ -17,7 +17,9 @@
 | `error` | `string` | Optional; sets `aria-invalid` when present |
 
 Everything `Input` accepts passes through, except `aria-describedby` and
-`aria-invalid`, which this component owns.
+`aria-invalid`, which this component owns. That includes
+[`size`](../input/README.md), so a labelled field takes the same `sm`/`md`/`lg`
+scale — and the same height — as the button beside it.
 
 **Why it exists:** the wiring is not hard, it is *invisible*. A missing
 `aria-describedby` looks identical in review to a present one. `aria-describedby`
