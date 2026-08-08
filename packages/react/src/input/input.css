@@ -20,8 +20,9 @@
      keeps the field's outer height identical but shrinks the `<input>`'s own
      box from 36px to 20px. The wrapper is a `<div>`, not a `<label>`, so a
      click in the vertical padding would then land on nothing and stop focusing
-     the field. A role describes one element's inset; this inset spans two. */
-  padding-inline: var(--lat-space-3);
+     the field. A role describes one element's inset; this inset spans two.
+
+     Both axes are set per size below. */
 
   background: var(--lat-field-bg);
   border: 1px solid var(--lat-border);
@@ -37,11 +38,34 @@
   transition-timing-function: var(--lat-easing-out);
 }
 
+.lat-input-field[data-size='sm'] {
+  padding-inline: var(--lat-space-3);
+}
+
+.lat-input-field[data-size='md'] {
+  padding-inline: var(--lat-space-3);
+}
+
+.lat-input-field[data-size='lg'] {
+  padding-inline: var(--lat-space-4);
+}
+
+/* Button's block padding at each step, so the two match in height. */
+.lat-input[data-size='sm'] {
+  padding-block: var(--lat-space-1);
+}
+
+.lat-input[data-size='md'] {
+  padding-block: var(--lat-space-2);
+}
+
+.lat-input[data-size='lg'] {
+  padding-block: var(--lat-space-3);
+}
+
 .lat-input {
   flex: 1;
   min-inline-size: 0;
-  /* The block half of the split inset — see `.lat-input-field` above. */
-  padding-block: var(--lat-space-2);
 
   /* Mono. Lattice sets every field value in the mono face — a token name, a
      URL, an identifier — because the things its fields hold are all of that

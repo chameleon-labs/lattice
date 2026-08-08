@@ -1,6 +1,10 @@
 import type {ComponentPropsWithRef, ReactNode} from 'react';
 
+export type InputSize = 'sm' | 'md' | 'lg';
+
 export interface InputOptions {
+  /** Button's scale, so a field and a button in a row match in height. */
+  size?: InputSize;
   /** Sets `aria-invalid`. `TextField` passes this for you when it renders an error. */
   invalid?: boolean;
   /** Rendered inside the field, before the control. A decorative icon here must carry `aria-hidden`. */
@@ -15,12 +19,8 @@ export interface InputOptions {
   inputClassName?: string;
 }
 
-// Fields are one size everywhere in the bundle — no variant of
-// Input renders at more than one size, unlike Button's sm/md/lg. Offering a
-// size knob the design never turns is worse than not offering it, so there is
-// no custom `size` prop here; the native `size` attribute (visible character
-// width) passes through untouched.
-export type InputProps = ComponentPropsWithRef<'input'> & InputOptions;
+// Shadows the native `size` attribute (visible character width).
+export type InputProps = Omit<ComponentPropsWithRef<'input'>, 'size'> & InputOptions;
 
 /**
  * The wrapper (`.lat-input-field`) always renders, addons or not: it owns the
@@ -35,6 +35,7 @@ export type InputProps = ComponentPropsWithRef<'input'> & InputOptions;
  * and native behaviour.
  */
 export function Input({
+  size = 'md',
   invalid = false,
   addonStart,
   addonEnd,
@@ -47,6 +48,7 @@ export function Input({
   return (
     <div
       className={className === undefined ? 'lat-input-field' : `lat-input-field ${className}`}
+      data-size={size}
       data-invalid={invalid ? true : undefined}
       data-disabled={disabled ? true : undefined}
     >
@@ -56,6 +58,7 @@ export function Input({
         ref={ref}
         disabled={disabled}
         className={inputClassName === undefined ? 'lat-input' : `lat-input ${inputClassName}`}
+        data-size={size}
         aria-invalid={invalid ? true : undefined}
       />
       {addonEnd}

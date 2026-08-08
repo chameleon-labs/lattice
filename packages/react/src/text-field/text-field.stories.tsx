@@ -46,3 +46,14 @@ export const WithDescriptionAndError: Story = {
 export const Disabled: Story = {
   args: {disabled: true},
 };
+
+/** The label steps with the control, so a small field is not topped by a full-size eyebrow. */
+export const Sizes: Story = {
+  render: () => (
+    <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+      {(['sm', 'md', 'lg'] as const).map((size) => (
+        <TextField key={size} size={size} label={`Page URL (${size})`} placeholder="https://example.com" />
+      ))}
+    </div>
+  ),
+};

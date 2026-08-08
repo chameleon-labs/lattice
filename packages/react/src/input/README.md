@@ -6,19 +6,26 @@ to the control, use [`TextField`](../text-field/README.md) instead.
 
 ```tsx
 <Input aria-label="Search" />
+<Input size="lg" aria-label="Page URL" />
 <Input invalid />
 ```
 
 | Prop | Values | Default |
 |---|---|---|
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` |
 | `invalid` | `boolean` — sets `aria-invalid` | `false` |
 
-There is no `size` prop. Fields render at one size everywhere in
-the source design — no variant of a field is shown larger or smaller than
-another — so this system doesn't offer a knob the design never turns, the
-same call Button made when it dropped the tone axis. The native `size`
-attribute (HTML's "visible character width") passes through untouched, since
-nothing here shadows it any more.
+`size` is **Button's scale**, not a second one: at every step a field and a
+button render the same height — 30, 38 and 46px — so the two sit level in a
+row without either being nudged. A hero pairing a URL field with its submit
+button is the case that needs it, and that pairing is what
+`tests/browser/field.spec.ts` measures. Only the block padding changes; the
+type stays put, because a field's value is the same value at any size.
+
+The scale shadows the native `size` attribute (HTML's "visible character
+width"), which is why the prop type omits it. Set an explicit width in CSS
+instead — the native attribute never sized a field predictably anyway, being
+measured in average character widths of the rendered face.
 
 Lattice sets every field value in the mono face — a token name, a URL, an
 identifier — because the things its fields hold are all of that kind. Focus
