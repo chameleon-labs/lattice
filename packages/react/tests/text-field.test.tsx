@@ -21,7 +21,7 @@ describe('Input', () => {
   it('defaults to the md size', () => {
     render(<Input aria-label="URL" />);
 
-    expect(screen.getByLabelText('URL').closest('.lat-input-field')?.dataset['size']).toBe('md');
+    expect(screen.getByLabelText('URL').closest('.lat-input-field')?.getAttribute('data-size')).toBe('md');
   });
 
   // Both boxes carry it: the wrapper pads the inline axis, the input the block axis.
@@ -30,7 +30,7 @@ describe('Input', () => {
     const input = screen.getByLabelText('URL');
 
     expect(input.dataset['size']).toBe('lg');
-    expect(input.closest('.lat-input-field')?.dataset['size']).toBe('lg');
+    expect(input.closest('.lat-input-field')?.getAttribute('data-size')).toBe('lg');
     // The DS scale shadows the native attribute rather than passing through as one.
     expect(input.getAttribute('size')).toBeNull();
   });
@@ -194,14 +194,14 @@ describe('TextField', () => {
     render(<TextField label="Page URL" size="lg" />);
     const input = screen.getByLabelText('Page URL');
 
-    expect(input.closest('.lat-text-field')?.dataset['size']).toBe('lg');
-    expect(input.closest('.lat-input-field')?.dataset['size']).toBe('lg');
+    expect(input.closest('.lat-text-field')?.getAttribute('data-size')).toBe('lg');
+    expect(input.closest('.lat-input-field')?.getAttribute('data-size')).toBe('lg');
     expect(input.dataset['size']).toBe('lg');
   });
 
   it('defaults to the md size', () => {
     render(<TextField label="Page URL" />);
 
-    expect(screen.getByLabelText('Page URL').closest('.lat-text-field')?.dataset['size']).toBe('md');
+    expect(screen.getByLabelText('Page URL').closest('.lat-text-field')?.getAttribute('data-size')).toBe('md');
   });
 });
