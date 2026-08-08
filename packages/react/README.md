@@ -64,7 +64,7 @@ Twenty families. Seven wrap Ariakit; thirteen are ours on tokens.
 | Component | Guarantee |
 |---|---|
 | [`Button`](./src/button/README.md) | The focus, variant and motion contracts every other family follows. Five variants — `primary`, `secondary`, `ghost`, `destructive`, `link` — and no other prop that changes colour |
-| [`Input`](./src/input/README.md) | Invalid state is an attribute, not only a colour |
+| [`Input`](./src/input/README.md) | Invalid state is an attribute, not only a colour. `size` is Button's scale, so a field and a button of one size render the same height |
 | [`TextField`](./src/text-field/README.md) | `aria-describedby` lists exactly what was rendered, and is absent otherwise |
 | [`Switch`](./src/switch/README.md) | State is a position that survives reduced motion |
 | [`Disclosure`](./src/disclosure/README.md) | A real button carrying `aria-expanded` |

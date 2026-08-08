@@ -15,3 +15,31 @@ test('the field label is an uppercase eyebrow', async ({page}) => {
   expect(await label.evaluate((el) => getComputedStyle(el).textTransform)).toBe('uppercase');
   expect(await label.evaluate((el) => getComputedStyle(el).letterSpacing)).not.toBe('normal');
 });
+
+test('a field and a button of the same size are the same height', async ({page}) => {
+  await page.goto('/iframe.html?id=components-input--sizes&globals=theme:dark');
+  await page.locator('.lat-input-field').first().waitFor();
+
+  const rows = await page.locator('.lat-input-field').evaluateAll((fields) =>
+    fields.map((field) => {
+      const row = field.parentElement as HTMLElement;
+      const button = row.querySelector('.lat-button') as HTMLElement;
+
+      return {
+        size: field.getAttribute('data-size'),
+        field: field.getBoundingClientRect().height,
+        button: button.getBoundingClientRect().height,
+      };
+    }),
+  );
+
+  expect(rows).toHaveLength(3);
+
+  for (const row of rows) {
+    expect(row.field, `${row.size} field vs button`).toBeCloseTo(row.button, 1);
+  }
+
+  // Ascending, so a "scale" that rendered three identical boxes would fail.
+  expect(rows[0]!.field).toBeLessThan(rows[1]!.field);
+  expect(rows[1]!.field).toBeLessThan(rows[2]!.field);
+});

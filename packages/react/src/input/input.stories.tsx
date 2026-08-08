@@ -1,4 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/react-vite';
+import {Button} from '../button/button.js';
 import {Input} from './input.js';
 
 /**
@@ -63,4 +64,23 @@ export const WithLeadingIcon: Story = {
       </svg>
     ),
   },
+};
+
+/**
+ * The scale matches Button's, so a field and a button in the same row are the
+ * same height — the landing hero pairs a `lg` field with a `lg` button.
+ */
+export const Sizes: Story = {
+  render: () => (
+    <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+      {(['sm', 'md', 'lg'] as const).map((size) => (
+        <div key={size} style={{display: 'flex', alignItems: 'flex-start', gap: '0.5rem', inlineSize: 'fit-content'}}>
+          <Input size={size} aria-label={`Page URL, ${size}`} placeholder="https://example.com" />
+          <Button size={size} style={{flexShrink: 0}}>
+            Audit now
+          </Button>
+        </div>
+      ))}
+    </div>
+  ),
 };
