@@ -190,9 +190,18 @@ describe('TextField', () => {
     expect(error.getAttribute('aria-live')).toBeNull();
   });
 
-  it('forwards size to the input it wraps', () => {
+  it('carries the size on its own box as well as forwarding it', () => {
     render(<TextField label="Page URL" size="lg" />);
+    const input = screen.getByLabelText('Page URL');
 
-    expect(screen.getByLabelText('Page URL').closest('.lat-input-field')?.dataset['size']).toBe('lg');
+    expect(input.closest('.lat-text-field')?.dataset['size']).toBe('lg');
+    expect(input.closest('.lat-input-field')?.dataset['size']).toBe('lg');
+    expect(input.dataset['size']).toBe('lg');
+  });
+
+  it('defaults to the md size', () => {
+    render(<TextField label="Page URL" />);
+
+    expect(screen.getByLabelText('Page URL').closest('.lat-text-field')?.dataset['size']).toBe('md');
   });
 });

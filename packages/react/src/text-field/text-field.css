@@ -12,11 +12,27 @@
   margin-bottom: var(--lat-space-2);
 
   font-family: var(--lat-text-eyebrow-font-family);
-  font-size: var(--lat-text-eyebrow-font-size);
   font-weight: var(--lat-text-eyebrow-font-weight);
   letter-spacing: var(--lat-text-eyebrow-letter-spacing);
   line-height: var(--lat-text-eyebrow-line-height);
   text-transform: var(--lat-text-eyebrow-text-transform);
+}
+
+/* The one property the size axis moves. `md` is the eyebrow role's own step,
+   so a field that never asks for a size is unchanged; `sm` and `lg` take the
+   primitives either side of it. The role's leading is unitless and follows on
+   its own, and the label carries `data-size` for the same reason the control
+   does — the rule selects the element that owns the property. */
+.lat-text-field__label[data-size='sm'] {
+  font-size: var(--lat-font-size-4xs);
+}
+
+.lat-text-field__label[data-size='md'] {
+  font-size: var(--lat-text-eyebrow-font-size);
+}
+
+.lat-text-field__label[data-size='lg'] {
+  font-size: var(--lat-font-size-2xs);
 }
 
 .lat-text-field__description {

@@ -21,6 +21,17 @@ Everything `Input` accepts passes through, except `aria-describedby` and
 [`size`](../input/README.md), so a labelled field takes the same `sm`/`md`/`lg`
 scale — and the same height — as the button beside it.
 
+`size` also lands on `.lat-text-field` as `data-size`, so the outer box states
+which step it is on rather than leaving a caller to read it off the control
+inside.
+
+The label steps with the control — 9, 10 and 11px — so a small field is not
+topped by a full-size eyebrow. `md` is the eyebrow role's own step, so a field
+that never asks for a size is unchanged. Font size is the only property that
+moves: the role's leading is unitless and follows on its own, and the tracking,
+weight, face and casing are the eyebrow construction at every step. The
+description and error do not scale.
+
 **Why it exists:** the wiring is not hard, it is *invisible*. A missing
 `aria-describedby` looks identical in review to a present one. `aria-describedby`
 lists exactly the ids that were rendered — description then error — and is

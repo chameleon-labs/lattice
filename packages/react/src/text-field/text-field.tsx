@@ -15,7 +15,14 @@ export interface TextFieldProps extends Omit<InputProps, 'aria-describedby' | 'a
  * product exists to find — so the relationship is built here rather than
  * re-established correctly at every call site.
  */
-export function TextField({label, description, error, className, ...props}: TextFieldProps): React.JSX.Element {
+export function TextField({
+  label,
+  description,
+  error,
+  className,
+  size = 'md',
+  ...props
+}: TextFieldProps): React.JSX.Element {
   const base = useId();
   const inputId = `${base}-input`;
   const descriptionId = `${base}-description`;
@@ -28,8 +35,8 @@ export function TextField({label, description, error, className, ...props}: Text
     .join(' ');
 
   return (
-    <div className={className === undefined ? 'lat-text-field' : `lat-text-field ${className}`}>
-      <label className="lat-text-field__label" htmlFor={inputId}>
+    <div className={className === undefined ? 'lat-text-field' : `lat-text-field ${className}`} data-size={size}>
+      <label className="lat-text-field__label" htmlFor={inputId} data-size={size}>
         {label}
       </label>
 
@@ -41,6 +48,7 @@ export function TextField({label, description, error, className, ...props}: Text
 
       <Input
         {...props}
+        size={size}
         id={inputId}
         invalid={error !== undefined}
         {...(describedBy === '' ? {} : {'aria-describedby': describedBy})}

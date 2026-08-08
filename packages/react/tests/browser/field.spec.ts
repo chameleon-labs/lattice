@@ -43,3 +43,16 @@ test('a field and a button of the same size are the same height', async ({page})
   expect(rows[0]!.field).toBeLessThan(rows[1]!.field);
   expect(rows[1]!.field).toBeLessThan(rows[2]!.field);
 });
+
+test('the field label steps with the control', async ({page}) => {
+  await page.goto('/iframe.html?id=components-textfield--sizes&globals=theme:dark');
+  await page.locator('.lat-text-field').first().waitFor();
+
+  const sizes = await page
+    .locator('.lat-text-field__label')
+    .evaluateAll((labels) => labels.map((el) => Number.parseFloat(getComputedStyle(el).fontSize)));
+
+  expect(sizes).toHaveLength(3);
+  expect(sizes[0]!).toBeLessThan(sizes[1]!);
+  expect(sizes[1]!).toBeLessThan(sizes[2]!);
+});
