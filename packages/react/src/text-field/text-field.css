@@ -4,9 +4,8 @@
   gap: var(--lat-gap-xs);
 }
 
-/* The eyebrow construction — the same five properties Card's `__label` uses.
-   Uppercase mono, letter-spaced, so a field's name reads as metadata about
-   the mono value beneath it rather than as another line of prose. */
+/* The eyebrow construction, but at the panel label's 0.1em rather than the
+   eyebrow role's own 0.2em. Deliberate, not a token to tidy back into line. */
 .lat-text-field__label {
   display: block;
   margin-bottom: var(--lat-space-2);
@@ -14,9 +13,10 @@
   font-family: var(--lat-text-eyebrow-font-family);
   font-size: var(--lat-text-eyebrow-font-size);
   font-weight: var(--lat-text-eyebrow-font-weight);
-  letter-spacing: var(--lat-text-eyebrow-letter-spacing);
+  letter-spacing: var(--lat-letter-spacing-wider);
   line-height: var(--lat-text-eyebrow-line-height);
   text-transform: var(--lat-text-eyebrow-text-transform);
+  color: var(--lat-text-subtle);
 }
 
 .lat-text-field__description {
