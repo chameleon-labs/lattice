@@ -1,0 +1,64 @@
+/* Floored at 24px on both axes — WCAG 2.2 §2.5.8. */
+.lat-addon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+
+  min-inline-size: var(--lat-space-6);
+  min-block-size: var(--lat-space-6);
+
+  background: transparent;
+  border: none;
+  border-radius: var(--lat-radius-none);
+  color: var(--lat-text-subtle);
+
+  /* The field wrapper sets `cursor: text` for its whole box. */
+  cursor: pointer;
+
+  transition-property: color, box-shadow;
+  transition-duration: var(--lat-duration-default);
+  transition-timing-function: var(--lat-easing-out);
+}
+
+/* `1em` against the size below, so one declaration sizes every icon. */
+.lat-addon-button > svg {
+  inline-size: 1em;
+  block-size: 1em;
+}
+
+.lat-addon-button[data-size='sm'] {
+  font-size: var(--lat-font-size-xs);
+}
+
+.lat-addon-button[data-size='md'] {
+  font-size: var(--lat-font-size-sm);
+}
+
+.lat-addon-button[data-size='lg'] {
+  font-size: var(--lat-font-size-lg);
+}
+
+.lat-addon-button:hover:not([aria-disabled='true']) {
+  color: var(--lat-text);
+}
+
+.lat-addon-button:focus-visible {
+  outline: none;
+  color: var(--lat-text);
+  box-shadow: 0 0 0 1px var(--lat-focus-ring);
+}
+
+/* forced-colors strips box-shadow, so the ring is restated here. */
+@media (forced-colors: active) {
+  .lat-addon-button:focus-visible {
+    outline: 2px solid CanvasText;
+    outline-offset: 1px;
+  }
+}
+
+.lat-addon-button[aria-disabled='true'] {
+  color: var(--lat-text-subtle);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
