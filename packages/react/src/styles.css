@@ -25,6 +25,7 @@
    meaning: every family below assumes bare elements are already sane. */
 @import './base.css';
 
+@import './addon-button/addon-button.css';
 @import './badge/badge.css';
 @import './button/button.css';
 @import './callout/callout.css';
