@@ -1,6 +1,6 @@
 {
   "name": "@chameleon-labs/lattice-tokens",
-  "version": "0.1.0-rc.2",
+  "version": "0.1.0-rc.3",
   "description": "The token layer of Lattice, an accessibility-first design system. Colour, typography, and layout values are generated from reviewed config; contrast is measured and reported at build time, not gated.",
   "keywords": [
     "accessibility",
