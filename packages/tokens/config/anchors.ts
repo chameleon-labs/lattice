@@ -7,9 +7,13 @@
  *
  * That is a deliberate reversal. Until 2026-08-03 this package generated its
  * palette from a lightness curve and a chroma envelope, and the generation was
- * the authority. Lattice's values do not lie on any single curve — its accent
- * is L 0.905 H 120 in dark and L 0.630 H 129 in light — so keeping the curve
- * would have meant approximating the identity rather than applying it.
+ * the authority. Lattice's values do not lie on any single curve — the accent
+ * fills at L 0.905 H 120 in both modes but reads as text at L 0.630 H 129 in
+ * light — so keeping the curve would have meant approximating the identity
+ * rather than applying it.
+ *
+ * The accent fill and the accent text colour are two anchors, not one; see
+ * ACCENT_TEXT_ANCHORS below and the spec's §9.4.
  */
 import type {Mode} from './modes.js';
 
