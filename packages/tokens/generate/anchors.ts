@@ -5,6 +5,7 @@
  * OKLCH the stylesheet emits, and records where each value came from.
  */
 import {
+  ACCENT_TEXT_ANCHORS,
   ACCENT_VIVID,
   CHROMATIC_SCALES,
   GRAY_ANCHORS,
@@ -61,6 +62,7 @@ export function resolveAll(mode: Mode): Swatch[] {
     ...resolveGray(mode),
     ...resolveSolids(mode),
     ...resolveOnSolids(mode),
+    swatch('accent', 'text', mode, ACCENT_TEXT_ANCHORS[mode]),
     swatch('accent', 'vivid', mode, ACCENT_VIVID),
   ];
 }

@@ -6,7 +6,7 @@ import {parseHex} from '../generate/oklch.js';
 import {buildLedger, over} from '../generate/report.js';
 
 describe('contrast ledger', () => {
-  it('records exactly the twenty-one known failures, in emission order', () => {
+  it('records exactly the twenty known failures, in emission order', () => {
     // Thirteen of these are the design's original documented set (§9). Nine
     // more join here, added 2026-08-04 alongside `tintsOnBg` /
     // `severityColouredOnBg`: every tinted triple is translucent (see
@@ -27,12 +27,17 @@ describe('contrast ledger', () => {
     // Twenty-two became twenty-one on 2026-08-04 when issue #47 anchored the
     // focus ring and `light focus ring on bg-raised` started passing. It is the
     // first row to leave this list by being fixed rather than re-measured.
+    //
+    // Twenty-one became twenty on 2026-08-09 (issue #76): the accent fills with
+    // the one chartreuse in both modes and carries dark ink, so
+    // `light on-solid on solid` goes from 3.33:1 to 15.22:1. The accent's text
+    // colour split off from its fill in the same change, which is why the row
+    // below is named `accent as text` rather than `solid as text`.
     const failing = buildLedger()
       .filter((e) => !e.passes)
       .map((e) => e.name);
     expect(failing).toEqual([
-      'light on-solid on solid',
-      'light solid as text on bg',
+      'light accent as text on bg',
       'light accent text on its tint',
       'light danger text on its tint',
       'light warning text on its tint',
@@ -75,10 +80,16 @@ describe('contrast ledger', () => {
     expect(dark.ratio).toBeCloseTo(3.2, 2);
   });
 
-  it('measures the light primary button label at 3.33:1', () => {
-    const entry = buildLedger().find((e) => e.name === 'light on-solid on solid')!;
-    expect(entry.ratio).toBeCloseTo(3.33, 1);
-    expect(entry.minimum).toBe(4.5);
+  // Issue #76. White on the light olive measured 3.33:1 and every consumer had
+  // to override it; this is the row that must not go back.
+  it('clears AA for the primary button label in both modes', () => {
+    for (const mode of ['light', 'dark']) {
+      const entry = buildLedger().find((e) => e.name === `${mode} on-solid on solid`)!;
+
+      expect(entry.ratio, mode).toBeCloseTo(15.22, 1);
+      expect(entry.minimum, mode).toBe(4.5);
+      expect(entry.passes, mode).toBe(true);
+    }
   });
 
   it('clears the 3:1 SC 1.4.11 floor on every surface the ring is drawn on', () => {

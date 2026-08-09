@@ -1,5 +1,6 @@
 dark.accent.on-solid
 dark.accent.solid
+dark.accent.text
 dark.accent.vivid
 dark.alpha.accent-tint
 dark.alpha.accent-tint-border
@@ -58,6 +59,7 @@ dark.role.on-solid
 dark.role.solid
 dark.role.switch-track
 dark.role.text
+dark.role.text-accent
 dark.role.text-subtle
 dark.severity.critical
 dark.severity.moderate
@@ -173,6 +175,7 @@ global.text.ui
 global.text.ui-strong
 light.accent.on-solid
 light.accent.solid
+light.accent.text
 light.accent.vivid
 light.alpha.accent-tint
 light.alpha.accent-tint-border
@@ -231,6 +234,7 @@ light.role.on-solid
 light.role.solid
 light.role.switch-track
 light.role.text
+light.role.text-accent
 light.role.text-subtle
 light.severity.critical
 light.severity.moderate

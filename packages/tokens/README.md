@@ -55,7 +55,7 @@ rebuild — a value that is not declared or computed does not ship.
 
 Every documented pair is measured against its WCAG 2.2 AA minimum, with APCA
 `Lc` reported alongside. **The build reports; it does not gate.** Lattice's
-values are the identity, thirteen of its pairs miss their minimum, and refusing
+values are the identity, twelve of its pairs miss their minimum, and refusing
 to write them would mean refusing to ship the design.
 
 `dist/contrast-ledger.json` is that measurement as data — passes and failures
@@ -64,7 +64,7 @@ rather than as a colour that silently vanished from the file.
 `@chameleon-labs/lattice-react` reads it to tell a documented, accepted
 deficiency from a new defect in its axe sweep.
 
-The thirteen accepted failures are listed in [the root README](../../README.md#accepted-contrast-failures).
+The twelve accepted failures are listed in [the root README](../../README.md#accepted-contrast-failures).
 **Anything outside them is a real defect.**
 
 ## Fonts

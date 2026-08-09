@@ -25,12 +25,21 @@ describe('anchors', () => {
     }
   });
 
-  it('anchors the accent solid at a different lightness per mode', () => {
+  it('fills with the one chartreuse in both modes', () => {
     const dark = resolveSolids('dark').find((s) => s.scale === 'accent')!;
     const light = resolveSolids('light').find((s) => s.scale === 'accent')!;
     expect(dark.hex).toBe('#cff23a');
-    expect(light.hex).toBe('#6a9b00');
-    expect(dark.l).toBeGreaterThan(light.l + 0.2);
+    expect(light.hex).toBe('#cff23a');
+  });
+
+  // The fill is one colour; the text colour is not. Chartreuse text on a light
+  // background is 1.13:1, so light mode keeps the bundle's olive for that job.
+  it('splits the accent text colour from the fill in light mode', () => {
+    const swatchFor = (mode: 'dark' | 'light'): string =>
+      resolveAll(mode).find((s) => s.scale === 'accent' && s.role === 'text')!.hex;
+
+    expect(swatchFor('dark')).toBe('#cff23a');
+    expect(swatchFor('light')).toBe('#6a9b00');
   });
 
   it('covers every declared anchor with no extras', () => {

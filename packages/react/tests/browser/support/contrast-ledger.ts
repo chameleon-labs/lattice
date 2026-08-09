@@ -104,6 +104,15 @@ export function acceptedContrastFloors(): ReadonlyMap<string, number> {
   return floors;
 }
 
+/*
+ * The ledger composites a translucent tint in floating point and rounds each
+ * channel once; the browser rounds the same value independently. At an exact
+ * .5 tie the two land one 8-bit unit apart — the accent tint over `bg` is
+ * 0.15 x 58 + 0.85 x 248 = 219.5 — which moves the ratio by up to 0.02. That
+ * is quantisation, not a colour that changed, so the floor absorbs one unit.
+ */
+const CHANNEL_ROUNDING = 0.02;
+
 /** The subset of an axe `CheckResult["data"]` this module reads. */
 interface ContrastCheckData {
   readonly fgColor?: string;
@@ -207,7 +216,7 @@ export function summarizeViolations(
       }
 
       const floor = floors.get(data.fgColor!.toLowerCase());
-      const accepted = floor !== undefined && data.contrastRatio! >= floor;
+      const accepted = floor !== undefined && data.contrastRatio! >= floor - CHANNEL_ROUNDING;
 
       if (!accepted) {
         const reason =

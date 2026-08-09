@@ -202,7 +202,7 @@
 }
 
 .system-page__display-accent {
-  color: var(--lat-accent-solid);
+  color: var(--lat-text-accent);
 }
 
 .system-page__lede {
@@ -386,7 +386,7 @@
    accent, info and chart-3 roles standing in for the bundle's primary/
    chart-2/chart-3 icon colours. */
 .system-page__tone[data-tone='primary'] {
-  color: var(--lat-accent-solid);
+  color: var(--lat-text-accent);
 }
 .system-page__tone[data-tone='info'] {
   color: var(--lat-info-solid);
@@ -830,7 +830,7 @@
 }
 
 .landing-page__accent-text {
-  color: var(--lat-accent-solid);
+  color: var(--lat-text-accent);
 }
 
 .landing-page__lede {
@@ -1138,7 +1138,7 @@
 .landing-page__audit-footer .lat-button[data-variant='link'] {
   padding: 0;
   gap: var(--lat-space-1);
-  color: var(--lat-solid);
+  color: var(--lat-text-accent);
   font-family: var(--lat-font-mono);
   font-size: var(--lat-font-size-3xs);
 }
@@ -1360,7 +1360,7 @@
   margin: 0;
   padding-block-start: var(--lat-space-3);
   border-block-start: 1px solid var(--lat-border);
-  color: var(--lat-accent-solid);
+  color: var(--lat-text-accent);
   font-family: var(--lat-text-meta-font-family);
   font-size: var(--lat-font-size-3xs);
 }
@@ -1594,7 +1594,7 @@
 }
 
 .landing-page__why-grid .lat-table__row[data-highlight='true'] .landing-page__bool-check {
-  color: var(--lat-solid);
+  color: var(--lat-text-accent);
 }
 
 .landing-page__why-grid .landing-page__bool-x {
@@ -1640,7 +1640,7 @@
 }
 
 .landing-page__check-icon {
-  color: var(--lat-accent-solid);
+  color: var(--lat-text-accent);
 }
 
 /* ─── CTA ──────────────────────────────────────────────────────────────── */

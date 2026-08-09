@@ -23,7 +23,14 @@
  * viewer sees.
  */
 import {ALPHA_CHANNEL, FOCUS_RING, HAIRLINE, TINT_FRACTIONS, WASH} from '../config/alpha.js';
-import {CHROMATIC_SCALES, GRAY_ANCHORS, ON_SOLID_ANCHORS, SOLID_ANCHORS} from '../config/anchors.js';
+import {
+  ACCENT_TEXT_ANCHORS,
+  type ChromaticScale,
+  CHROMATIC_SCALES,
+  GRAY_ANCHORS,
+  ON_SOLID_ANCHORS,
+  SOLID_ANCHORS,
+} from '../config/anchors.js';
 import {MODES, type Mode} from '../config/modes.js';
 import {apcaLc, contrastRatio} from './contrast.js';
 import {formatHex, parseHex, type Rgb} from './oklch.js';
@@ -82,6 +89,9 @@ function forMode(mode: Mode): LedgerEntry[] {
   const raised = parseHex(gray['bg-raised']);
   const solid = parseHex(SOLID_ANCHORS.accent[mode]);
   const onSolid = parseHex(ON_SOLID_ANCHORS.accent![mode]);
+  const accentText = parseHex(ACCENT_TEXT_ANCHORS[mode]);
+  const textOf = (scale: ChromaticScale): Rgb =>
+    scale === 'accent' ? accentText : parseHex(SOLID_ANCHORS[scale][mode]);
   const field = parseHex(gray['field-bg']);
   // The ring is anchored, not derived from `solid`. It is still composited over
   // each surface: light ships opaque, so the composite is the anchor itself,
@@ -101,7 +111,7 @@ function forMode(mode: Mode): LedgerEntry[] {
     const scaleSolid = parseHex(SOLID_ANCHORS[scale][mode]);
     const fraction = scale === 'accent' ? TINT_FRACTIONS.accent.fill : TINT_FRACTIONS.default.fill;
     const tint = over(scaleSolid, fraction, raised);
-    return entry(`${mode} ${scale} text on its tint`, scaleSolid, tint, 4.5);
+    return entry(`${mode} ${scale} text on its tint`, textOf(scale), tint, 4.5);
   });
 
   // The same tinted triple again, composited over `bg` instead of `bg-raised`.
@@ -123,7 +133,7 @@ function forMode(mode: Mode): LedgerEntry[] {
     const scaleSolid = parseHex(SOLID_ANCHORS[scale][mode]);
     const fraction = scale === 'accent' ? TINT_FRACTIONS.accent.fill : TINT_FRACTIONS.default.fill;
     const tint = over(scaleSolid, fraction, bg);
-    return entry(`${mode} ${scale} text on its tint over bg`, scaleSolid, tint, 4.5);
+    return entry(`${mode} ${scale} text on its tint over bg`, textOf(scale), tint, 4.5);
   });
 
   // The severity ramp's own tinted triple — Phase 2 gave severity its own
@@ -165,7 +175,7 @@ function forMode(mode: Mode): LedgerEntry[] {
     entry(`${mode} text on bg`, parseHex(gray.text), bg, 4.5),
     entry(`${mode} text-subtle on bg-raised`, parseHex(gray['text-subtle']), raised, 4.5),
     entry(`${mode} on-solid on solid`, onSolid, solid, 4.5),
-    entry(`${mode} solid as text on bg`, solid, bg, 4.5),
+    entry(`${mode} accent as text on bg`, accentText, bg, 4.5),
     // SC 1.4.11: a focus indicator needs 3:1 against what surrounds it. Every
     // surface a component draws the ring on is measured, rather than one
     // standing in for the others. All six currently pass; `field-bg` is the
