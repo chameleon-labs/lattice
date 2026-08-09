@@ -202,7 +202,7 @@
 }
 
 .system-page__display-accent {
-  color: var(--lat-accent-solid);
+  color: var(--lat-text-accent);
 }
 
 .system-page__lede {
@@ -386,7 +386,7 @@
    accent, info and chart-3 roles standing in for the bundle's primary/
    chart-2/chart-3 icon colours. */
 .system-page__tone[data-tone='primary'] {
-  color: var(--lat-accent-solid);
+  color: var(--lat-text-accent);
 }
 .system-page__tone[data-tone='info'] {
   color: var(--lat-info-solid);
@@ -427,7 +427,7 @@
  * tried here first, both wrong for the same underlying reason:
  *
  * 1. `--lat-accent-tint` — the tint half of the accent tinted triple, built
- *    to pair with `--lat-solid` as text (that pairing is measured: the
+ *    to pair with `--lat-text-accent` as text (that pairing is measured: the
  *    ledger's "accent text on its tint" row). The default `Badge` inside
  *    this row reads `--lat-text-subtle`, a colour sized for Lattice's
  *    *neutral* surfaces, not an accent wash — a pairing no ledger row,
@@ -830,7 +830,7 @@
 }
 
 .landing-page__accent-text {
-  color: var(--lat-accent-solid);
+  color: var(--lat-text-accent);
 }
 
 .landing-page__lede {
@@ -1138,12 +1138,12 @@
 .landing-page__audit-footer .lat-button[data-variant='link'] {
   padding: 0;
   gap: var(--lat-space-1);
-  color: var(--lat-solid);
+  color: var(--lat-text-accent);
   font-family: var(--lat-font-mono);
   font-size: var(--lat-font-size-3xs);
 }
 .landing-page__audit-footer .lat-button[data-variant='link']:hover:not(:disabled):not([aria-disabled='true']) {
-  color: color-mix(in oklch, var(--lat-solid) 80%, transparent);
+  color: color-mix(in oklch, var(--lat-text-accent) 80%, transparent);
 }
 
 /* ─── Trust bar ────────────────────────────────────────────────────────── */
@@ -1360,7 +1360,7 @@
   margin: 0;
   padding-block-start: var(--lat-space-3);
   border-block-start: 1px solid var(--lat-border);
-  color: var(--lat-accent-solid);
+  color: var(--lat-text-accent);
   font-family: var(--lat-text-meta-font-family);
   font-size: var(--lat-font-size-3xs);
 }
@@ -1406,7 +1406,7 @@
 
 .landing-page__chart-line {
   fill: none;
-  stroke: var(--lat-solid);
+  stroke: var(--lat-text-accent);
   stroke-width: 2;
 }
 
@@ -1419,7 +1419,7 @@
 }
 
 .landing-page__chart-dot--good {
-  fill: var(--lat-solid);
+  fill: var(--lat-text-accent);
 }
 .landing-page__chart-dot--warn {
   fill: var(--lat-severity-serious);
@@ -1566,7 +1566,7 @@
    `border-block-*` there — it does not need restating per cell. */
 .landing-page__why-grid .lat-table__row[data-highlight='true'] {
   background: color-mix(in srgb, var(--lat-solid) 5%, transparent);
-  border-inline-start: 2px solid var(--lat-solid);
+  border-inline-start: 2px solid var(--lat-text-accent);
 }
 
 /* No hover wash for the highlighted row: the source's own ternary gives it
@@ -1594,7 +1594,7 @@
 }
 
 .landing-page__why-grid .lat-table__row[data-highlight='true'] .landing-page__bool-check {
-  color: var(--lat-solid);
+  color: var(--lat-text-accent);
 }
 
 .landing-page__why-grid .landing-page__bool-x {
@@ -1640,7 +1640,7 @@
 }
 
 .landing-page__check-icon {
-  color: var(--lat-accent-solid);
+  color: var(--lat-text-accent);
 }
 
 /* ─── CTA ──────────────────────────────────────────────────────────────── */

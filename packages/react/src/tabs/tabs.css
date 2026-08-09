@@ -19,7 +19,7 @@
      Transparent at rest, this border-bottom sits at the same 1px line as the
      list's own hairline (the list stretches every tab to its full height by
      default flex cross-axis alignment); the negative margin pulls it down
-     exactly one line so a selected tab's --lat-solid border paints over the
+     exactly one line so a selected tab's accent border paints over the
      hairline in that position rather than stacking a second line beneath it. */
   border-bottom: 1px solid transparent;
   margin-bottom: -1px;
@@ -39,7 +39,7 @@
    colour alone — assistive technology reads the second. */
 .lat-tab[aria-selected='true'] {
   color: var(--lat-text);
-  border-bottom-color: var(--lat-solid);
+  border-bottom-color: var(--lat-text-accent);
 }
 
 .lat-tab:focus-visible {

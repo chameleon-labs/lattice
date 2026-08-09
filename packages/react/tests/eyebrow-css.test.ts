@@ -59,10 +59,12 @@ describe("Eyebrow's stylesheet", () => {
     expect(rule).toContain('color: var(--lat-text-subtle);');
   });
 
-  it("tone='accent' reads --lat-solid", () => {
+  // --lat-text-accent, not --lat-solid: since #76 the fill is chartreuse in both
+  // modes, and chartreuse text on a light background is 1.13:1.
+  it("tone='accent' reads --lat-text-accent", () => {
     const rule = selectorBlock(css, ".lat-eyebrow[data-tone='accent'] .lat-eyebrow__text");
 
-    expect(rule).toContain('color: var(--lat-solid);');
+    expect(rule).toContain('color: var(--lat-text-accent);');
     expect(rule).not.toContain('--lat-text-subtle');
   });
 

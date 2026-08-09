@@ -402,10 +402,10 @@ WCAG 2.x on the delivered values:
 | dark severity serious text on its tint | 7.13 | passes (duplicates dark warning) |
 | dark severity moderate text on its tint | 9.34 | passes |
 | light severity minor text on its tint | 5.92 | passes |
-| **light `primary-foreground` (#fff) on `primary` (#6a9b00)** | **3.33** | **fails AA for the button label** |
+| ~~**light `primary-foreground` (#fff) on `primary` (#6a9b00)**~~ | ~~**3.33**~~ | **fixed — see §9.4** |
 | **dark `muted-foreground` on `card`** | **3.67** | **fails AA for body text** |
-| **light `primary` as text on `background`** | **2.94** | **fails AA** |
-| **light accent text on its 15% tint** | **2.84** | **fails AA** |
+| **light accent as text on `background`** | **2.94** | **fails AA** — renamed in §9.4, ratio unchanged |
+| **light accent text on its 15% tint** | **2.84** | **fails AA** — 3.19 after §9.4 |
 | **light danger text on its 10% tint** | **4.49** | **fails AA, by 0.01** |
 | **light warning text on its 10% tint** | **3.15** | **fails AA** |
 | **light success text on its 10% tint** | **3.34** | **fails AA** |
@@ -418,7 +418,7 @@ WCAG 2.x on the delivered values:
 | dark focus ring `primary/40` vs `card` | 3.20 | passes SC 1.4.11 |
 | hairline border vs its surface | 1.20 / 1.19 | decorative; see below |
 
-**Thirteen failures ship**, not nine. *(Superseded twice below — the current count is twenty-one of fifty-four pairs.)* *Corrected 2026-08-04, during the
+**Thirteen failures ship**, not nine. *(Superseded three times below — the current count is twenty of fifty-six pairs; see §9.4.)* *Corrected 2026-08-04, during the
 whole-phase component review.* The count of nine (itself corrected up from an
 original four earlier the same day) covered the six grey and accent pairs plus
 the chromatic tinted triple. It never measured the severity ramp's own tinted
@@ -465,7 +465,7 @@ Those are different pairs, and nine of them fail:
 
 | pair | ratio | verdict |
 | --- | --- | --- |
-| light accent text on its tint over bg | 2.54 | fails AA |
+| light accent text on its tint over bg | 2.54 | fails AA — 2.87 after §9.4 |
 | light danger text on its tint over bg | 3.98 | fails AA |
 | light warning text on its tint over bg | 2.80 | fails AA |
 | light success text on its tint over bg | 2.97 | fails AA |
@@ -552,6 +552,44 @@ Three things worth recording:
   primary button, all accent text and every tint render exactly as before.
 
 APCA `Lc` is computed and emitted alongside every WCAG figure, as before.
+
+### 9.4 The accent fill and the accent text colour split — issue #76
+
+*Added 2026-08-09.*
+
+White on the light olive measured **3.33** against 4.5. Every consumer overrode
+`--lat-accent-on-solid` to get a legible primary button, which is a semantic
+accessibility token being replaced by the application — the signal that the pair
+itself was wrong rather than merely accepted.
+
+The accent now fills with `#cff23a` in **both** modes and carries the dark ink
+light mode already used in dark: **15.22**. That is the second row to leave this
+ledger by being repaired rather than re-measured.
+
+Swapping the ink alone does not work, and the reason is the last bullet of §9.3
+applied a second time. The olive existed *because* a white label could sit on
+it — but it was also the accent's text colour, and chartreuse cannot do that
+job. Chartreuse text on a light background is **1.13**. Changing the fill without
+separating the roles measured:
+
+| pair | before | fill-only | with the split |
+|---|---|---|---|
+| light accent as text on `bg` | 2.94 | **1.13** | 2.94 |
+| light accent text on its 15% tint | 2.84 | **1.23** | 3.19 |
+| light accent text on its tint over `bg` | 2.54 | **1.10** | 2.87 |
+
+`Eyebrow`, `Badge` and `CodeBlock` render accent text, so the middle column is
+those three unreadable in light mode, not a ledger-only regression.
+
+So the accent gained a text colour distinct from its fill: an `accent-text`
+primitive and a `--lat-text-accent` role. Light mode reads the bundle's olive
+there — the same value, kept for the one job it is legible at — so no new colour
+enters the system and those three pairs end up no worse. §9.3 separated the
+focus indicator from `--lat-solid` for exactly this reason; this separates the
+text colour, leaving the fill with one job.
+
+**The count is now twenty of fifty-six pairs**, and the documented set in the
+root README goes from thirteen to twelve. Dark mode is unchanged throughout.
 
 ## 10. Superseded
 

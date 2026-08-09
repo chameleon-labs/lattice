@@ -85,8 +85,15 @@ function loadLedger(): LedgerEntry[] {
  * to drop by more than the width of one truncation step (up to 0.01) before
  * its floored value changes.
  */
-export function acceptedContrastFloors(): ReadonlyMap<string, number> {
-  const floors = new Map<string, number>();
+export interface AcceptedFloor {
+  /** The worst ratio the ledger records for this foreground. */
+  readonly floor: number;
+  /** Every background it was measured against, lowercased. */
+  readonly backgrounds: ReadonlySet<string>;
+}
+
+export function acceptedContrastFloors(): ReadonlyMap<string, AcceptedFloor> {
+  const floors = new Map<string, {floor: number; backgrounds: Set<string>}>();
 
   for (const entry of loadLedger()) {
     if (entry.passes) {
@@ -95,13 +102,45 @@ export function acceptedContrastFloors(): ReadonlyMap<string, number> {
 
     const key = entry.text.toLowerCase();
     const flooredRatio = Math.floor(entry.ratio * 100) / 100;
-    const worst = floors.get(key);
-    if (worst === undefined || flooredRatio < worst) {
-      floors.set(key, flooredRatio);
+    const existing = floors.get(key);
+
+    if (existing === undefined) {
+      floors.set(key, {floor: flooredRatio, backgrounds: new Set([entry.background.toLowerCase()])});
+      continue;
     }
+
+    existing.backgrounds.add(entry.background.toLowerCase());
+    existing.floor = Math.min(existing.floor, flooredRatio);
   }
 
   return floors;
+}
+
+/*
+ * The ledger composites a translucent tint in floating point and rounds each
+ * channel once; the browser rounds the same value independently. At an exact
+ * .5 tie the two land one 8-bit unit apart — the accent tint over `bg` is
+ * 0.15 x 58 + 0.85 x 248 = 219.5 — which moves the ratio by up to 0.02. That
+ * is quantisation, not a colour that changed, so the floor absorbs one unit.
+ */
+const CHANNEL_ROUNDING = 0.02;
+
+/** True when two 8-bit hex colours differ by at most one unit in each channel. */
+function withinOneUnit(a: string, b: string): boolean {
+  if (!/^#[0-9a-f]{6}$/i.test(a) || !/^#[0-9a-f]{6}$/i.test(b)) {
+    return false;
+  }
+
+  for (let index = 1; index < 7; index += 2) {
+    const left = Number.parseInt(a.slice(index, index + 2), 16);
+    const right = Number.parseInt(b.slice(index, index + 2), 16);
+
+    if (Math.abs(left - right) > 1) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 /** The subset of an axe `CheckResult["data"]` this module reads. */
@@ -178,7 +217,7 @@ function contrastData(node: AxeNodeResult): ContrastCheckData | undefined {
  */
 export function summarizeViolations(
   violations: readonly AxeViolation[],
-  floors: ReadonlyMap<string, number>,
+  floors: ReadonlyMap<string, AcceptedFloor>,
 ): ViolationSummaryEntry[] {
   const summary: ViolationSummaryEntry[] = [];
 
@@ -206,8 +245,16 @@ export function summarizeViolations(
         continue;
       }
 
-      const floor = floors.get(data.fgColor!.toLowerCase());
-      const accepted = floor !== undefined && data.contrastRatio! >= floor;
+      const documented = floors.get(data.fgColor!.toLowerCase());
+      const floor = documented?.floor;
+      // The allowance applies only where the browser's composite is the
+      // ledger's own, one channel unit apart. A pair the ledger measured
+      // against some other surface gets the exact floor.
+      const quantised =
+        documented !== undefined &&
+        [...documented.backgrounds].some((background) => withinOneUnit(background, data.bgColor!.toLowerCase()));
+      const accepted =
+        documented !== undefined && data.contrastRatio! >= documented.floor - (quantised ? CHANNEL_ROUNDING : 0);
 
       if (!accepted) {
         const reason =

@@ -35,6 +35,7 @@ export const ROLE_ALIASES: readonly RoleAlias[] = [
   {role: 'switch-track', source: 'gray-switch-track'},
   {role: 'text', source: 'gray-text'},
   {role: 'text-subtle', source: 'gray-text-subtle'},
+  {role: 'text-accent', source: 'accent-text'},
   {role: 'solid', source: 'accent-solid'},
   {role: 'on-solid', source: 'accent-on-solid'},
 ];

@@ -34,10 +34,12 @@ function block(selector: string): string {
 }
 
 describe("Tabs' stylesheet", () => {
-  it("marks the selected tab's indicator with --lat-solid, not the list's own hairline colour", () => {
+  // --lat-text-accent, not --lat-solid: the indicator is a mark against the page,
+  // and since #76 the fill is chartreuse, which is 1.13:1 there in light mode.
+  it("marks the selected tab's indicator with the accent text colour, not the list's own hairline colour", () => {
     const rule = block(".lat-tab[aria-selected='true']");
 
-    expect(rule).toContain('border-bottom-color: var(--lat-solid);');
+    expect(rule).toContain('border-bottom-color: var(--lat-text-accent);');
     expect(rule).not.toContain('var(--lat-border)');
   });
 });

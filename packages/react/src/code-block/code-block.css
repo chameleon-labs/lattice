@@ -87,5 +87,5 @@
    assistive technology. */
 .lat-code-block__copy[data-copied] {
   opacity: 1;
-  color: var(--lat-solid);
+  color: var(--lat-text-accent);
 }

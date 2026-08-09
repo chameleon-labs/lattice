@@ -43,5 +43,5 @@
    kickers. `subtle` needs no rule of its own: it is the default set on
    `.lat-eyebrow__text` above. */
 .lat-eyebrow[data-tone='accent'] .lat-eyebrow__text {
-  color: var(--lat-solid);
+  color: var(--lat-text-accent);
 }

@@ -25,7 +25,7 @@
 .lat-badge[data-variant='primary'] {
   --_tint: var(--lat-accent-tint);
   --_tint-border: var(--lat-accent-tint-border);
-  --_text: var(--lat-solid);
+  --_text: var(--lat-text-accent);
 }
 .lat-badge[data-variant='info'] {
   --_tint: var(--lat-info-tint);

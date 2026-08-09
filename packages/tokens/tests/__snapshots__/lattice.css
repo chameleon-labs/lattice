@@ -248,21 +248,22 @@
   --lat-gray-switch-track: oklch(0.838957 0.027671 285.788238);
   --lat-gray-text-subtle: oklch(0.482383 0.07972 283.001628);
   --lat-gray-text: oklch(0.15857 0.016889 284.309748);
-  --lat-accent-solid: oklch(0.630364 0.166245 128.60811);
+  --lat-accent-solid: oklch(0.90537 0.199002 120.264194);
   --lat-danger-solid: oklch(0.556256 0.216016 17.999819);
   --lat-warning-solid: oklch(0.646072 0.194327 41.115779);
   --lat-success-solid: oklch(0.595971 0.127418 163.225402);
   --lat-info-solid: oklch(0.587617 0.138868 241.966052);
   --lat-decorative-solid: oklch(0.541337 0.246586 293.008968);
-  --lat-accent-on-solid: oklch(1 0 89.875563);
+  --lat-accent-on-solid: oklch(0.15857 0.016889 284.309748);
+  --lat-accent-text: oklch(0.630364 0.166245 128.60811);
   --lat-accent-vivid: oklch(0.90537 0.199002 120.264194);
 
   --lat-border: rgb(0 0 0 / 0.08);
   --lat-border-strong: rgb(0 0 0 / 0.15);
   --lat-wash: rgb(0 0 0 / 0.05);
   --lat-focus-ring: rgb(79 115 0 / 1);
-  --lat-accent-tint: rgb(106 155 0 / 0.15);
-  --lat-accent-tint-border: rgb(106 155 0 / 0.25);
+  --lat-accent-tint: rgb(207 242 58 / 0.15);
+  --lat-accent-tint-border: rgb(207 242 58 / 0.25);
   --lat-danger-tint: rgb(212 18 64 / 0.1);
   --lat-danger-tint-border: rgb(212 18 64 / 0.2);
   --lat-warning-tint: rgb(234 88 12 / 0.1);
@@ -282,6 +283,7 @@
   --lat-switch-track: var(--lat-gray-switch-track);
   --lat-text: var(--lat-gray-text);
   --lat-text-subtle: var(--lat-gray-text-subtle);
+  --lat-text-accent: var(--lat-accent-text);
   --lat-solid: var(--lat-accent-solid);
   --lat-on-solid: var(--lat-accent-on-solid);
 }
@@ -332,6 +334,7 @@
   --lat-info-solid: oklch(0.753513 0.138989 232.66148);
   --lat-decorative-solid: oklch(0.708969 0.159168 293.541199);
   --lat-accent-on-solid: oklch(0.15857 0.016889 284.309748);
+  --lat-accent-text: oklch(0.90537 0.199002 120.264194);
   --lat-accent-vivid: oklch(0.90537 0.199002 120.264194);
 
   --lat-border: rgb(255 255 255 / 0.07);
@@ -359,6 +362,7 @@
   --lat-switch-track: var(--lat-gray-switch-track);
   --lat-text: var(--lat-gray-text);
   --lat-text-subtle: var(--lat-gray-text-subtle);
+  --lat-text-accent: var(--lat-accent-text);
   --lat-solid: var(--lat-accent-solid);
   --lat-on-solid: var(--lat-accent-on-solid);
 }
@@ -413,6 +417,7 @@
     --lat-info-solid: oklch(0.753513 0.138989 232.66148);
     --lat-decorative-solid: oklch(0.708969 0.159168 293.541199);
     --lat-accent-on-solid: oklch(0.15857 0.016889 284.309748);
+    --lat-accent-text: oklch(0.90537 0.199002 120.264194);
     --lat-accent-vivid: oklch(0.90537 0.199002 120.264194);
 
     --lat-border: rgb(255 255 255 / 0.07);
@@ -440,6 +445,7 @@
     --lat-switch-track: var(--lat-gray-switch-track);
     --lat-text: var(--lat-gray-text);
     --lat-text-subtle: var(--lat-gray-text-subtle);
+    --lat-text-accent: var(--lat-accent-text);
     --lat-solid: var(--lat-accent-solid);
     --lat-on-solid: var(--lat-accent-on-solid);
   }

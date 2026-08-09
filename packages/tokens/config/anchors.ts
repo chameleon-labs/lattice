@@ -7,9 +7,13 @@
  *
  * That is a deliberate reversal. Until 2026-08-03 this package generated its
  * palette from a lightness curve and a chroma envelope, and the generation was
- * the authority. Lattice's values do not lie on any single curve — its accent
- * is L 0.905 H 120 in dark and L 0.630 H 129 in light — so keeping the curve
- * would have meant approximating the identity rather than applying it.
+ * the authority. Lattice's values do not lie on any single curve — the accent
+ * fills at L 0.905 H 120 in both modes but reads as text at L 0.630 H 129 in
+ * light — so keeping the curve would have meant approximating the identity
+ * rather than applying it.
+ *
+ * The accent fill and the accent text colour are two anchors, not one; see
+ * ACCENT_TEXT_ANCHORS below and the spec's §9.4.
  */
 import type {Mode} from './modes.js';
 
@@ -75,7 +79,7 @@ export const GRAY_ANCHORS: Record<Mode, Record<GrayRole, string>> = {
  * token table while binding them to those slots.
  */
 export const SOLID_ANCHORS: Record<ChromaticScale, Record<Mode, string>> = {
-  accent: {dark: '#cff23a', light: '#6a9b00'},
+  accent: {dark: '#cff23a', light: '#cff23a'},
   danger: {dark: '#ff4d6a', light: '#d41240'},
   warning: {dark: '#fb923c', light: '#ea580c'},
   success: {dark: '#34d399', light: '#059669'},
@@ -91,15 +95,27 @@ export const SOLID_ANCHORS: Record<ChromaticScale, Record<Mode, string>> = {
  * on-solid answer.
  */
 export const ON_SOLID_ANCHORS: Partial<Record<ChromaticScale, Record<Mode, string>>> = {
-  accent: {dark: '#0c0c14', light: '#ffffff'},
+  accent: {dark: '#0c0c14', light: '#0c0c14'},
+};
+
+/**
+ * The accent as *text*, which is a different job from the accent as a fill.
+ *
+ * The chartreuse is the identity and now fills in both modes, carrying dark ink
+ * at 15.22:1. It cannot also be the accent text colour: on a light background it
+ * measures 1.13:1. Light mode therefore reads the bundle's olive here — the same
+ * value that used to be the light fill, kept for the one job it is legible at.
+ */
+export const ACCENT_TEXT_ANCHORS: Record<Mode, string> = {
+  dark: '#cff23a',
+  light: '#6a9b00',
 };
 
 /**
  * The vivid accent.
  *
- * Lattice keeps `--accent: #cff23a` in *both* modes while `--primary` drops to
- * olive in light. The chartreuse is the identity; the olive exists only so a
- * white label can sit on it. Emitted separately so a caller can reach the brand
- * colour without going through the primary fill.
+ * Emitted separately so a caller can reach the brand colour without going
+ * through the primary fill. Since #76 the fill is this same value in both
+ * modes; the token stays because it is published API.
  */
 export const ACCENT_VIVID = '#cff23a';
