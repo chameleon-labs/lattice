@@ -53,6 +53,10 @@ jobs:
   cut:
     runs-on: ubuntu-latest
 
+    # Holds RELEASE_APP_ID and RELEASE_APP_PRIVATE_KEY, and only main may deploy
+    # to it. Add required reviewers here to gate a release on an approval.
+    environment: release
+
     permissions:
       # Read-only, deliberately. The version bump is pushed with a GitHub App
       # token minted below, not with GITHUB_TOKEN — see that step for why — so
