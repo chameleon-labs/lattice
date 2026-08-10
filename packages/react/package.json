@@ -1,6 +1,6 @@
 {
   "name": "@chameleon-labs/lattice-react",
-  "version": "0.1.0-rc.3",
+  "version": "0.1.0-rc.4",
   "description": "The component layer of Lattice, an accessibility-first design system. Ariakit supplies behaviour; Lattice decides appearance and guarantees legibility.",
   "keywords": [
     "accessibility",
