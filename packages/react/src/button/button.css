@@ -75,17 +75,18 @@
   opacity: 0.9;
 }
 
-/* Link: text with a hairline underline. */
 .lat-button[data-variant='link'] {
   background: transparent;
   color: var(--lat-text-subtle);
   font-weight: var(--lat-font-weight-medium);
-  text-decoration: underline;
-  text-decoration-color: var(--lat-border);
-  text-underline-offset: 2px;
+  text-decoration: none;
 }
 .lat-button[data-variant='link']:hover:not(:disabled):not([aria-disabled='true']) {
   color: var(--lat-text);
+}
+
+.lat-button:is(a) {
+  text-decoration: none;
 }
 
 /*

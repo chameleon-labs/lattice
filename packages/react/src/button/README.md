@@ -24,6 +24,17 @@ is gone, and `ButtonTone` is removed entirely. A system that follows a design
 strictly cannot also offer combinations the design never drew: a neutral button
 is `secondary`, a dangerous one is `destructive`.
 
+`link` carries **no underline**, so at rest it is told apart from the text
+around it by colour alone. That makes it a **standalone** control — a nav item,
+a footer action, a control on its own line — not something to drop inside a
+paragraph, where WCAG 1.4.1 expects a link in a block of text to carry a second
+cue. The axe sweep will not catch that misuse: `link-in-text-block` looks at
+`<a>`, and this variant renders a `<button>` unless `render` says otherwise.
+
+The rule sets `text-decoration: none` rather than leaving the property unset,
+because `render={<a href="…" />}` is a normal way to use this variant and a
+browser underlines a bare anchor by default.
+
 `destructive` is a *tinted* button — danger at 10% fill, 20% border, and
 full-strength danger text — not a solid red fill. That is what the design
 shows, and it is what stops a destructive action from outweighing the primary
