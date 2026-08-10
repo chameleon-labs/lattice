@@ -56,7 +56,8 @@ jobs:
     # large: a secret scoped here cannot be read by any other workflow. Add
     # required reviewers to it in Settings → Environments to make every release
     # need a second pair of eyes; the workflow needs no change for that.
-    # Referencing an environment that does not exist yet creates it, unprotected.
+    # Only `v*` tags may deploy to it, so a manual re-run is dispatched from the
+    # tag rather than from a branch.
     environment: npm-publish
 
     permissions:
