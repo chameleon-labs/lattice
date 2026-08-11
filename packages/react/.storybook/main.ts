@@ -20,6 +20,8 @@ const config: StorybookConfig = {
     disableTelemetry: true,
   },
   stories: ['../src/**/*.stories.tsx'],
+  // Story-only assets. Never reaches dist/, so it cannot ship to consumers.
+  staticDirs: ['./public'],
   addons: [
     // Prop tables and story source, generated from the component's actual
     // signature rather than written a second time by hand.

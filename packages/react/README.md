@@ -59,11 +59,12 @@ bundler that is not configured for CSS.
 
 ## Components
 
-Twenty-one families. Eight wrap Ariakit; thirteen are ours on tokens.
+Twenty-two families. Eight wrap Ariakit; fourteen are ours on tokens.
 
 | Component | Guarantee |
 |---|---|
 | [`Button`](./src/button/README.md) | The focus, variant and motion contracts every other family follows. Five variants — `primary`, `secondary`, `ghost`, `destructive`, `link` — and no other prop that changes colour |
+| [`Avatar`](./src/avatar/README.md) | Falls back to initials when the image fails to paint, not merely when `src` is absent; the person is announced once |
 | [`AddonButton`](./src/addon-button/README.md) | Cannot render unlabelled, never submits the form it sits in, and keeps a 24px hit target however small the icon |
 | [`Input`](./src/input/README.md) | Invalid state is an attribute, not only a colour. `size` is Button's scale, so a field and a button of one size render the same height |
 | [`TextField`](./src/text-field/README.md) | `aria-describedby` lists exactly what was rendered, and is absent otherwise |

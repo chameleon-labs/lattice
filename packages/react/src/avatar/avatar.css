@@ -1,0 +1,80 @@
+/* The initials and the image occupy one grid cell, so a loaded image covers the
+   initials on the same frame rather than replacing them a frame later. */
+.lat-avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  overflow: hidden;
+
+  background: var(--lat-component);
+  border-radius: var(--lat-radius-full);
+  color: var(--lat-text);
+  user-select: none;
+}
+
+.lat-avatar__initials,
+.lat-avatar__image {
+  grid-area: 1 / 1;
+}
+
+.lat-avatar__initials {
+  font-family: var(--lat-text-ui-strong-font-family);
+  font-weight: var(--lat-text-ui-strong-font-weight);
+  line-height: var(--lat-line-height-none);
+}
+
+.lat-avatar__image {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+/* Hidden once the image has painted, not when it mounts: a stalled request must
+   keep showing the fallback rather than a blank box. The wrapper's own surface
+   is what shows through a transparent image afterwards. */
+.lat-avatar__initials[data-covered] {
+  visibility: hidden;
+}
+
+/* Not interactive on its own. The ring is for when a trigger renders through
+   it — Ariakit's `render` makes the span focusable, and without this it would
+   fall back to the browser's own outline instead of the system's. */
+/* Interactive only when a trigger renders through it — a plain avatar is an
+   image and points at nothing. */
+.lat-avatar[role='button'],
+.lat-avatar[tabindex] {
+  cursor: pointer;
+}
+
+/* 2px, where a bordered control uses 1px. Button recolours its own transparent
+   border and adds a 1px shadow, so its ring is two pixels of focus colour; this
+   has no border to recolour, and in dark the ring is 40% alpha. */
+.lat-avatar:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--lat-focus-ring);
+}
+
+@media (forced-colors: active) {
+  .lat-avatar:focus-visible {
+    outline: 2px solid CanvasText;
+    outline-offset: 2px;
+  }
+}
+
+.lat-avatar[data-size='sm'] {
+  inline-size: var(--lat-space-6);
+  block-size: var(--lat-space-6);
+  font-size: var(--lat-font-size-3xs);
+}
+
+.lat-avatar[data-size='md'] {
+  inline-size: var(--lat-space-8);
+  block-size: var(--lat-space-8);
+  font-size: var(--lat-font-size-2xs);
+}
+
+.lat-avatar[data-size='lg'] {
+  inline-size: calc(var(--lat-space-8) + var(--lat-space-2));
+  block-size: calc(var(--lat-space-8) + var(--lat-space-2));
+  font-size: var(--lat-font-size-xs);
+}

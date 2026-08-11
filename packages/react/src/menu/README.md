@@ -18,6 +18,17 @@ Ariakit supplies roving focus, typeahead and focus return; this supplies the
 surface, which uses the **overlay** elevation role — surface, border and shadow
 together.
 
+`MenuButton` renders a Lattice button by default. Pass `bare` when the trigger
+brings its own geometry — an [`Avatar`](../avatar/README.md), say — and the
+chrome is omitted entirely rather than layered over it:
+
+```tsx
+<MenuButton bare aria-label="Account menu" render={<Avatar name="Ada Lovelace" decorative />} />
+```
+
+Without it both class names land on one element and the button's padding
+collapses whatever it wrapped.
+
 Only the parts a tabstop screen uses are wrapped: `MenuButton`, `Menu`,
 `MenuItem` and `MenuSeparator`, plus `MenuProvider` re-exported untouched.
 
