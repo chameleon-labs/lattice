@@ -30,9 +30,13 @@ describe('Avatar', () => {
   it('leaves the accessibility tree when decorative, so the name is announced once', () => {
     const {container} = render(<Avatar name="Ada Lovelace" decorative />);
 
-    // The attribute itself: queryByRole alone also passes when aria-hidden is
-    // dropped, because decorative already omits role="img".
-    expect(container.querySelector('.lat-avatar')?.getAttribute('aria-hidden')).toBe('true');
+    const wrapper = container.querySelector('.lat-avatar')!;
+
+    // Contributes nothing, without aria-hidden — which would be invalid once a
+    // trigger renders through this element and makes it focusable.
+    expect(wrapper.hasAttribute('aria-hidden')).toBe(false);
+    expect(wrapper.hasAttribute('role')).toBe(false);
+    expect(wrapper.hasAttribute('aria-label')).toBe(false);
     expect(screen.queryByRole('img')).toBeNull();
   });
 

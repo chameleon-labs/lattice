@@ -1,4 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/react-vite';
+import {Menu, MenuButton, MenuItem, MenuProvider, MenuSeparator} from '../menu/menu.js';
 import {Avatar} from './avatar.js';
 
 const PORTRAIT = '/avatar-sample.jpg';
@@ -42,5 +43,30 @@ export const BesideAName: Story = {
       <Avatar name="Ada Lovelace" decorative />
       <span>Ada Lovelace</span>
     </div>
+  ),
+};
+
+/**
+ * As a menu trigger. `decorative` is what makes this work: the button supplies
+ * the role and the name, and the avatar adds neither.
+ *
+ * The avatar is the button's *content*, not the button itself. Rendering it
+ * *as* the trigger — `render={<Avatar />}` — does not work today: MenuButton
+ * stamps `lat-button`, and its padding collapses the image to nothing. See
+ * #86.
+ */
+export const AsAMenuTrigger: Story = {
+  render: () => (
+    <MenuProvider>
+      <MenuButton aria-label="Account menu">
+        <Avatar name="Ada Lovelace" src={PORTRAIT} size="sm" decorative />
+      </MenuButton>
+      <Menu>
+        <MenuItem>Profile</MenuItem>
+        <MenuItem>Settings</MenuItem>
+        <MenuSeparator />
+        <MenuItem>Sign out</MenuItem>
+      </Menu>
+    </MenuProvider>
   ),
 };

@@ -36,6 +36,21 @@
   visibility: hidden;
 }
 
+/* Not interactive on its own. The ring is for when a trigger renders through
+   it — Ariakit's `render` makes the span focusable, and without this it would
+   fall back to the browser's own outline instead of the system's. */
+.lat-avatar:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 1px var(--lat-focus-ring);
+}
+
+@media (forced-colors: active) {
+  .lat-avatar:focus-visible {
+    outline: 2px solid CanvasText;
+    outline-offset: 2px;
+  }
+}
+
 .lat-avatar[data-size='sm'] {
   inline-size: var(--lat-space-6);
   block-size: var(--lat-space-6);

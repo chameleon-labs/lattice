@@ -11,8 +11,13 @@ export interface AvatarOptions {
   initials?: string;
   size?: AvatarSize;
   /**
-   * Set when the name is already visible beside this avatar. The whole element
-   * leaves the accessibility tree, so the person is announced once, not twice.
+   * Set when something else already names this avatar — a visible name beside
+   * it, or a trigger rendering through it. The element then contributes no role
+   * and no name of its own, so the person is announced once.
+   *
+   * Not `aria-hidden`: that would be invalid on a trigger, which is focusable.
+   * The contents are already inert — the image is `alt=""` and the initials
+   * are hidden — so the element contributes nothing without it.
    */
   decorative?: boolean;
 }
@@ -61,7 +66,7 @@ export function Avatar({
       {...props}
       className={className === undefined ? 'lat-avatar' : `lat-avatar ${className}`}
       data-size={size}
-      {...(decorative ? {'aria-hidden': true} : {role: 'img', 'aria-label': name})}
+      {...(decorative ? {} : {role: 'img', 'aria-label': name})}
     >
       <span className="lat-avatar__initials" aria-hidden="true" data-covered={status === 'loaded' ? '' : undefined}>
         {initials ?? initialsFrom(name)}
