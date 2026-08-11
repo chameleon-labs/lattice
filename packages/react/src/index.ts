@@ -4,6 +4,9 @@ export type {ButtonOptions, ButtonProps, ButtonSize, ButtonVariant} from './butt
 export {AddonButton} from './addon-button/addon-button.js';
 export type {AddonButtonOptions, AddonButtonProps, AddonButtonSize} from './addon-button/addon-button.js';
 
+export {Avatar} from './avatar/avatar.js';
+export type {AvatarOptions, AvatarProps, AvatarSize} from './avatar/avatar.js';
+
 export {Input} from './input/input.js';
 export type {InputOptions, InputProps, InputSize} from './input/input.js';
 

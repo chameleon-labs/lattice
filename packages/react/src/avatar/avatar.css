@@ -1,0 +1,50 @@
+/* The initials and the image occupy one grid cell, so a loaded image covers the
+   initials on the same frame rather than replacing them a frame later. */
+.lat-avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  overflow: hidden;
+
+  background: var(--lat-component);
+  border-radius: var(--lat-radius-none);
+  color: var(--lat-text);
+  user-select: none;
+}
+
+.lat-avatar__initials,
+.lat-avatar__image {
+  grid-area: 1 / 1;
+}
+
+.lat-avatar__initials {
+  font-family: var(--lat-text-ui-strong-font-family);
+  font-weight: var(--lat-text-ui-strong-font-weight);
+  line-height: var(--lat-line-height-none);
+}
+
+/* Opaque, so a transparent image does not let the initials show through it. */
+.lat-avatar__image {
+  inline-size: 100%;
+  block-size: 100%;
+  background: var(--lat-component);
+  object-fit: cover;
+}
+
+.lat-avatar[data-size='sm'] {
+  inline-size: var(--lat-space-6);
+  block-size: var(--lat-space-6);
+  font-size: var(--lat-font-size-3xs);
+}
+
+.lat-avatar[data-size='md'] {
+  inline-size: var(--lat-space-8);
+  block-size: var(--lat-space-8);
+  font-size: var(--lat-font-size-2xs);
+}
+
+.lat-avatar[data-size='lg'] {
+  inline-size: calc(var(--lat-space-8) + var(--lat-space-2));
+  block-size: calc(var(--lat-space-8) + var(--lat-space-2));
+  font-size: var(--lat-font-size-xs);
+}

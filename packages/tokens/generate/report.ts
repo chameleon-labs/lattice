@@ -174,6 +174,7 @@ function forMode(mode: Mode): LedgerEntry[] {
   return [
     entry(`${mode} text on bg`, parseHex(gray.text), bg, 4.5),
     entry(`${mode} text-subtle on bg-raised`, parseHex(gray['text-subtle']), raised, 4.5),
+    entry(`${mode} text on component`, parseHex(gray.text), parseHex(gray.component), 4.5),
     entry(`${mode} on-solid on solid`, onSolid, solid, 4.5),
     entry(`${mode} accent as text on bg`, accentText, bg, 4.5),
     // SC 1.4.11: a focus indicator needs 3:1 against what surrounds it. Every
