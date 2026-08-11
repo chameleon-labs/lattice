@@ -51,12 +51,20 @@ cannot ship in this system. Every colour pair is measured into a contrast
 ledger; a generated colour is by construction unmeasured. One treatment, from
 tokens — `text on component` is a ledger row like any other.
 
-## Square, not round
+## Round, in a square system
 
-`--lat-radius-none`, matching every other box. Avatars are conventionally
-circular, and `Switch` does use `--lat-radius-full`, but its roundness is
-functional — a track a thumb slides along. A system that follows a design
-strictly should not go round for convention alone.
+`--lat-radius-full`, and the only box here that is not square.
+
+Lattice's square radius is part of the identity, so this needs a reason beyond
+convention. It is the same one `Switch` has: the shape carries meaning rather
+than decorating. A circle reads as a person; a square reads as a logo, a
+thumbnail, an asset — a distinction other systems use deliberately, circles for
+people and squares for organisations. Rounding here is a signifier doing work,
+not a corner softened because it looks nicer.
+
+The identity is also silent on this. The source bundle never drew an avatar, so
+there is no square one to be faithful to — the square radius is a rule about
+panels, fields and buttons, and it was never asked this question.
 
 **Classes:** `.lat-avatar`, `.lat-avatar__image`, `.lat-avatar__initials`, with
 `data-size`.

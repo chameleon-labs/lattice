@@ -7,7 +7,7 @@
   overflow: hidden;
 
   background: var(--lat-component);
-  border-radius: var(--lat-radius-none);
+  border-radius: var(--lat-radius-full);
   color: var(--lat-text);
   user-select: none;
 }

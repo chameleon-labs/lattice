@@ -1,9 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/react-vite';
 import {Avatar} from './avatar.js';
 
-const PORTRAIT = `data:image/svg+xml;utf8,${encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="%23cff23a"/><circle cx="32" cy="25" r="12" fill="%230c0c14"/><path d="M8 64c0-14 11-22 24-22s24 8 24 22z" fill="%230c0c14"/></svg>',
-)}`;
+const PORTRAIT = '/avatar-sample.jpg';
 
 const meta = {
   title: 'Components/Avatar',
