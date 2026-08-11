@@ -28,8 +28,11 @@ describe('Avatar', () => {
   });
 
   it('leaves the accessibility tree when decorative, so the name is announced once', () => {
-    render(<Avatar name="Ada Lovelace" decorative />);
+    const {container} = render(<Avatar name="Ada Lovelace" decorative />);
 
+    // The attribute itself: queryByRole alone also passes when aria-hidden is
+    // dropped, because decorative already omits role="img".
+    expect(container.querySelector('.lat-avatar')?.getAttribute('aria-hidden')).toBe('true');
     expect(screen.queryByRole('img')).toBeNull();
   });
 
@@ -55,6 +58,27 @@ describe('Avatar', () => {
 
     expect(container.querySelector('.lat-avatar__image')?.getAttribute('alt')).toBe('');
     expect(container.querySelector('.lat-avatar__initials')?.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('shows the initials until the image actually paints', () => {
+    const {container} = render(<Avatar name="Ada Lovelace" src="/slow.png" />);
+    const initials = container.querySelector('.lat-avatar__initials')!;
+
+    expect(initials.hasAttribute('data-covered')).toBe(false);
+
+    fireEvent.load(container.querySelector('.lat-avatar__image')!);
+
+    expect(container.querySelector('.lat-avatar__initials')!.hasAttribute('data-covered')).toBe(true);
+  });
+
+  it('attempts a new src rather than inheriting the previous failure', () => {
+    const {container, rerender} = render(<Avatar name="Ada Lovelace" src="/gone.png" />);
+    fireEvent.error(container.querySelector('.lat-avatar__image')!);
+    expect(container.querySelector('.lat-avatar__image')).toBeNull();
+
+    rerender(<Avatar name="Ada Lovelace" src="/ada.png" />);
+
+    expect(container.querySelector('.lat-avatar__image')?.getAttribute('src')).toBe('/ada.png');
   });
 
   it('takes an explicit override for the names the rule gets wrong', () => {

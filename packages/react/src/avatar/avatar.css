@@ -23,12 +23,17 @@
   line-height: var(--lat-line-height-none);
 }
 
-/* Opaque, so a transparent image does not let the initials show through it. */
 .lat-avatar__image {
   inline-size: 100%;
   block-size: 100%;
-  background: var(--lat-component);
   object-fit: cover;
+}
+
+/* Hidden once the image has painted, not when it mounts: a stalled request must
+   keep showing the fallback rather than a blank box. The wrapper's own surface
+   is what shows through a transparent image afterwards. */
+.lat-avatar__initials[data-covered] {
+  visibility: hidden;
 }
 
 .lat-avatar[data-size='sm'] {

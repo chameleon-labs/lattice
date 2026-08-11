@@ -25,6 +25,9 @@ export type AvatarProps = Omit<ComponentPropsWithRef<'span'>, 'children'> & Avat
  * was not written for, and `initials` is the escape hatch when it is wrong.
  *
  * Split on code points, not UTF-16 units, so an astral character stays whole.
+ *
+ * Cased without a locale: `toLocaleUpperCase` would render the same name
+ * differently on a Turkish host than on an English one.
  */
 export function initialsFrom(name: string): string {
   const words = name.trim().split(/\s+/).filter(Boolean);
@@ -36,7 +39,7 @@ export function initialsFrom(name: string): string {
   const first = [...words[0]!][0] ?? '';
   const last = words.length > 1 ? ([...words[words.length - 1]!][0] ?? '') : '';
 
-  return `${first}${last}`.toLocaleUpperCase();
+  return `${first}${last}`.toUpperCase();
 }
 
 export function Avatar({
@@ -48,7 +51,10 @@ export function Avatar({
   className,
   ...props
 }: AvatarProps): React.JSX.Element {
-  const [failed, setFailed] = useState(false);
+  // Keyed by the src it describes, so a new src is attempted rather than
+  // inheriting the previous one's failure.
+  const [result, setResult] = useState<{src: string; status: 'loaded' | 'failed'}>();
+  const status = result !== undefined && result.src === src ? result.status : undefined;
 
   return (
     <span
@@ -57,16 +63,19 @@ export function Avatar({
       data-size={size}
       {...(decorative ? {'aria-hidden': true} : {role: 'img', 'aria-label': name})}
     >
-      <span className="lat-avatar__initials" aria-hidden="true">
+      <span className="lat-avatar__initials" aria-hidden="true" data-covered={status === 'loaded' ? '' : undefined}>
         {initials ?? initialsFrom(name)}
       </span>
-      {src === undefined || failed ? null : (
+      {src === undefined || status === 'failed' ? null : (
         <img
           className="lat-avatar__image"
           src={src}
           alt=""
+          onLoad={() => {
+            setResult({src, status: 'loaded'});
+          }}
           onError={() => {
-            setFailed(true);
+            setResult({src, status: 'failed'});
           }}
         />
       )}

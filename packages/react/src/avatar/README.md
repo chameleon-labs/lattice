@@ -39,10 +39,26 @@ verbose; the other way is silent.
 First letter of the first word, first letter of the last. One word gives one
 letter. Split on code points, so an astral character stays whole.
 
+Uppercased without a locale. `toLocaleUpperCase` would render the same name
+differently depending on the host — `izmir` gives `İ` on a Turkish machine and
+`I` everywhere else — so a server and a browser could disagree about what the
+same person's initials are.
+
 It is deliberately simple, and it is wrong for some names — particles like
 "van der", compound surnames, honorifics, scripts where a leading character is
 not what a reader would pick. A cleverer rule fails silently on the names it was
 not written for. This one is predictable, and `initials` is the escape hatch.
+
+## While the image loads
+
+The initials and the image share one grid cell. The initials are hidden only
+once the image has *painted*, not when the `<img>` mounts — a stalled or slow
+request keeps showing the fallback rather than a blank box, which is the
+guarantee this component exists for. Afterwards the wrapper's own surface is
+what shows through a transparent image.
+
+A failure is remembered against the `src` that caused it, so changing `src` to
+a working URL is attempted rather than inheriting the previous failure.
 
 ## No colour from a hash
 
