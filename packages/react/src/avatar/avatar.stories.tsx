@@ -48,19 +48,13 @@ export const BesideAName: Story = {
 
 /**
  * As a menu trigger. `decorative` is what makes this work: the button supplies
- * the role and the name, and the avatar adds neither.
- *
- * The avatar is the button's *content*, not the button itself. Rendering it
- * *as* the trigger — `render={<Avatar />}` — does not work today: MenuButton
- * stamps `lat-button`, and its padding collapses the image to nothing. See
- * #86.
+ * the role and the name, and the avatar adds neither. `bare` keeps MenuButton
+ * from stamping its own chrome over the avatar's shape.
  */
 export const AsAMenuTrigger: Story = {
   render: () => (
     <MenuProvider>
-      <MenuButton aria-label="Account menu">
-        <Avatar name="Ada Lovelace" src={PORTRAIT} size="sm" decorative />
-      </MenuButton>
+      <MenuButton bare aria-label="Account menu" render={<Avatar name="Ada Lovelace" src={PORTRAIT} decorative />} />
       <Menu>
         <MenuItem>Profile</MenuItem>
         <MenuItem>Settings</MenuItem>

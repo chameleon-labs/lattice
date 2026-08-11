@@ -15,7 +15,16 @@ export {MenuProvider} from '@ariakit/react';
 export type {MenuProviderProps} from '@ariakit/react';
 
 export type MenuProps<T extends ElementType = 'div'> = AriakitMenuProps<T>;
-export type MenuButtonProps<T extends ElementType = 'button'> = AriakitMenuButtonProps<T>;
+export interface MenuButtonOptions {
+  /**
+   * Renders no button chrome, for a trigger that brings its own geometry —
+   * `render={<Avatar />}`. Without it both class names land on one element and
+   * the button's padding collapses whatever it wrapped.
+   */
+  bare?: boolean;
+}
+
+export type MenuButtonProps<T extends ElementType = 'button'> = AriakitMenuButtonProps<T> & MenuButtonOptions;
 export type MenuItemProps<T extends ElementType = 'div'> = AriakitMenuItemProps<T>;
 export type MenuSeparatorProps<T extends ElementType = 'hr'> = AriakitMenuSeparatorProps<T>;
 
@@ -41,8 +50,13 @@ export function Menu<T extends ElementType = 'div'>({className, ...props}: MenuP
 
 export function MenuButton<T extends ElementType = 'button'>({
   className,
+  bare = false,
   ...props
 }: MenuButtonProps<T>): React.JSX.Element {
+  if (bare) {
+    return <AriakitMenuButton {...props} className={className} />;
+  }
+
   return (
     <AriakitMenuButton
       {...props}

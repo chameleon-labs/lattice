@@ -39,9 +39,19 @@
 /* Not interactive on its own. The ring is for when a trigger renders through
    it — Ariakit's `render` makes the span focusable, and without this it would
    fall back to the browser's own outline instead of the system's. */
+/* Interactive only when a trigger renders through it — a plain avatar is an
+   image and points at nothing. */
+.lat-avatar[role='button'],
+.lat-avatar[tabindex] {
+  cursor: pointer;
+}
+
+/* 2px, where a bordered control uses 1px. Button recolours its own transparent
+   border and adds a 1px shadow, so its ring is two pixels of focus colour; this
+   has no border to recolour, and in dark the ring is 40% alpha. */
 .lat-avatar:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 1px var(--lat-focus-ring);
+  box-shadow: 0 0 0 2px var(--lat-focus-ring);
 }
 
 @media (forced-colors: active) {

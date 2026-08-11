@@ -62,22 +62,16 @@ a working URL is attempted rather than inheriting the previous failure.
 
 ## As a trigger
 
-An avatar that opens a menu is the button's **content**, with `decorative` set
-so the button supplies the role and the name:
+An avatar that opens a menu is the trigger itself. `bare` keeps `MenuButton`
+from stamping its own chrome over the avatar's shape, and `decorative` lets the
+trigger supply the role and the name:
 
 ```tsx
-<MenuButton aria-label="Account menu">
-  <Avatar name="Ada Lovelace" src={user.imageUrl} size="sm" decorative />
-</MenuButton>
+<MenuButton bare aria-label="Account menu" render={<Avatar name="Ada Lovelace" src={user.imageUrl} decorative />} />
 ```
 
-Rendering it *as* the trigger — `render={<Avatar />}` — does not work today.
-`MenuButton` stamps `lat-button` unconditionally, and its padding collapses
-the avatar's image to nothing. See [#86](https://github.com/chameleon-labs/lattice/issues/86).
-
-`.lat-avatar` still carries a `:focus-visible` ring. Nothing in the library
-makes the element focusable today, so it is defensive — but a focusable element
-in this system should show the system's ring rather than the browser's.
+That is what `.lat-avatar:focus-visible` is for: the element becomes focusable,
+and it shows the system's ring rather than the browser's.
 
 ## No colour from a hash
 
