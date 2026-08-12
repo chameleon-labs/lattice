@@ -96,3 +96,30 @@ describe('Dialog', () => {
 // provide — under jsdom focus simply stays on the dismiss button. A jsdom test
 // of it would either fail for the wrong reason or be weakened until it proved
 // nothing.
+
+describe('DialogDisclosure chrome', () => {
+  it('stamps the button appearance by default', () => {
+    render(
+      <DialogProvider>
+        <DialogDisclosure>Open</DialogDisclosure>
+      </DialogProvider>,
+    );
+    const trigger = screen.getByRole('button', {name: 'Open'});
+
+    expect(trigger.className).toBe('lat-button');
+    expect(trigger.getAttribute('data-variant')).toBe('secondary');
+  });
+
+  it('omits it entirely when bare, so a trigger keeps its own geometry', () => {
+    render(
+      <DialogProvider>
+        <DialogDisclosure bare aria-label="Open" className="mine" />
+      </DialogProvider>,
+    );
+    const trigger = screen.getByRole('button', {name: 'Open'});
+
+    expect(trigger.className).toBe('mine');
+    expect(trigger.hasAttribute('data-variant')).toBe(false);
+    expect(trigger.hasAttribute('data-size')).toBe(false);
+  });
+});

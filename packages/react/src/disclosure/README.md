@@ -17,4 +17,12 @@ Ariakit keeps the content **mounted and marked `hidden`** rather than unmounting
 it. `hidden` removes it from the accessibility tree and from layout, and the
 stable DOM is what lets it animate open without measuring twice.
 
+`Disclosure` draws the ghost-button construction by default. Pass `bare` when
+the trigger is a whole row that expands rather than a button above one, and the
+padding, border and hover wash are omitted rather than layered over it.
+
+It is the same prop, for the same reason, as `MenuButton` and
+`DialogDisclosure`: a wrapper whose job is behaviour should not impose
+appearance a caller cannot decline.
+
 **Classes:** `.lat-disclosure`, `.lat-disclosure__content`.

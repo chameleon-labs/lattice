@@ -23,6 +23,18 @@ setting `aria-modal` — the stronger of the two mechanisms. The heading names t
 dialog, so the accessible name is not left to whichever text node the browser
 finds first.
 
+`DialogDisclosure` renders a Lattice button by default. Pass `bare` when the
+trigger brings its own geometry — an [`Avatar`](../avatar/README.md), say — and
+the chrome is omitted rather than layered over it:
+
+```tsx
+<DialogDisclosure bare aria-label="Open account" render={<Avatar name="Ada Lovelace" decorative />} />
+```
+
+Without it both class names land on one element and the button's padding
+collapses whatever it wrapped. `render={<a href="…" />}` still gets the button
+appearance, which is the case `bare` deliberately leaves alone.
+
 **Classes:** `.lat-dialog`, `.lat-dialog__backdrop`, `.lat-dialog__heading`,
 `.lat-dialog__dismiss`. Uses the **overlay** elevation role, shared with Menu.
 The centring transform

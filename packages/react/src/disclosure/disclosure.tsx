@@ -11,7 +11,16 @@ import type {ElementType} from 'react';
 export {DisclosureProvider} from '@ariakit/react';
 export type {DisclosureProviderProps} from '@ariakit/react';
 
-export type DisclosureProps<T extends ElementType = 'button'> = AriakitDisclosureProps<T>;
+export interface DisclosureOptions {
+  /**
+   * Renders no chrome, for a trigger that brings its own geometry — a whole
+   * row that expands, rather than a button above one. Same prop, same reason,
+   * as `MenuButton` and `DialogDisclosure`.
+   */
+  bare?: boolean;
+}
+
+export type DisclosureProps<T extends ElementType = 'button'> = AriakitDisclosureProps<T> & DisclosureOptions;
 export type DisclosureContentProps<T extends ElementType = 'div'> = AriakitDisclosureContentProps<T>;
 
 /**
@@ -23,8 +32,13 @@ export type DisclosureContentProps<T extends ElementType = 'div'> = AriakitDiscl
  */
 export function Disclosure<T extends ElementType = 'button'>({
   className,
+  bare = false,
   ...props
 }: DisclosureProps<T>): React.JSX.Element {
+  if (bare) {
+    return <AriakitDisclosure {...props} className={className} />;
+  }
+
   return (
     <AriakitDisclosure
       {...props}

@@ -17,13 +17,19 @@ export {Switch} from './switch/switch.js';
 export type {SwitchProps} from './switch/switch.js';
 
 export {Disclosure, DisclosureContent, DisclosureProvider} from './disclosure/disclosure.js';
-export type {DisclosureContentProps, DisclosureProps, DisclosureProviderProps} from './disclosure/disclosure.js';
+export type {
+  DisclosureContentProps,
+  DisclosureOptions,
+  DisclosureProps,
+  DisclosureProviderProps,
+} from './disclosure/disclosure.js';
 
 export {Tab, TabList, TabPanel, TabProvider} from './tabs/tabs.js';
 export type {TabListProps, TabPanelProps, TabProps, TabProviderProps} from './tabs/tabs.js';
 
 export {Dialog, DialogDisclosure, DialogDismiss, DialogHeading, DialogProvider} from './dialog/dialog.js';
 export type {
+  DialogDisclosureOptions,
   DialogDisclosureProps,
   DialogDismissProps,
   DialogHeadingProps,

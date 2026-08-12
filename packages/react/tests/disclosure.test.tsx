@@ -62,3 +62,27 @@ describe('Disclosure', () => {
     expect(screen.getByRole('button', {name: 'Affected nodes'}).tagName).toBe('BUTTON');
   });
 });
+
+describe('Disclosure chrome', () => {
+  it('stamps its own appearance by default', () => {
+    render(
+      <DisclosureProvider>
+        <Disclosure>Affected nodes</Disclosure>
+      </DisclosureProvider>,
+    );
+
+    expect(screen.getByRole('button', {name: 'Affected nodes'}).className).toBe('lat-disclosure');
+  });
+
+  it('omits it when bare, for a whole row that expands', () => {
+    render(
+      <DisclosureProvider>
+        <Disclosure bare className="row">
+          Affected nodes
+        </Disclosure>
+      </DisclosureProvider>,
+    );
+
+    expect(screen.getByRole('button', {name: 'Affected nodes'}).className).toBe('row');
+  });
+});
