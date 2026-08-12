@@ -31,8 +31,29 @@ export type {
   DialogProviderProps,
 } from './dialog/dialog.js';
 
-export {Menu, MenuButton, MenuItem, MenuProvider, MenuSeparator} from './menu/menu.js';
-export type {MenuButtonProps, MenuItemProps, MenuProps, MenuProviderProps, MenuSeparatorProps} from './menu/menu.js';
+export {
+  Menu,
+  MenuButton,
+  MenuGroup,
+  MenuGroupLabel,
+  MenuItem,
+  MenuItemCheckbox,
+  MenuItemRadio,
+  MenuProvider,
+  MenuSeparator,
+} from './menu/menu.js';
+export type {
+  MenuButtonOptions,
+  MenuButtonProps,
+  MenuGroupLabelProps,
+  MenuGroupProps,
+  MenuItemCheckboxProps,
+  MenuItemProps,
+  MenuItemRadioProps,
+  MenuProps,
+  MenuProviderProps,
+  MenuSeparatorProps,
+} from './menu/menu.js';
 
 export {Badge} from './badge/badge.js';
 export type {BadgeOptions, BadgeProps, BadgeVariant} from './badge/badge.js';

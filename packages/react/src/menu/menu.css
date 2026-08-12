@@ -99,3 +99,35 @@
     forced-color-adjust: none;
   }
 }
+
+/* A checkable item reserves an indicator column, so its label lines up whether
+   it is checked or not. Plain items keep their own inset. */
+.lat-menu__item[aria-checked] {
+  position: relative;
+  padding-inline-start: var(--lat-space-6);
+}
+
+/* Drawn, not an icon: this package ships no glyphs, and `currentColor` keeps
+   the mark visible under forced-colors where a background signal is flattened. */
+.lat-menu__item[aria-checked='true']::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: var(--lat-space-3);
+  inline-size: 0.3em;
+  block-size: 0.6em;
+  border-inline-end: 2px solid currentColor;
+  border-block-end: 2px solid currentColor;
+  transform: translateY(-15%) rotate(45deg);
+}
+
+.lat-menu__group-label {
+  padding: var(--lat-inset-row-sm);
+
+  font-family: var(--lat-text-eyebrow-font-family);
+  font-size: var(--lat-text-eyebrow-font-size);
+  font-weight: var(--lat-text-eyebrow-font-weight);
+  letter-spacing: var(--lat-letter-spacing-wider);
+  line-height: var(--lat-text-eyebrow-line-height);
+  text-transform: var(--lat-text-eyebrow-text-transform);
+  color: var(--lat-text-subtle);
+}
