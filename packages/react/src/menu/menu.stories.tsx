@@ -1,14 +1,25 @@
 import type {Meta, StoryObj} from '@storybook/react-vite';
-import {Menu, MenuButton, MenuItem, MenuProvider, MenuSeparator} from './menu.js';
+import {
+  Menu,
+  MenuButton,
+  MenuGroup,
+  MenuGroupLabel,
+  MenuItem,
+  MenuItemCheckbox,
+  MenuItemRadio,
+  MenuProvider,
+  MenuSeparator,
+} from './menu.js';
 
 /**
  * Ariakit supplies roving focus, typeahead and focus return; Lattice supplies
  * the surface, which uses the `overlay` elevation role.
  *
- * Only the parts a real screen uses are wrapped. Ariakit's remaining menu parts
- * are available from `@ariakit/react` but are deliberately not re-exported: an
- * unstyled part arriving through this package would look like a system component
- * and behave like an unfinished one.
+ * A part is wrapped when leaving it out would push semantics onto the call site —
+ * which is why the checkable item and the group are here. Ariakit's remaining
+ * parts stay available from `@ariakit/react` and unwrapped: an unstyled part
+ * arriving through this package would look like a system component and behave
+ * like an unfinished one.
  */
 const meta = {
   title: 'Components/Menu',
@@ -50,6 +61,37 @@ export const Open: Story = {
       <MenuButton>Actions</MenuButton>
       <Menu>
         <Items />
+      </Menu>
+    </MenuProvider>
+  ),
+};
+
+/**
+ * A choice inside a menu. The role and `aria-checked` come from
+ * `MenuItemRadio`, and `MenuGroupLabel` names the group — none of it is the
+ * call site's to remember.
+ */
+export const Choices: Story = {
+  render: () => (
+    <MenuProvider defaultOpen defaultValues={{theme: 'system'}}>
+      <MenuButton>Preferences</MenuButton>
+      <Menu>
+        <MenuGroup>
+          <MenuGroupLabel>Theme</MenuGroupLabel>
+          <MenuItemRadio name="theme" value="system">
+            Match system
+          </MenuItemRadio>
+          <MenuItemRadio name="theme" value="light">
+            Light
+          </MenuItemRadio>
+          <MenuItemRadio name="theme" value="dark">
+            Dark
+          </MenuItemRadio>
+        </MenuGroup>
+        <MenuSeparator />
+        <MenuItemCheckbox name="density" value="compact">
+          Compact rows
+        </MenuItemCheckbox>
       </Menu>
     </MenuProvider>
   ),

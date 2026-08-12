@@ -91,3 +91,25 @@ describe("Menu's forced-colors fallback", () => {
     expect(rule).toContain('forced-color-adjust: none;');
   });
 });
+
+/*
+ * The checked mark is a pseudo-element, so no DOM test can see it: menu.test.tsx
+ * asserts `aria-checked` and would stay green with the mark deleted, leaving
+ * the selected option announced but unmarked. In forced-colors that is the whole
+ * signal — the active row's Highlight background is shared by every focused row,
+ * checked or not.
+ */
+describe("Menu's checked mark", () => {
+  it('draws the mark on a pseudo-element, reserving its column either way', () => {
+    expect(block(css, ".lat-menu__item[aria-checked='true']::before")).toContain("content: '';");
+    expect(block(css, '.lat-menu__item[aria-checked]')).toContain('padding-inline-start:');
+  });
+
+  it('draws it in currentColor, which forced-colors resolves rather than strips', () => {
+    const rule = block(css, ".lat-menu__item[aria-checked='true']::before");
+
+    // Two borders make the tick. Either one alone is not a mark.
+    expect(rule).toMatch(/border-inline-end:[^;]*currentColor;/);
+    expect(rule).toMatch(/border-block-end:[^;]*currentColor;/);
+  });
+});

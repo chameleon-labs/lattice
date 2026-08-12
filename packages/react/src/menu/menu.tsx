@@ -1,9 +1,17 @@
 import {
   Menu as AriakitMenu,
+  MenuGroup as AriakitMenuGroup,
+  MenuGroupLabel as AriakitMenuGroupLabel,
+  MenuItemCheckbox as AriakitMenuItemCheckbox,
+  MenuItemRadio as AriakitMenuItemRadio,
   MenuButton as AriakitMenuButton,
   MenuItem as AriakitMenuItem,
   MenuSeparator as AriakitMenuSeparator,
   type MenuButtonProps as AriakitMenuButtonProps,
+  type MenuGroupLabelProps as AriakitMenuGroupLabelProps,
+  type MenuGroupProps as AriakitMenuGroupProps,
+  type MenuItemCheckboxProps as AriakitMenuItemCheckboxProps,
+  type MenuItemRadioProps as AriakitMenuItemRadioProps,
   type MenuItemProps as AriakitMenuItemProps,
   type MenuProps as AriakitMenuProps,
   type MenuSeparatorProps as AriakitMenuSeparatorProps,
@@ -27,20 +35,28 @@ export interface MenuButtonOptions {
 export type MenuButtonProps<T extends ElementType = 'button'> = AriakitMenuButtonProps<T> & MenuButtonOptions;
 export type MenuItemProps<T extends ElementType = 'div'> = AriakitMenuItemProps<T>;
 export type MenuSeparatorProps<T extends ElementType = 'hr'> = AriakitMenuSeparatorProps<T>;
+export type MenuItemRadioProps<T extends ElementType = 'div'> = AriakitMenuItemRadioProps<T>;
+export type MenuItemCheckboxProps<T extends ElementType = 'div'> = AriakitMenuItemCheckboxProps<T>;
+export type MenuGroupProps<T extends ElementType = 'div'> = AriakitMenuGroupProps<T>;
+export type MenuGroupLabelProps<T extends ElementType = 'div'> = AriakitMenuGroupLabelProps<T>;
 
 /**
  * Ariakit's menu supplies roving focus, typeahead and focus return; this
  * supplies the surface, which uses the `overlay` elevation role.
  *
- * Only the parts a tabstop screen uses are wrapped: `MenuButton`, `Menu`,
- * `MenuItem` and `MenuSeparator`, plus `MenuProvider` re-exported untouched.
+ * Wrapped here: `MenuButton`, `Menu`, `MenuItem`, `MenuItemRadio`,
+ * `MenuItemCheckbox`, `MenuGroup`, `MenuGroupLabel` and `MenuSeparator`, plus
+ * `MenuProvider` re-exported untouched.
  *
- * Ariakit's remaining menu parts — `MenuGroup`, `MenuItemCheckbox`,
- * `MenuItemRadio`, `MenuBar` and the rest — are available from `@ariakit/react`
- * but are deliberately not re-exported here: an unstyled part arriving through
- * this package would look like a system component and behave like an unfinished
- * one. No count is given, because that number belongs to Ariakit and moves with
- * it.
+ * A part belongs here when leaving it out would push semantics onto the call
+ * site. The earlier rule — only what a screen happened to use — is what left the
+ * checkable item out until a screen hand-rolled one from `MenuItem`,
+ * `role="menuitemradio"` and `aria-checked`.
+ *
+ * Ariakit's remaining parts — `MenuBar` and the rest — stay available from
+ * `@ariakit/react` and unwrapped: an unstyled part arriving through this package
+ * would look like a system component and behave like an unfinished one. No count
+ * is given, because that number belongs to Ariakit and moves with it.
  */
 export function Menu<T extends ElementType = 'div'>({className, ...props}: MenuProps<T>): React.JSX.Element {
   return (
@@ -84,6 +100,61 @@ export function MenuSeparator<T extends ElementType = 'hr'>({
     <AriakitMenuSeparator
       {...props}
       className={className === undefined ? 'lat-menu__separator' : `lat-menu__separator ${className}`}
+    />
+  );
+}
+
+/**
+ * A choice inside a menu. The role and `aria-checked` come from here, so a
+ * selected option cannot be selected only visually.
+ *
+ * Ariakit holds the value in the menu store — give `MenuProvider` a
+ * `defaultValues` (or `values`/`setValues`) and each item a `name` and `value`.
+ */
+export function MenuItemRadio<T extends ElementType = 'div'>({
+  className,
+  ...props
+}: MenuItemRadioProps<T>): React.JSX.Element {
+  return (
+    <AriakitMenuItemRadio
+      {...props}
+      className={className === undefined ? 'lat-menu__item' : `lat-menu__item ${className}`}
+    />
+  );
+}
+
+/** As `MenuItemRadio`, for choices that are not mutually exclusive. */
+export function MenuItemCheckbox<T extends ElementType = 'div'>({
+  className,
+  ...props
+}: MenuItemCheckboxProps<T>): React.JSX.Element {
+  return (
+    <AriakitMenuItemCheckbox
+      {...props}
+      className={className === undefined ? 'lat-menu__item' : `lat-menu__item ${className}`}
+    />
+  );
+}
+
+/** Groups related items. Pair with `MenuGroupLabel`, which names the group. */
+export function MenuGroup<T extends ElementType = 'div'>({className, ...props}: MenuGroupProps<T>): React.JSX.Element {
+  return (
+    <AriakitMenuGroup
+      {...props}
+      className={className === undefined ? 'lat-menu__group' : `lat-menu__group ${className}`}
+    />
+  );
+}
+
+/** Names the enclosing `MenuGroup`. Ariakit wires the association. */
+export function MenuGroupLabel<T extends ElementType = 'div'>({
+  className,
+  ...props
+}: MenuGroupLabelProps<T>): React.JSX.Element {
+  return (
+    <AriakitMenuGroupLabel
+      {...props}
+      className={className === undefined ? 'lat-menu__group-label' : `lat-menu__group-label ${className}`}
     />
   );
 }
