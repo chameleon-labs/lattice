@@ -17,7 +17,17 @@ export type {DialogProviderProps} from '@ariakit/react';
 export type DialogProps<T extends ElementType = 'div'> = AriakitDialogProps<T>;
 export type DialogHeadingProps<T extends ElementType = 'h1'> = AriakitDialogHeadingProps<T>;
 export type DialogDismissProps<T extends ElementType = 'button'> = AriakitDialogDismissProps<T>;
-export type DialogDisclosureProps<T extends ElementType = 'button'> = AriakitDialogDisclosureProps<T>;
+export interface DialogDisclosureOptions {
+  /**
+   * Renders no button chrome, for a trigger that brings its own geometry.
+   * Without it both class names land on one element and the button's padding
+   * collapses whatever it wrapped. Same prop, same reason, as `MenuButton`.
+   */
+  bare?: boolean;
+}
+
+export type DialogDisclosureProps<T extends ElementType = 'button'> = AriakitDialogDisclosureProps<T> &
+  DialogDisclosureOptions;
 
 /**
  * A modal dialog: focus trapped, focus returned, scroll locked, labelled.
@@ -64,8 +74,13 @@ export function DialogDismiss<T extends ElementType = 'button'>({
 
 export function DialogDisclosure<T extends ElementType = 'button'>({
   className,
+  bare = false,
   ...props
 }: DialogDisclosureProps<T>): React.JSX.Element {
+  if (bare) {
+    return <AriakitDialogDisclosure {...props} className={className} />;
+  }
+
   return (
     <AriakitDialogDisclosure
       {...props}
