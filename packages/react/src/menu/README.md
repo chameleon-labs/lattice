@@ -1,6 +1,7 @@
 # Menu
 
-`MenuButton`, `Menu`, `MenuItem`, `MenuSeparator`, and `MenuProvider`
+`MenuButton`, `Menu`, `MenuItem`, `MenuItemRadio`, `MenuItemCheckbox`,
+`MenuGroup`, `MenuGroupLabel` and `MenuSeparator`, plus `MenuProvider`
 (re-exported from Ariakit unchanged).
 
 ```tsx
@@ -73,6 +74,8 @@ Ariakit's remaining menu parts are available from `@ariakit/react` but are
 deliberately not re-exported here: an unstyled part arriving through this
 package would look like a system component and behave like an unfinished one.
 
-**Classes:** `.lat-menu`, `.lat-menu__item`, `.lat-menu__separator`. The
-keyboard position styles off `[data-active-item]`, because DOM focus stays on
-the menu.
+**Classes:** `.lat-menu`, `.lat-menu__item`, `.lat-menu__separator`,
+`.lat-menu__group`, `.lat-menu__group-label`. The keyboard position styles off
+`[data-active-item]`, because DOM focus stays on the menu. A checkable item is
+the same `.lat-menu__item`, selected by `[aria-checked]` — the state it already
+carries, rather than a class of its own.

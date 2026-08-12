@@ -44,15 +44,19 @@ export type MenuGroupLabelProps<T extends ElementType = 'div'> = AriakitMenuGrou
  * Ariakit's menu supplies roving focus, typeahead and focus return; this
  * supplies the surface, which uses the `overlay` elevation role.
  *
- * Only the parts a tabstop screen uses are wrapped: `MenuButton`, `Menu`,
- * `MenuItem` and `MenuSeparator`, plus `MenuProvider` re-exported untouched.
+ * Wrapped here: `MenuButton`, `Menu`, `MenuItem`, `MenuItemRadio`,
+ * `MenuItemCheckbox`, `MenuGroup`, `MenuGroupLabel` and `MenuSeparator`, plus
+ * `MenuProvider` re-exported untouched.
  *
- * Ariakit's remaining menu parts — `MenuGroup`, `MenuItemCheckbox`,
- * `MenuItemRadio`, `MenuBar` and the rest — are available from `@ariakit/react`
- * but are deliberately not re-exported here: an unstyled part arriving through
- * this package would look like a system component and behave like an unfinished
- * one. No count is given, because that number belongs to Ariakit and moves with
- * it.
+ * A part belongs here when leaving it out would push semantics onto the call
+ * site. The earlier rule — only what a screen happened to use — is what left the
+ * checkable item out until a screen hand-rolled one from `MenuItem`,
+ * `role="menuitemradio"` and `aria-checked`.
+ *
+ * Ariakit's remaining parts — `MenuBar` and the rest — stay available from
+ * `@ariakit/react` and unwrapped: an unstyled part arriving through this package
+ * would look like a system component and behave like an unfinished one. No count
+ * is given, because that number belongs to Ariakit and moves with it.
  */
 export function Menu<T extends ElementType = 'div'>({className, ...props}: MenuProps<T>): React.JSX.Element {
   return (

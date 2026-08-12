@@ -15,10 +15,11 @@ import {
  * Ariakit supplies roving focus, typeahead and focus return; Lattice supplies
  * the surface, which uses the `overlay` elevation role.
  *
- * Only the parts a real screen uses are wrapped. Ariakit's remaining menu parts
- * are available from `@ariakit/react` but are deliberately not re-exported: an
- * unstyled part arriving through this package would look like a system component
- * and behave like an unfinished one.
+ * A part is wrapped when leaving it out would push semantics onto the call site —
+ * which is why the checkable item and the group are here. Ariakit's remaining
+ * parts stay available from `@ariakit/react` and unwrapped: an unstyled part
+ * arriving through this package would look like a system component and behave
+ * like an unfinished one.
  */
 const meta = {
   title: 'Components/Menu',
