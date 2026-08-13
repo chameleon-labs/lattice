@@ -1,0 +1,15 @@
+/* The `overlay` elevation role, the same surface Menu and Dialog use. The
+   hairline is the edge that survives forced-colors; the shadow is enhancement. */
+.lat-tooltip {
+  max-inline-size: var(--lat-space-32);
+  padding: var(--lat-inset-row-sm);
+
+  font-family: var(--lat-text-caption-font-family);
+  font-size: var(--lat-text-caption-font-size);
+  line-height: var(--lat-text-caption-line-height);
+  color: var(--lat-text);
+  background: var(--lat-bg-raised);
+  border: 1px solid var(--lat-border);
+  border-radius: var(--lat-radius-none);
+  box-shadow: var(--lat-elevation-overlay);
+}

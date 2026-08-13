@@ -59,7 +59,7 @@ bundler that is not configured for CSS.
 
 ## Components
 
-Twenty-two families. Eight wrap Ariakit; fourteen are ours on tokens.
+Twenty-three families. Nine wrap Ariakit; fourteen are ours on tokens.
 
 | Component | Guarantee |
 |---|---|
@@ -72,6 +72,7 @@ Twenty-two families. Eight wrap Ariakit; fourteen are ours on tokens.
 | [`Disclosure`](./src/disclosure/README.md) | A real button carrying `aria-expanded` |
 | [`Tabs`](./src/tabs/README.md) | Roving focus, automatic activation, panels associated |
 | [`Menu`](./src/menu/README.md) | Typeahead and focus return, on the elevation Dialog shares with it |
+| [`Tooltip`](./src/tooltip/README.md) | Cannot become the accessible name; dismissable, hoverable and persistent. Its text is never announced, so nothing may live only in it |
 | [`Dialog`](./src/dialog/README.md) | Focus trapped and returned, scroll locked, named by its heading |
 | [`Card`](./src/card/README.md), `CardHeader`, `CardBody` | All three elevation signals; never `role="button"`. `CardHeader` carries the eyebrow label every panel needs; `CardBody` is the plain content slot |
 | [`Badge`](./src/badge/README.md) | Text is required, so colour is never the only signal. Six variants — `default`, `primary`, `info`, `success`, `danger`, `warning` — plus four severity levels — `critical`, `serious`, `moderate`, `minor` — that are their own variants rather than a mapping onto the six |
@@ -90,8 +91,7 @@ Every component makes a guarantee a consumer would otherwise have to remember.
 That is the admission test: `EmptyState` was requested and cut because it makes
 none.
 
-**Not here:** `EmptyState`, `Skeleton`, `Toast`, `Link`, `Tooltip`, `Select`,
-`Combobox`. `Skeleton` and `Toast` both need a continuous-motion and pausability
+**Not here:** `EmptyState`, `Skeleton`, `Toast`, `Link`, `Select`, `Combobox`. `Skeleton` and `Toast` both need a continuous-motion and pausability
 decision the current contract does not permit.
 
 ## The class names are an escape hatch
