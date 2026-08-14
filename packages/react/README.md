@@ -91,6 +91,14 @@ Every component makes a guarantee a consumer would otherwise have to remember.
 That is the admission test: `EmptyState` was requested and cut because it makes
 none.
 
+[`Tooltip`](./src/tooltip/README.md) passes on a technicality, and was nearly
+cut for it. Its text is never announced, so the constraint that matters —
+nothing may live only in a tooltip — is a rule a reader has to follow rather
+than something the component enforces. It ships because WCAG 1.4.13 is
+genuinely hard: content on hover or focus must be dismissable, hoverable and
+persistent, and a hand-rolled tooltip gets all three wrong. Solving that is
+worth one documented rule. It is not worth a second.
+
 **Not here:** `EmptyState`, `Skeleton`, `Toast`, `Link`, `Select`, `Combobox`. `Skeleton` and `Toast` both need a continuous-motion and pausability
 decision the current contract does not permit.
 
