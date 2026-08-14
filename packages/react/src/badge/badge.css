@@ -15,7 +15,12 @@
   line-height: var(--lat-text-tag-line-height);
   text-transform: var(--lat-text-tag-text-transform);
 
-  padding: var(--lat-space-0-5) var(--lat-space-2);
+  /* 20px on the nose — `--lat-space-5` — rather than whatever the tag role's
+     leading plus a padding rung happens to add up to. Border-box so the
+     hairline is inside that height. */
+  box-sizing: border-box;
+  block-size: var(--lat-space-5);
+  padding-inline: var(--lat-space-2);
   background: var(--_tint);
   border: 1px solid var(--_tint-border);
   border-radius: var(--lat-radius-none);
