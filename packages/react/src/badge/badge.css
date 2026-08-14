@@ -15,7 +15,7 @@
   line-height: var(--lat-text-tag-line-height);
   text-transform: var(--lat-text-tag-text-transform);
 
-  padding: 0 var(--lat-space-2);
+  padding: var(--lat-space-0-5) var(--lat-space-2);
   background: var(--_tint);
   border: 1px solid var(--_tint-border);
   border-radius: var(--lat-radius-none);
