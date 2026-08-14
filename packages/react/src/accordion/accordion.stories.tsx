@@ -67,3 +67,23 @@ export const AtAnotherHeadingLevel: Story = {
     </Accordion>
   ),
 };
+
+/** A panel long enough to overflow, so long-content layout and scrolling are reviewable. */
+export const LongPanel: Story = {
+  render: (args) => (
+    <div style={{maxBlockSize: '14rem', overflowY: 'auto'}}>
+      <Accordion {...args}>
+        <AccordionItem label="Colour contrast" defaultOpen>
+          {Array.from({length: 8}, (_, index) => (
+            <p key={index}>
+              Node {index + 1} renders #6a9b00 on #ebf0db and measures 2.85:1, against the 4.5:1 minimum for normal
+              text. The pair is documented in the contrast ledger, so this is an accepted deficiency rather than a new
+              defect — but it is listed here because a reader auditing the page still has to see it.
+            </p>
+          ))}
+        </AccordionItem>
+        <AccordionItem label="Landmarks">Two regions share a role and a name.</AccordionItem>
+      </Accordion>
+    </div>
+  ),
+};

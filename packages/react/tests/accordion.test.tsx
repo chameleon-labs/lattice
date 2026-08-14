@@ -1,4 +1,4 @@
-import {render, screen} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 import {userEvent} from '@testing-library/user-event';
 import {describe, expect, it} from 'vitest';
 import {Accordion, AccordionItem} from '../src/accordion/accordion.js';
@@ -67,6 +67,54 @@ describe('Accordion', () => {
 
     expect(screen.getByRole('button', {name: 'Colour contrast'}).getAttribute('aria-expanded')).toBe('false');
     expect(screen.getByRole('button', {name: 'Landmarks'}).getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('honours defaultOpen under single, which it used to drop', async () => {
+    render(
+      <Accordion headingLevel={3} single>
+        <AccordionItem label="Colour contrast">Thirteen nodes fail.</AccordionItem>
+        <AccordionItem label="Landmarks" defaultOpen>
+          Two regions share a name.
+        </AccordionItem>
+      </Accordion>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', {name: 'Landmarks'}).getAttribute('aria-expanded')).toBe('true');
+    });
+    expect(screen.getByRole('button', {name: 'Colour contrast'}).getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('gives the slot to the first claimant when several ask for it', async () => {
+    render(
+      <Accordion headingLevel={3} single>
+        <AccordionItem label="Colour contrast" defaultOpen>
+          Thirteen nodes fail.
+        </AccordionItem>
+        <AccordionItem label="Landmarks" defaultOpen>
+          Two regions share a name.
+        </AccordionItem>
+      </Accordion>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', {name: 'Colour contrast'}).getAttribute('aria-expanded')).toBe('true');
+    });
+    expect(screen.getByRole('button', {name: 'Landmarks'}).getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('forwards native props to both roots', () => {
+    const {container} = render(
+      <Accordion headingLevel={3} id="outline" data-testid="root">
+        <AccordionItem label="Colour contrast" data-testid="item">
+          Thirteen nodes fail.
+        </AccordionItem>
+      </Accordion>,
+    );
+
+    expect(container.querySelector('.lat-accordion')?.getAttribute('id')).toBe('outline');
+    expect(screen.getByTestId('root').className).toBe('lat-accordion');
+    expect(screen.getByTestId('item').className).toBe('lat-accordion__item');
   });
 
   it('refuses to render an item outside an Accordion', () => {

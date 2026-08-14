@@ -1,4 +1,4 @@
-import {createContext, useContext, useId, useMemo, useState, type ReactNode} from 'react';
+import {createContext, useContext, useEffect, useId, useMemo, useState, type ComponentPropsWithRef} from 'react';
 import {Disclosure, DisclosureContent, DisclosureProvider} from '../disclosure/disclosure.js';
 
 export type AccordionHeadingLevel = 2 | 3 | 4 | 5 | 6;
@@ -12,45 +12,66 @@ export interface AccordionOptions {
   headingLevel: AccordionHeadingLevel;
   /** Opening one panel closes the others. Off by default — collapsing a panel the reader opened is a surprise. */
   single?: boolean;
-  children: ReactNode;
-  className?: string;
 }
+
+export type AccordionProps = Omit<ComponentPropsWithRef<'div'>, 'children'> &
+  AccordionOptions & {children: React.ReactNode};
 
 interface AccordionContextValue {
   readonly headingLevel: AccordionHeadingLevel;
   readonly openId: string | undefined;
   readonly setOpenId: ((id: string | undefined) => void) | undefined;
+  readonly claimDefault: (id: string) => void;
 }
 
 const AccordionContext = createContext<AccordionContextValue | undefined>(undefined);
 
-export function Accordion({headingLevel, single = false, className, children}: AccordionOptions): React.JSX.Element {
+export function Accordion({
+  headingLevel,
+  single = false,
+  className,
+  children,
+  ...props
+}: AccordionProps): React.JSX.Element {
   const [openId, setOpenId] = useState<string | undefined>();
   const value = useMemo(
-    () => ({headingLevel, openId, setOpenId: single ? setOpenId : undefined}),
+    () => ({
+      headingLevel,
+      openId,
+      setOpenId: single ? setOpenId : undefined,
+      // First in DOM order wins: effects run in mount order, and `?? id` means
+      // a later claim finds the slot taken.
+      claimDefault: (id: string): void => {
+        setOpenId((previous) => previous ?? id);
+      },
+    }),
     [headingLevel, openId, single],
   );
 
   return (
     <AccordionContext.Provider value={value}>
-      <div className={className === undefined ? 'lat-accordion' : `lat-accordion ${className}`}>{children}</div>
+      <div {...props} className={className === undefined ? 'lat-accordion' : `lat-accordion ${className}`}>
+        {children}
+      </div>
     </AccordionContext.Provider>
   );
 }
 
-export interface AccordionItemProps {
+export interface AccordionItemOptions {
   /** The header's text. Rendered inside the heading, as the button's own label. */
-  label: ReactNode;
+  label: React.ReactNode;
   defaultOpen?: boolean;
-  children: ReactNode;
-  className?: string;
 }
+
+export type AccordionItemProps = Omit<ComponentPropsWithRef<'div'>, 'children'> &
+  AccordionItemOptions & {children: React.ReactNode};
 
 export function AccordionItem({
   label,
   defaultOpen = false,
   className,
   children,
+  ...props
 }: AccordionItemProps): React.JSX.Element {
   const context = useContext(AccordionContext);
 
@@ -59,8 +80,17 @@ export function AccordionItem({
   }
 
   const id = useId();
-  const {headingLevel, openId, setOpenId} = context;
+  const {headingLevel, openId, setOpenId, claimDefault} = context;
   const Heading = `h${headingLevel}` as 'h2';
+  const controlled = setOpenId !== undefined;
+
+  useEffect(() => {
+    if (controlled && defaultOpen) {
+      claimDefault(id);
+    }
+    // Mount only: `defaultOpen` is an initial state, not a binding.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const coordinated =
     setOpenId === undefined
@@ -74,7 +104,7 @@ export function AccordionItem({
 
   return (
     <DisclosureProvider {...coordinated}>
-      <div className={className === undefined ? 'lat-accordion__item' : `lat-accordion__item ${className}`}>
+      <div {...props} className={className === undefined ? 'lat-accordion__item' : `lat-accordion__item ${className}`}>
         {/* The button inside the heading, not the heading inside the button:
             a screen reader navigating by heading must land on the text. */}
         <Heading className="lat-accordion__heading">

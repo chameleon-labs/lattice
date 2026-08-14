@@ -33,6 +33,9 @@ navigating by heading lands on the text. `tests/browser/accordion.spec.ts`
 asserts the level through the accessibility tree rather than the tag, so an
 `<h5>` the browser exposed as a generic would fail.
 
+`defaultOpen` works under `single` too: the first item in DOM order that asks
+for it gets the slot, and later claimants find it taken.
+
 ## Independent by default
 
 `single` is off. Collapsing a panel the reader opened deliberately is a
