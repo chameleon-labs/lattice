@@ -27,6 +27,9 @@ export type {
 export {Tab, TabList, TabPanel, TabProvider} from './tabs/tabs.js';
 export type {TabListProps, TabPanelProps, TabProps, TabProviderProps} from './tabs/tabs.js';
 
+export {Tooltip, TooltipAnchor, TooltipProvider} from './tooltip/tooltip.js';
+export type {TooltipAnchorProps, TooltipProps, TooltipProviderProps} from './tooltip/tooltip.js';
+
 export {Dialog, DialogDisclosure, DialogDismiss, DialogHeading, DialogProvider} from './dialog/dialog.js';
 export type {
   DialogDisclosureOptions,
