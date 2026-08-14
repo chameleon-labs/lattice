@@ -1,0 +1,87 @@
+.lat-accordion {
+  display: flex;
+  flex-direction: column;
+}
+
+/* A rule between items, not around them: the set reads as one stack rather than
+   a column of separate cards. */
+.lat-accordion__item {
+  border-block-end: 1px solid var(--lat-border);
+}
+
+/* The heading carries no type role of its own. Its level is a document-outline
+   decision, and inheriting h2's display size would make an accordion header
+   read as a section title. */
+.lat-accordion__heading {
+  margin: 0;
+  font: inherit;
+}
+
+/* Full-width row, not the ghost button `.lat-disclosure` draws — the trigger is
+   rendered `bare` so that chrome never lands here to be fought. */
+.lat-accordion__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lat-gap-sm);
+  inline-size: 100%;
+
+  padding: var(--lat-inset-row-md);
+
+  font-family: var(--lat-text-ui-strong-font-family);
+  font-size: var(--lat-text-ui-strong-font-size);
+  font-weight: var(--lat-text-ui-strong-font-weight);
+  line-height: var(--lat-text-ui-strong-line-height);
+  color: var(--lat-text);
+  text-align: start;
+
+  background: transparent;
+  border: none;
+  border-radius: var(--lat-radius-none);
+  cursor: pointer;
+
+  transition-property: background-color, color;
+  transition-duration: var(--lat-duration-default);
+  transition-timing-function: var(--lat-easing-out);
+}
+
+.lat-accordion__trigger:hover {
+  background: var(--lat-wash);
+}
+
+.lat-accordion__trigger:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--lat-focus-ring);
+}
+
+@media (forced-colors: active) {
+  .lat-accordion__trigger:focus-visible {
+    outline: 2px solid CanvasText;
+    outline-offset: -2px;
+  }
+}
+
+/* Drawn, not an icon: this package ships no glyphs, and `currentColor` keeps the
+   chevron visible under forced-colors. */
+.lat-accordion__trigger::after {
+  content: '';
+  flex: none;
+  inline-size: 0.45em;
+  block-size: 0.45em;
+  border-inline-end: 2px solid currentColor;
+  border-block-end: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.lat-accordion__trigger[aria-expanded='true']::after {
+  transform: rotate(225deg);
+}
+
+.lat-accordion__panel {
+  padding-inline: var(--lat-space-4);
+  padding-block-end: var(--lat-space-4);
+  font-family: var(--lat-text-body-font-family);
+  font-size: var(--lat-text-body-font-size);
+  line-height: var(--lat-text-body-line-height);
+  color: var(--lat-text-subtle);
+}
