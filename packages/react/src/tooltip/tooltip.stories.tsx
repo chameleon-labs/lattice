@@ -11,11 +11,14 @@ const InfoIcon = (): React.JSX.Element => (
 );
 
 /**
- * A tooltip describes; it never names. The trigger carries its own accessible
- * name, and the tooltip arrives as `aria-describedby`.
+ * A tooltip never names. The trigger carries its own accessible name, and the
+ * tooltip adds nothing to the accessibility tree — Ariakit associates it with
+ * neither `aria-labelledby` nor `aria-describedby`, so its text is not
+ * announced at all.
  *
- * Nothing may live only in a tooltip: there is no hover on touch and no press
- * affordance, so anything said here has to be available elsewhere too.
+ * Nothing may live only in a tooltip: no hover on touch, no press affordance,
+ * and not announced. Anything said here has to be available elsewhere too. See
+ * the component README.
  */
 const meta = {
   title: 'Components/Tooltip',

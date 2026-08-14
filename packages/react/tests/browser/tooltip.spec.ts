@@ -15,20 +15,26 @@ test('never becomes the name, and never claims to be announced', async ({page}) 
   }));
 
   // The trigger's own name survives, and the tooltip supplies neither name nor
-  // description — see ./README.md on why the text has to exist elsewhere too.
+  // description — see src/tooltip/README.md for why the text must exist elsewhere.
   expect(wiring.name).toBe('Copy page URL');
   expect(wiring.labelledby).toBeNull();
   expect(wiring.describedby).toBeNull();
 });
 
 // WCAG 1.4.13, all three parts.
-test('dismisses on Escape without moving the pointer', async ({page}) => {
+test('dismisses on Escape while the pointer stays put', async ({page}) => {
   await page.goto(story('default'));
-  await page.getByRole('button', {name: 'Re-run audit'}).focus();
+  // Opened by hover, because 1.4.13 is about content shown on hover: dismissing
+  // it by moving the mouse away is exactly what the criterion forbids relying on.
+  await page.getByRole('button', {name: 'Re-run audit'}).hover();
   await expect(page.getByRole('tooltip')).toBeVisible();
 
   await page.keyboard.press('Escape');
 
+  await expect(page.getByRole('tooltip')).toHaveCount(0);
+
+  // Still hovered, so a tooltip that reopened on its own would fail here.
+  await page.waitForTimeout(500);
   await expect(page.getByRole('tooltip')).toHaveCount(0);
 });
 
