@@ -76,7 +76,7 @@ Twenty-four families. Nine wrap Ariakit; fifteen are ours on tokens.
 | [`Tooltip`](./src/tooltip/README.md) | Cannot become the accessible name; dismissable, hoverable and persistent. Its text is never announced, so nothing may live only in it |
 | [`Dialog`](./src/dialog/README.md) | Focus trapped and returned, scroll locked, named by its heading |
 | [`Card`](./src/card/README.md), `CardHeader`, `CardBody` | All three elevation signals; never `role="button"`. `CardHeader` carries the eyebrow label every panel needs; `CardBody` is the plain content slot |
-| [`Badge`](./src/badge/README.md) | Text is required, so colour is never the only signal. Six variants — `default`, `primary`, `info`, `success`, `danger`, `warning` — plus four severity levels — `critical`, `serious`, `moderate`, `minor` — that are their own variants rather than a mapping onto the six |
+| [`Badge`](./src/badge/README.md) | Text is required, so colour is never the only signal — and the label is never tinted, because at 10px that pairing did not reach 4.5:1. Six variants — `default`, `primary`, `info`, `success`, `danger`, `warning` — plus four severity levels — `critical`, `serious`, `moderate`, `minor` — that are their own variants rather than a mapping onto the six |
 | [`Callout`](./src/callout/README.md) | No live role by default. Four required variants — `info`, `success`, `warning`, `danger` — there is no neutral case to default to |
 | [`Table`](./src/table/README.md) | Caption and scope required by the type |
 | [`LiveRegion`](./src/live-region/README.md) | Never re-announces an unchanged message |
