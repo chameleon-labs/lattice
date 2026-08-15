@@ -51,19 +51,17 @@ jobs:
   release:
     runs-on: ubuntu-latest
 
-    # The one place a token that can publish under @chameleon-labs is used, so
-    # NPM_TOKEN belongs to this environment rather than to the repository at
-    # large: a secret scoped here cannot be read by any other workflow. Add
-    # required reviewers to it in Settings → Environments to make every release
-    # need a second pair of eyes; the workflow needs no change for that.
+    # Named in each package's trusted publisher config, so this is part of what
+    # npm checks before exchanging the OIDC token — a job in another environment
+    # is refused even from this workflow. Add required reviewers here to make
+    # every release need a second pair of eyes; the workflow needs no change.
     # Only `v*` tags may deploy to it, so a manual re-run is dispatched from the
     # tag rather than from a branch.
     environment: npm-publish
 
     permissions:
-      # `npm publish --provenance` mints a signed attestation from a Sigstore
-      # OIDC token. Without this the publish fails outright rather than quietly
-      # shipping an unattested package.
+      # The OIDC token trusted publishing exchanges for a registry credential,
+      # and what the automatic provenance attestation is signed against.
       id-token: write
       # Creating the GitHub Release at the end.
       contents: write
@@ -85,9 +83,9 @@ jobs:
         with:
           node-version-file: package.json
           cache: pnpm
-          # Writes the .npmrc that resolves NODE_AUTH_TOKEN at publish time.
-          # npm does the publishing here, not pnpm: pnpm 10.7 has no
-          # --provenance flag, and provenance is a requirement of this release.
+          # Writes the .npmrc naming the registry npm publishes against. npm
+          # does the publishing here, not pnpm: pnpm 10.7 cannot do trusted
+          # publishing, and an unattested package is not a release.
           registry-url: 'https://registry.npmjs.org'
 
       # A prerelease must not become `latest`, or `npm i @chameleon-labs/…`
@@ -157,9 +155,11 @@ jobs:
       # Tokens first: the React package's peer range names a token version, and
       # a consumer installing react in the window between the two publishes
       # should find a resolvable peer rather than a 404.
+      # No registry credential in this job. npm exchanges the OIDC token GitHub
+      # mints for it against the trusted publisher configured on each package —
+      # chameleon-labs/lattice, release.yml, environment npm-publish. All four
+      # have to match or the exchange is refused.
       - name: Publish to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
           for name in lattice-tokens lattice-react; do
@@ -180,7 +180,8 @@ jobs:
             fi
 
             echo "publishing ${tarball} under dist-tag '${DIST_TAG}'"
-            npm publish "${tarball}" --provenance --access public --tag "${DIST_TAG}"
+            # No --provenance: trusted publishing attests automatically.
+            npm publish "${tarball}" --access public --tag "${DIST_TAG}"
           done
 
       # The exit code is not the evidence. A publish that skips a private
