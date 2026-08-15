@@ -17,6 +17,7 @@ import {createReadStream} from 'node:fs';
 import {stat} from 'node:fs/promises';
 import {createServer} from 'node:http';
 import {extname, join, normalize, resolve, sep} from 'node:path';
+import {fileURLToPath} from 'node:url';
 
 const TYPES = new Map(
   Object.entries({
@@ -147,7 +148,13 @@ async function selfTest() {
   console.log('serve-static: 7 checks passed');
 }
 
-if (process.argv[2] === '--self-test') {
+// Only when run directly. Importing this file — a benchmark, a test — must not
+// start a server or exit the process.
+const runDirectly = process.argv[1] !== undefined && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (!runDirectly) {
+  // nothing
+} else if (process.argv[2] === '--self-test') {
   await selfTest();
 } else {
   const [, , directoryArgument, portArgument] = process.argv;
