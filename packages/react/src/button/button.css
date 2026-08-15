@@ -7,6 +7,7 @@
   font-family: var(--lat-text-ui-font-family);
   font-size: var(--lat-text-ui-font-size);
   line-height: var(--lat-text-ui-line-height);
+  white-space: nowrap;
 
   border: 1px solid transparent;
   border-radius: var(--lat-radius-none);
