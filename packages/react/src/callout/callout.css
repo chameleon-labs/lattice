@@ -61,9 +61,9 @@
   color: var(--lat-text);
 }
 
-/* Body text reads at full-strength --lat-text, not the accent colour that
-   --_text carries for the icon: a long message stays readable, unlike
-   Badge's short label, which can afford the accent hue at 10px. */
+/* Body text reads at full-strength --lat-text, not the colour --_text carries
+   for the icon. Badge no longer tints its label either — at 10px that pairing
+   measured 2.01-3.98:1 in light mode. See #96. */
 .lat-callout__body {
   font-family: var(--lat-text-body-font-family);
   font-size: var(--lat-text-body-font-size);

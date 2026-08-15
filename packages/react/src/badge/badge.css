@@ -1,9 +1,11 @@
 .lat-badge {
-  /* Every variant is the tinted triple; only the three custom properties
-     below change. A new variant is three declarations. */
+  /* Every variant is a tint and a border; the text is the same colour in all of
+     them. A new variant is two declarations.
+
+     The label is not tinted: at 10px the tinted triple measured 2.01-3.98:1 in
+     light mode, and colour still reads from the tint and the border. See #96. */
   --_tint: var(--lat-wash);
   --_tint-border: var(--lat-border);
-  --_text: var(--lat-text-subtle);
 
   display: inline-flex;
   align-items: center;
@@ -24,33 +26,28 @@
   background: var(--_tint);
   border: 1px solid var(--_tint-border);
   border-radius: var(--lat-radius-none);
-  color: var(--_text);
+  color: var(--lat-text);
 }
 
 .lat-badge[data-variant='primary'] {
   --_tint: var(--lat-accent-tint);
   --_tint-border: var(--lat-accent-tint-border);
-  --_text: var(--lat-text-accent);
 }
 .lat-badge[data-variant='info'] {
   --_tint: var(--lat-info-tint);
   --_tint-border: var(--lat-info-tint-border);
-  --_text: var(--lat-info-solid);
 }
 .lat-badge[data-variant='success'] {
   --_tint: var(--lat-success-tint);
   --_tint-border: var(--lat-success-tint-border);
-  --_text: var(--lat-success-solid);
 }
 .lat-badge[data-variant='danger'] {
   --_tint: var(--lat-danger-tint);
   --_tint-border: var(--lat-danger-tint-border);
-  --_text: var(--lat-danger-solid);
 }
 .lat-badge[data-variant='warning'] {
   --_tint: var(--lat-warning-tint);
   --_tint-border: var(--lat-warning-tint-border);
-  --_text: var(--lat-warning-solid);
 }
 
 /* The severity ramp. Its own tint tokens, not a chromatic scale's — there is
@@ -62,20 +59,16 @@
 .lat-badge[data-variant='critical'] {
   --_tint: var(--lat-severity-critical-tint);
   --_tint-border: var(--lat-severity-critical-tint-border);
-  --_text: var(--lat-severity-critical);
 }
 .lat-badge[data-variant='serious'] {
   --_tint: var(--lat-severity-serious-tint);
   --_tint-border: var(--lat-severity-serious-tint-border);
-  --_text: var(--lat-severity-serious);
 }
 .lat-badge[data-variant='moderate'] {
   --_tint: var(--lat-severity-moderate-tint);
   --_tint-border: var(--lat-severity-moderate-tint-border);
-  --_text: var(--lat-severity-moderate);
 }
 .lat-badge[data-variant='minor'] {
   --_tint: var(--lat-severity-minor-tint);
   --_tint-border: var(--lat-severity-minor-tint-border);
-  --_text: var(--lat-severity-minor);
 }

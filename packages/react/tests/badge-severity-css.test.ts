@@ -55,7 +55,8 @@ describe("Badge's severity variant blocks", () => {
 
     expect(block).toContain(`--_tint: var(--lat-severity-${level}-tint);`);
     expect(block).toContain(`--_tint-border: var(--lat-severity-${level}-tint-border);`);
-    expect(block).toContain(`--_text: var(--lat-severity-${level});`);
+    // No --_text: since #96 every badge label is --lat-text. The tint and the
+    // border still identify the scale, which is what this file guards.
 
     // The negative half is the important half — this is the exact shape
     // the regression took: every token above being individually declared
