@@ -10,6 +10,11 @@ import {defineConfig} from '@playwright/test';
 // fourteen components would make the suite slow enough to stop being run.
 export default defineConfig({
   testDir: './tests/browser',
+  // Without this, tests inside one file share a worker, and a11y.spec.ts is one
+  // file holding a test per component per theme — so the whole sweep ran on a
+  // single core while the other files finished in seconds. Every test opens its
+  // own page and asserts on its own story; none of them share state.
+  fullyParallel: true,
   reporter: 'line',
   // Raised from the 30s default. Each family test navigates once per story, and
   // Storybook's dev server compiles a story's module the first time it is asked
