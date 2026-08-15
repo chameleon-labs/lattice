@@ -83,10 +83,12 @@ jobs:
         with:
           node-version-file: package.json
           cache: pnpm
-          # Writes the .npmrc naming the registry npm publishes against. npm
-          # does the publishing here, not pnpm: pnpm 10.7 cannot do trusted
-          # publishing, and an unattested package is not a release.
-          registry-url: 'https://registry.npmjs.org'
+          # No `registry-url`. It writes an .npmrc carrying
+          # `_authToken=${NODE_AUTH_TOKEN}`, and with no token supplied setup-node
+          # fills in its own placeholder — so npm authenticates with a dud string
+          # instead of falling back to OIDC, and the publish 404s. The default
+          # registry is registry.npmjs.org anyway, and each package's
+          # publishConfig carries its access.
 
       # A prerelease must not become `latest`, or `npm i @chameleon-labs/…`
       # hands every consumer an RC. npm tags whatever it publishes `latest`
@@ -155,6 +157,9 @@ jobs:
       # Tokens first: the React package's peer range names a token version, and
       # a consumer installing react in the window between the two publishes
       # should find a resolvable peer rather than a 404.
+      # npm does the publishing, not pnpm: pnpm 10.7 cannot do trusted
+      # publishing, and an unattested package is not a release.
+      #
       # No registry credential in this job. npm exchanges the OIDC token GitHub
       # mints for it against the trusted publisher configured on each package —
       # chameleon-labs/lattice, release.yml, environment npm-publish. All four
