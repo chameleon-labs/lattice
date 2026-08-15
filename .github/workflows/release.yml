@@ -186,7 +186,11 @@ jobs:
 
             echo "publishing ${tarball} under dist-tag '${DIST_TAG}'"
             # No --provenance: trusted publishing attests automatically.
-            npm publish "${tarball}" --access public --tag "${DIST_TAG}"
+            # --loglevel verbose because npm's OIDC exchange is written never to
+            # throw: every way it can bail returns quietly, and the publish then
+            # fails as ENEEDAUTH with nothing saying why. The registry's own
+            # rejection reason only appears at this level.
+            npm publish "${tarball}" --access public --tag "${DIST_TAG}" --loglevel verbose
           done
 
       # The exit code is not the evidence. A publish that skips a private
