@@ -16,10 +16,10 @@ export default defineConfig({
   // own page and asserts on its own story; none of them share state.
   fullyParallel: true,
   reporter: 'line',
-  // Raised from the 30s default. Each family test navigates once per story, and
-  // Storybook's dev server compiles a story's module the first time it is asked
-  // for — so the opening navigations are slow, and slower still with every
-  // worker asking at once. The tests themselves are not slow; the first visit is.
+  // Raised from the 30s default when the suite ran against a dev server that
+  // compiled each story on first request. That cost is gone with the static
+  // build, so this is headroom now rather than necessity — worth lowering, but
+  // on a measurement of per-test duration rather than on a guess.
   timeout: 90_000,
   // Nothing here is retried locally: a failure on a laptop should be looked at,
   // not re-rolled until it passes, and a flaky assertion hidden by a retry is
@@ -36,16 +36,23 @@ export default defineConfig({
     baseURL: 'http://localhost:6006',
   },
   webServer: {
-    command: 'pnpm exec storybook dev -p 6006 --no-open --quiet',
+    // Built, not compiled on demand. `storybook dev` compiles each story the
+    // first time it is asked for, which is what the suite spent its time on and
+    // why adding workers made it slower (#105).
+    command: 'pnpm build-storybook && node ../../scripts/serve-static.mjs storybook-static 6006',
     // Readiness is measured against the story index rather than against the
     // root, because that is what the sweep reads. A server that has bound its
     // port but has not finished indexing would serve the tests an empty list,
     // and every loop over it would pass vacuously.
     url: 'http://localhost:6006/index.json',
-    // A cold Storybook boot exceeds Playwright's 60s default on CI.
     timeout: 180_000,
-    reuseExistingServer: process.env.CI === undefined,
+    // Never reused. A static build does not track source, so a server left
+    // running from an earlier run would serve stale stories and the suite would
+    // pass against code that no longer exists. Playwright rebuilds every run,
+    // which costs seconds and removes the whole failure mode.
+    reuseExistingServer: false,
   },
+
   projects: [
     {
       name: 'firefox-default-16',
