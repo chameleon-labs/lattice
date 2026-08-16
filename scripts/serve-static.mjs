@@ -127,7 +127,9 @@ async function selfTest() {
   await mkdir(join(root, 'empty'));
 
   const server = createStaticServer(root);
-  await new Promise((done) => server.listen(0, done));
+  await new Promise((done) => {
+    server.listen(0, done);
+  });
   const {port} = server.address();
   const get = async (path) => {
     const response = await fetch(`http://localhost:${port}${path}`);
@@ -144,7 +146,9 @@ async function selfTest() {
   // Still listening: the point of the three above is that none of them killed it.
   assert.equal(await get('/'), 200, 'the server survived all of them');
 
-  await new Promise((done) => server.close(done));
+  await new Promise((done) => {
+    server.close(done);
+  });
   console.log('serve-static: 7 checks passed');
 }
 
