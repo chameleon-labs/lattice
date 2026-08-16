@@ -174,6 +174,16 @@ function forMode(mode: Mode): LedgerEntry[] {
   return [
     entry(`${mode} text on bg`, parseHex(gray.text), bg, 4.5),
     entry(`${mode} text-subtle on bg-raised`, parseHex(gray['text-subtle']), raised, 4.5),
+    // The page, not a card. Muted metadata — timestamps, counts, captions —
+    // mostly sits directly on `bg`, so this is the commoner pairing of the two
+    // and it was the unmeasured one.
+    entry(`${mode} text-subtle on bg`, parseHex(gray['text-subtle']), bg, 4.5),
+    // Identical to the row above by construction: severity's `minor` carries no
+    // colour of its own and aliases `text-subtle`. Measured anyway, because a
+    // component reaching for the severity token produces this pair and a reader
+    // checking the ledger for it should find it, the same way `critical` and
+    // `serious` duplicate `danger` and `warning`.
+    entry(`${mode} severity minor on bg`, parseHex(gray['text-subtle']), bg, 4.5),
     entry(`${mode} text on component`, parseHex(gray.text), parseHex(gray.component), 4.5),
     entry(`${mode} on-solid on solid`, onSolid, solid, 4.5),
     entry(`${mode} accent as text on bg`, accentText, bg, 4.5),
