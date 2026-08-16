@@ -41,7 +41,7 @@ Systems that skip the semantic tier end up unable to add a second theme without 
 
 ### Accepted contrast failures
 
-Reported, not hidden, and not fixed by nudging a Lattice value — the values are the identity. **Twelve documented pairs fail AA**, by explicit approved decision. Reproduce these with `pnpm --filter @chameleon-labs/lattice-tokens build`; the full ledger, including how the count was twice corrected upward as more of the palette was measured, is in [the design spec's §9](./docs/superpowers/specs/2026-08-03-lattice-identity-design.md#9-the-contrast-ledger).
+Reported, not hidden, and not fixed by nudging a Lattice value — the values are the identity. **Fourteen documented pairs fail AA**, by explicit approved decision. Reproduce these with `pnpm --filter @chameleon-labs/lattice-tokens build`; the full ledger, including how the count was twice corrected upward as more of the palette was measured, is in [the design spec's §9](./docs/superpowers/specs/2026-08-03-lattice-identity-design.md#9-the-contrast-ledger).
 
 | pair | ratio | needs |
 | --- | --- | --- |
@@ -54,13 +54,19 @@ Reported, not hidden, and not fixed by nudging a Lattice value — the values ar
 | light success text on its own tint | 3.34:1 | 4.5:1 |
 | light info text on its own tint | 3.61:1 | 4.5:1 |
 | dark `text-subtle` on `bg-raised` | 3.67:1 | 4.5:1 |
+| dark `text-subtle` on `bg` | 3.83:1 | 4.5:1 |
+| dark severity minor on `bg` | 3.83:1 | 4.5:1 |
 | dark severity minor text on its own tint | 3.27:1 | 4.5:1 |
 | light danger text on its own tint | 4.49:1 | 4.5:1 |
 | light danger severity text on its own tint | 4.49:1 | 4.5:1 |
 
 The light-mode focus ring is the most serious of these: a focus indicator a keyboard user cannot see is not a cosmetic miss, it is a loss of orientation. It ships as delivered because the Figma bundle's own components focus at `ring-primary/40`, and a token nobody reaches for guarantees nothing.
 
-The severity ramp's `critical` and `serious` levels are anchored to the same colours as `danger` and `warning`, so their rows above duplicate them by construction rather than being independent failures — `moderate` and `minor` do not duplicate anything and are the two failures added when the count was corrected from nine to thirteen. The primary button label left the list on 2026-08-09 (issue #76), taking it to twelve.
+The severity ramp's `critical` and `serious` levels are anchored to the same colours as `danger` and `warning`, so their rows above duplicate them by construction rather than being independent failures — `moderate` does not duplicate anything and was one of the two failures added when the count was corrected from nine to thirteen.
+
+`minor` is the other, and it duplicates in the same way `critical` and `serious` do: it carries no colour of its own and aliases `--lat-text-subtle`, so its `on bg` row is the same pair as the grey one above it.
+
+The primary button label left the list on 2026-08-09 (issue #76), taking it to twelve. Measuring `text-subtle` against `bg` — the page, where most muted metadata sits, and where it is slightly worse than on a card — added two on 2026-08-16 (issue #108), taking it to fourteen.
 
 **Anything outside these twelve is a real defect, not an accepted one.** The `Pages/System` and `Pages/Landing` Storybook stories — see [Development](#development) — are the acceptance test that checks for exactly that distinction: both bundle pages rebuilt from this package's public components alone, swept by the same axe-core suite. See [`docs/superpowers/plans/2026-08-03-lattice-gaps.md`](./docs/superpowers/plans/2026-08-03-lattice-gaps.md) for the full triage of every axe finding against this ledger, the resulting library gap list, and the deliberate omissions (`ScoreArc`, the score-history chart, the untouched shadcn components).
 

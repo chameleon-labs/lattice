@@ -6,7 +6,7 @@ import {parseHex} from '../generate/oklch.js';
 import {buildLedger, over} from '../generate/report.js';
 
 describe('contrast ledger', () => {
-  it('records exactly the twenty known failures, in emission order', () => {
+  it('records exactly the twenty-two known failures, in emission order', () => {
     // Thirteen of these are the design's original documented set (§9). Nine
     // more join here, added 2026-08-04 alongside `tintsOnBg` /
     // `severityColouredOnBg`: every tinted triple is translucent (see
@@ -27,6 +27,11 @@ describe('contrast ledger', () => {
     // Twenty-two became twenty-one on 2026-08-04 when issue #47 anchored the
     // focus ring and `light focus ring on bg-raised` started passing. It is the
     // first row to leave this list by being fixed rather than re-measured.
+    //
+    // Twenty became twenty-two on 2026-08-16 (issue #108): `text-subtle` had
+    // only ever been measured against `bg-raised`, and it is worse on `bg` —
+    // the surface most muted metadata actually sits on. `severity minor on bg`
+    // is the same pair by construction, since that level aliases the token.
     //
     // Twenty-one became twenty on 2026-08-09 (issue #76): the accent fills with
     // the one chartreuse in both modes and carries dark ink, so
@@ -56,6 +61,8 @@ describe('contrast ledger', () => {
       'light severity serious text on its tint over bg',
       'light severity moderate text on its tint over bg',
       'dark text-subtle on bg-raised',
+      'dark text-subtle on bg',
+      'dark severity minor on bg',
       'dark severity minor text on its tint',
     ]);
   });
