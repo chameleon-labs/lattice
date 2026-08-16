@@ -55,6 +55,15 @@ jobs:
       - name: Typecheck
         run: pnpm -r typecheck
 
+      # The file server the browser suite runs against. Its failure modes end
+      # the process rather than returning a status, so a bad request would take
+      # the whole suite with it — checked before anything depends on it.
+      - name: Check the static server
+        run: node scripts/serve-static.mjs --self-test
+
+      # This builds Storybook: the browser suite serves the production build
+      # rather than a dev server, so a Storybook that stopped building fails
+      # here instead of on the day someone tried to publish it.
       - name: Test
         run: pnpm -r test
 
@@ -64,12 +73,6 @@ jobs:
       - name: Build
         run: pnpm -r build
 
-      # The browser tests run Storybook in dev mode, which tolerates things the
-      # production build does not. Nothing is deployed yet, so without this step
-      # a Storybook that had stopped building would go unnoticed until the day
-      # someone tried to publish it.
-      - name: Build Storybook
-        run: pnpm build-storybook
 
       # Release preconditions are checked on every PR, not only at release. A
       # package still marked `private`, an `exports` entry pointing outside
